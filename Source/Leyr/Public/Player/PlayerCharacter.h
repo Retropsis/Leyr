@@ -27,13 +27,13 @@ public:
 	void RotateController() const;
 
 protected:
+	virtual void InitAbilityActorInfo() override;
+	
 	bool bAirborne = false;
 	bool bIsAccelerating = false;
 	bool bIsMoving = false;
 
-private:
-	void InitAbilityActorInfo();
-	
+private:	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USpringArmComponent> SpringArm;
 	

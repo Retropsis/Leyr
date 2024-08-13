@@ -27,6 +27,8 @@ public:
 	void ChangeDirections();
 
 protected:
+	virtual void InitAbilityActorInfo() {}
+	
 	/*
 	 * Ability System
 	 */
@@ -36,7 +38,7 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
 	
-private:
+private:	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PaperZD", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UPaperZDAnimationComponent> AnimationComponent;
 };
