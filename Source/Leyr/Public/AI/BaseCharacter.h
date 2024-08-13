@@ -6,8 +6,10 @@
 #include "PaperCharacter.h"
 #include "PaperZD/Public/PaperZDAnimationComponent.h"
 #include "AbilitySystemInterface.h"
+#include "Interaction/CombatInterface.h"
 #include "BaseCharacter.generated.h"
 
+class UGameplayEffect;
 class UAttributeSet;
 class UAbilitySystemComponent;
 
@@ -15,7 +17,7 @@ class UAbilitySystemComponent;
  * 
  */
 UCLASS()
-class LEYR_API ABaseCharacter : public APaperCharacter, public IAbilitySystemInterface
+class LEYR_API ABaseCharacter : public APaperCharacter, public IAbilitySystemInterface, public ICombatInterface
 {
 	GENERATED_BODY()
 
@@ -27,11 +29,22 @@ public:
 	void ChangeDirections();
 
 protected:
-	virtual void InitAbilityActorInfo() {}
-	
 	/*
 	 * Ability System
 	 */
+	virtual void InitAbilityActorInfo() {}
+	void InitializeDefaultAttributes() const;
+	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, float Level) const;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
+	
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
+
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 

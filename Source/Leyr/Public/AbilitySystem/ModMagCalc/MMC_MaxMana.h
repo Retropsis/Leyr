@@ -1,0 +1,24 @@
+// @ Retropsis 2024-2025.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameplayModMagnitudeCalculation.h"
+#include "MMC_MaxMana.generated.h"
+
+/**
+ * 
+ */
+UCLASS()
+class LEYR_API UMMC_MaxMana : public UGameplayModMagnitudeCalculation
+{
+	GENERATED_BODY()
+	
+public:
+	UMMC_MaxMana();
+	virtual float CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const override;
+
+private:
+	FGameplayEffectAttributeCaptureDefinition IntelligenceDef;
+	FGameplayEffectAttributeCaptureDefinition WisdomDef;
+};

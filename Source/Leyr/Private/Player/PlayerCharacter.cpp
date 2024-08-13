@@ -56,6 +56,7 @@ void APlayerCharacter::InitAbilityActorInfo()
 			PlayerHUD->InitOverlay(PlayerCharacterController, PlayerCharacterState, AbilitySystemComponent, AttributeSet);
 		}
 	}
+	InitializeDefaultAttributes();
 }
 
 void APlayerCharacter::Move(const float ScaleValue)
@@ -74,4 +75,14 @@ void APlayerCharacter::RotateController() const
 	{
 		GetController()->SetControlRotation(FRotator(0.f, 180.f, 0.f));
 	}
+}
+
+/*
+ * Combat Interface
+ */
+int32 APlayerCharacter::GetCharacterLevel()
+{
+	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	return PlayerCharacterState->GetCharacterLevel();
 }

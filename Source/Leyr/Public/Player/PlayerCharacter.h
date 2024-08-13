@@ -25,6 +25,10 @@ public:
 	
 	void Move(float ScaleValue);
 	void RotateController() const;
+	
+	/** Combat Interface */
+	virtual int32 GetCharacterLevel() override;
+	/** end Combat Interface */
 
 protected:
 	virtual void InitAbilityActorInfo() override;

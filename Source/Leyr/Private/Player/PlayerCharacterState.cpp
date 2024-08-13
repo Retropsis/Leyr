@@ -3,6 +3,7 @@
 #include "Player/PlayerCharacterState.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
+#include "Net/UnrealNetwork.h"
 
 APlayerCharacterState::APlayerCharacterState()
 {
@@ -15,10 +16,21 @@ APlayerCharacterState::APlayerCharacterState()
 	AttributeSet = CreateDefaultSubobject<UBaseAttributeSet>("AttributeSet");
 }
 
+void APlayerCharacterState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+	DOREPLIFETIME(APlayerCharacterState, Level);
+}
+
 /*
  * Ability System
  */
 UAbilitySystemComponent* APlayerCharacterState::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
+}
+
+void APlayerCharacterState::OnRep_Level(int32 OldLevel)
+{
 }

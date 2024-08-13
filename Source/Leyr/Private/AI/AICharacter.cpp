@@ -24,3 +24,7 @@ void AAICharacter::InitAbilityActorInfo()
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
 }
+
+/*
+ * Combat Interface
+ */
