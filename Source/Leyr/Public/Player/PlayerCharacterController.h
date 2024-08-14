@@ -7,6 +7,8 @@
 #include "InputActionValue.h"
 #include "PlayerCharacterController.generated.h"
 
+class UBaseAbilitySystemComponent;
+struct FGameplayTag;
 class APlayerCharacter;
 class UInputAction;
 class UInputConfig;
@@ -80,7 +82,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
-	void CursorTrace();
 	
 	void Move(const FInputActionValue& Value);
 	void Jump();
@@ -97,4 +98,17 @@ protected:
 private:
 	UPROPERTY()
 	TObjectPtr<APlayerCharacter> PlayerCharacter;
+	
+	void CursorTrace();
+	void AbilityInputTagPressed(FGameplayTag InputTag);
+	void AbilityInputTagReleased(FGameplayTag InputTag);
+	void AbilityInputTagHeld(FGameplayTag InputTag);
+
+	UPROPERTY(EditDefaultsOnly, Category="Input")
+	TObjectPtr<UInputConfig> InputConfig;
+
+	UPROPERTY()
+	TObjectPtr<UBaseAbilitySystemComponent> BaseAbilitySystemComponent;
+
+	UBaseAbilitySystemComponent* GetASC();
 };

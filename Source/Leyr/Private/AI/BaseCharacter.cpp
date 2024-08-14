@@ -3,6 +3,7 @@
 #include "AI/BaseCharacter.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectTypes.h"
+#include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -31,6 +32,14 @@ void ABaseCharacter::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& Gamep
 	ContextHandle.AddSourceObject(this);
 	const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GameplayEffectClass, Level, ContextHandle);
 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
+}
+
+void ABaseCharacter::AddCharacterAbilities() const
+{
+	UBaseAbilitySystemComponent* BaseASC = CastChecked<UBaseAbilitySystemComponent>(AbilitySystemComponent);
+	if (!HasAuthority()) return;
+
+	BaseASC->AddCharacterAbilities(StartupAbilities);
 }
 
 UAbilitySystemComponent* ABaseCharacter::GetAbilitySystemComponent() const

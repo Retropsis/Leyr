@@ -1,6 +1,8 @@
 // @ Retropsis 2024-2025.
 
 #include "UI/PlayerHUD.h"
+
+#include "UI/Controller/AttributeMenuWidgetController.h"
 #include "UI/Controller/OverlayWidgetController.h"
 #include "UI/Widget/BaseUserWidget.h"
 
@@ -13,6 +15,17 @@ UOverlayWidgetController* APlayerHUD::GetOverlayWidgetController(const FWidgetCo
 		OverlayWidgetController->BindCallbacksToDependencies();
 	}
 	return OverlayWidgetController;
+}
+
+UAttributeMenuWidgetController* APlayerHUD::GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams)
+{
+	if (AttributeMenuWidgetController == nullptr)
+	{
+		AttributeMenuWidgetController = NewObject<UAttributeMenuWidgetController>(this, AttributeMenuWidgetControllerClass);
+		AttributeMenuWidgetController->SetWidgetControllerParams(WCParams);
+		AttributeMenuWidgetController->BindCallbacksToDependencies();
+	}
+	return AttributeMenuWidgetController;
 }
 
 void APlayerHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS)

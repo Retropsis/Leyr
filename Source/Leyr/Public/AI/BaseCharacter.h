@@ -9,6 +9,7 @@
 #include "Interaction/CombatInterface.h"
 #include "BaseCharacter.generated.h"
 
+class UGameplayAbility;
 class UGameplayEffect;
 class UAttributeSet;
 class UAbilitySystemComponent;
@@ -35,14 +36,15 @@ protected:
 	virtual void InitAbilityActorInfo() {}
 	void InitializeDefaultAttributes() const;
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, float Level) const;
+	void AddCharacterAbilities() const;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Character|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Character|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Character|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
 
 	UPROPERTY()
@@ -51,7 +53,10 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
 	
-private:	
+private:
+	UPROPERTY(EditAnywhere, Category = "Character|Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PaperZD", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UPaperZDAnimationComponent> AnimationComponent;
 };
