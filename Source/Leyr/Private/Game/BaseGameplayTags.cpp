@@ -239,6 +239,13 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Message_Potion_Health_Duration = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Message.Potion.Health.Duration"), FString("Message Potion Health Duration"));
 	GameplayTags.Message_Potion_Mana_Instant = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Message.Potion.Mana.Instant"), FString("Message Potion Mana Instant"));
 	GameplayTags.Message_Potion_Mana_Duration = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Message.Potion.Mana.Duration"), FString("Message Potion Mana Duration"));
+		
+	/*
+	 * Montages / GameplayEvents
+	 */
+	GameplayTags.Event_Montage_FireBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Event.Montage.FireBolt"), FString("Event Montage FireBolt"));
+	GameplayTags.Event_Montage_Bow_Draw = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Event.Montage.Bow.Draw"), FString("Event Montage Bow Draw"));
+	GameplayTags.Event_Montage_Bow_Shot = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Event.Montage.Bow.Shot"), FString("Event Montage Bow Shot"));
 	
 	/*
 	 * Montages

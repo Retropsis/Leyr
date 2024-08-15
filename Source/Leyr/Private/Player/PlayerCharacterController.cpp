@@ -61,14 +61,12 @@ void APlayerCharacterController::AbilityInputTagPressed(FGameplayTag InputTag)
 
 void APlayerCharacterController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
-	if (GetASC() == nullptr) return;
-	GetASC()->AbilityInputTagReleased(InputTag);
+	if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
 }
 
 void APlayerCharacterController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
-	if (GetASC() == nullptr) return;
-	GetASC()->AbilityInputTagHeld(InputTag);
+	if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
 }
 
 UBaseAbilitySystemComponent* APlayerCharacterController::GetASC()
@@ -88,7 +86,6 @@ void APlayerCharacterController::PlayerTick(float DeltaTime)
 
 void APlayerCharacterController::CursorTrace()
 {
-	FHitResult CursorHit;
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
 	if (!CursorHit.bBlockingHit) return;
 }

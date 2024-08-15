@@ -34,7 +34,7 @@ protected:
 	 * Ability System
 	 */
 	virtual void InitAbilityActorInfo() {}
-	void InitializeDefaultAttributes() const;
+	virtual void InitializeDefaultAttributes() const;
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, float Level) const;
 	void AddCharacterAbilities() const;
 
@@ -52,6 +52,16 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USceneComponent> Weapon;
+	
+	UPROPERTY(EditAnywhere, Category = "Character|Combat")
+	FName WeaponTipSocketName;
+
+	//~ Combat Interface
+	virtual FVector GetCombatSocketLocation() override;
+	//~ Combat Interface
 	
 private:
 	UPROPERTY(EditAnywhere, Category = "Character|Abilities")

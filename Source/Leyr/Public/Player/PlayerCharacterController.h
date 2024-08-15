@@ -99,16 +99,17 @@ private:
 	UPROPERTY()
 	TObjectPtr<APlayerCharacter> PlayerCharacter;
 	
-	void CursorTrace();
-	void AbilityInputTagPressed(FGameplayTag InputTag);
-	void AbilityInputTagReleased(FGameplayTag InputTag);
-	void AbilityInputTagHeld(FGameplayTag InputTag);
+	UPROPERTY()
+	TObjectPtr<UBaseAbilitySystemComponent> BaseAbilitySystemComponent;
 
 	UPROPERTY(EditDefaultsOnly, Category="Input")
 	TObjectPtr<UInputConfig> InputConfig;
 
-	UPROPERTY()
-	TObjectPtr<UBaseAbilitySystemComponent> BaseAbilitySystemComponent;
-
+	FHitResult CursorHit;
+	
+	void CursorTrace();
+	void AbilityInputTagPressed(FGameplayTag InputTag);
+	void AbilityInputTagReleased(FGameplayTag InputTag);
+	void AbilityInputTagHeld(FGameplayTag InputTag);
 	UBaseAbilitySystemComponent* GetASC();
 };

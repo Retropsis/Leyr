@@ -224,7 +224,14 @@ FGameplayTag CombatSocket_RightFeet;
  FGameplayTag Message_Potion_Health_Duration;
  FGameplayTag Message_Potion_Mana_Instant;
  FGameplayTag Message_Potion_Mana_Duration;
-  
+    
+ /*
+  * Montage / Gameplay Events
+  */
+FGameplayTag Event_Montage_FireBolt;
+FGameplayTag Event_Montage_Bow_Draw;
+FGameplayTag Event_Montage_Bow_Shot;
+ 
  /*
   * Montages
   */

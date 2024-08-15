@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "LeyrGameMode.generated.h"
 
+class UCharacterClassInfo;
+
 /**
  * 
  */
@@ -14,4 +16,7 @@ class LEYR_API ALeyrGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "Character Class Defaults")
+	TObjectPtr<UCharacterClassInfo> CharacterClassInfo;
 };
