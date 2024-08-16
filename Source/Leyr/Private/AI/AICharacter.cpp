@@ -5,6 +5,8 @@
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "Components/WidgetComponent.h"
+#include "Game/BaseGameplayTags.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AAICharacter::AAICharacter()
 {
@@ -21,7 +23,9 @@ AAICharacter::AAICharacter()
 void AAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 	InitAbilityActorInfo();
+	ULeyrAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
 	
 	if (UBaseUserWidget* BaseUserWidget = Cast<UBaseUserWidget>(HealthBar->GetUserWidgetObject()))
 	{
@@ -42,6 +46,8 @@ void AAICharacter::BeginPlay()
 				OnMaxHealthChanged.Broadcast(Data.NewValue);
 			}
 		);
+		AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAICharacter::HitReactTagChanged);
+		
 		OnHealthChanged.Broadcast(BaseAS->GetHealth());
 		OnMaxHealthChanged.Broadcast(BaseAS->GetMaxHealth());
 	}
@@ -59,6 +65,17 @@ void AAICharacter::InitializeDefaultAttributes() const
 	ULeyrAbilitySystemLibrary::InitializeDefaultAttributes(this, CharacterClass, Level, AbilitySystemComponent);
 }
 
+void AAICharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	bHitReacting = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+}
+
 /*
  * Combat Interface
  */
+void AAICharacter::Die()
+{
+	SetLifeSpan(LifeSpan);
+	Super::Die();
+}

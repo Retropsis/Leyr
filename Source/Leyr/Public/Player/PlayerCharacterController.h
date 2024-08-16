@@ -7,6 +7,7 @@
 #include "InputActionValue.h"
 #include "PlayerCharacterController.generated.h"
 
+class UDamageTextComponent;
 class UBaseAbilitySystemComponent;
 struct FGameplayTag;
 class APlayerCharacter;
@@ -24,6 +25,9 @@ class LEYR_API APlayerCharacterController : public APlayerController
 
 public:
 	virtual void PlayerTick(float DeltaTime) override;
+
+	UFUNCTION(Client, Reliable)
+	void ClientShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="PlayerCharacter")
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
@@ -94,6 +98,12 @@ protected:
 	 * Hotbar
 	 */
 	void HotbarButtonPressed(int32 Index);
+
+	/*
+	 * Damage Numbers
+	 */
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
 
 private:
 	UPROPERTY()

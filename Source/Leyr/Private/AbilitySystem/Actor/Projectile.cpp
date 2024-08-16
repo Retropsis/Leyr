@@ -28,6 +28,7 @@ AProjectile::AProjectile()
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
 	ProjectileMovement->SetPlaneConstraintEnabled(true);
 	ProjectileMovement->SetPlaneConstraintAxisSetting(EPlaneConstraintAxisSetting::Y);
+	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->InitialSpeed = 800.f;
 	ProjectileMovement->MaxSpeed = 800.f;
 	ProjectileMovement->ProjectileGravityScale = 1.f;

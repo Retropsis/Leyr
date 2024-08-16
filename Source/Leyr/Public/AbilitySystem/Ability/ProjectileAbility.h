@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystem/Ability/BaseGameplayAbility.h"
+#include "Leyr/Leyr.h"
 #include "ProjectileAbility.generated.h"
 
 class AProjectile;
@@ -19,14 +20,17 @@ class LEYR_API UProjectileAbility : public UBaseGameplayAbility
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
-	UFUNCTION(BlueprintCallable, Category = "Projectile")
+	UFUNCTION(BlueprintCallable, Category="Projectile")
 	void SpawnProjectile(const FVector& ProjectileTargetLocation);
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ability")
 	TSubclassOf<AProjectile> ProjectileClass;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability|Damage")
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability|Damage")
+	FValueRange AbilityPower;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector CursorHitLocation;

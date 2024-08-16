@@ -10,6 +10,7 @@
 #include "GameplayTagContainer.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "Player/Input/BaseInputComponent.h"
+#include "UI/Widget/DamageTextComponent.h"
 
 void APlayerCharacterController::BeginPlay()
 {
@@ -119,4 +120,19 @@ void APlayerCharacterController::InteractButtonPressed()
 
 void APlayerCharacterController::HotbarButtonPressed(int32 Index)
 {
+}
+
+/*
+ * UI - Damage Numbers
+ */
+void APlayerCharacterController::ClientShowDamageNumber_Implementation(float DamageAmount, ACharacter* TargetCharacter)
+{
+	if (IsValid(TargetCharacter) && DamageTextComponentClass)
+	{
+		UDamageTextComponent* DamageText = NewObject<UDamageTextComponent>(TargetCharacter, DamageTextComponentClass);
+		DamageText->RegisterComponent();
+		DamageText->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		DamageText->SetDamageText(DamageAmount);
+	}
 }

@@ -5,20 +5,12 @@
 #include "GameplayEffectExtension.h"
 #include "Game/BaseGameplayTags.h"
 #include "GameFramework/Character.h"
+#include "Interaction/CombatInterface.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/PlayerCharacterController.h"
 
-UBaseAttributeSet::UBaseAttributeSet()
-{
-	// const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-	//
-	// TagsToAttributes.Add(GameplayTags.Attributes_Primary_Strength, GetStrengthAttribute);
-	// TagsToAttributes.Add(GameplayTags.Attributes_Primary_Dexterity, GetDexterityAttribute);
-	// TagsToAttributes.Add(GameplayTags.Attributes_Primary_Vitality, GetVitalityAttribute);
-	// TagsToAttributes.Add(GameplayTags.Attributes_Primary_Intelligence, GetIntelligenceAttribute);
-	// TagsToAttributes.Add(GameplayTags.Attributes_Primary_Wisdom, GetWisdomAttribute);
-	// TagsToAttributes.Add(GameplayTags.Attributes_Primary_Spirit, GetSpiritAttribute);
-	// TagsToAttributes.Add(GameplayTags.Attributes_Primary_Luck, GetLuckAttribute);
-}
+UBaseAttributeSet::UBaseAttributeSet() {}
 
 void UBaseAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -103,7 +95,29 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			const float NewHealth = GetHealth() - LocalIncomingDamage;
 			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
 
-			const bool bFatal = NewHealth <= 0.f;
+			if (NewHealth <= 0.f)
+			{
+				if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor))
+				{
+					CombatInterface->Die();
+				}
+			}
+			else
+			{
+				Props.TargetASC->TryActivateAbilitiesByTag(FBaseGameplayTags::Get().Effects_HitReact.GetSingleTagContainer());
+			}
+			ShowFloatingText(Props, LocalIncomingDamage);
+		}
+	}
+}
+
+void UBaseAttributeSet::ShowFloatingText(const FEffectProperties& Props, float Damage) const
+{
+	if (Props.SourceCharacter != Props.TargetCharacter)
+	{
+		if(APlayerCharacterController* PC = Cast<APlayerCharacterController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter, 0)))
+		{
+			PC->ClientShowDamageNumber(Damage, Props.TargetCharacter);
 		}
 	}
 }

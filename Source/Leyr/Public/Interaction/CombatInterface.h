@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "CombatInterface.generated.h"
 
+class UPaperZDAnimSequence;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)
 class UCombatInterface : public UInterface
@@ -24,7 +25,16 @@ class LEYR_API ICombatInterface
 public:
 	virtual int32 GetCharacterLevel() { return 0; }
 	virtual FVector GetCombatSocketLocation() { return FVector(); }
+	virtual void Die() = 0;
 	
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void UpdateFacingTarget(const FVector& Target);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UAnimMontage* GetHitReactMontage();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UPaperZDAnimSequence* GetHitReactSequence();
+
+	
 };

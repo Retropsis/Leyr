@@ -38,13 +38,13 @@ protected:
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, float Level) const;
 	void AddCharacterAbilities() const;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Character|Attributes")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Character|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Character|Attributes")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Character|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Character|Attributes")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Character|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
 
 	UPROPERTY()
@@ -56,17 +56,49 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> Weapon;
 	
-	UPROPERTY(EditAnywhere, Category = "Character|Combat")
+	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	FName WeaponTipSocketName;
 
 	//~ Combat Interface
 	virtual FVector GetCombatSocketLocation() override;
+	virtual UAnimMontage* GetHitReactMontage_Implementation() override { return HitReactMontage; }
+	virtual UPaperZDAnimSequence* GetHitReactSequence_Implementation() override { return HitReactSequence; }
+	virtual void Die() override;
 	//~ Combat Interface
+
+	UFUNCTION(NetMulticast, Reliable)
+	virtual void MulticastHandleDeath();
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bDead = false;
+	
+	UPROPERTY(EditAnywhere, Category="Character|Combat")
+	TObjectPtr<UAnimMontage> HitReactMontage;
+	
+	UPROPERTY(EditAnywhere, Category="Character|Combat")
+	TObjectPtr<UPaperZDAnimSequence> HitReactSequence;
+	
+	/*
+	 * Dissolve Effects
+	 */ 
+	void Dissolve();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartDissolveTimeline(UMaterialInstanceDynamic* DynamicMaterialInstance);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartWeaponDissolveTimeline(UMaterialInstanceDynamic* DynamicMaterialInstance);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UMaterialInstance> DissolveMaterialInstance;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
 	
 private:
-	UPROPERTY(EditAnywhere, Category = "Character|Abilities")
+	UPROPERTY(EditAnywhere, Category="Character|Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PaperZD", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="PaperZD", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UPaperZDAnimationComponent> AnimationComponent;
 };
