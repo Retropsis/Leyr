@@ -27,6 +27,8 @@ public:
 
 	void InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS);
 
+	void ToggleInventory();
+
 private:
 	UPROPERTY()
 	TObjectPtr<UBaseUserWidget>  OverlayWidget;
@@ -45,4 +47,15 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UAttributeMenuWidgetController> AttributeMenuWidgetControllerClass;
+
+	/*
+	 * Inventory
+	 */
+	UPROPERTY()
+	TObjectPtr<UBaseUserWidget>  InventoryWidget;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UBaseUserWidget> InventoryWidgetClass;
+
+	bool bIsInventoryOpen = false;
 };

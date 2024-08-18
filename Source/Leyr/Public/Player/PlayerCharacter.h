@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "AI/BaseCharacter.h"
+#include "Interaction/InventoryInterface.h"
 #include "Interaction/PlayerInterface.h"
 #include "PlayerCharacter.generated.h"
 
+class UPlayerInventoryComponent;
 class UCameraComponent;
 class USpringArmComponent;
 
@@ -14,7 +16,7 @@ class USpringArmComponent;
  * 
  */
 UCLASS()
-class LEYR_API APlayerCharacter : public ABaseCharacter, public IPlayerInterface
+class LEYR_API APlayerCharacter : public ABaseCharacter, public IPlayerInterface, public IInventoryInterface
 {
 	GENERATED_BODY()
 
@@ -29,6 +31,10 @@ public:
 	/** Combat Interface */
 	virtual int32 GetCharacterLevel() override;
 	/** end Combat Interface */
+	
+	/** Inventory Interface */
+	virtual UInventoryComponent* GetInventoryComponent_Implementation() override { return InventoryComponent; }
+	/** end Inventory Interface */
 
 protected:
 	virtual void InitAbilityActorInfo() override;
@@ -38,11 +44,14 @@ protected:
 	bool bIsMoving = false;
 
 private:	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<USpringArmComponent> SpringArm;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UCameraComponent> FollowCamera;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(AllowPrivateAccess="true"))
+	TObjectPtr<UInventoryComponent> InventoryComponent;
 
 public:
 	FORCEINLINE bool IsAirborne() const { return bAirborne; }

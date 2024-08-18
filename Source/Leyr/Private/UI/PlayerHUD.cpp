@@ -44,3 +44,28 @@ void APlayerHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySy
 	
 	Widget->AddToViewport();
 }
+
+void APlayerHUD::ToggleInventory()
+{
+	if(!IsValid(InventoryWidget))
+	{
+		InventoryWidget = CreateWidget<UBaseUserWidget>(GetOwningPlayerController(), InventoryWidgetClass);
+	}
+	if(IsValid(InventoryWidget))
+	{
+		if(InventoryWidget->IsInViewport())
+		{
+			InventoryWidget->RemoveFromParent();
+			const FInputModeGameOnly GameOnlyMode;
+			GetOwningPlayerController()->SetInputMode(GameOnlyMode);
+			GetOwningPlayerController()->SetShowMouseCursor(false);
+		}
+		else
+		{
+			InventoryWidget->AddToViewport();
+			const FInputModeGameAndUI GameAndUIMode;
+			GetOwningPlayerController()->SetInputMode(GameAndUIMode);
+			GetOwningPlayerController()->SetShowMouseCursor(true);
+		}
+	}
+}

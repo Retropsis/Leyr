@@ -56,6 +56,18 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> Weapon;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<USceneComponent> BoxTraceStart;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<USceneComponent> BoxTraceEnd;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FVector BoxTraceExtent = FVector(20.f);
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FRotator BoxTraceRotation = FRotator::ZeroRotator;
+	
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	FName WeaponTipSocketName;
 
@@ -63,6 +75,7 @@ protected:
 	virtual FVector GetCombatSocketLocation() override;
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override { return HitReactMontage; }
 	virtual UPaperZDAnimSequence* GetHitReactSequence_Implementation() override { return HitReactSequence; }
+	virtual void GetAttackAnimationData_Implementation(FVector& InBoxTraceStart, FVector& InBoxTraceEnd) override;
 	virtual void Die() override;
 	//~ Combat Interface
 

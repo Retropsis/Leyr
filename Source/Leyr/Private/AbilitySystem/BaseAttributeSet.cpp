@@ -3,6 +3,7 @@
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayEffectExtension.h"
+#include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "Game/BaseGameplayTags.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
@@ -106,18 +107,20 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 			{
 				Props.TargetASC->TryActivateAbilitiesByTag(FBaseGameplayTags::Get().Effects_HitReact.GetSingleTagContainer());
 			}
-			ShowFloatingText(Props, LocalIncomingDamage);
+			const bool bBlockedHit = ULeyrAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
+			const bool bCriticalHit = ULeyrAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
+			ShowFloatingText(Props, LocalIncomingDamage, bBlockedHit, bCriticalHit);
 		}
 	}
 }
 
-void UBaseAttributeSet::ShowFloatingText(const FEffectProperties& Props, float Damage) const
+void UBaseAttributeSet::ShowFloatingText(const FEffectProperties& Props, float Damage, bool bBlockedHit, bool bCriticalHit) const
 {
 	if (Props.SourceCharacter != Props.TargetCharacter)
 	{
-		if(APlayerCharacterController* PC = Cast<APlayerCharacterController>(UGameplayStatics::GetPlayerController(Props.SourceCharacter, 0)))
+		if(APlayerCharacterController* PC = Cast<APlayerCharacterController>(Props.SourceCharacter->Controller))
 		{
-			PC->ClientShowDamageNumber(Damage, Props.TargetCharacter);
+			PC->ClientShowDamageNumber(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit);
 		}
 	}
 }

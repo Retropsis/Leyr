@@ -35,6 +35,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UPaperZDAnimSequence* GetHitReactSequence();
-
 	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void GetAttackAnimationData(FVector& InBoxTraceStart, FVector& InBoxTraceEnd);
 };

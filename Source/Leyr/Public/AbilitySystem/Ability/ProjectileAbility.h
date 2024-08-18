@@ -3,8 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/Ability/BaseGameplayAbility.h"
-#include "Leyr/Leyr.h"
+#include "DamageGameplayAbility.h"
 #include "ProjectileAbility.generated.h"
 
 class AProjectile;
@@ -13,7 +12,7 @@ class AProjectile;
  * 
  */
 UCLASS()
-class LEYR_API UProjectileAbility : public UBaseGameplayAbility
+class LEYR_API UProjectileAbility : public UDamageGameplayAbility
 {
 	GENERATED_BODY()
 	
@@ -25,13 +24,4 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ability")
 	TSubclassOf<AProjectile> ProjectileClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability|Damage")
-	TSubclassOf<UGameplayEffect> DamageEffectClass;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability|Damage")
-	FValueRange AbilityPower;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FVector CursorHitLocation;
 };

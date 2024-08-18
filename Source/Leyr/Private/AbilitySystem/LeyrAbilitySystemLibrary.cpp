@@ -3,6 +3,7 @@
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 
 #include "AbilitySystemComponent.h"
+#include "AbilityTypes.h"
 #include "GameplayEffectTypes.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Game/LeyrGameMode.h"
@@ -98,4 +99,38 @@ UCharacterClassInfo* ULeyrAbilitySystemLibrary::GetCharacterClassInfo(const UObj
 	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
 	if (LeyrGameMode == nullptr) return nullptr;
 	return LeyrGameMode->CharacterClassInfo;
+}
+
+bool ULeyrAbilitySystemLibrary::IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FBaseGameplayEffectContext* BaseEffectContext = static_cast<const FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return BaseEffectContext->IsBlockedHit();
+	}
+	return false;
+}
+
+bool ULeyrAbilitySystemLibrary::IsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FBaseGameplayEffectContext* BaseEffectContext = static_cast<const FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return BaseEffectContext->IsCriticalHit();
+	}
+	return false;
+}
+
+void ULeyrAbilitySystemLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& EffectContextHandle, bool bInIsBlockedHit)
+{
+	if (FBaseGameplayEffectContext* BaseEffectContext = static_cast<FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		BaseEffectContext->SetIsBlockedHit(bInIsBlockedHit);
+	}
+}
+
+void ULeyrAbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& EffectContextHandle, bool bInIsCriticalHit)
+{
+	if (FBaseGameplayEffectContext* BaseEffectContext = static_cast<FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		BaseEffectContext->SetIsCriticalHit(bInIsCriticalHit);
+	}
 }

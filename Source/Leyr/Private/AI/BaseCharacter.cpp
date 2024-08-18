@@ -28,6 +28,12 @@ ABaseCharacter::ABaseCharacter()
 
 	Weapon = CreateDefaultSubobject<USceneComponent>("Weapon");
 	Weapon->SetupAttachment(GetRootComponent());
+
+	BoxTraceStart = CreateDefaultSubobject<USceneComponent>("BoxTraceStart");
+	BoxTraceStart->SetupAttachment(GetRootComponent());
+
+	BoxTraceEnd = CreateDefaultSubobject<USceneComponent>("BoxTraceEnd");
+	BoxTraceEnd->SetupAttachment(GetRootComponent());
 }
 
 /*
@@ -73,6 +79,12 @@ FVector ABaseCharacter::GetCombatSocketLocation()
 	// return Weapon->GetSocketLocation(WeaponTipSocketName);
 	// return GetSprite()->GetSocketLocation(WeaponTipSocketName);
 	return Weapon->GetComponentLocation();
+}
+
+void ABaseCharacter::GetAttackAnimationData_Implementation(FVector& InBoxTraceStart, FVector& InBoxTraceEnd)
+{
+	InBoxTraceStart = BoxTraceStart->GetComponentLocation();
+	InBoxTraceEnd = BoxTraceEnd->GetComponentLocation();
 }
 
 void ABaseCharacter::Die()

@@ -1,8 +1,6 @@
 // @ Retropsis 2024-2025.
 
-
 #include "Player/PlayerCharacterController.h"
-
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Player/PlayerCharacter.h"
 #include "EnhancedInputSubsystems.h"
@@ -10,6 +8,7 @@
 #include "GameplayTagContainer.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "Player/Input/BaseInputComponent.h"
+#include "UI/PlayerHUD.h"
 #include "UI/Widget/DamageTextComponent.h"
 
 void APlayerCharacterController::BeginPlay()
@@ -36,6 +35,7 @@ void APlayerCharacterController::SetupInputComponent()
 		BaseInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &APlayerCharacterController::StopJumping);
 		BaseInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerCharacterController::InteractButtonPressed);
 		BaseInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &APlayerCharacterController::CrouchButtonPressed);
+		BaseInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &APlayerCharacterController::InventoryButtonPressed);
 
 		/*
 		 * Hotbar
@@ -118,6 +118,11 @@ void APlayerCharacterController::InteractButtonPressed()
 {
 }
 
+void APlayerCharacterController::InventoryButtonPressed()
+{
+	if(APlayerHUD* PlayerHUD = Cast<APlayerHUD>(GetHUD())) PlayerHUD->ToggleInventory();
+}
+
 void APlayerCharacterController::HotbarButtonPressed(int32 Index)
 {
 }
@@ -125,14 +130,14 @@ void APlayerCharacterController::HotbarButtonPressed(int32 Index)
 /*
  * UI - Damage Numbers
  */
-void APlayerCharacterController::ClientShowDamageNumber_Implementation(float DamageAmount, ACharacter* TargetCharacter)
+void APlayerCharacterController::ClientShowDamageNumber_Implementation(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit)
 {
-	if (IsValid(TargetCharacter) && DamageTextComponentClass)
+	if (IsValid(TargetCharacter) && DamageTextComponentClass && IsLocalController())
 	{
 		UDamageTextComponent* DamageText = NewObject<UDamageTextComponent>(TargetCharacter, DamageTextComponentClass);
 		DamageText->RegisterComponent();
 		DamageText->AttachToComponent(TargetCharacter->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-		DamageText->SetDamageText(DamageAmount);
+		DamageText->SetDamageText(DamageAmount, bBlockedHit, bCriticalHit);
 	}
 }

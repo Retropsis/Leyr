@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Inventory/PlayerInventoryComponent.h"
 #include "Player/PlayerCharacterController.h"
 #include "Player/PlayerCharacterState.h"
 #include "UI/PlayerHUD.h"
@@ -23,6 +24,10 @@ APlayerCharacter::APlayerCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCamera");
 	FollowCamera->SetupAttachment(SpringArm);
 	FollowCamera->SetProjectionMode(ECameraProjectionMode::Orthographic);
+
+	InventoryComponent = CreateDefaultSubobject<UPlayerInventoryComponent>("PlayerInventory");
+	InventoryComponent->Columns = 6;
+	InventoryComponent->Rows = 15;
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)

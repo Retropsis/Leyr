@@ -46,10 +46,15 @@ void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation
 		EffectContextHandle.AddHitResult(HitResult);
 
 		const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContextHandle);
-
-		const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-		const float ScaledMagnitude = AbilityPower.GetRandomFloatFromScalableRange(GetAbilityLevel());
-		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage_Piercing, ScaledMagnitude);
+		for (auto& Pair : DamageTypes)
+		{
+			const float ScaledMagnitude = Pair.Value.GetRandomFloatFromScalableRange(GetAbilityLevel());
+			UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, ScaledMagnitude);
+		}
+		// TODO: Single Type
+		// const float ScaledMagnitude = AbilityPower.GetRandomFloatFromScalableRange(GetAbilityLevel());
+		// UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage_Piercing, ScaledMagnitude);
+		
 		Projectile->DamageEffectSpecHandle = SpecHandle;
 
 		Projectile->FinishSpawning(SpawnTransform);

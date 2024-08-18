@@ -27,7 +27,7 @@ public:
 	virtual void PlayerTick(float DeltaTime) override;
 
 	UFUNCTION(Client, Reliable)
-	void ClientShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter);
+	void ClientShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="PlayerCharacter")
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;
@@ -93,6 +93,7 @@ protected:
 	void AttackButtonPressed();
 	void CrouchButtonPressed();
 	void InteractButtonPressed();
+	void InventoryButtonPressed();
 	
 	/*
 	 * Hotbar
