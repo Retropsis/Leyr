@@ -12,7 +12,6 @@ AItem::AItem()
 	Sphere = CreateDefaultSubobject<USphereComponent>("Sphere");
 	Sphere->SetupAttachment(GetRootComponent());
 	Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
 }
 
 void AItem::BeginPlay()

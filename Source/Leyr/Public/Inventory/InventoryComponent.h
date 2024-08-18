@@ -7,6 +7,8 @@
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChanged);
+
 class AItem;
 
 USTRUCT(BlueprintType)
@@ -43,10 +45,15 @@ public:
 	bool bRotated = false;
 
 	UPROPERTY(BlueprintReadWrite)
-	UMaterialInterface* Icon;
+	UMaterialInterface* Icon = nullptr;
 	
 	UPROPERTY(BlueprintReadWrite)
-	UMaterialInterface* IconRotated;
+	UMaterialInterface* IconRotated = nullptr;
+
+	UMaterialInterface* GetIcon() const
+	{
+		return bRotated ? Icon : IconRotated;
+	}
 };
 
 UENUM(BlueprintType)
@@ -65,14 +72,24 @@ class LEYR_API UInventoryComponent : public UActorComponent
 
 public:	
 	UInventoryComponent();
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	bool TryAddItem(FInventoryItemData ItemToAdd);
+	
+	UFUNCTION(BlueprintCallable)
+	void RemoveItem(FInventoryItemData ItemToRemove);
+
+	UFUNCTION(BlueprintCallable)
+	TMap<FIntPoint, FInventoryItemData> GetAllItems();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn))
 	int32 Columns = 5;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn))
 	int32 Rows = 5;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnInventoryChanged OnInventoryChanged;
 
 protected:
 	virtual void BeginPlay() override;

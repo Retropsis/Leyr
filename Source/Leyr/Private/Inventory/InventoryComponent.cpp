@@ -4,7 +4,19 @@
 
 UInventoryComponent::UInventoryComponent()
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
+	// PrimaryComponentTick.TickInterval = 0.1f;
+}
+
+void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if(bIsDirty)
+	{
+		bIsDirty = false;
+		OnInventoryChanged.Broadcast();
+	}
 }
 
 void UInventoryComponent::BeginPlay()
@@ -26,6 +38,24 @@ bool UInventoryComponent::TryAddItem(FInventoryItemData ItemToAdd)
 		}
 	}
 	return false;
+}
+
+void UInventoryComponent::RemoveItem(FInventoryItemData ItemTORemove)
+{
+	
+}
+
+TMap<FIntPoint, FInventoryItemData> UInventoryComponent::GetAllItems()
+{
+	TMap<FIntPoint, FInventoryItemData> AllItems;
+	for (int i = 0; i < Items.Num(); ++i)
+	{
+		if(Items[i].ID != 0 && !AllItems.Contains(FIntPoint(IndexToTile(i).X, IndexToTile(i).Y)))
+		{
+			AllItems.Add(FIntPoint(IndexToTile(i).X, IndexToTile(i).Y), Items[i]);
+		}
+	}
+	return AllItems;
 }
 
 void UInventoryComponent::AddItemAt(FInventoryItemData ItemToAdd, int32 TopLeftIndex)
