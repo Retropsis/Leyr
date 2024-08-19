@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "InputActionValue.h"
+#include "Interaction/ControllerInterface.h"
 #include "PlayerCharacterController.generated.h"
 
 class UDamageTextComponent;
@@ -19,7 +20,7 @@ class UInputMappingContext;
  * 
  */
 UCLASS()
-class LEYR_API APlayerCharacterController : public APlayerController
+class LEYR_API APlayerCharacterController : public APlayerController, public IControllerInterface
 {
 	GENERATED_BODY()
 
@@ -93,7 +94,16 @@ protected:
 	void AttackButtonPressed();
 	void CrouchButtonPressed();
 	void InteractButtonPressed();
-	void InventoryButtonPressed();
+
+	/*
+	 * Inventory
+	 */
+	virtual void UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData) override {}
+	
+	UFUNCTION(Client, Reliable) void InventoryButtonPressed();
+	UFUNCTION(BlueprintImplementableEvent) void ToggleInventory();
+	UFUNCTION(BlueprintCallable) void ToggleInputMode();
+	UPROPERTY(BlueprintReadWrite) bool bIsInventoryOpen = false;
 	
 	/*
 	 * Hotbar

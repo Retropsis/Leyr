@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Grid.h"
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChanged);
 
+class UItemData;
 class AItem;
 
 USTRUCT(BlueprintType)
@@ -19,9 +19,6 @@ struct FInventoryItemData
 public:
 	UPROPERTY(BlueprintReadWrite)
 	int32 ID = 0;
-
-	UPROPERTY(BlueprintReadWrite)
-	FIntPoint Dimensions = FIntPoint(2, 3);
 	
 	UPROPERTY(BlueprintReadWrite)
 	int32 Quantity = 0;
@@ -29,8 +26,8 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	int32 StackSize = 0;
 
-	// UPROPERTY(BlueprintReadWrite)
-	// TSoftObjectPtr<UItemInfo> Asset = nullptr;
+	UPROPERTY(BlueprintReadWrite)
+	TSoftObjectPtr<UItemData> Asset = nullptr;
 
 	UPROPERTY(BlueprintReadWrite)
 	float Health = 0.f;
@@ -42,18 +39,10 @@ public:
 	TSubclassOf<AItem> ItemClass;
 	
 	UPROPERTY(BlueprintReadWrite)
-	bool bRotated = false;
-
-	UPROPERTY(BlueprintReadWrite)
-	UMaterialInterface* Icon = nullptr;
+	int32 Ammunition = 0;
 	
 	UPROPERTY(BlueprintReadWrite)
-	UMaterialInterface* IconRotated = nullptr;
-
-	UMaterialInterface* GetIcon() const
-	{
-		return bRotated ? Icon : IconRotated;
-	}
+	int32 MaxAmmunition = 0;
 };
 
 UENUM(BlueprintType)
@@ -74,36 +63,32 @@ public:
 	UInventoryComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	bool TryAddItem(FInventoryItemData ItemToAdd);
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void ServerAddItem(FInventoryItemData ItemToAdd);
 	
-	UFUNCTION(BlueprintCallable)
-	void RemoveItem(FInventoryItemData ItemToRemove);
-
-	UFUNCTION(BlueprintCallable)
-	TMap<FIntPoint, FInventoryItemData> GetAllItems();
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn))
-	int32 Columns = 5;
+	UFUNCTION(Server, Reliable)
+	void OnSlotDrop(UInventoryComponent* SourceInventory, int32 SourceSlotIndex, int32 TargetSlotIndex);
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta=(ExposeOnSpawn))
-	int32 Rows = 5;
+	bool IsSlotEmpty(int32 SlotIndex);
+	FInventoryItemData GetItemAtIndex(int32 SlotIndex);
+	void UpdateInventorySlotUI(int32 SlotIndex, const FInventoryItemData& ItemData) const;
+	void SetInventorySize(int32 Size);
 
-	UPROPERTY(BlueprintAssignable)
-	FOnInventoryChanged OnInventoryChanged;
+	virtual void TransferItem(UInventoryComponent* TargetInventory, int32 SourceSlotIndex, int32 TargetSlotIndex);
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<FInventoryItemData> Items;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	EContainerType ContainerType = EContainerType::Inventory;
 
 protected:
 	virtual void BeginPlay() override;
+	virtual bool AddItemToIndex(FInventoryItemData InventoryItemData, int32 SourceSlotIndex, int32 TargetSlotIndex);
+	virtual bool RemoveItemAtIndex(int32 SlotIndex);
+	virtual void HandleOnSlotDrop(UInventoryComponent* SourceInventory, int32 SourceSlotIndex, int32 TargetSlotIndex) {}
 
 private:
-	void AddItemAt(FInventoryItemData ItemToAdd, int32 TopLeftIndex);
-	bool IsRoomAvailable(FInventoryItemData ItemToAdd, int32 TopLeftIndex);
-	// FTile ForEachIndex(FInventoryItemData ItemToAdd, int32 TopLeftIndex);
-	FTile IndexToTile(int32 Index) const;
-	int32 TileToIndex(FTile Tile) const;
-	bool IsTileValid(FTile Tile) const;
-	FInventoryItemData GetItemAtIndex(int32 Index);
-	
-	TArray<FInventoryItemData> Items;
-
-	bool bIsDirty = false;
+	bool FindEmptySlot(int32& EmptySlotIndex);
+	void AddItem(const FInventoryItemData& ItemToAdd);
 };

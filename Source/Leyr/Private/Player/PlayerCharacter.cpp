@@ -25,9 +25,10 @@ APlayerCharacter::APlayerCharacter()
 	FollowCamera->SetupAttachment(SpringArm);
 	FollowCamera->SetProjectionMode(ECameraProjectionMode::Orthographic);
 
-	InventoryComponent = CreateDefaultSubobject<UPlayerInventoryComponent>("PlayerInventory");
-	InventoryComponent->Columns = 6;
-	InventoryComponent->Rows = 15;
+	PlayerInventory = CreateDefaultSubobject<UPlayerInventoryComponent>("PlayerInventory");
+	PlayerInventory->ContainerType = EContainerType::Inventory;
+
+	TraceObjectType = EOT_EnemyCapsule;
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)
@@ -43,6 +44,58 @@ void APlayerCharacter::OnRep_PlayerState()
 	Super::OnRep_PlayerState();
 	// Init Ability Actor Info Client Side
 	InitAbilityActorInfo();
+}
+
+void APlayerCharacter::OnSlotDrop_Implementation(EContainerType TargetContainer, EContainerType SourceContainer, int32 SourceSlotIndex, int32 TargetSlotIndex, EArmorType ArmorType)
+{
+	ServerOnSlotDrop(TargetContainer, SourceContainer, SourceSlotIndex, TargetSlotIndex, ArmorType);
+}
+
+void APlayerCharacter::ServerOnSlotDrop_Implementation(EContainerType TargetContainer, EContainerType SourceContainer, int32 SourceSlotIndex, int32 TargetSlotIndex, EArmorType ArmorType)
+{
+	UInventoryComponent* TargetInventory = nullptr;
+	UInventoryComponent* SourceInventory = nullptr;
+	
+	switch (TargetContainer)
+	{
+	case EContainerType::Inventory:
+		TargetInventory = PlayerInventory;
+		break;
+	case EContainerType::Hotbar:
+		// TargetInventory = HotbarComponent;
+		break;
+	case EContainerType::Storage:
+		break;
+	case EContainerType::Equipment:
+		break;
+	default: ;
+	}
+	
+	switch (SourceContainer)
+	{
+	case EContainerType::Inventory:
+		SourceInventory = PlayerInventory;
+		break;
+	case EContainerType::Hotbar:
+		// SourceInventory = HotbarComponent;
+		break;
+	case EContainerType::Storage:
+		break;
+	case EContainerType::Equipment:
+		break;
+	default: ;
+	}
+	if(TargetInventory && SourceInventory) TargetInventory->OnSlotDrop(SourceInventory, SourceSlotIndex, TargetSlotIndex);
+}
+
+void APlayerCharacter::UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData)
+{
+	IControllerInterface::Execute_UpdateInventorySlot(Controller, ContainerType, SlotIndex, ItemData);
+}
+
+void APlayerCharacter::ResetInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex)
+{
+	IControllerInterface::Execute_ResetInventorySlot(Controller, ContainerType, SlotIndex);
 }
 
 void APlayerCharacter::InitAbilityActorInfo()
@@ -92,3 +145,5 @@ int32 APlayerCharacter::GetCharacterLevel()
 	check(PlayerCharacterState);
 	return PlayerCharacterState->GetCharacterLevel();
 }
+
+

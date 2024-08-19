@@ -9,6 +9,8 @@
 #include "UI/Controller/OverlayWidgetController.h"
 #include "AICharacter.generated.h"
 
+class ABaseAIController;
+class UBehaviorTree;
 class UWidgetComponent;
 /**
  * 
@@ -20,12 +22,18 @@ class LEYR_API AAICharacter : public ABaseCharacter, public IEnemyInterface
 
 public:
 	AAICharacter();
+	virtual void PossessedBy(AController* NewController) override;
 	void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 	
 	/** Combat Interface */
 	virtual int32 GetCharacterLevel() override { return Level; }
+	virtual void SetCombatTarget_Implementation(AActor* InCombatTarget) override { CombatTarget = InCombatTarget; }
+	virtual AActor* GetCombatTarget_Implementation() const override { return CombatTarget; }
 	virtual void Die() override;
 	/** end Combat Interface */
+	
+	UPROPERTY(BlueprintReadWrite, Category = "Combat")
+	TObjectPtr<AActor> CombatTarget;
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature OnHealthChanged;
@@ -55,4 +63,10 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBar;
+	
+	UPROPERTY(EditAnywhere, Category = "Character|AI")
+	TObjectPtr<UBehaviorTree> BehaviorTree;
+
+	UPROPERTY()
+	TObjectPtr<ABaseAIController> BaseAIController;
 };

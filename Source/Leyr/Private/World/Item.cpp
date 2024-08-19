@@ -33,6 +33,6 @@ void AItem::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 {
 	if (UInventoryComponent* InventoryComponent = IInventoryInterface::Execute_GetInventoryComponent(OtherActor))
 	{
-		if (InventoryComponent->TryAddItem(ItemData)) Destroy();
+		// if (InventoryComponent->TryAddItem(ItemData)) Destroy();
 	}
 }

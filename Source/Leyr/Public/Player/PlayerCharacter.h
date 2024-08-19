@@ -8,6 +8,7 @@
 #include "Interaction/PlayerInterface.h"
 #include "PlayerCharacter.generated.h"
 
+struct FInventoryItemData;
 class UPlayerInventoryComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -33,8 +34,18 @@ public:
 	/** end Combat Interface */
 	
 	/** Inventory Interface */
-	virtual UInventoryComponent* GetInventoryComponent_Implementation() override { return InventoryComponent; }
+	virtual UInventoryComponent* GetInventoryComponent_Implementation() override { return PlayerInventory; }
 	/** end Inventory Interface */
+
+	UFUNCTION(Server, Reliable)
+	void ServerOnSlotDrop(EContainerType TargetContainer, EContainerType SourceContainer, int32 SourceSlotIndex, int32 TargetSlotIndex, EArmorType ArmorType);
+	
+	virtual void OnSlotDrop_Implementation(EContainerType TargetContainer, EContainerType SourceContainer, int32 SourceSlotIndex, int32 TargetSlotIndex, EArmorType ArmorType) override;
+
+	/** Player Interface */
+	virtual void ResetInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex) override;
+	virtual void UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData) override;
+	/** end Player Interface */
 
 protected:
 	virtual void InitAbilityActorInfo() override;
@@ -51,7 +62,7 @@ private:
 	TObjectPtr<UCameraComponent> FollowCamera;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(AllowPrivateAccess="true"))
-	TObjectPtr<UInventoryComponent> InventoryComponent;
+	TObjectPtr<UInventoryComponent> PlayerInventory;
 
 public:
 	FORCEINLINE bool IsAirborne() const { return bAirborne; }

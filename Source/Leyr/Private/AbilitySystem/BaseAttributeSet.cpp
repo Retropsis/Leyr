@@ -7,7 +7,6 @@
 #include "Game/BaseGameplayTags.h"
 #include "GameFramework/Character.h"
 #include "Interaction/CombatInterface.h"
-#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/PlayerCharacterController.h"
 
@@ -119,6 +118,11 @@ void UBaseAttributeSet::ShowFloatingText(const FEffectProperties& Props, float D
 	if (Props.SourceCharacter != Props.TargetCharacter)
 	{
 		if(APlayerCharacterController* PC = Cast<APlayerCharacterController>(Props.SourceCharacter->Controller))
+		{
+			PC->ClientShowDamageNumber(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit);
+			return;
+		}
+		if(APlayerCharacterController* PC = Cast<APlayerCharacterController>(Props.TargetCharacter->Controller))
 		{
 			PC->ClientShowDamageNumber(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit);
 		}

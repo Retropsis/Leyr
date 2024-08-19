@@ -4,6 +4,9 @@
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
+#include "AI/BaseAIController.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Game/BaseGameplayTags.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -14,10 +17,28 @@ AAICharacter::AAICharacter()
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 
+	// TODO: Only for 3D, 2D should snap
+	// bUseControllerRotationPitch = false;
+	// bUseControllerRotationRoll = false;
+	// bUseControllerRotationYaw = false;
+	// GetCharacterMovement()->bUseControllerDesiredRotation = true;
+	
 	AttributeSet = CreateDefaultSubobject<UBaseAttributeSet>("AttributeSet");
 	
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthBar");
 	HealthBar->SetupAttachment(GetRootComponent());
+}
+
+void AAICharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	
+	if (!HasAuthority()) return;
+	BaseAIController = Cast<ABaseAIController>(NewController);
+	BaseAIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
+	BaseAIController->RunBehaviorTree(BehaviorTree);
+	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), false);
+	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("RangedAttacker"), CharacterClass != ECharacterClass::Warrior);
 }
 
 void AAICharacter::BeginPlay()
@@ -27,7 +48,7 @@ void AAICharacter::BeginPlay()
 	InitAbilityActorInfo();
 	if (HasAuthority())
 	{
-		ULeyrAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+		ULeyrAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent, CharacterClass);
 	}
 	
 	if (UBaseUserWidget* BaseUserWidget = Cast<UBaseUserWidget>(HealthBar->GetUserWidgetObject()))
@@ -75,6 +96,7 @@ void AAICharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewC
 {
 	bHitReacting = NewCount > 0;
 	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), bHitReacting);
 }
 
 /*

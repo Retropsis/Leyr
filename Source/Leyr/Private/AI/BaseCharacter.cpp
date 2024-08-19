@@ -72,7 +72,7 @@ UAbilitySystemComponent* ABaseCharacter::GetAbilitySystemComponent() const
 /*
  * Combat Interface
  */
-FVector ABaseCharacter::GetCombatSocketLocation()
+FVector ABaseCharacter::GetCombatSocketLocation_Implementation()
 {
 	// TODO: Weapon could exist even as a sprite and have its own socket
 	// check(Weapon);
@@ -124,6 +124,7 @@ void ABaseCharacter::MulticastHandleDeath_Implementation()
 	// GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	// Dissolve();
 	
+	bDead = true;
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 

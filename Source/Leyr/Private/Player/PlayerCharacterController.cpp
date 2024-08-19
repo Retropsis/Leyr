@@ -8,7 +8,6 @@
 #include "GameplayTagContainer.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "Player/Input/BaseInputComponent.h"
-#include "UI/PlayerHUD.h"
 #include "UI/Widget/DamageTextComponent.h"
 
 void APlayerCharacterController::BeginPlay()
@@ -118,9 +117,29 @@ void APlayerCharacterController::InteractButtonPressed()
 {
 }
 
-void APlayerCharacterController::InventoryButtonPressed()
+void APlayerCharacterController::InventoryButtonPressed_Implementation()
 {
-	if(APlayerHUD* PlayerHUD = Cast<APlayerHUD>(GetHUD())) PlayerHUD->ToggleInventory();
+	// if(APlayerHUD* PlayerHUD = Cast<APlayerHUD>(GetHUD())) PlayerHUD->ToggleInventory();
+	ToggleInventory();
+}
+
+void APlayerCharacterController::ToggleInputMode()
+{
+	if (bIsInventoryOpen)
+	{
+		const FInputModeGameOnly InputModeGameOnly;
+		SetInputMode(InputModeGameOnly);
+		SetShowMouseCursor(false);
+		bIsInventoryOpen = false;
+	}
+	else
+	{
+		FInputModeUIOnly InputModeUIOnly;
+		SetInputMode(InputModeUIOnly);
+		FlushPressedKeys();
+		SetShowMouseCursor(true);
+		bIsInventoryOpen = true;
+	}
 }
 
 void APlayerCharacterController::HotbarButtonPressed(int32 Index)

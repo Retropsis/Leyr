@@ -7,6 +7,7 @@
 #include "PaperZD/Public/PaperZDAnimationComponent.h"
 #include "AbilitySystemInterface.h"
 #include "Interaction/CombatInterface.h"
+#include "Leyr/Leyr.h"
 #include "BaseCharacter.generated.h"
 
 class UGameplayAbility;
@@ -72,11 +73,16 @@ protected:
 	FName WeaponTipSocketName;
 
 	//~ Combat Interface
-	virtual FVector GetCombatSocketLocation() override;
+	virtual FVector GetCombatSocketLocation_Implementation() override;
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override { return HitReactMontage; }
 	virtual UPaperZDAnimSequence* GetHitReactSequence_Implementation() override { return HitReactSequence; }
+	virtual UPaperZDAnimSequence* GetAttackSequence_Implementation() override { return AttackSequence; }
+	virtual UPaperZDAnimInstance* GetPaperAnimInstance_Implementation() override { return AnimationComponent->GetAnimInstance(); }
 	virtual void GetAttackAnimationData_Implementation(FVector& InBoxTraceStart, FVector& InBoxTraceEnd) override;
+	virtual EObjectTypeQuery GetTraceObjectType_Implementation() override { return EOT_EnemyCapsule; }
 	virtual void Die() override;
+	virtual bool IsDead_Implementation() const override { return  bDead; }
+	virtual AActor* GetAvatar_Implementation() override { return this; }
 	//~ Combat Interface
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -86,10 +92,16 @@ protected:
 	bool bDead = false;
 	
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
+	TObjectPtr<UPaperZDAnimSequence> AttackSequence;
+	
+	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
 	
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	TObjectPtr<UPaperZDAnimSequence> HitReactSequence;
+
+	UPROPERTY(EditAnywhere, Category="Character|Combat")
+	TEnumAsByte<EObjectTypeQuery> TraceObjectType = ObjectTypeQuery3;
 	
 	/*
 	 * Dissolve Effects

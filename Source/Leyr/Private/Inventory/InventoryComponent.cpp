@@ -1,133 +1,119 @@
 // @ Retropsis 2024-2025.
 
 #include "Inventory/InventoryComponent.h"
+#include "Interaction/PlayerInterface.h"
 
 UInventoryComponent::UInventoryComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	// PrimaryComponentTick.TickInterval = 0.1f;
 }
 
 void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if(bIsDirty)
-	{
-		bIsDirty = false;
-		OnInventoryChanged.Broadcast();
-	}
 }
 
 void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	Items.SetNum(Columns * Rows);
 }
 
-bool UInventoryComponent::TryAddItem(FInventoryItemData ItemToAdd)
+void UInventoryComponent::ServerAddItem_Implementation(FInventoryItemData ItemToAdd)
 {
-	if (ItemToAdd.ID == 0) return false;
+	AddItem(ItemToAdd);
+}
 
-	for (int i = 0; i < Items.Num(); ++i)
+void UInventoryComponent::AddItem(const FInventoryItemData& ItemToAdd)
+{
+	int32 EmptySlotIndex;
+	if(FindEmptySlot(EmptySlotIndex))
 	{
-		if (IsRoomAvailable(ItemToAdd, i))
-		{
-			AddItemAt(ItemToAdd, i);
-			return true;
-		}
+		Items[EmptySlotIndex] = ItemToAdd;
+		UpdateInventorySlotUI(EmptySlotIndex, ItemToAdd);
+	}
+}
+
+bool UInventoryComponent::AddItemToIndex(FInventoryItemData InventoryItemData, int32 SourceSlotIndex, int32 TargetSlotIndex)
+{
+	if(IsSlotEmpty(TargetSlotIndex))
+	{
+		Items[TargetSlotIndex] = InventoryItemData;
+		return true;
+	}
+	else
+	{
+		// Stacking Items
 	}
 	return false;
 }
 
-void UInventoryComponent::RemoveItem(FInventoryItemData ItemTORemove)
+bool UInventoryComponent::RemoveItemAtIndex(int32 SlotIndex)
 {
-	
-}
-
-TMap<FIntPoint, FInventoryItemData> UInventoryComponent::GetAllItems()
-{
-	TMap<FIntPoint, FInventoryItemData> AllItems;
-	for (int i = 0; i < Items.Num(); ++i)
-	{
-		if(Items[i].ID != 0 && !AllItems.Contains(FIntPoint(IndexToTile(i).X, IndexToTile(i).Y)))
-		{
-			AllItems.Add(FIntPoint(IndexToTile(i).X, IndexToTile(i).Y), Items[i]);
-		}
-	}
-	return AllItems;
-}
-
-void UInventoryComponent::AddItemAt(FInventoryItemData ItemToAdd, int32 TopLeftIndex)
-{
-	const int32 FirstI = IndexToTile(TopLeftIndex).X;
-	const int32 LastI = FirstI + ItemToAdd.Dimensions.X - 1;
-
-	const int32 FirstJ = IndexToTile(TopLeftIndex).Y;
-	const int32 LastJ = FirstJ + ItemToAdd.Dimensions.Y - 1;
-	
-	for (int i = FirstI; i < LastI; ++i)
-	{
-		for (int j = FirstJ; j < LastJ; ++j)
-		{
-			Items[TileToIndex(FTile(i, j))] = ItemToAdd;
-		}
-	}
-	bIsDirty = true;
-}
-
-bool UInventoryComponent::IsRoomAvailable(FInventoryItemData ItemToAdd, int32 TopLeftIndex)
-{
-	const int32 FirstI = IndexToTile(TopLeftIndex).X;
-	const int32 LastI = FirstI + ItemToAdd.Dimensions.X - 1;
-
-	const int32 FirstJ = IndexToTile(TopLeftIndex).Y;
-	const int32 LastJ = FirstJ + ItemToAdd.Dimensions.Y - 1;
-	
-	for (int i = FirstI; i < LastI; ++i)
-	{
-		for (int j = FirstJ; j < LastJ; ++j)
-		{
-			if(IsTileValid(FTile(i, j)))
-			{
-				FInventoryItemData Item = GetItemAtIndex(TileToIndex(FTile(i, j)));
-				if(Item.ID != 0) return false;
-			}
-			else
-			{
-				return false;
-			}
-		}
-	}
+	Items[SlotIndex] = FInventoryItemData();
 	return true;
 }
 
-// FTile UInventoryComponent::ForEachIndex(FInventoryItemData ItemToAdd, int32 TopLeftIndex)
-// {
-// 	const int32 FirstI = IndexToTile(TopLeftIndex).X;
-// 	const int32 LastI = FirstI + ItemToAdd.Dimensions.X - 1;
-//
-// 	const int32 FirstJ = IndexToTile(TopLeftIndex).Y;
-// 	const int32 LastJ = FirstJ + ItemToAdd.Dimensions.Y - 1;
-// 	
-// 	for (int i = FirstI; i < LastI; ++i)
-// 	{
-// 		for (int j = FirstJ; j < LastJ; ++j)
-// 		{
-// 			return FTile(i, j);
-// 		}
-// 	}
-// }
-
-FTile UInventoryComponent::IndexToTile(int32 Index) const { return FTile{ FMath::Modulo(Index, Columns), Index / Columns }; }
-int32 UInventoryComponent::TileToIndex(FTile Tile) const { return Tile.X + Tile.Y * Columns; }
-bool UInventoryComponent::IsTileValid(const FTile Tile) const { return Tile.X >= 0 && Tile.Y >= 0 && Tile.X < Columns && Tile.Y < Rows; }
-
-FInventoryItemData UInventoryComponent::GetItemAtIndex(int32 Index)
+void UInventoryComponent::OnSlotDrop_Implementation(UInventoryComponent* SourceInventory, int32 SourceSlotIndex, int32 TargetSlotIndex)
 {
-	if (Items.IsValidIndex(Index))
+	HandleOnSlotDrop(SourceInventory, SourceSlotIndex, TargetSlotIndex);
+}
+
+void UInventoryComponent::TransferItem(UInventoryComponent* TargetInventory, int32 SourceSlotIndex, int32 TargetSlotIndex)
+{
+	if(IsSlotEmpty(SourceSlotIndex) || (SourceSlotIndex == TargetSlotIndex && TargetInventory == this)) return;
+
+	if(TargetInventory)
 	{
-		return Items[Index];
+		const FInventoryItemData ItemData = GetItemAtIndex(SourceSlotIndex);
+		if (TargetInventory->AddItemToIndex(ItemData, SourceSlotIndex, TargetSlotIndex))
+		{
+			RemoveItemAtIndex(SourceSlotIndex);
+		}
 	}
-	return FInventoryItemData();
+}
+
+bool UInventoryComponent::IsSlotEmpty(int32 SlotIndex)
+{
+	checkf(Items.IsValidIndex(SlotIndex), TEXT("Attempting to reach out of bounds index in %s"), *GetNameSafe(this));
+	return Items[SlotIndex].ID == 0;
+}
+
+FInventoryItemData UInventoryComponent::GetItemAtIndex(int32 SlotIndex)
+{
+	return Items.IsValidIndex(SlotIndex) ? Items[SlotIndex] : FInventoryItemData();
+}
+
+void UInventoryComponent::UpdateInventorySlotUI(int32 SlotIndex, const FInventoryItemData& ItemData) const
+{
+	// TODO: Remainder if custom behaviour is needed, don't forget to break
+	switch (ContainerType)
+	{
+	case EContainerType::Inventory:
+	case EContainerType::Hotbar:
+		IPlayerInterface::Execute_UpdateInventorySlot(GetOwner(), ContainerType, SlotIndex, ItemData);
+		break;
+	case EContainerType::Storage:
+		break;
+	case EContainerType::Equipment:
+		break;
+	default: ;
+	}
+}
+
+void UInventoryComponent::SetInventorySize(int32 Size)
+{
+	Items.SetNum(Size, EAllowShrinking::No);
+}
+
+bool UInventoryComponent::FindEmptySlot(int32& EmptySlotIndex)
+{
+	for (int i = 0; i < Items.Num(); ++i)
+	{
+		if (Items[i].ID == 0)
+		{
+			EmptySlotIndex = i;
+			return true;
+		}
+	}
+	return false;
 }

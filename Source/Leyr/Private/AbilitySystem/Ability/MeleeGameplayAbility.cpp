@@ -1,6 +1,7 @@
 // @ Retropsis 2024-2025.
 
 #include "AbilitySystem/Ability/MeleeGameplayAbility.h"
+
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Interaction/CombatInterface.h"
@@ -13,13 +14,13 @@ void UMeleeGameplayAbility::BoxTrace()
 	ICombatInterface::Execute_GetAttackAnimationData(GetAvatarActorFromActorInfo(), Start, End);
 	const FVector BoxExtent = FVector(40.f, 20.f, 30.f);
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(EOT_EnemyCapsule);
+	ObjectTypes.Add(ICombatInterface::Execute_GetTraceObjectType(GetAvatarActorFromActorInfo()));
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(GetAvatarActorFromActorInfo());
 	FHitResult Hit;
 	UKismetSystemLibrary::BoxTraceSingleForObjects(
 		this, Start, End, BoxExtent, FRotator::ZeroRotator, ObjectTypes,
-		false, ActorsToIgnore, EDrawDebugTrace::None, Hit, true);
+		false, ActorsToIgnore, EDrawDebugTrace::ForDuration, Hit, true);
 
 	if(Hit.bBlockingHit && Hit.GetActor())
 	{
@@ -37,6 +38,7 @@ void UMeleeGameplayAbility::BoxTrace()
 			{
 				TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 			}
+			// CauseDamage(Hit.GetActor());
 		}
 	}
 }
