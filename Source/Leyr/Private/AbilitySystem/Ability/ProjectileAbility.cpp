@@ -16,7 +16,7 @@ void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation
 {
 	if (!GetAvatarActorFromActorInfo()->HasAuthority()) return;
 
-	const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo());
+	const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), FBaseGameplayTags::Get().Montage_Attack_1);
 	FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
 	Rotation.Pitch = 5.f;
 

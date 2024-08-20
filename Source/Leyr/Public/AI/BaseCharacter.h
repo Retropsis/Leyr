@@ -73,12 +73,17 @@ protected:
 	FName WeaponTipSocketName;
 
 	//~ Combat Interface
-	virtual FVector GetCombatSocketLocation_Implementation() override;
+	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override { return HitReactMontage; }
 	virtual UPaperZDAnimSequence* GetHitReactSequence_Implementation() override { return HitReactSequence; }
 	virtual UPaperZDAnimSequence* GetAttackSequence_Implementation() override { return AttackSequence; }
 	virtual UPaperZDAnimInstance* GetPaperAnimInstance_Implementation() override { return AnimationComponent->GetAnimInstance(); }
 	virtual void GetAttackAnimationData_Implementation(FVector& InBoxTraceStart, FVector& InBoxTraceEnd) override;
+	// virtual FTaggedMontage GetTaggedMontage_Implementation() override;
+	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override { return AttackMontages; }
+	// virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
+	virtual UNiagaraSystem* GetImpactEffect_Implementation() override { return ImpactEffect; }
+	// virtual int32 GetMinionCount_Implementation() override;
 	virtual EObjectTypeQuery GetTraceObjectType_Implementation() override { return EOT_EnemyCapsule; }
 	virtual void Die() override;
 	virtual bool IsDead_Implementation() const override { return  bDead; }
@@ -101,10 +106,13 @@ protected:
 	TObjectPtr<UPaperZDAnimSequence> HitReactSequence;
 
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
-	TEnumAsByte<EObjectTypeQuery> TraceObjectType = ObjectTypeQuery3;
+	TArray<FTaggedMontage> AttackMontages;
+
+	UPROPERTY(EditAnywhere, Category="Character|Combat")
+	TEnumAsByte<EObjectTypeQuery> TraceObjectType = EObjectTypeQuery::ObjectTypeQuery3;
 	
 	/*
-	 * Dissolve Effects
+	 * Visual Effects
 	 */ 
 	void Dissolve();
 
@@ -119,6 +127,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	UNiagaraSystem* ImpactEffect;
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Character|Abilities")

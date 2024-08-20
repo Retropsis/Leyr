@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "PaperFlipbookComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Game/BaseGameplayTags.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Leyr/Leyr.h"
 
@@ -72,12 +73,39 @@ UAbilitySystemComponent* ABaseCharacter::GetAbilitySystemComponent() const
 /*
  * Combat Interface
  */
-FVector ABaseCharacter::GetCombatSocketLocation_Implementation()
+FVector ABaseCharacter::GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag)
 {
 	// TODO: Weapon could exist even as a sprite and have its own socket
 	// check(Weapon);
 	// return Weapon->GetSocketLocation(WeaponTipSocketName);
 	// return GetSprite()->GetSocketLocation(WeaponTipSocketName);
+	// TODO: Implements this for both weapons or just hands
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Weapon) && IsValid(Weapon))
+	{
+		// return Weapon->GetSocketLocation(WeaponSocketName);
+	}
+	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_LeftHand))
+	{
+		// return GetMesh()->GetSocketLocation(LeftHandSocketName);
+	}
+	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_RightHand))
+	{
+		// return GetMesh()->GetSocketLocation(RightHandSocketName);
+	}
+	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Tail))
+	{
+		// return GetMesh()->GetSocketLocation(TailSocketName);
+	}
+	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_LeftFeet))
+	{
+		// return GetMesh()->GetSocketLocation(LeftFootSocketName);
+	}
+	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_RightFeet))
+	{
+		// return GetMesh()->GetSocketLocation(RightFootSocketName);
+	}
+	// return FVector();
 	return Weapon->GetComponentLocation();
 }
 
