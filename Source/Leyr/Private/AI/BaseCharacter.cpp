@@ -5,9 +5,9 @@
 #include "GameplayEffectTypes.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "PaperFlipbookComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Game/BaseGameplayTags.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Leyr/Leyr.h"
 
@@ -63,6 +63,7 @@ void ABaseCharacter::AddCharacterAbilities() const
 	if (!HasAuthority()) return;
 
 	BaseASC->AddCharacterAbilities(StartupAbilities);
+	BaseASC->AddCharacterPassiveAbilities(StartupPassiveAbilities);
 }
 
 UAbilitySystemComponent* ABaseCharacter::GetAbilitySystemComponent() const
@@ -115,10 +116,22 @@ void ABaseCharacter::GetAttackAnimationData_Implementation(FVector& InBoxTraceSt
 	InBoxTraceEnd = BoxTraceEnd->GetComponentLocation();
 }
 
+FTaggedMontage ABaseCharacter::GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag)
+{
+	for (FTaggedMontage TaggedMontage : AttackMontages)
+	{
+		if (TaggedMontage.MontageTag == MontageTag)
+		{
+			return TaggedMontage;
+		}
+	}
+	return FTaggedMontage();
+}
+
 void ABaseCharacter::Die()
 {
 	bDead = true;
-	// TODO: for 3D meshes, could try also with 2D Weapon
+	//TODO: for 3D meshes, could try also with 2D Weapon
 	// Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
 	MulticastHandleDeath();
 }
@@ -152,6 +165,7 @@ void ABaseCharacter::MulticastHandleDeath_Implementation()
 	// GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	// Dissolve();
 	
+	UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation(), GetActorRotation());
 	bDead = true;
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }

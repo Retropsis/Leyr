@@ -4,7 +4,6 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/Actor/Projectile.h"
-#include "Game/BaseGameplayTags.h"
 #include "Interaction/CombatInterface.h"
 
 void UProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
@@ -12,13 +11,16 @@ void UProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation)
+void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag, bool bOverridePitch, float PitchOverride)
 {
 	if (!GetAvatarActorFromActorInfo()->HasAuthority()) return;
 
-	const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), FBaseGameplayTags::Get().Montage_Attack_1);
+	const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), SocketTag);
 	FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
-	Rotation.Pitch = 5.f;
+	if (bOverridePitch)
+	{
+		Rotation.Pitch = PitchOverride;
+	}
 
 	FTransform SpawnTransform;
 	SpawnTransform.SetLocation(SocketLocation);

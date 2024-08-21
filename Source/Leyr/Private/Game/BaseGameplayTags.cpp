@@ -179,6 +179,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	 * Range Weapons
 	 */
 	GameplayTags.Abilities_Weapon_Aim = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Aim"), FString("Abilities Weapon Aim"));
+	GameplayTags.Abilities_Weapon_Bow_Shot = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Bow.Shot"), FString("Abilities Weapon Bow Shot"));
 
 	/*
 	 * Fighting
@@ -214,6 +215,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Cooldown_Weapon_Sword_Slash = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Weapon.Sword.Slash"), FString("Cooldown Weapon Sword Slash"));
 	GameplayTags.Cooldown_Weapon_Fire_FireBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Weapon.Fire.FireBolt"), FString("Cooldown Fire FireBolt Weapon Version"));
 	GameplayTags.Cooldown_Alteration_Berserk_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Alteration.Berserk.1"), FString("Cooldown Alteration Berserk 1"));
+	GameplayTags.Cooldown_Weapon_Bow_Shot = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Weapon.Bow.Shot"), FString("Cooldown Weapon Bow Shot"));
 	
 	/*
 	 * Side Effects

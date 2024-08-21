@@ -74,4 +74,6 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "LeyrAbilitySystemLibrary|GameplayMechanics")
 	static bool IsHostile(const AActor* FirstActor, const AActor* SecondActor);
+	
+	static int32 GetXPRewardForClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass, int32 CharacterLevel);
 };

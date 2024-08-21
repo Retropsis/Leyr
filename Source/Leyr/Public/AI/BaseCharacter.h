@@ -81,13 +81,15 @@ protected:
 	virtual void GetAttackAnimationData_Implementation(FVector& InBoxTraceStart, FVector& InBoxTraceEnd) override;
 	// virtual FTaggedMontage GetTaggedMontage_Implementation() override;
 	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override { return AttackMontages; }
-	// virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
+	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
 	virtual UNiagaraSystem* GetImpactEffect_Implementation() override { return ImpactEffect; }
-	// virtual int32 GetMinionCount_Implementation() override;
+	virtual int32 GetMinionCount_Implementation() override { return MinionCount; }
+	virtual void IncrementMinionCount_Implementation(const int32 Amount) override { MinionCount += Amount; }
 	virtual EObjectTypeQuery GetTraceObjectType_Implementation() override { return EOT_EnemyCapsule; }
+	virtual ECharacterClass GetCharacterClass_Implementation() override { return CharacterClass; }
+	virtual AActor* GetAvatar_Implementation() override { return this; }
 	virtual void Die() override;
 	virtual bool IsDead_Implementation() const override { return  bDead; }
-	virtual AActor* GetAvatar_Implementation() override { return this; }
 	//~ Combat Interface
 
 	UFUNCTION(NetMulticast, Reliable)
@@ -110,6 +112,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	TEnumAsByte<EObjectTypeQuery> TraceObjectType = EObjectTypeQuery::ObjectTypeQuery3;
+
+	/* Minions */
+	int32 MinionCount = 0;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
+	ECharacterClass CharacterClass = ECharacterClass::Warrior;
 	
 	/*
 	 * Visual Effects
@@ -128,12 +136,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TObjectPtr<UMaterialInstance> WeaponDissolveMaterialInstance;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Combat")
 	UNiagaraSystem* ImpactEffect;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Combat")
+	USoundBase* DeathSound;
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Character|Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
+	
+	UPROPERTY(EditAnywhere, Category = "Character|Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartupPassiveAbilities;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="PaperZD", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UPaperZDAnimationComponent> AnimationComponent;

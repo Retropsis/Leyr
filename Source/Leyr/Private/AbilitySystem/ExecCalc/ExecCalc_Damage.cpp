@@ -125,8 +125,16 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	AActor* SourceAvatar = SourceASC ? SourceASC->GetAvatarActor() : nullptr;
 	AActor* TargetAvatar = TargetASC ? TargetASC->GetAvatarActor() : nullptr;
-	ICombatInterface* SourceCombatInterface = Cast<ICombatInterface>(SourceAvatar);
-	ICombatInterface* TargetCombatInterface = Cast<ICombatInterface>(TargetAvatar);
+	int32 SourceCharacterLevel = 1;
+	if (SourceAvatar->Implements<UCombatInterface>())
+	{
+		SourceCharacterLevel = ICombatInterface::Execute_GetCharacterLevel(SourceAvatar);
+	}
+	int32 TargetCharacterLevel = 1;
+	if (TargetAvatar->Implements<UCombatInterface>())
+	{
+		TargetCharacterLevel = ICombatInterface::Execute_GetCharacterLevel(TargetAvatar);
+	}
 
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
 	
@@ -178,13 +186,13 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	
 	const UCharacterClassInfo* CharacterClassInfo = ULeyrAbilitySystemLibrary::GetCharacterClassInfo(SourceAvatar);
 	const FRealCurve* ArmorPenetrationCurve = CharacterClassInfo->DamageCalculationCoefficients->FindCurve(FName("ArmorPenetration"), FString());
-	const float ArmorPenetrationCoefficient = ArmorPenetrationCurve->Eval(SourceCombatInterface->GetCharacterLevel());
+	const float ArmorPenetrationCoefficient = ArmorPenetrationCurve->Eval(SourceCharacterLevel);
 
 	// ArmorPenetration ignores a percentage of the Target's Armor.	
 	const float EffectivePhysicalDefense = TargetPhysicalDefense *= ( 100 - SourceArmorPenetration * ArmorPenetrationCoefficient ) / 100.f;
 
 	const FRealCurve* EffectivePhysicalDefenseCurve = CharacterClassInfo->DamageCalculationCoefficients->FindCurve(FName("EffectivePhysicalDefense"), FString());
-	const float EffectivePhysicalDefenseCoefficient = EffectivePhysicalDefenseCurve->Eval(TargetCombatInterface->GetCharacterLevel());
+	const float EffectivePhysicalDefenseCoefficient = EffectivePhysicalDefenseCurve->Eval(TargetCharacterLevel);
 	// Armor ignores a percentage of incoming Damage.
 	Damage *= ( 100 - EffectivePhysicalDefense * EffectivePhysicalDefenseCoefficient ) / 100.f;	float SourceCriticalHitChance = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().CriticalHitChanceDef, EvaluationParameters, SourceCriticalHitChance);
@@ -199,7 +207,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	SourceCriticalHitDamage = FMath::Max<float>(SourceCriticalHitDamage, 0.f);
 
 	const FRealCurve* CriticalHitResistanceCurve = CharacterClassInfo->DamageCalculationCoefficients->FindCurve(FName("CriticalHitResistance"), FString());
-	const float CriticalHitResistanceCoefficient = CriticalHitResistanceCurve->Eval(TargetCombatInterface->GetCharacterLevel());
+	const float CriticalHitResistanceCoefficient = CriticalHitResistanceCurve->Eval(TargetCharacterLevel);
 
 	// Critical Hit Resistance reduces Critical Hit Chance by a certain percentage
 	const float EffectiveCriticalHitChance = SourceCriticalHitChance - TargetCriticalHitResistance * CriticalHitResistanceCoefficient;

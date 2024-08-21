@@ -26,7 +26,7 @@ public:
 	void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 	
 	/** Combat Interface */
-	virtual int32 GetCharacterLevel() override { return Level; }
+	virtual int32 GetCharacterLevel_Implementation() override { return Level; }
 	virtual void SetCombatTarget_Implementation(AActor* InCombatTarget) override { CombatTarget = InCombatTarget; }
 	virtual AActor* GetCombatTarget_Implementation() const override { return CombatTarget; }
 	virtual void Die() override;
@@ -57,9 +57,6 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
 	int32 Level = 1;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
-	ECharacterClass CharacterClass = ECharacterClass::Warrior;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBar;

@@ -6,6 +6,7 @@
 #include "UObject/NoExportTypes.h"
 #include "WidgetController.generated.h"
 
+class UGameplayAbility;
 class UAttributeSet;
 class UAbilitySystemComponent;
 
@@ -46,6 +47,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void BroadcastInitialValues() {}
 	virtual void BindCallbacksToDependencies() {}
+
+	UFUNCTION(BlueprintImplementableEvent, Category="AbilitySystem")
+	void OnAbilityCommitted(UGameplayAbility* Ability);
 	
 protected:
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")

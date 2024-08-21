@@ -1,13 +1,11 @@
 // @ Retropsis 2024-2025.
 
 #include "AbilitySystem/Ability/MeleeGameplayAbility.h"
-
-#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-void UMeleeGameplayAbility::BoxTrace()
+FHitResult UMeleeGameplayAbility::BoxTrace()
 {
 	FVector Start =  FVector::ZeroVector;
 	FVector End = FVector::ZeroVector;
@@ -24,23 +22,13 @@ void UMeleeGameplayAbility::BoxTrace()
 		this, Start, End, BoxExtent, FRotator::ZeroRotator, ObjectTypes,
 		false, ActorsToIgnore, EDrawDebugTrace::None, Hit, true);
 
-	if(Hit.bBlockingHit && Hit.GetActor())
-	{
-		if (GetAvatarActorFromActorInfo()->HasAuthority())
-		{
-			// const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
-			// const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), SourceASC->MakeEffectContext());
-			// for (auto& Pair : DamageTypes)
-			// {
-			// 	const float ScaledMagnitude = Pair.Value.GetRandomFloatFromScalableRange(GetAbilityLevel());
-			// 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, ScaledMagnitude);
-			// }
-			//
-			// if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Hit.GetActor()))
-			// {
-			// 	TargetASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-			// }
-			CauseDamage(Hit.GetActor());
-		}
-	}
+	return Hit;
+
+	// if(Hit.bBlockingHit && Hit.GetActor())
+	// {
+	// 	if (GetAvatarActorFromActorInfo()->HasAuthority())
+	// 	{
+	// 		CauseDamage(Hit.GetActor());
+	// 	}
+	// }
 }

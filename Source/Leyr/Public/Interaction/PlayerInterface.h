@@ -27,6 +27,12 @@ class LEYR_API IPlayerInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintNativeEvent)
+	void AddToXP(int32 InXP);
+	
+	UFUNCTION(BlueprintNativeEvent)
+	void LevelUp();
+	
+	UFUNCTION(BlueprintNativeEvent)
 	void UpdateInventorySlot(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)

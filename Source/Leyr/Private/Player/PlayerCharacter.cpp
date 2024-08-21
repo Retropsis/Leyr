@@ -29,6 +29,8 @@ APlayerCharacter::APlayerCharacter()
 	PlayerInventory->ContainerType = EContainerType::Inventory;
 
 	TraceObjectType = EOT_EnemyCapsule;
+	
+	CharacterClass = ECharacterClass::Warrior;
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)
@@ -46,6 +48,9 @@ void APlayerCharacter::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
+/*
+ * Player Interface
+ */
 void APlayerCharacter::OnSlotDrop_Implementation(EContainerType TargetContainer, EContainerType SourceContainer, int32 SourceSlotIndex, int32 TargetSlotIndex, EArmorType ArmorType)
 {
 	ServerOnSlotDrop(TargetContainer, SourceContainer, SourceSlotIndex, TargetSlotIndex, ArmorType);
@@ -98,6 +103,20 @@ void APlayerCharacter::ResetInventorySlot_Implementation(EContainerType Containe
 	IControllerInterface::Execute_ResetInventorySlot(Controller, ContainerType, SlotIndex);
 }
 
+void APlayerCharacter::AddToXP_Implementation(int32 InXP)
+{
+	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	PlayerCharacterState->AddToXP(InXP);
+}
+
+void APlayerCharacter::LevelUp_Implementation()
+{
+}
+
+/*
+ * Ability System
+ */
 void APlayerCharacter::InitAbilityActorInfo()
 {
 	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
@@ -139,7 +158,7 @@ void APlayerCharacter::RotateController() const
 /*
  * Combat Interface
  */
-int32 APlayerCharacter::GetCharacterLevel()
+int32 APlayerCharacter::GetCharacterLevel_Implementation()
 {
 	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
 	check(PlayerCharacterState);

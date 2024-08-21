@@ -165,6 +165,7 @@ FGameplayTag Abilities_Weapon_Sword_Slash;
 FGameplayTag Abilities_Weapon_Fire_FireBolt;
 FGameplayTag Abilities_Weapon_Noxious_Bio_1;
 FGameplayTag Abilities_Weapon_Aim;
+FGameplayTag Abilities_Weapon_Bow_Shot;
  
 FGameplayTag Abilities_Monk_Basic;
  
@@ -197,6 +198,7 @@ FGameplayTag Cooldown_Noxious_Bio_1;
 FGameplayTag Cooldown_Cosmos_Meteor;
 FGameplayTag Cooldown_Weapon_Sword_Slash;
 FGameplayTag Cooldown_Weapon_Fire_FireBolt;
+FGameplayTag Cooldown_Weapon_Bow_Shot;
  
 FGameplayTag Cooldown_Alteration_Berserk_1;
  

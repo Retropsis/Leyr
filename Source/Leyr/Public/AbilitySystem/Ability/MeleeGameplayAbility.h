@@ -15,5 +15,5 @@ class LEYR_API UMeleeGameplayAbility : public UDamageGameplayAbility
 	GENERATED_BODY()
 
 	UFUNCTION(BlueprintCallable)
-	void BoxTrace();
+	FHitResult BoxTrace();
 };

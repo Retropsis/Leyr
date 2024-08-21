@@ -25,6 +25,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, meta=(ExposeOnSpawn = true))
 	FGameplayEffectSpecHandle DamageEffectSpecHandle;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<USphereComponent> Sphere;
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void Destroyed() override;
@@ -33,10 +36,6 @@ protected:
 	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 private:
-	
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USphereComponent> Sphere;
-
 	UPROPERTY(EditDefaultsOnly)
 	float LifeSpan = 15.f;
 

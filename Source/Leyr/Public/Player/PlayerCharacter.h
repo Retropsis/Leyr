@@ -30,7 +30,7 @@ public:
 	void RotateController() const;
 	
 	/** Combat Interface */
-	virtual int32 GetCharacterLevel() override;
+	virtual int32 GetCharacterLevel_Implementation() override;
 	/** end Combat Interface */
 	
 	/** Inventory Interface */
@@ -44,7 +44,9 @@ public:
 
 	/** Player Interface */
 	virtual void ResetInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex) override;
-	virtual void UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData) override;
+	virtual void UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData) override;	
+	virtual void AddToXP_Implementation(int32 InXP) override;
+	virtual void LevelUp_Implementation() override;
 	/** end Player Interface */
 
 protected:
