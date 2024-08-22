@@ -27,7 +27,34 @@ class LEYR_API IPlayerInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintNativeEvent)
+	int32 FindLevelForXP(int32 InXP) const;
+
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetXP() const;
+
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetAttributePointsReward(int32 Level) const;
+
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetAttributePoints() const;
+	
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetSkillPointsReward(int32 Level) const;
+
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetSkillPoints() const;
+	
+	UFUNCTION(BlueprintNativeEvent)
 	void AddToXP(int32 InXP);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void AddToPlayerLevel(int32 InPlayerLevel);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void AddToAttributePoints(int32 InAttributePoints);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void AddToSkillPoints(int32 InSkillPoints);
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void LevelUp();
@@ -40,4 +67,6 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void ResetInventorySlot(EContainerType ContainerType, int32 SlotIndex);
+
+	
 };

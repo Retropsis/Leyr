@@ -33,6 +33,13 @@ struct FTaggedMontage
 	USoundBase* ImpactSound = nullptr;
 };
 
+UENUM(BlueprintType)
+enum class ECombatState : uint8
+{
+	Unoccupied UMETA(DisplayName="Unoccupied"),
+	Attacking UMETA(DisplayName="Attacking"),
+};
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)
 class UCombatInterface : public UInterface
@@ -107,4 +114,19 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	ECharacterClass GetCharacterClass();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	ECombatState GetCombatState() const;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetCombatState(ECombatState NewState);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetMovementEnabled(bool Enabled);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetComboWindow(bool bOpen);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool IsComboWindowOpen();
 };

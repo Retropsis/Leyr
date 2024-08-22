@@ -38,6 +38,7 @@ protected:
 	virtual void InitializeDefaultAttributes() const;
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, float Level) const;
 	void AddCharacterAbilities() const;
+	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) {}
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Character|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
@@ -71,6 +72,12 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	FName WeaponTipSocketName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Combat")
+	float BaseWalkSpeed = 120.f;
+
+	UPROPERTY(BlueprintReadOnly, Category="Character|Combat")
+	bool bHitReacting = false;
 
 	//~ Combat Interface
 	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;

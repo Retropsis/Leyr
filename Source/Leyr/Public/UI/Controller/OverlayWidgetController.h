@@ -69,6 +69,9 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category="GAS|Meta")
 	FOnXPValueChanged OnXPValueChanged;
+
+	UPROPERTY(BlueprintAssignable, Category="GAS|Meta")
+	FOnPlayerStatChangedSignature OnPlayerLevelChangedDelegate;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")

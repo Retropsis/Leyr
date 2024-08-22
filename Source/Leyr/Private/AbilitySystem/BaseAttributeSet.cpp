@@ -118,10 +118,52 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 		const float LocalIncomingXP = GetIncomingXP();
 		SetIncomingXP(0.f);
 		
-		if (Props.SourceCharacter->Implements<UPlayerInterface>())
+		if (Props.SourceCharacter->Implements<UPlayerInterface>() && Props.SourceCharacter->Implements<UCombatInterface>())
 		{
+			const int32 CurrentLevel = ICombatInterface::Execute_GetCharacterLevel(Props.SourceCharacter);
+			const int32 CurrentXP = IPlayerInterface::Execute_GetXP(Props.SourceCharacter);
+
+			const int32 NewLevel = IPlayerInterface::Execute_FindLevelForXP(Props.SourceCharacter, CurrentXP + LocalIncomingXP);
+			const int32 NumLevelUps = NewLevel - CurrentLevel;
+			
+			if(NumLevelUps > 0)
+			{
+				IPlayerInterface::Execute_AddToPlayerLevel(Props.SourceCharacter, NumLevelUps);
+			
+				int32 AttributePointReward = 0;
+				int32 SkillPointReward = 0;
+
+				for (int i = 0; i < NumLevelUps; ++i)
+				{
+					SkillPointReward += IPlayerInterface::Execute_GetSkillPointsReward(Props.SourceCharacter, CurrentLevel + i);
+					AttributePointReward += IPlayerInterface::Execute_GetAttributePointsReward(Props.SourceCharacter, CurrentLevel + i);
+				}
+				IPlayerInterface::Execute_AddToAttributePoints(Props.SourceCharacter, AttributePointReward);
+				IPlayerInterface::Execute_AddToSkillPoints(Props.SourceCharacter, SkillPointReward);
+
+				bRefillHealth = true;
+				bRefillMana = true;
+				
+				IPlayerInterface::Execute_LevelUp(Props.SourceCharacter);
+			}
 			IPlayerInterface::Execute_AddToXP(Props.SourceCharacter, LocalIncomingXP);
 		}
+	}
+}
+
+void UBaseAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
+{
+	Super::PostAttributeChange(Attribute, OldValue, NewValue);
+	
+	if (Attribute == GetMaxHealthAttribute() && bRefillHealth)
+	{
+		SetHealth(GetMaxHealth());
+		bRefillHealth = false;
+	}
+	if (Attribute == GetMaxManaAttribute() && bRefillMana)
+	{
+		SetMana(GetMaxMana());
+		bRefillMana = false;
 	}
 }
 

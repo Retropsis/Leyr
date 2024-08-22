@@ -1,8 +1,11 @@
 // @ Retropsis 2024-2025.
 
 #include "UI/Controller/AttributeMenuWidgetController.h"
+
+#include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/Data/AttributeInfo.h"
+#include "Player/PlayerCharacterState.h"
 
 void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 {
@@ -11,12 +14,19 @@ void UAttributeMenuWidgetController::BindCallbacksToDependencies()
 	for (auto& Info : AttributeInfo.Get()->AttributeInformation)
 	{
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(Info.AttributeGetter).AddLambda(
-		[this, Info](const FOnAttributeChangeData& Data)
+		[this, Info] (const FOnAttributeChangeData& Data)
 			{
 				BroadcastAttributeInfo(Info.AttributeTag);
 			}
 		);
 	}
+	APlayerCharacterState* PlayerCharacterState = CastChecked<APlayerCharacterState>(PlayerState);
+	PlayerCharacterState->OnAttributePointsChangedDelegate.AddLambda(
+		[this] (int32 Points)
+		{
+			AttributePointsChangedDelegate.Broadcast(Points);
+		}
+	);
 }
 
 void UAttributeMenuWidgetController::BroadcastInitialValues()
@@ -29,12 +39,14 @@ void UAttributeMenuWidgetController::BroadcastInitialValues()
 	{
 		BroadcastAttributeInfo(Info.AttributeTag);
 	}
-	// for (auto& Pair : AS->TagsToAttributes)
-	// {
-	// 	FBaseAttributeInfo Info = AttributeInfo->FindAttributeInfoForTag(Pair.Key);
-	// 	Info.AttributeValue = Pair.Value().GetNumericValue(AS);
-	// 	AttributeInfoDelegate.Broadcast(Info);
-	// }
+	APlayerCharacterState* PlayerCharacterState = CastChecked<APlayerCharacterState>(PlayerState);
+	AttributePointsChangedDelegate.Broadcast(PlayerCharacterState->GetAttributePoints());
+}
+
+void UAttributeMenuWidgetController::UpgradeAttribute(const FGameplayTag& AttributeTag)
+{
+	UBaseAbilitySystemComponent* BaseASC = CastChecked<UBaseAbilitySystemComponent>(AbilitySystemComponent);
+	BaseASC->UpgradeAttribute(AttributeTag);
 }
 
 void UAttributeMenuWidgetController::BroadcastAttributeInfo(const FGameplayTag& AttributeTag) const

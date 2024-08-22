@@ -22,6 +22,12 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 {
 	APlayerCharacterState* PlayerCharacterState = CastChecked<APlayerCharacterState>(PlayerState);
 	PlayerCharacterState->OnXPChangedDelegate.AddUObject(this, &UOverlayWidgetController::OnXPChanged);
+	PlayerCharacterState->OnLevelChangedDelegate.AddLambda(
+		[this](int32 NewLevel)
+		{
+			OnPlayerLevelChangedDelegate.Broadcast(NewLevel);
+		}
+	);
 	
 	const UBaseAttributeSet* BaseAttributeSet = CastChecked<UBaseAttributeSet>(AttributeSet);
 

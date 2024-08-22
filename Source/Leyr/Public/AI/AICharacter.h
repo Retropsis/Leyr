@@ -23,7 +23,7 @@ class LEYR_API AAICharacter : public ABaseCharacter, public IEnemyInterface
 public:
 	AAICharacter();
 	virtual void PossessedBy(AController* NewController) override;
-	void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 	
 	/** Combat Interface */
 	virtual int32 GetCharacterLevel_Implementation() override { return Level; }
@@ -40,12 +40,6 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature OnMaxHealthChanged;
-
-	UPROPERTY(BlueprintReadOnly, Category="Character|Combat")
-	bool bHitReacting = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Combat")
-	float BaseWalkSpeed = 60.f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Combat")
 	float LifeSpan = 5.f;

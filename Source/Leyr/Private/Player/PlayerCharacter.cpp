@@ -1,15 +1,17 @@
 // @ Retropsis 2024-2025.
 
 #include "Player/PlayerCharacter.h"
-
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
+#include "AbilitySystem/Data/LevelUpInfo.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Inventory/PlayerInventoryComponent.h"
 #include "Player/PlayerCharacterController.h"
 #include "Player/PlayerCharacterState.h"
+#include "NiagaraComponent.h"
+#include "Game/BaseGameplayTags.h"
 #include "UI/PlayerHUD.h"
 
 APlayerCharacter::APlayerCharacter()
@@ -27,10 +29,15 @@ APlayerCharacter::APlayerCharacter()
 
 	PlayerInventory = CreateDefaultSubobject<UPlayerInventoryComponent>("PlayerInventory");
 	PlayerInventory->ContainerType = EContainerType::Inventory;
+	
+	LevelUpNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>("LevelUpNiagaraComponent");
+	LevelUpNiagaraComponent->SetupAttachment(GetRootComponent());
+	LevelUpNiagaraComponent->bAutoActivate = false;
 
 	TraceObjectType = EOT_EnemyCapsule;
 	
 	CharacterClass = ECharacterClass::Warrior;
+	BaseWalkSpeed = 600.f;
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)
@@ -46,6 +53,20 @@ void APlayerCharacter::OnRep_PlayerState()
 	Super::OnRep_PlayerState();
 	// Init Ability Actor Info Client Side
 	InitAbilityActorInfo();
+}
+
+void APlayerCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	bHitReacting = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = !bHitReacting ? 0.f : BaseWalkSpeed;
+	if(bHitReacting)
+	{
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	}
+	else
+	{
+		GetCharacterMovement()->StopActiveMovement();
+	}
 }
 
 /*
@@ -112,6 +133,96 @@ void APlayerCharacter::AddToXP_Implementation(int32 InXP)
 
 void APlayerCharacter::LevelUp_Implementation()
 {
+	MulticastLevelUpParticles();
+}
+
+void APlayerCharacter::MulticastLevelUpParticles_Implementation() const
+{
+	if (IsValid(LevelUpNiagaraComponent))
+	{
+		LevelUpNiagaraComponent->Activate(true);
+	}
+}
+
+int32 APlayerCharacter::GetXP_Implementation() const
+{
+	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	return PlayerCharacterState->GetXP();
+}
+
+int32 APlayerCharacter::FindLevelForXP_Implementation(int32 InXP) const
+{
+	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	return PlayerCharacterState->LevelUpInfo->FindLevelForXP(InXP);
+}
+
+int32 APlayerCharacter::GetAttributePointsReward_Implementation(int32 Level) const
+{
+	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	return PlayerCharacterState->LevelUpInfo->LevelUpInformation[Level].AttributePointAward;
+}
+
+int32 APlayerCharacter::GetSkillPointsReward_Implementation(int32 Level) const
+{
+	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	return PlayerCharacterState->LevelUpInfo->LevelUpInformation[Level].SkillPointAward;
+}
+
+void APlayerCharacter::AddToPlayerLevel_Implementation(int32 InPlayerLevel)
+{
+	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	PlayerCharacterState->AddToLevel(InPlayerLevel);
+}
+
+void APlayerCharacter::AddToAttributePoints_Implementation(int32 InAttributePoints)
+{
+	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	PlayerCharacterState->AddToAttributePoints(InAttributePoints);
+}
+
+void APlayerCharacter::AddToSkillPoints_Implementation(int32 InSkillPoints)
+{
+	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	PlayerCharacterState->AddToSkillPoints(InSkillPoints);
+}
+
+int32 APlayerCharacter::GetAttributePoints_Implementation() const
+{
+	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	return PlayerCharacterState->GetAttributePoints();
+}
+
+int32 APlayerCharacter::GetSkillPoints_Implementation() const
+{
+	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	return PlayerCharacterState->GetSkillPoints();
+}
+
+void APlayerCharacter::SetCombatState_Implementation(ECombatState NewState)
+{
+	CombatState = NewState;
+}
+
+void APlayerCharacter::SetMovementEnabled_Implementation(bool Enabled)
+{
+	GetCharacterMovement()->MaxWalkSpeed = !Enabled ? 0.f : BaseWalkSpeed;
+	if(Enabled)
+	{
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	}
+	else
+	{
+		GetCharacterMovement()->StopActiveMovement();
+	}
 }
 
 /*
@@ -135,6 +246,9 @@ void APlayerCharacter::InitAbilityActorInfo()
 		}
 	}
 	InitializeDefaultAttributes();
+
+	//TODO: Move this to some other (PlayerState, BeginPlay)
+	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::HitReactTagChanged);
 }
 
 void APlayerCharacter::Move(const float ScaleValue)

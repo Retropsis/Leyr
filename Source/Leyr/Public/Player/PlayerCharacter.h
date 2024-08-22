@@ -8,6 +8,7 @@
 #include "Interaction/PlayerInterface.h"
 #include "PlayerCharacter.generated.h"
 
+class UNiagaraComponent;
 struct FInventoryItemData;
 class UPlayerInventoryComponent;
 class UCameraComponent;
@@ -25,6 +26,7 @@ public:
 	APlayerCharacter();
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
+	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 	
 	void Move(float ScaleValue);
 	void RotateController() const;
@@ -47,7 +49,24 @@ public:
 	virtual void UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData) override;	
 	virtual void AddToXP_Implementation(int32 InXP) override;
 	virtual void LevelUp_Implementation() override;
+	virtual int32 GetXP_Implementation() const override;
+	virtual int32 FindLevelForXP_Implementation(int32 InXP) const override;
+	virtual int32 GetAttributePointsReward_Implementation(int32 Level) const override;
+	virtual int32 GetSkillPointsReward_Implementation(int32 Level) const override;
+	virtual void AddToPlayerLevel_Implementation(int32 InPlayerLevel) override;
+	virtual void AddToAttributePoints_Implementation(int32 InAttributePoints) override;
+	virtual void AddToSkillPoints_Implementation(int32 InSpellPoints) override;
+	virtual int32 GetAttributePoints_Implementation() const override;
+	virtual int32 GetSkillPoints_Implementation() const override;
+	virtual ECombatState GetCombatState_Implementation() const override { return CombatState; }
+	virtual void SetCombatState_Implementation(ECombatState NewState) override;
+	virtual void SetMovementEnabled_Implementation(bool Enabled) override;
+	virtual void SetComboWindow_Implementation(bool bOpen) override { bIsComboWindowOpen = bOpen; }
+	virtual bool IsComboWindowOpen_Implementation() override { return bIsComboWindowOpen; }
 	/** end Player Interface */
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UNiagaraComponent> LevelUpNiagaraComponent;
 
 protected:
 	virtual void InitAbilityActorInfo() override;
@@ -55,6 +74,8 @@ protected:
 	bool bAirborne = false;
 	bool bIsAccelerating = false;
 	bool bIsMoving = false;
+	bool bIsComboWindowOpen = false;
+	ECombatState CombatState = ECombatState::Unoccupied;
 
 private:	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))
@@ -65,6 +86,9 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UInventoryComponent> PlayerInventory;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastLevelUpParticles() const;
 
 public:
 	FORCEINLINE bool IsAirborne() const { return bAirborne; }
