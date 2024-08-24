@@ -8,8 +8,9 @@
 
 // TODO: Could do it for GrantedTags as well ?
 DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer& /*AssetTags*/);
-DECLARE_MULTICAST_DELEGATE_OneParam(FAbilitiesGiven, UBaseAbilitySystemComponent*);
+DECLARE_MULTICAST_DELEGATE(FAbilitiesGiven);
 DECLARE_DELEGATE_OneParam(FForEachAbility, const FGameplayAbilitySpec&);
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FAbilityStatusChanged, const FGameplayTag& /*AbilityTag*/, const FGameplayTag& /*StatusTag*/, int32 /*AbilityLevel*/);
 
 /**
  * 
@@ -29,20 +30,30 @@ public:
 
 	static FGameplayTag GetAbilityTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
 	static FGameplayTag GetInputTagFromSpec(const FGameplayAbilitySpec& AbilitySpec);
-	
-	FAbilitiesGiven AbilitiesGivenDelegate;
-	bool bStartupAbilitiesGiven = false;
-	
-	FEffectAssetTags EffectAssetTags;
+	static FGameplayTag GetStatusFromSpec(const FGameplayAbilitySpec& AbilitySpec);
+	FGameplayAbilitySpec* GetSpecFromAbilityTag(const FGameplayTag& AbilityTag);
 
+	void UpdateAbilityStatuses(int32 Level);
 	void UpgradeAttribute(const FGameplayTag& AttributeTag);
 
 	UFUNCTION(Server, Reliable)
 	void ServerUpgradeAttribute(const FGameplayTag& AttributeTag);
+	
+	UFUNCTION(Server, Reliable)
+	void ServerSpendSkillPoint(const FGameplayTag& AbilityTag);
+	
+	FAbilityStatusChanged AbilityStatusChanged;
+	FAbilitiesGiven AbilitiesGivenDelegate;
+	bool bStartupAbilitiesGiven = false;
+	
+	FEffectAssetTags EffectAssetTags;
 	
 protected:
 	virtual void OnRep_ActivateAbilities() override;
 	
 	UFUNCTION(Client, Reliable)
 	void ClientEffectApplied(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& EffectSpec, FActiveGameplayEffectHandle ActiveEffectHandle) const;
+	
+	UFUNCTION(Client, Reliable)
+	void ClientUpdateAbilityStatus(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, int32 AbilityLevel);
 };

@@ -9,64 +9,59 @@
 #include "Player/PlayerCharacterState.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
-{
-	const UBaseAttributeSet* BaseAttributeSet = CastChecked<UBaseAttributeSet>(AttributeSet);
-	
-	OnHealthChanged.Broadcast(BaseAttributeSet->GetHealth());
-	OnMaxHealthChanged.Broadcast(BaseAttributeSet->GetMaxHealth());
-	OnManaChanged.Broadcast(BaseAttributeSet->GetMana());
-	OnMaxManaChanged.Broadcast(BaseAttributeSet->GetMaxMana());
+{	
+	OnHealthChanged.Broadcast(GetBaseAS()->GetHealth());
+	OnMaxHealthChanged.Broadcast(GetBaseAS()->GetMaxHealth());
+	OnManaChanged.Broadcast(GetBaseAS()->GetMana());
+	OnMaxManaChanged.Broadcast(GetBaseAS()->GetMaxMana());
 }
 
 void UOverlayWidgetController::BindCallbacksToDependencies()
 {
-	APlayerCharacterState* PlayerCharacterState = CastChecked<APlayerCharacterState>(PlayerState);
-	PlayerCharacterState->OnXPChangedDelegate.AddUObject(this, &UOverlayWidgetController::OnXPChanged);
-	PlayerCharacterState->OnLevelChangedDelegate.AddLambda(
+	GetBasePS()->OnXPChangedDelegate.AddUObject(this, &UOverlayWidgetController::OnXPChanged);
+	GetBasePS()->OnLevelChangedDelegate.AddLambda(
 		[this](int32 NewLevel)
 		{
 			OnPlayerLevelChangedDelegate.Broadcast(NewLevel);
 		}
 	);
 	
-	const UBaseAttributeSet* BaseAttributeSet = CastChecked<UBaseAttributeSet>(AttributeSet);
-
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(BaseAttributeSet->GetHealthAttribute()).AddLambda(
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(GetBaseAS()->GetHealthAttribute()).AddLambda(
 		[this] (const FOnAttributeChangeData& Data)
 		{
 			OnHealthChanged.Broadcast(Data.NewValue);
 		}
 	);
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(BaseAttributeSet->GetMaxHealthAttribute()).AddLambda(
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(GetBaseAS()->GetMaxHealthAttribute()).AddLambda(
 		[this] (const FOnAttributeChangeData& Data)
 		{
 			OnMaxHealthChanged.Broadcast(Data.NewValue);
 		}
 	);
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(BaseAttributeSet->GetManaAttribute()).AddLambda(
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(GetBaseAS()->GetManaAttribute()).AddLambda(
 		[this] (const FOnAttributeChangeData& Data)
 		{
 			OnManaChanged.Broadcast(Data.NewValue);
 		}
 	);
-	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(BaseAttributeSet->GetMaxManaAttribute()).AddLambda(
+	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(GetBaseAS()->GetMaxManaAttribute()).AddLambda(
 		[this] (const FOnAttributeChangeData& Data)
 		{
 			OnMaxManaChanged.Broadcast(Data.NewValue);
 		}
 	);
 
-	if (UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent))
+	if (GetBaseASC())
 	{
-		if (BaseASC->bStartupAbilitiesGiven)
+		if (GetBaseASC()->bStartupAbilitiesGiven)
 		{
-			OnInitializeStartupAbilities(BaseASC);
+			BroadcastAbilityInfo();
 		}
 		else
 		{
-			BaseASC->AbilitiesGivenDelegate.AddUObject(this, &UOverlayWidgetController::OnInitializeStartupAbilities);
+			GetBaseASC()->AbilitiesGivenDelegate.AddUObject(this, &UOverlayWidgetController::BroadcastAbilityInfo);
 		}
-		BaseASC->EffectAssetTags.AddLambda([this] (const FGameplayTagContainer& AssetTags)
+		GetBaseASC()->EffectAssetTags.AddLambda([this] (const FGameplayTagContainer& AssetTags)
 		{
 			for (const FGameplayTag& Tag : AssetTags)
 			{
@@ -83,25 +78,9 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 	}	
 }
 
-void UOverlayWidgetController::OnInitializeStartupAbilities(UBaseAbilitySystemComponent* BaseAbilitySystemComponent)
+void UOverlayWidgetController::OnXPChanged(int32 NewXP)
 {
-	if (!BaseAbilitySystemComponent->bStartupAbilitiesGiven) return;
-	
-	FForEachAbility BroadcastDelegate;
-	BroadcastDelegate.BindLambda([this, BaseAbilitySystemComponent](const FGameplayAbilitySpec& AbilitySpec)
-	{
-		//TODO need a way to figure out the ability tag for a given ability spec.
-		FBaseAbilityInfo Info = AbilityInfo->FindAbilityInfoForTag(BaseAbilitySystemComponent->GetAbilityTagFromSpec(AbilitySpec));
-		Info.InputTag = BaseAbilitySystemComponent->GetInputTagFromSpec(AbilitySpec);
-		AbilityInfoDelegate.Broadcast(Info);
-	});
-	BaseAbilitySystemComponent->ForEachAbility(BroadcastDelegate);
-}
-
-void UOverlayWidgetController::OnXPChanged(int32 NewXP) const
-{
-	const APlayerCharacterState* PlayerCharacterState = CastChecked<APlayerCharacterState>(PlayerState);
-	const ULevelUpInfo* LevelUpInfo = PlayerCharacterState->LevelUpInfo;
+	const ULevelUpInfo* LevelUpInfo = GetBasePS()->LevelUpInfo;
 	checkf(LevelUpInfo, TEXT("Unabled to find LevelUpInfo. Please fill out AuraPlayerState Blueprint"));
 
 	const int32 Level = LevelUpInfo->FindLevelForXP(NewXP);

@@ -7,6 +7,8 @@
 #include "Engine/DataAsset.h"
 #include "AbilityInfo.generated.h"
 
+class UGameplayAbility;
+
 USTRUCT(BlueprintType)
 struct FBaseAbilityInfo
 {
@@ -21,11 +23,20 @@ struct FBaseAbilityInfo
 	UPROPERTY(BlueprintReadOnly)
 	FGameplayTag InputTag = FGameplayTag();
 
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayTag StatusTag = FGameplayTag();
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<const UTexture2D> Icon = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<const UMaterialInterface> BackgroundMaterial = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UGameplayAbility> Ability;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 LevelRequirement = 1;
 };
 
 /**

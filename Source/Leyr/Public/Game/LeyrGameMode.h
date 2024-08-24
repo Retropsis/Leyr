@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "LeyrGameMode.generated.h"
 
+class UAbilityInfo;
 class UCharacterClassInfo;
 
 /**
@@ -19,4 +20,7 @@ class LEYR_API ALeyrGameMode : public AGameModeBase
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Character Class Defaults")
 	TObjectPtr<UCharacterClassInfo> CharacterClassInfo;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Ability Info")
+	TObjectPtr<UAbilityInfo> AbilityInfo;
 };

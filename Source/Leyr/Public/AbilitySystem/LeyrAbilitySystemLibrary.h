@@ -6,6 +6,8 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "LeyrAbilitySystemLibrary.generated.h"
 
+class UAbilityInfo;
+class USkillMenuWidgetController;
 struct FGameplayEffectContextHandle;
 class UCharacterClassInfo;
 class UAbilitySystemComponent;
@@ -33,8 +35,8 @@ public:
 	UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary", meta=(WorldContext="WorldContextObject"))
 	static  UAttributeMenuWidgetController* GetAttributeMenuWidgetController(const UObject* WorldContextObject);
 	
-	// UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary", meta=(WorldContext="WorldContextObject"))
-	// static  USpellMenuWidgetController* GetSpellMenuWidgetController(const UObject* WorldContextObject);
+	UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary", meta=(WorldContext="WorldContextObject"))
+	static  USkillMenuWidgetController* GetSkillMenuWidgetController(const UObject* WorldContextObject);
 	
 	UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary", meta=(WorldContext="WorldContextObject"))
 	static  bool MakeWidgetControllerParams(const UObject* WorldContextObject, FWidgetControllerParams& OutWCParams, APlayerHUD*& OutPlayerHUD);
@@ -50,6 +52,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|CharacterClassDefaults", meta=(WorldContext="WorldContextObject"))
 	static UCharacterClassInfo* GetCharacterClassInfo(const UObject* WorldContextObject);
+	
+	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|CharacterClassDefaults", meta=(WorldContext="WorldContextObject"))
+	static UAbilityInfo* GetAbilityInfo(const UObject* WorldContextObject);
 
 	/*
 	 * Custom Effect Context

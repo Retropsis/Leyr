@@ -39,6 +39,17 @@ UAttributeMenuWidgetController* ULeyrAbilitySystemLibrary::GetAttributeMenuWidge
 	return nullptr;
 }
 
+USkillMenuWidgetController* ULeyrAbilitySystemLibrary::GetSkillMenuWidgetController(const UObject* WorldContextObject)
+{
+	FWidgetControllerParams WCParams;
+	APlayerHUD* PlayerHUD = nullptr;
+	if (MakeWidgetControllerParams(WorldContextObject, WCParams, PlayerHUD))
+	{
+		return PlayerHUD->GetSkillMenuWidgetController(WCParams);
+	}
+	return nullptr;
+}
+
 bool ULeyrAbilitySystemLibrary::MakeWidgetControllerParams(const UObject* WorldContextObject, FWidgetControllerParams& OutWCParams, APlayerHUD*& OutPlayerHUD)
 {
 	if (const APlayerController* PC  = WorldContextObject->GetWorld()->GetFirstPlayerController())
@@ -110,6 +121,13 @@ UCharacterClassInfo* ULeyrAbilitySystemLibrary::GetCharacterClassInfo(const UObj
 	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
 	if (LeyrGameMode == nullptr) return nullptr;
 	return LeyrGameMode->CharacterClassInfo;
+}
+
+UAbilityInfo* ULeyrAbilitySystemLibrary::GetAbilityInfo(const UObject* WorldContextObject)
+{
+	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (LeyrGameMode == nullptr) return nullptr;
+	return LeyrGameMode->AbilityInfo;
 }
 
 bool ULeyrAbilitySystemLibrary::IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)
