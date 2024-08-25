@@ -24,3 +24,9 @@ FTaggedMontage UDamageGameplayAbility::GetRandomTaggedMontageFromArray(const TAr
 	}
 	return FTaggedMontage();
 }
+
+FVector2D UDamageGameplayAbility::GetDamageByDamageType(float InLevel, const FGameplayTag& DamageType)
+{
+	checkf(DamageTypes.Contains(DamageType), TEXT("GameplayAbilit [%s] does not contain DamageType [%s]"), *GetNameSafe(this), *DamageType.ToString());
+	return FVector2D(DamageTypes[DamageType].ValueMin.GetValueAtLevel(InLevel), DamageTypes[DamageType].ValueMax.GetValueAtLevel(InLevel));
+}

@@ -8,7 +8,9 @@
 #include "UI/Controller/WidgetController.h"
 #include "SkillMenuWidgetController.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FSkillSlotSelectedSignature, bool, bSpendPointsButtonEnabled, bool, bEquipButtonEnabled);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FSkillSlotSelectedSignature, bool, bSpendPointsButtonEnabled, bool, bEquipButtonEnabled, FString, DescriptionString, FString, NextLevelDescriptionString);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FWaitForEquipSelectionSignature, const FGameplayTag&, AbilityType);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSkillSlotReassignedSignature, const FGameplayTag&, AbilityTag);
 
 struct FSelectedAbility
 {
@@ -34,14 +36,36 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FSkillSlotSelectedSignature SkillSlotSelectedDelegate;
 
+	UPROPERTY(BlueprintAssignable)
+	FWaitForEquipSelectionSignature WaitForEquipDelegate;
+
+	UPROPERTY(BlueprintAssignable)
+	FWaitForEquipSelectionSignature StopWaitingForEquipDelegate;
+	
+	UPROPERTY(BlueprintAssignable)
+	FSkillSlotReassignedSignature SkillSlotReassignedDelegate;
+
 	UFUNCTION(BlueprintCallable)
 	void SkillSlotSelected(const FGameplayTag& AbilityTag);
 	
 	UFUNCTION(BlueprintCallable)
+	void SkillSlotDeselect();
+	
+	UFUNCTION(BlueprintCallable)
 	void SpendPointButtonPressed();
+	
+	UFUNCTION(BlueprintCallable)
+	void EquipButtonPressed();
+	
+	UFUNCTION(BlueprintCallable)
+	void SkillRowSlotPressed(const FGameplayTag& SlotTag, const FGameplayTag& AbilityType);
+
+	void OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& Status, const FGameplayTag& Slot, const FGameplayTag& PreviousSlot);
 
 private:
 	static void ShouldEnableButtons(const FGameplayTag& AbilityStatus, int32 SkillPoints, bool& bShouldEnableSkillPointsButton, bool& bShouldEnableEquipButton);
 	FSelectedAbility SelectedAbility = { FBaseGameplayTags::Get().Abilities_None,  FBaseGameplayTags::Get().Abilities_Status_Locked };
 	int32 CurrentSpellPoints = 0;
+	bool bWaitingForEquipSelection = false;
+	FGameplayTag SelectedSlot;
 };

@@ -19,6 +19,9 @@ struct FBaseAbilityInfo
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(Categories="Cooldown"))
 	FGameplayTag CooldownTag = FGameplayTag();
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(Categories="Abilities.Type"))
+	FGameplayTag AbilityType = FGameplayTag();
 
 	UPROPERTY(BlueprintReadOnly)
 	FGameplayTag InputTag = FGameplayTag();

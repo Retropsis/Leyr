@@ -6,6 +6,7 @@
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/Data/AbilityInfo.h"
 #include "AbilitySystem/Data/LevelUpInfo.h"
+#include "Game/BaseGameplayTags.h"
 #include "Player/PlayerCharacterState.h"
 
 void UOverlayWidgetController::BroadcastInitialValues()
@@ -53,6 +54,7 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 
 	if (GetBaseASC())
 	{
+		GetBaseASC()->AbilityEquipped.AddUObject(this, &UOverlayWidgetController::OnAbilityEquipped);
 		if (GetBaseASC()->bStartupAbilitiesGiven)
 		{
 			BroadcastAbilityInfo();
@@ -81,7 +83,7 @@ void UOverlayWidgetController::BindCallbacksToDependencies()
 void UOverlayWidgetController::OnXPChanged(int32 NewXP)
 {
 	const ULevelUpInfo* LevelUpInfo = GetBasePS()->LevelUpInfo;
-	checkf(LevelUpInfo, TEXT("Unabled to find LevelUpInfo. Please fill out AuraPlayerState Blueprint"));
+	checkf(LevelUpInfo, TEXT("Unabled to find LevelUpInfo. Please fill out BasePlayerState Blueprint"));
 
 	const int32 Level = LevelUpInfo->FindLevelForXP(NewXP);
 	const int32 MaxLevel = LevelUpInfo->LevelUpInformation.Num();
@@ -99,4 +101,21 @@ void UOverlayWidgetController::OnXPChanged(int32 NewXP)
 		OnXPPercentChangedDelegate.Broadcast(XPBarPercent);
 		OnXPValueChanged.Broadcast(XPForThisLevel);
 	}
+}
+
+void UOverlayWidgetController::OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& Status, const FGameplayTag& Slot, const FGameplayTag& PreviousSlot) const
+{
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+
+	FBaseAbilityInfo LastSlotInfo;
+	LastSlotInfo.StatusTag = GameplayTags.Abilities_Status_Unlocked;
+	LastSlotInfo.InputTag = PreviousSlot;
+	LastSlotInfo.AbilityTag = GameplayTags.Abilities_None;
+	// Broadcast empty info if PreviousSlot is a valid slot. Only if equipping an already-equipped spell
+	AbilityInfoDelegate.Broadcast(LastSlotInfo);
+
+	FBaseAbilityInfo Info = AbilityInfo->FindAbilityInfoForTag(AbilityTag);
+	Info.StatusTag = Status;
+	Info.InputTag = Slot;
+	AbilityInfoDelegate.Broadcast(Info);
 }
