@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
+#include "Leyr/Leyr.h"
 #include "UObject/Interface.h"
 #include "CombatInterface.generated.h"
 
@@ -19,6 +20,9 @@ USTRUCT(BlueprintType)
 struct FTaggedMontage
 {
 	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FValueRange AbilityPower = FValueRange();
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UPaperZDAnimSequence* Montage = nullptr;
@@ -31,6 +35,12 @@ struct FTaggedMontage
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	USoundBase* ImpactSound = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FVector BoxTraceStart = FVector::ZeroVector;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FVector BoxTraceEnd = FVector::ZeroVector;
 };
 
 UENUM(BlueprintType)
@@ -129,4 +139,16 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool IsComboWindowOpen();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ResetAttacking();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ResetCombatVariables();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	int32 GetAttackComboIndex();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetAttackComboIndex(int32 Index);
 };

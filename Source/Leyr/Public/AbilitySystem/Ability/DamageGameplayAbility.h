@@ -23,7 +23,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability|Damage")
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Damage", meta=(Categories="Damage"))
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Damage", meta=(Categories="Damage"))
 	TMap<FGameplayTag, FValueRange> DamageTypes;
 
 	UFUNCTION(BlueprintPure)

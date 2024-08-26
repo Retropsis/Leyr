@@ -63,6 +63,10 @@ public:
 	virtual void SetMovementEnabled_Implementation(bool Enabled) override;
 	virtual void SetComboWindow_Implementation(bool bOpen) override { bIsComboWindowOpen = bOpen; }
 	virtual bool IsComboWindowOpen_Implementation() override { return bIsComboWindowOpen; }
+	virtual void ResetAttacking_Implementation() override {}
+	virtual void ResetCombatVariables_Implementation() override {}
+	virtual int32 GetAttackComboIndex_Implementation() override { return AttackCount; }
+	virtual void SetAttackComboIndex_Implementation(int32 Index) override { AttackCount = Index; }
 	/** end Player Interface */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -75,6 +79,10 @@ protected:
 	bool bIsAccelerating = false;
 	bool bIsMoving = false;
 	bool bIsComboWindowOpen = false;
+
+	UPROPERTY(BlueprintReadWrite)
+	int32 AttackCount = 0;
+	
 	ECombatState CombatState = ECombatState::Unoccupied;
 
 private:	
