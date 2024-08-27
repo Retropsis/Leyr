@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "LeyrAbilitySystemLibrary.generated.h"
 
+struct FAdditionalEffectParams;
 class UAbilityInfo;
 class USkillMenuWidgetController;
 struct FGameplayEffectContextHandle;
@@ -71,6 +73,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects")
 	static void SetIsCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, bool bInIsCriticalHit);
 
+	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|AdditionalEffect")
+	static FGameplayEffectContextHandle ApplyAdditionalEffect(const FAdditionalEffectParams& AdditionalEffectParams);
+	
 	/*
 	 * Gameplay Mechanics
 	 */
@@ -79,6 +84,38 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "LeyrAbilitySystemLibrary|GameplayMechanics")
 	static bool IsHostile(const AActor* FirstActor, const AActor* SecondActor);
+	
+	/*
+	 *	Status Effects
+	 */
+	UFUNCTION(BlueprintPure, Category = "LeyrAbilitySystemLibrary|GameplayEffects", meta=(WorldContext="WorldContextObject"))
+	static bool IsSuccessfulStatusEffect(const FGameplayEffectContextHandle& EffectContextHandle);
+
+	UFUNCTION(BlueprintPure, Category = "LeyrAbilitySystemLibrary|GameplayEffects", meta=(WorldContext="WorldContextObject"))
+	static float GetStatusEffectDamage(const FGameplayEffectContextHandle& EffectContextHandle);
+
+	UFUNCTION(BlueprintPure, Category = "LeyrAbilitySystemLibrary|GameplayEffects", meta=(WorldContext="WorldContextObject"))
+	static float GetStatusEffectDuration(const FGameplayEffectContextHandle& EffectContextHandle);
+
+	UFUNCTION(BlueprintPure, Category = "LeyrAbilitySystemLibrary|GameplayEffects", meta=(WorldContext="WorldContextObject"))
+	static float GetStatusEffectFrequency(const FGameplayEffectContextHandle& EffectContextHandle);
+
+	UFUNCTION(BlueprintPure, Category = "LeyrAbilitySystemLibrary|GameplayEffects", meta=(WorldContext="WorldContextObject"))
+	static FGameplayTag GetDamageType(const FGameplayEffectContextHandle& EffectContextHandle);
+	
+	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects", meta=(WorldContext="WorldContextObject"))
+	static void SetIsSuccessfulStatusEffect(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, bool bInSuccessfulStatusEffect);
+
+	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects", meta=(WorldContext="WorldContextObject"))
+	static void SetStatusEffectDamage(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, float InDamage);
+
+	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects", meta=(WorldContext="WorldContextObject"))
+	static void SetStatusEffectDuration(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, float InDuration);
+
+	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects", meta=(WorldContext="WorldContextObject"))
+	static void SetStatusEffectFrequency(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, float InFrequency);
+
+	static void SetDamageType(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const FGameplayTag& InDamageType);
 	
 	static int32 GetXPRewardForClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass, int32 CharacterLevel);
 };

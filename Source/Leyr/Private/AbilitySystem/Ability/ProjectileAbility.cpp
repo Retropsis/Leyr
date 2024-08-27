@@ -32,30 +32,7 @@ void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation
 		GetOwningActorFromActorInfo(),
 		Cast<APawn>(GetOwningActorFromActorInfo()),
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-
-	const UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo());
-		
-	FGameplayEffectContextHandle EffectContextHandle = SourceASC->MakeEffectContext();
-	EffectContextHandle.SetAbility(this);
-	EffectContextHandle.AddSourceObject(Projectile);
-	TArray<TWeakObjectPtr<AActor>> Actors;
-	Actors.Add(Projectile);
-	EffectContextHandle.AddActors(Actors);
-	FHitResult HitResult;
-	HitResult.Location = ProjectileTargetLocation;
-	EffectContextHandle.AddHitResult(HitResult);
-
-	const FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), EffectContextHandle);
-	for (auto& Pair : DamageTypes)
-	{
-		const float ScaledMagnitude = Pair.Value.GetRandomFloatFromScalableRange(GetAbilityLevel());
-		UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, Pair.Key, ScaledMagnitude);
-	}
-	// TODO: Single Type
-	// const float ScaledMagnitude = AbilityPower.GetRandomFloatFromScalableRange(GetAbilityLevel());
-	// UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.Damage_Piercing, ScaledMagnitude);
-		
-	Projectile->DamageEffectSpecHandle = SpecHandle;
-
+	
+	Projectile->AdditionalEffectParams = MakeAdditionalEffectParamsFromClassDefaults();
 	Projectile->FinishSpawning(SpawnTransform);
 }

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilityTypes.h"
 #include "AbilitySystem/Ability/BaseGameplayAbility.h"
 #include "Interaction/CombatInterface.h"
 #include "DamageGameplayAbility.generated.h"
@@ -19,15 +20,32 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void CauseDamage(AActor* TargetActor);
 
+	FAdditionalEffectParams MakeAdditionalEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability|Damage")
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
 
+	// UPROPERTY(EditDefaultsOnly, Category="Ability|Damage", meta=(Categories="Damage"))
+	// TMap<FGameplayTag, FValueRange> DamageTypes;
+
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Damage", meta=(Categories="Damage"))
-	TMap<FGameplayTag, FValueRange> DamageTypes;
+	FGameplayTag DamageType;
+
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Status Effect")
+	float StatusEffectChance = 20.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Status Effect")
+	float StatusEffectDamage = 5.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Status Effect")
+	float StatusEffectFrequency = 1.f;
+
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Status Effect")
+	float StatusEffectDuration = 5.f;
 
 	UFUNCTION(BlueprintPure)
 	FTaggedMontage GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& TaggedMontages) const;
 	
-	FVector2D GetDamageByDamageType(float InLevel, const FGameplayTag& DamageType);
+	// FVector2D GetDamageByDamageType(float InLevel, const FGameplayTag& DamageType);
 };

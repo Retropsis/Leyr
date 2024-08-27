@@ -43,9 +43,29 @@ bool FBaseGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		{
 			RepBits |= 1 << 8;
 		}
+		if (bIsSuccessfulStatusEffect)
+		{
+			RepBits |= 1 << 9;
+		}
+		if (StatusEffectDamage > 0.f)
+		{
+			RepBits |= 1 << 10;
+		}
+		if (StatusEffectDuration > 0.f)
+		{
+			RepBits |= 1 << 11;
+		}
+		if (StatusEffectFrequency > 0.f)
+		{
+			RepBits |= 1 << 12;
+		}
+		if (DamageType.IsValid())
+		{
+			RepBits |= 1 << 13;
+		}
 	}
 
-	Ar.SerializeBits(&RepBits, 9);
+	Ar.SerializeBits(&RepBits, 14);
 
 	if (RepBits & (1 << 0))
 	{
@@ -95,7 +115,33 @@ bool FBaseGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 	{
 		Ar << bIsCriticalHit;
 	}
-
+	if (RepBits & (1 << 9))
+	{
+		Ar << bIsSuccessfulStatusEffect;
+	}
+	if (RepBits & (1 << 10))
+	{
+		Ar << StatusEffectDamage;
+	}
+	if (RepBits & (1 << 11))
+	{
+		Ar << StatusEffectDuration;
+	}
+	if (RepBits & (1 << 12))
+	{
+		Ar << StatusEffectFrequency;
+	}
+	if (RepBits & (1 << 13))
+	{
+		if (Ar.IsLoading())
+		{
+			if (!DamageType.IsValid())
+			{
+				DamageType = TSharedPtr<FGameplayTag>(new FGameplayTag());
+			}
+		}
+		DamageType->NetSerialize(Ar, Map, bOutSuccess);
+	}
 	if (Ar.IsLoading())
 	{
 		AddInstigator(Instigator.Get(), EffectCauser.Get()); // Just to initialize InstigatorAbilitySystemComponent

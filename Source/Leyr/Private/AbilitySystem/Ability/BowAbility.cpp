@@ -2,12 +2,10 @@
 
 #include "AbilitySystem/Ability/BowAbility.h"
 
-#include "Game/BaseGameplayTags.h"
-
 FString UBowAbility::GetDescription(int32 Level)
 {
-	const int32 MinDamage = DamageTypes[FBaseGameplayTags::Get().Damage_Piercing].ValueMin.GetValueAtLevel(Level);
-	const int32 MaxDamage = DamageTypes[FBaseGameplayTags::Get().Damage_Piercing].ValueMax.GetValueAtLevel(Level);
+	const int32 MinDamage = AbilityPower.ValueMin.GetValueAtLevel(Level);
+	const int32 MaxDamage = AbilityPower.ValueMax.GetValueAtLevel(Level);
 	const float ManaCost = FMath::Abs(GetManaCost(Level));
 	const float Cooldown = GetCooldown(Level);
 	if(Level == 1)
@@ -37,8 +35,8 @@ FString UBowAbility::GetDescription(int32 Level)
 
 FString UBowAbility::GetNextLevelDescription(int32 Level)
 {
-	const int32 MinDamage = DamageTypes[FBaseGameplayTags::Get().Damage_Piercing].ValueMin.GetValueAtLevel(Level);
-	const int32 MaxDamage = DamageTypes[FBaseGameplayTags::Get().Damage_Piercing].ValueMax.GetValueAtLevel(Level);
+	const int32 MinDamage = AbilityPower.ValueMin.GetValueAtLevel(Level);
+	const int32 MaxDamage = AbilityPower.ValueMax.GetValueAtLevel(Level);
 	const float ManaCost = FMath::Abs(GetManaCost(Level));
 	const float Cooldown = GetCooldown(Level);
 	

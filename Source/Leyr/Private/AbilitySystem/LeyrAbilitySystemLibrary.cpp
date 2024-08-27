@@ -2,11 +2,13 @@
 
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilityTypes.h"
 #include "GameplayEffectTypes.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Engine/OverlapResult.h"
+#include "Game/BaseGameplayTags.h"
 #include "Game/LeyrGameMode.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -164,6 +166,25 @@ void ULeyrAbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& E
 	}
 }
 
+FGameplayEffectContextHandle ULeyrAbilitySystemLibrary::ApplyAdditionalEffect(const FAdditionalEffectParams& AdditionalEffectParams)
+{
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	const AActor* SourceAvatarActor = AdditionalEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
+
+	FGameplayEffectContextHandle EffectContextHandle = AdditionalEffectParams.SourceAbilitySystemComponent->MakeEffectContext();
+	EffectContextHandle.AddSourceObject(SourceAvatarActor);
+	const FGameplayEffectSpecHandle SpecHandle = AdditionalEffectParams.SourceAbilitySystemComponent->MakeOutgoingSpec(AdditionalEffectParams.AdditionalEffectClass, AdditionalEffectParams.AbilityLevel, EffectContextHandle);
+
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, AdditionalEffectParams.DamageType, AdditionalEffectParams.AbilityPower);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Chance, AdditionalEffectParams.StatusEffectChance);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Damage, AdditionalEffectParams.StatusEffectDamage);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Duration, AdditionalEffectParams.StatusEffectDuration);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Frequency, AdditionalEffectParams.StatusEffectFrequency);
+
+	AdditionalEffectParams.TargetAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
+	return EffectContextHandle;
+}
+
 /*
  * Gameplay Mechanics
  */
@@ -191,6 +212,98 @@ bool ULeyrAbilitySystemLibrary::IsHostile(const AActor* FirstActor, const AActor
 {
 	return !(FirstActor->ActorHasTag(FName("Player")) && SecondActor->ActorHasTag(FName("Player"))
 	|| FirstActor->ActorHasTag(FName("Enemy")) && SecondActor->ActorHasTag(FName("Enemy")));
+}
+
+/*
+ * Status Effects
+ */
+bool ULeyrAbilitySystemLibrary::IsSuccessfulStatusEffect(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FBaseGameplayEffectContext* BaseEffectContext = static_cast<const FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return BaseEffectContext->IsSuccessfulStatusEffect();
+	}
+	return false;
+}
+
+float ULeyrAbilitySystemLibrary::GetStatusEffectDamage(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FBaseGameplayEffectContext* BaseEffectContext = static_cast<const FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return BaseEffectContext->GetStatusEffectDamage();
+	}
+	return 0.f;
+}
+
+float ULeyrAbilitySystemLibrary::GetStatusEffectDuration(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FBaseGameplayEffectContext* BaseEffectContext = static_cast<const FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return BaseEffectContext->GetStatusEffectDuration();
+	}
+	return 0.f;
+}
+
+float ULeyrAbilitySystemLibrary::GetStatusEffectFrequency(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FBaseGameplayEffectContext* BaseEffectContext = static_cast<const FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return BaseEffectContext->GetStatusEffectFrequency();
+	}
+	return 0.f;
+}
+
+FGameplayTag ULeyrAbilitySystemLibrary::GetDamageType(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FBaseGameplayEffectContext* BaseEffectContext = static_cast<const FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		if (BaseEffectContext->GetDamageType().IsValid())
+		{
+			return *BaseEffectContext->GetDamageType();
+		}
+	}
+	return FGameplayTag();
+}
+
+void ULeyrAbilitySystemLibrary::SetIsSuccessfulStatusEffect(FGameplayEffectContextHandle& EffectContextHandle, bool bInSuccessfulStatusEffect)
+{
+	if (FBaseGameplayEffectContext* BaseEffectContext = static_cast<FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		BaseEffectContext->SetIsSuccessfulStatusEffect(bInSuccessfulStatusEffect);
+	}
+}
+
+void ULeyrAbilitySystemLibrary::SetStatusEffectDamage(FGameplayEffectContextHandle& EffectContextHandle, float InDamage)
+{
+	if (FBaseGameplayEffectContext* BaseEffectContext = static_cast<FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		BaseEffectContext->SetStatusEffectDamage(InDamage);
+	}
+}
+
+void ULeyrAbilitySystemLibrary::SetStatusEffectDuration(FGameplayEffectContextHandle& EffectContextHandle, float InDuration)
+{
+	if (FBaseGameplayEffectContext* BaseEffectContext = static_cast<FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		BaseEffectContext->SetStatusEffectDuration(InDuration);
+	}
+}
+
+void ULeyrAbilitySystemLibrary::SetStatusEffectFrequency(FGameplayEffectContextHandle& EffectContextHandle, float InFrequency)
+{
+	if (FBaseGameplayEffectContext* BaseEffectContext = static_cast<FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		BaseEffectContext->SetStatusEffectFrequency(InFrequency);
+	}
+}
+
+void ULeyrAbilitySystemLibrary::SetDamageType(FGameplayEffectContextHandle& EffectContextHandle, const FGameplayTag& InDamageType)
+{
+	if (FBaseGameplayEffectContext* BaseEffectContext = static_cast<FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		const TSharedPtr<FGameplayTag> DamageType = MakeShared<FGameplayTag>(InDamageType);
+		BaseEffectContext->SetDamageType(DamageType);
+	}
 }
 
 int32 ULeyrAbilitySystemLibrary::GetXPRewardForClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass, int32 CharacterLevel)
