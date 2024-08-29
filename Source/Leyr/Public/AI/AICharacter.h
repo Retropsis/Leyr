@@ -29,7 +29,7 @@ public:
 	virtual int32 GetCharacterLevel_Implementation() override { return Level; }
 	virtual void SetCombatTarget_Implementation(AActor* InCombatTarget) override { CombatTarget = InCombatTarget; }
 	virtual AActor* GetCombatTarget_Implementation() const override { return CombatTarget; }
-	virtual void Die() override;
+	virtual void Die(const FVector& DeathImpulse) override;
 	/** end Combat Interface */
 	
 	UPROPERTY(BlueprintReadWrite, Category = "Combat")

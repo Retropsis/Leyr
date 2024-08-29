@@ -4,6 +4,7 @@
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectTypes.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
+#include "AbilitySystem/Effect/StatusEffectNiagaraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Game/BaseGameplayTags.h"
@@ -35,6 +36,13 @@ ABaseCharacter::ABaseCharacter()
 
 	BoxTraceEnd = CreateDefaultSubobject<USceneComponent>("BoxTraceEnd");
 	BoxTraceEnd->SetupAttachment(GetRootComponent());
+	
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+
+	//TODO: Need a more modular system
+	BurnStatusEffectComponent = CreateDefaultSubobject<UStatusEffectNiagaraComponent>("BurnStatusEffectComponent");
+	BurnStatusEffectComponent->SetupAttachment(GetRootComponent());
+	BurnStatusEffectComponent->StatusEffectTag = GameplayTags.StatusEffect_Burn;
 }
 
 /*
@@ -128,12 +136,12 @@ FTaggedMontage ABaseCharacter::GetTaggedMontageByTag_Implementation(const FGamep
 	return FTaggedMontage();
 }
 
-void ABaseCharacter::Die()
+void ABaseCharacter::Die(const FVector& DeathImpulse)
 {
 	bDead = true;
 	//TODO: for 3D meshes, could try also with 2D Weapon
 	// Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
-	MulticastHandleDeath();
+	MulticastHandleDeath(DeathImpulse);
 }
 
 void ABaseCharacter::Dissolve()
@@ -152,22 +160,30 @@ void ABaseCharacter::Dissolve()
 	// }
 }
 
-void ABaseCharacter::MulticastHandleDeath_Implementation()
+void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImpulse)
 {
 	// TODO: Activate this for 3D Meshes
 	// Weapon->SetSimulatePhysics(true);
 	// Weapon->SetEnableGravity(true);
 	// Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	// Weapon->AddImpulse(DeathImpulse * 0.1f, NAME_None, true);
 	//
 	// GetMesh()->SetSimulatePhysics(true);
 	// GetMesh()->SetEnableGravity(true);
 	// GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	// GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	// GetMesh()->AddImpulse(DeathImpulse, NAME_None, true);
 	// Dissolve();
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	// GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetSimulatePhysics(true);
+	GetCapsuleComponent()->AddImpulse(DeathImpulse, NAME_None, true);
 	
 	UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation(), GetActorRotation());
 	bDead = true;
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	BurnStatusEffectComponent->Deactivate();
+	OnDeath.Broadcast(this);
 }
 
 /*

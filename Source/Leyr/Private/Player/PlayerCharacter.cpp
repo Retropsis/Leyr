@@ -242,6 +242,7 @@ void APlayerCharacter::InitAbilityActorInfo()
 	
 	AbilitySystemComponent = PlayerCharacterState->GetAbilitySystemComponent();
 	AttributeSet = PlayerCharacterState->GetAttributeSet();
+	OnASCRegistered.Broadcast(AbilitySystemComponent);
 
 	if(APlayerCharacterController* PlayerCharacterController = Cast<APlayerCharacterController>(GetController()))
 	{

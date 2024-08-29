@@ -69,9 +69,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	int32 GetCharacterLevel();
 	
-	virtual void Die() = 0;
-	// virtual FOnASCRegistered& GetOnASCRegistered() = 0;
-	// virtual FOnDeath& GetOnDeathDelegate() = 0;
+	virtual void Die(const FVector& DeathImpulse) = 0;
+	virtual FOnASCRegistered& GetOnASCRegistered() = 0;
+	virtual FOnDeath& GetOnDeath() = 0;
 	// virtual FOnTakeDamage& GetOnTakeDamage() = 0;
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)

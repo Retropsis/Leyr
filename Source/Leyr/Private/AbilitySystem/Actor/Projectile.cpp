@@ -66,6 +66,18 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	{
 		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
 		{
+			const FVector DeathImpulse = GetActorForwardVector() * AdditionalEffectParams.DeathImpulseMagnitude;
+			AdditionalEffectParams.DeathImpulse = DeathImpulse;
+			if (FMath::RandRange(1, 100) < AdditionalEffectParams.AirborneChance)
+			{
+				FRotator Rotation = GetActorRotation();
+				Rotation.Pitch = 45.f;
+
+				const FVector AirborneDirection = Rotation.Vector();
+				// const FVector AirborneForce = AirborneDirection * AdditionalEffectParams.AirborneForceMagnitude;
+				const FVector AirborneForce = FVector::UpVector * AdditionalEffectParams.AirborneForceMagnitude;
+				AdditionalEffectParams.AirborneForce = AirborneForce;
+			}
 			AdditionalEffectParams.TargetAbilitySystemComponent = TargetASC;
 			ULeyrAbilitySystemLibrary::ApplyAdditionalEffect(AdditionalEffectParams);
 		}

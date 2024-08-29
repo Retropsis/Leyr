@@ -2,10 +2,13 @@
 
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "AbilityTypes.h"
+#include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "GameplayEffectExtension.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "Game/BaseGameplayTags.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Interaction/CombatInterface.h"
 #include "Interaction/PlayerInterface.h"
 #include "Net/UnrealNetwork.h"
@@ -78,6 +81,8 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	
 	FEffectProperties Props;
 	SetEffectProperties(Data, Props);
+	
+	if(Props.TargetCharacter->Implements<UCombatInterface>() && ICombatInterface::Execute_IsDead(Props.TargetCharacter)) return;
 
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
@@ -158,17 +163,27 @@ void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 		{
 			if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor))
 			{
-				CombatInterface->Die();
+				CombatInterface->Die(ULeyrAbilitySystemLibrary::GetDeathImpulse(Props.EffectContextHandle));
 			}
 			SendXPEvent(Props);
 		}
 		else
 		{
 			Props.TargetASC->TryActivateAbilitiesByTag(FBaseGameplayTags::Get().Effects_HitReact.GetSingleTagContainer());
+			const FVector& AirborneForce = ULeyrAbilitySystemLibrary::GetAirborneForce(Props.EffectContextHandle);
+			if (!AirborneForce.IsNearlyZero(1.f))
+			{
+				Props.TargetCharacter->GetCharacterMovement()->StopMovementImmediately();
+				Props.TargetCharacter->LaunchCharacter(AirborneForce, true, true);
+			}
 		}
 		const bool bBlockedHit = ULeyrAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
 		const bool bCriticalHit = ULeyrAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
 		ShowFloatingText(Props, LocalIncomingDamage, bBlockedHit, bCriticalHit);
+		if (ULeyrAbilitySystemLibrary::IsSuccessfulStatusEffect(Props.EffectContextHandle))
+		{
+			HandleStatusEffect(Props);
+		}
 	}
 }
 
@@ -211,6 +226,48 @@ void UBaseAttributeSet::HandleIncomingXP(const FEffectProperties& Props)
 
 void UBaseAttributeSet::HandleStatusEffect(const FEffectProperties& Props)
 {
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	FGameplayEffectContextHandle EffectContext = Props.SourceASC->MakeEffectContext();
+	EffectContext.AddSourceObject(Props.SourceAvatarActor);
+
+	const FGameplayTag DamageType = ULeyrAbilitySystemLibrary::GetDamageType(Props.EffectContextHandle);
+	const float StatusEffectDamage = ULeyrAbilitySystemLibrary::GetStatusEffectDamage(Props.EffectContextHandle);
+	const float StatusEffectDuration = ULeyrAbilitySystemLibrary::GetStatusEffectDuration(Props.EffectContextHandle);
+	const float StatusEffectFrequency = ULeyrAbilitySystemLibrary::GetStatusEffectFrequency(Props.EffectContextHandle);
+
+	FString StatusEffectName = FString::Printf(TEXT("DynamicStatusEffect_%s"), *DamageType.ToString());
+	UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(StatusEffectName));
+
+	Effect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
+	Effect->Period = StatusEffectFrequency;
+	Effect->DurationMagnitude = FScalableFloat(StatusEffectDuration);
+
+	// Effect->InheritableOwnedTagsContainer.AddTag(GameplayTags.DamageTypesToStatusEffects[DamageType]);
+	
+	UTargetTagsGameplayEffectComponent& AssetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
+	FInheritedTagContainer InheritedTagContainer;
+	InheritedTagContainer.Added.AddTag(GameplayTags.DamageTypesToStatusEffects[DamageType]);
+	AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
+	
+	Effect->StackingType = EGameplayEffectStackingType::AggregateBySource;
+	Effect->StackLimitCount = 1;
+
+	const int32 Index = Effect->Modifiers.Num();
+	Effect->Modifiers.Add(FGameplayModifierInfo());
+	FGameplayModifierInfo& ModifierInfo = Effect->Modifiers[Index];
+
+	ModifierInfo.ModifierMagnitude = FScalableFloat(StatusEffectDamage);
+	ModifierInfo.ModifierOp = EGameplayModOp::Additive;
+	ModifierInfo.Attribute = UBaseAttributeSet::GetIncomingDamageAttribute();
+
+	if (FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec(Effect, EffectContext, 1.f))
+	{
+		FBaseGameplayEffectContext* BaseContext = static_cast<FBaseGameplayEffectContext*>(MutableSpec->GetContext().Get());
+		TSharedPtr<FGameplayTag> StatusEffectDamageType = MakeShareable(new FGameplayTag(DamageType));
+		BaseContext->SetDamageType(StatusEffectDamageType);
+
+		Props.TargetASC->ApplyGameplayEffectSpecToSelf(*MutableSpec);
+	}
 }
 
 void UBaseAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const

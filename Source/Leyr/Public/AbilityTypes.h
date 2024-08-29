@@ -13,17 +13,22 @@ struct FAdditionalEffectParams
 
 	FAdditionalEffectParams(){}
 
-	UPROPERTY() TObjectPtr<UObject> WorldContextObject = nullptr;
-	UPROPERTY() TSubclassOf<UGameplayEffect> AdditionalEffectClass = nullptr;
-	UPROPERTY() TObjectPtr<UAbilitySystemComponent> SourceAbilitySystemComponent;
-	UPROPERTY() TObjectPtr<UAbilitySystemComponent> TargetAbilitySystemComponent;
-	UPROPERTY() float AbilityPower = 0.f;
-	UPROPERTY() float AbilityLevel = 1.f;
-	UPROPERTY() FGameplayTag DamageType = FGameplayTag();
-	UPROPERTY() float StatusEffectChance = 0.f;
-	UPROPERTY() float StatusEffectDamage = 0.f;
-	UPROPERTY() float StatusEffectDuration = 0.f;
-	UPROPERTY() float StatusEffectFrequency = 0.f;
+	UPROPERTY(BlueprintReadWrite) TObjectPtr<UObject> WorldContextObject = nullptr;
+	UPROPERTY(BlueprintReadWrite) TSubclassOf<UGameplayEffect> AdditionalEffectClass = nullptr;
+	UPROPERTY(BlueprintReadWrite) TObjectPtr<UAbilitySystemComponent> SourceAbilitySystemComponent;
+	UPROPERTY(BlueprintReadWrite) TObjectPtr<UAbilitySystemComponent> TargetAbilitySystemComponent;
+	UPROPERTY(BlueprintReadWrite) float AbilityPower = 0.f;
+	UPROPERTY(BlueprintReadWrite) float AbilityLevel = 1.f;
+	UPROPERTY(BlueprintReadWrite) FGameplayTag DamageType = FGameplayTag();
+	UPROPERTY(BlueprintReadWrite) float StatusEffectChance = 0.f;
+	UPROPERTY(BlueprintReadWrite) float StatusEffectDamage = 0.f;
+	UPROPERTY(BlueprintReadWrite) float StatusEffectDuration = 0.f;
+	UPROPERTY(BlueprintReadWrite) float StatusEffectFrequency = 0.f;
+	UPROPERTY(BlueprintReadWrite) float DeathImpulseMagnitude = 0.f;
+	UPROPERTY(BlueprintReadWrite) FVector DeathImpulse = FVector::ZeroVector;
+	UPROPERTY(BlueprintReadWrite) float AirborneForceMagnitude = 0.f;
+	UPROPERTY(BlueprintReadWrite) float AirborneChance = 0.f;
+	UPROPERTY(BlueprintReadWrite) FVector AirborneForce = FVector::ZeroVector;
 };
 
 USTRUCT(BlueprintType)
@@ -39,7 +44,9 @@ public:
 	float GetStatusEffectDuration() const { return StatusEffectDuration; }
 	float GetStatusEffectFrequency() const { return StatusEffectFrequency; }
 	TSharedPtr<FGameplayTag> GetDamageType() const { return DamageType; }
-
+	FVector GetDeathImpulse() const { return DeathImpulse; }
+	FVector GetAirborneForce() const { return AirborneForce; }
+	
 	void SetIsCriticalHit(bool bInIsCriticalHit) { bIsCriticalHit = bInIsCriticalHit; }
 	void SetIsBlockedHit(bool bInIsBlockedHit) { bIsBlockedHit = bInIsBlockedHit; }
 	void SetIsSuccessfulStatusEffect(bool bInIsStatusEffect) { bIsSuccessfulStatusEffect = bInIsStatusEffect; }
@@ -47,6 +54,8 @@ public:
 	void SetStatusEffectDuration(float InDuration) { StatusEffectDuration = InDuration; }
 	void SetStatusEffectFrequency(float InFrequency) { StatusEffectFrequency = InFrequency; }
 	void SetDamageType(const TSharedPtr<FGameplayTag>& InDamageType) { DamageType = InDamageType; }
+	void SetDeathImpulse(const FVector& InImpulse) { DeathImpulse = InImpulse; }
+	void SetAirborneForce(const FVector& InForce) { AirborneForce = InForce; }
 	
 	/** Returns the actual struct used for serialization, subclasses must override this! */
 	virtual UScriptStruct* GetScriptStruct() const
@@ -90,6 +99,12 @@ protected:
 	float StatusEffectFrequency = 0.f;
 
 	TSharedPtr<FGameplayTag> DamageType;
+	
+	UPROPERTY()
+	FVector DeathImpulse = FVector::ZeroVector;
+	
+	UPROPERTY()
+	FVector AirborneForce = FVector::ZeroVector;
 };
 
 template<>

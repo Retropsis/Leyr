@@ -14,6 +14,7 @@ class UGameplayAbility;
 class UGameplayEffect;
 class UAttributeSet;
 class UAbilitySystemComponent;
+class UStatusEffectNiagaraComponent;
 
 /**
  * 
@@ -39,6 +40,9 @@ protected:
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, float Level) const;
 	void AddCharacterAbilities() const;
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) {}
+	
+	FOnASCRegistered OnASCRegistered;
+	FOnDeath OnDeath;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Character|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
@@ -95,12 +99,14 @@ protected:
 	virtual EObjectTypeQuery GetTraceObjectType_Implementation() override { return EOT_EnemyCapsule; }
 	virtual ECharacterClass GetCharacterClass_Implementation() override { return CharacterClass; }
 	virtual AActor* GetAvatar_Implementation() override { return this; }
-	virtual void Die() override;
+	virtual FOnASCRegistered& GetOnASCRegistered() override { return OnASCRegistered; }
+	virtual FOnDeath& GetOnDeath() override { return OnDeath; }
+	virtual void Die(const FVector& DeathImpulse) override;
 	virtual bool IsDead_Implementation() const override { return  bDead; }
 	//~ Combat Interface
 
 	UFUNCTION(NetMulticast, Reliable)
-	virtual void MulticastHandleDeath();
+	virtual void MulticastHandleDeath(const FVector& DeathImpulse);
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bDead = false;
@@ -148,6 +154,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Combat")
 	USoundBase* DeathSound;
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UStatusEffectNiagaraComponent> BurnStatusEffectComponent;
 	
 private:
 	UPROPERTY(EditAnywhere, Category="Character|Abilities")
