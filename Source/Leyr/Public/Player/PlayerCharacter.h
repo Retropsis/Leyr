@@ -8,6 +8,7 @@
 #include "Interaction/PlayerInterface.h"
 #include "PlayerCharacter.generated.h"
 
+class UHotbarComponent;
 class UNiagaraComponent;
 struct FInventoryItemData;
 class UPlayerInventoryComponent;
@@ -94,6 +95,9 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UInventoryComponent> PlayerInventory;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(AllowPrivateAccess="true"))
+	TObjectPtr<UHotbarComponent> HotbarComponent;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastLevelUpParticles() const;

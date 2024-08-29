@@ -48,7 +48,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	EItemType ItemType = EItemType::Misc;
 	
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	TSoftClassPtr<AItem> ItemClass;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")

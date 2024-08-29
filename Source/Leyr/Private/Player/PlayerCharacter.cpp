@@ -12,6 +12,7 @@
 #include "Player/PlayerCharacterState.h"
 #include "NiagaraComponent.h"
 #include "Game/BaseGameplayTags.h"
+#include "Inventory/HotbarComponent.h"
 #include "UI/PlayerHUD.h"
 
 APlayerCharacter::APlayerCharacter()
@@ -29,6 +30,9 @@ APlayerCharacter::APlayerCharacter()
 
 	PlayerInventory = CreateDefaultSubobject<UPlayerInventoryComponent>("PlayerInventory");
 	PlayerInventory->ContainerType = EContainerType::Inventory;
+	
+	HotbarComponent = CreateDefaultSubobject<UHotbarComponent>("Hotbar");
+	HotbarComponent->ContainerType = EContainerType::Hotbar;
 	
 	LevelUpNiagaraComponent = CreateDefaultSubobject<UNiagaraComponent>("LevelUpNiagaraComponent");
 	LevelUpNiagaraComponent->SetupAttachment(GetRootComponent());
@@ -88,7 +92,7 @@ void APlayerCharacter::ServerOnSlotDrop_Implementation(EContainerType TargetCont
 		TargetInventory = PlayerInventory;
 		break;
 	case EContainerType::Hotbar:
-		// TargetInventory = HotbarComponent;
+		TargetInventory = HotbarComponent;
 		break;
 	case EContainerType::Storage:
 		break;
@@ -103,7 +107,7 @@ void APlayerCharacter::ServerOnSlotDrop_Implementation(EContainerType TargetCont
 		SourceInventory = PlayerInventory;
 		break;
 	case EContainerType::Hotbar:
-		// SourceInventory = HotbarComponent;
+		SourceInventory = HotbarComponent;
 		break;
 	case EContainerType::Storage:
 		break;
