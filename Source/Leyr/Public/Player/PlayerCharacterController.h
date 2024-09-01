@@ -93,6 +93,7 @@ protected:
 	void StopJumping();
 	void AttackButtonPressed();
 	void CrouchButtonPressed();
+	void CrouchButtonReleased();
 	void InteractButtonPressed();
 
 	/*

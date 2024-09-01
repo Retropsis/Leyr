@@ -25,4 +25,5 @@ void UPlayerCharacterAnimInstance::Tick(float DeltaTime)
 	bIsMoving =  UKismetMathLibrary::VSizeXY(Velocity) > 0.f;
 	bAirborne = PlayerCharacter->GetCharacterMovement()->IsFalling();
 	bIsAccelerating = PlayerCharacter->IsAccelerating();
+	bIsCrouched = PlayerCharacter->bIsCrouched;
 }

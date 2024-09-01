@@ -11,8 +11,10 @@
 #include "Player/PlayerCharacterController.h"
 #include "Player/PlayerCharacterState.h"
 #include "NiagaraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Game/BaseGameplayTags.h"
 #include "Inventory/HotbarComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "UI/PlayerHUD.h"
 
 APlayerCharacter::APlayerCharacter()
@@ -23,6 +25,9 @@ APlayerCharacter::APlayerCharacter()
 	SpringArm->bInheritPitch = false;
 	SpringArm->bInheritYaw = false;
 	SpringArm->bInheritRoll = false;
+	
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Overlap);
 	
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCamera");
 	FollowCamera->SetupAttachment(SpringArm);
@@ -38,10 +43,19 @@ APlayerCharacter::APlayerCharacter()
 	LevelUpNiagaraComponent->SetupAttachment(GetRootComponent());
 	LevelUpNiagaraComponent->bAutoActivate = false;
 
+	GroundPoint = CreateDefaultSubobject<USceneComponent>("GroundPoint");
+	GroundPoint->SetupAttachment(GetRootComponent());
+
 	TraceObjectType = EOT_EnemyCapsule;
 	
 	CharacterClass = ECharacterClass::Warrior;
 	BaseWalkSpeed = 600.f;
+}
+
+void APlayerCharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	TraceForPlatforms();
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)
@@ -230,7 +244,8 @@ void APlayerCharacter::SetMovementEnabled_Implementation(bool Enabled)
 	}
 	else
 	{
-		GetCharacterMovement()->StopActiveMovement();
+		// GetCharacterMovement()->StopActiveMovement();
+		GetCharacterMovement()->StopMovementImmediately();
 	}
 }
 
@@ -279,6 +294,14 @@ void APlayerCharacter::RotateController() const
 	}
 }
 
+void APlayerCharacter::HandleCrouching(bool bShouldCrouch)
+{
+	if(bShouldCrouch && bIsCrouched) return;
+	
+	if(bShouldCrouch && !bIsCrouched) Crouch();
+	if(!bShouldCrouch && bIsCrouched) UnCrouch();
+}
+
 /*
  * Combat Interface
  */
@@ -289,4 +312,21 @@ int32 APlayerCharacter::GetCharacterLevel_Implementation()
 	return PlayerCharacterState->GetCharacterLevel();
 }
 
-
+void APlayerCharacter::TraceForPlatforms() const
+{
+	if(GetCharacterMovement()->IsFalling())
+	{
+		const FVector Start = GroundPoint->GetComponentLocation();
+		const FVector End = Start + FVector::DownVector * PlatformTraceDistance;
+		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+		ObjectTypes.Add(EOT_OneWayPlatform);
+		TArray<AActor*> ActorsToIgnore;
+		FHitResult Hit;
+		UKismetSystemLibrary::LineTraceSingleForObjects(
+			this, Start, End, ObjectTypes, false, TArray<AActor*>(),
+			EDrawDebugTrace::None, Hit, true);
+		
+		if(Hit.bBlockingHit && GetVelocity().Z < 0.f) GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Block);
+		else GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Overlap);
+	}
+}

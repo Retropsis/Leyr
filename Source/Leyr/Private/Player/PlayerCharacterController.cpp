@@ -33,7 +33,8 @@ void APlayerCharacterController::SetupInputComponent()
 		BaseInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APlayerCharacterController::Jump);
 		BaseInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &APlayerCharacterController::StopJumping);
 		BaseInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerCharacterController::InteractButtonPressed);
-		BaseInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &APlayerCharacterController::CrouchButtonPressed);
+		BaseInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::CrouchButtonPressed);
+		BaseInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &APlayerCharacterController::CrouchButtonReleased);
 		BaseInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &APlayerCharacterController::InventoryButtonPressed);
 
 		/*
@@ -111,6 +112,12 @@ void APlayerCharacterController::AttackButtonPressed()
 
 void APlayerCharacterController::CrouchButtonPressed()
 {
+	if (PlayerCharacter) PlayerCharacter->HandleCrouching(true);
+}
+
+void APlayerCharacterController::CrouchButtonReleased()
+{
+	if (PlayerCharacter) PlayerCharacter->HandleCrouching(false);
 }
 
 void APlayerCharacterController::InteractButtonPressed()

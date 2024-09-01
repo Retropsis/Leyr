@@ -25,12 +25,14 @@ class LEYR_API APlayerCharacter : public ABaseCharacter, public IPlayerInterface
 
 public:
 	APlayerCharacter();
+	virtual void Tick(float DeltaSeconds) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 	
 	void Move(float ScaleValue);
 	void RotateController() const;
+	void HandleCrouching(bool bShouldCrouch);
 	
 	/** Combat Interface */
 	virtual int32 GetCharacterLevel_Implementation() override;
@@ -98,9 +100,17 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UHotbarComponent> HotbarComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
+	TObjectPtr<USceneComponent> GroundPoint;
+
+	UPROPERTY(EditDefaultsOnly, Category="Player|Plaforming")
+	float PlatformTraceDistance = 10.f;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastLevelUpParticles() const;
+
+	void TraceForPlatforms() const;
 
 public:
 	FORCEINLINE bool IsAirborne() const { return bAirborne; }
