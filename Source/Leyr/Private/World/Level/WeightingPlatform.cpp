@@ -17,24 +17,20 @@ AWeightingPlatform::AWeightingPlatform()
 
 void AWeightingPlatform::Tick(float DeltaSeconds)
 {
-	Super::Tick(DeltaSeconds);
+	AActor::Tick(DeltaSeconds);
+	
 	switch (MovementDirection)
 	{
 	case EMovementDirection::Still:
 		break;
 	case EMovementDirection::Downward:
-		// TODO: Interpolate ?
-		BoxCollision->AddWorldOffset(FVector::DownVector * DownwardSpeed);
+		MoveTo(DownPosition, DownwardSpeed, DownwardInterpSpeed, DeltaSeconds);
 		break;
 	case EMovementDirection::Upward:
-		// TODO: Interpolate ?
-		BoxCollision->AddWorldOffset(FVector::UpVector * UpwardSpeed);
+		MoveTo(UpPosition, UpwardSpeed, UpwardInterpSpeed, DeltaSeconds);
 		break;
 	}
-	if(HasReachedTarget())
-	{
-		MovementDirection = EMovementDirection::Still;
-	}
+	if(HasReachedTarget()) MovementDirection = EMovementDirection::Still;
 }
 
 void AWeightingPlatform::BeginPlay()
@@ -47,6 +43,24 @@ void AWeightingPlatform::BeginPlay()
 		
 		DownPosition = RouteSpline->GetLocationAtSplinePoint(0, ESplineCoordinateSpace::World);
 		UpPosition = RouteSpline->GetLocationAtSplinePoint(1, ESplineCoordinateSpace::World);
+	}
+}
+
+void AWeightingPlatform::MoveTo(const FVector& InCurrentTarget, float Speed, float InterpolationSpeed, float DeltaSeconds) const
+{
+	switch (InterpMethod) {
+	case EInterpMethod::Default:
+		BoxCollision->SetWorldLocation(FMath::VInterpConstantTo(BoxCollision->GetComponentLocation(), InCurrentTarget, DeltaSeconds, Speed));
+		break;
+	case EInterpMethod::EaseOut:
+		BoxCollision->SetWorldLocation(FMath::VInterpTo(BoxCollision->GetComponentLocation(), InCurrentTarget, DeltaSeconds, InterpolationSpeed));
+		break;
+	case EInterpMethod::EaseIn:
+		BoxCollision->SetWorldLocation(FMath::InterpEaseIn(BoxCollision->GetComponentLocation(), InCurrentTarget, DeltaSeconds, InterpolationSpeed));
+		break;
+	case EInterpMethod::EaseInOut:
+		BoxCollision->SetWorldLocation(FMath::InterpEaseInOut(BoxCollision->GetComponentLocation(), InCurrentTarget, DeltaSeconds, InterpolationSpeed));
+		break;
 	}
 }
 

@@ -30,20 +30,24 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
-	UFUNCTION(BlueprintCallable)
+	void MoveTo(const FVector& InCurrentTarget, float Speed, float InterpolationSpeed, float DeltaSeconds) const;
 	void SetPlatformDirection(AActor* OtherActor, bool bDownward);
 
-	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	                            int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,  int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
 
-	UPROPERTY(EditDefaultsOnly, Category="Platform")
-	float DownwardSpeed = 1.f;
+	UPROPERTY(EditAnywhere, Category="Platform")
+	float DownwardSpeed = 50.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Platform")
-	float UpwardSpeed = 1.f;
+	UPROPERTY(EditAnywhere, Category="Platform")
+	float DownwardInterpSpeed = 1.f;
+	
+	UPROPERTY(EditAnywhere, Category="Platform")
+	float UpwardSpeed = 50.f;
+	
+	UPROPERTY(EditAnywhere, Category="Platform")
+	float UpwardInterpSpeed = 1.f;
 
 private:
 	FVector UpPosition = FVector::ZeroVector;

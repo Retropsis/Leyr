@@ -13,6 +13,7 @@
 #include "NiagaraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Game/BaseGameplayTags.h"
+#include "Interaction/PlatformInterface.h"
 #include "Inventory/HotbarComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "UI/PlayerHUD.h"
@@ -302,14 +303,9 @@ void APlayerCharacter::HandleCrouching(bool bShouldCrouch)
 	if(!bShouldCrouch && bIsCrouched) UnCrouch();
 }
 
-/*
- * Combat Interface
- */
-int32 APlayerCharacter::GetCharacterLevel_Implementation()
+void APlayerCharacter::JumpButtonPressed()
 {
-	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
-	check(PlayerCharacterState);
-	return PlayerCharacterState->GetCharacterLevel();
+	bIsCrouched ? TryVaultingDown() : Jump();
 }
 
 void APlayerCharacter::TraceForPlatforms() const
@@ -326,7 +322,49 @@ void APlayerCharacter::TraceForPlatforms() const
 			this, Start, End, ObjectTypes, false, TArray<AActor*>(),
 			EDrawDebugTrace::None, Hit, true);
 		
-		if(Hit.bBlockingHit && GetVelocity().Z < 0.f) GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Block);
+		if(Hit.bBlockingHit && GetVelocity().Z < 0.f)
+		{
+			GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Block);
+		}
 		else GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Overlap);
+		
+		if(Hit.GetActor() && Hit.GetActor()->ActorHasTag("VaultDownPlatform"))
+		{
+			GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, bOverlapPlatformTimerEnded ? ECR_Block : ECR_Overlap);
+		}
 	}
+}
+
+void APlayerCharacter::OverlapPlatformEnd()
+{
+	// GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Block);
+	bOverlapPlatformTimerEnded = true;
+}
+
+void APlayerCharacter::TryVaultingDown()
+{
+ 	const FVector Start = GroundPoint->GetComponentLocation() + FVector(0.f, 0.f, 50.f);
+	const FVector End = Start + FVector::DownVector * 60.f;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(EOT_OneWayPlatform);
+	TArray<AActor*> ActorsToIgnore;
+	FHitResult Hit;
+	UKismetSystemLibrary::LineTraceSingleForObjects(this, Start, End, ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, Hit, true);
+	if(Hit.bBlockingHit && Hit.GetActor()->Implements<UPlatformInterface>() && Hit.GetActor()->ActorHasTag("VaultDownPlatform"))
+	{
+		// IPlatformInterface::Execute_SetBoxCollisionEnabled(Hit.GetActor(), false);
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Overlap);
+		GetWorld()->GetTimerManager().SetTimer(OverlapPlatformTimer, this, &APlayerCharacter::OverlapPlatformEnd, OverlapPlatformTime);
+		bOverlapPlatformTimerEnded = false;
+	}
+}
+
+/*
+ * Combat Interface
+ */
+int32 APlayerCharacter::GetCharacterLevel_Implementation()
+{
+	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	return PlayerCharacterState->GetCharacterLevel();
 }

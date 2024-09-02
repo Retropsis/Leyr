@@ -18,7 +18,6 @@ class LEYR_API ATransientPlatform : public APlatform
 
 public:
 	ATransientPlatform();
-	void Tick(float DeltaSeconds) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -27,27 +26,33 @@ protected:
 	void HandleOnFinishedPlaying();
 
 	UFUNCTION()
-	void HandleOffCycleEnd();
+	void HandleOffCycleEnd() const;
+	
+	UFUNCTION()
+	void HandlePlatformTimeEnd();
 	
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Platform")
-	float TransientPosition = .5f;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Platform")
-	float TransientFadingSpeed = .3f;
-	
 	UPROPERTY(VisibleAnywhere, Category="Platform")
 	TObjectPtr<UPaperFlipbookComponent> FlipbookComponent;
-
-	FTimerHandle OffCycleTimer;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Platform")
+	UPROPERTY(EditAnywhere, Category="Platform")
+	float TransientPosition = .5f;
+	
+	UPROPERTY(EditAnywhere, Category="Platform")
+	float TransientFadingSpeed = 1.f;
+	
+	UPROPERTY(EditAnywhere, Category="Platform")
+	float PlatformTime = 1.f;
+	
+	UPROPERTY(EditAnywhere, Category="Platform")
 	float OffCycleDuration = 2.f;
 
 private:
+	FTimerHandle PlatformTimer;
+	FTimerHandle OffCycleTimer;
 	bool bCanSafelyBlock = true;
 };

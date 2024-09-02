@@ -6,6 +6,8 @@
 
 AMovingPlatform::AMovingPlatform()
 {
+	PrimaryActorTick.bCanEverTick = true;
+	
 	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>("Root");
 	SetRootComponent(Root);
 
@@ -16,10 +18,35 @@ AMovingPlatform::AMovingPlatform()
 	Platform = EPlatformType::Moving;
 }
 
+void AMovingPlatform::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	Move(DeltaSeconds);
+}
+
 void AMovingPlatform::BeginPlay()
 {
 	Super::BeginPlay();
 	CurrentTarget = RouteSpline->GetLocationAtSplinePoint(CurrentIndex, ESplineCoordinateSpace::World);
+}
+
+void AMovingPlatform::Move(float DeltaSeconds)
+{
+	switch (InterpMethod) {
+	case EInterpMethod::Default:
+		BoxCollision->SetWorldLocation(FMath::VInterpConstantTo(BoxCollision->GetComponentLocation(), CurrentTarget, DeltaSeconds, MovingSpeed));
+		break;
+	case EInterpMethod::EaseOut:
+		BoxCollision->SetWorldLocation(FMath::VInterpTo(BoxCollision->GetComponentLocation(), CurrentTarget, DeltaSeconds, InterpSpeed));
+		break;
+	case EInterpMethod::EaseIn:
+		BoxCollision->SetWorldLocation(FMath::InterpEaseIn(BoxCollision->GetComponentLocation(), CurrentTarget, DeltaSeconds, InterpSpeed));
+		break;
+	case EInterpMethod::EaseInOut:
+		BoxCollision->SetWorldLocation(FMath::InterpEaseInOut(BoxCollision->GetComponentLocation(), CurrentTarget, DeltaSeconds, InterpSpeed));
+		break;
+	}
+	if(HasReachedTarget()) ChooseNextTarget();
 }
 
 void AMovingPlatform::ChooseNextTarget()

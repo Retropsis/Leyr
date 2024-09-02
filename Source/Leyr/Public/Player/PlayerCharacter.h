@@ -33,6 +33,8 @@ public:
 	void Move(float ScaleValue);
 	void RotateController() const;
 	void HandleCrouching(bool bShouldCrouch);
+	void JumpButtonPressed();
+	void TryVaultingDown();
 	
 	/** Combat Interface */
 	virtual int32 GetCharacterLevel_Implementation() override;
@@ -111,6 +113,13 @@ private:
 	void MulticastLevelUpParticles() const;
 
 	void TraceForPlatforms() const;
+	void OverlapPlatformEnd();
+
+	FTimerHandle OverlapPlatformTimer;
+	bool bOverlapPlatformTimerEnded = true;
+
+	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
+	float OverlapPlatformTime = .25f;
 
 public:
 	FORCEINLINE bool IsAirborne() const { return bAirborne; }

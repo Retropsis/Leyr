@@ -7,6 +7,7 @@
 #include "MovingPlatform.generated.h"
 
 class USplineComponent;
+
 /**
  * 
  */
@@ -17,27 +18,25 @@ class LEYR_API AMovingPlatform : public APlatform
 
 public:
 	AMovingPlatform();
-	
-	UFUNCTION(BlueprintCallable)
+	virtual void Tick(float DeltaSeconds) override;
+	void Move(float DeltaSeconds);
 	void ChooseNextTarget();
-
-	UFUNCTION(BlueprintCallable)
 	bool HasReachedTarget() const;
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void MoveTo();
 	
-	UPROPERTY(EditDefaultsOnly, Category="Platform|Route")
+	UPROPERTY(EditAnywhere, Category="Platform|Route")
 	float TargetTolerance = 5.f;
+	
+	UPROPERTY(EditAnywhere, Category="Platform")
+	float MovingSpeed = 50.f;
+	
+	UPROPERTY(EditAnywhere, Category="Platform")
+	float InterpSpeed = 1.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Platform|Route")
 	TObjectPtr<USplineComponent> RouteSpline;
 
 protected:
 	virtual void BeginPlay() override;
-
-	UPROPERTY(BlueprintReadOnly)
 	FVector CurrentTarget = FVector::Zero();
-	
 	int32 CurrentIndex = 0;
 };

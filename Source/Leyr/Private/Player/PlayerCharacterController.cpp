@@ -98,7 +98,7 @@ void APlayerCharacterController::Move(const FInputActionValue& Value)
 
 void APlayerCharacterController::Jump()
 {
-	if (PlayerCharacter) PlayerCharacter->Jump();
+	if (PlayerCharacter) PlayerCharacter->JumpButtonPressed();
 }
 
 void APlayerCharacterController::StopJumping()

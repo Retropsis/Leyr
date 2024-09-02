@@ -12,7 +12,9 @@
 #define ECC_OneWayPlatform ECollisionChannel::ECC_GameTraceChannel4
 #define EOT_PlayerCapsule ObjectTypeQuery7
 #define EOT_EnemyCapsule ObjectTypeQuery8
+#define EOT_Projectile ObjectTypeQuery9
 #define EOT_OneWayPlatform ObjectTypeQuery10
+#define EOT_VaultDownPlatform ObjectTypeQuery11
 
 USTRUCT(BlueprintType)
 struct FValueRange

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interaction/PlatformInterface.h"
 #include "Platform.generated.h"
 
 class UBoxComponent;
@@ -18,8 +19,17 @@ enum class EPlatformType : uint8
 	Transient,
 };
 
+UENUM(BlueprintType)
+enum class EInterpMethod : uint8
+{
+	Default,
+	EaseOut,
+	EaseIn,
+	EaseInOut,
+};
+
 UCLASS()
-class LEYR_API APlatform : public AActor
+class LEYR_API APlatform : public AActor, public IPlatformInterface
 {
 	GENERATED_BODY()
 	
@@ -28,8 +38,7 @@ public:
 
 protected:
 	UFUNCTION()
-	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {}
+	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {}
 	
 	UFUNCTION()
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {}
@@ -42,4 +51,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	EPlatformType Platform = EPlatformType::Default;
+
+	UPROPERTY(EditAnywhere, Category="Platform")
+	EInterpMethod InterpMethod = EInterpMethod::EaseInOut;
 };

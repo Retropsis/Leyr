@@ -15,32 +15,16 @@ ATransientPlatform::ATransientPlatform()
 	FlipbookComponent = CreateDefaultSubobject<UPaperFlipbookComponent>("FlipbookComponent");
 	FlipbookComponent->SetupAttachment(GetRootComponent());
 	FlipbookComponent->SetPlayRate(0.f);
+	FlipbookComponent->SetLooping(false);
 	
 	Platform = EPlatformType::Transient;
-}
-
-void ATransientPlatform::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-
-	if (FlipbookComponent->GetPlayRate() > 0.f)
-	{
-		float PlayRate = FlipbookComponent->GetPlaybackPosition() / FlipbookComponent->GetFlipbookLength();
-		if(PlayRate > TransientPosition)
-		{
-			BoxCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-		}
-		if(PlayRate >= .99f)
-		{
-			HandleOnFinishedPlaying();
-		}
-	}
 }
 
 void ATransientPlatform::BeginPlay()
 {
 	Super::BeginPlay();
 	FlipbookComponent->OnFinishedPlaying.AddDynamic(this, &ATransientPlatform::HandleOnFinishedPlaying);
+	FlipbookComponent->SetPlaybackPosition(0.f, true);
 	if (HasAuthority())
 	{
 		OverlapBox->OnComponentBeginOverlap.AddDynamic(this, &ATransientPlatform::OnBeginOverlap);
@@ -52,8 +36,7 @@ void ATransientPlatform::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent
 {
 	if (OtherActor && OtherActor->Implements<UPlayerInterface>())
 	{
-		FlipbookComponent->SetPlayRate(TransientFadingSpeed);
-		bCanSafelyBlock = false;
+		if (const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(PlatformTimer, this, &ATransientPlatform::HandlePlatformTimeEnd, PlatformTime);
 	}
 }
 
@@ -65,16 +48,20 @@ void ATransientPlatform::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, 
 	}
 }
 
-void ATransientPlatform::HandleOnFinishedPlaying()
+void ATransientPlatform::HandlePlatformTimeEnd()
 {
-	if (const UWorld* World = GetWorld())
-	{
-		World->GetTimerManager().SetTimer(OffCycleTimer, this, &ATransientPlatform::HandleOffCycleEnd, OffCycleDuration);
-	}
-	FlipbookComponent->SetPlayRate(0.f);
+	FlipbookComponent->SetPlayRate(TransientFadingSpeed);
+	BoxCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	FlipbookComponent->PlayFromStart();
+	bCanSafelyBlock = false;
 }
 
-void ATransientPlatform::HandleOffCycleEnd()
+void ATransientPlatform::HandleOnFinishedPlaying()
+{
+	if (const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(OffCycleTimer, this, &ATransientPlatform::HandleOffCycleEnd, OffCycleDuration);
+}
+
+void ATransientPlatform::HandleOffCycleEnd() const
 {
 	BoxCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	FlipbookComponent->SetPlaybackPosition(0.f, true);
