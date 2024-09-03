@@ -93,7 +93,7 @@ void APlayerCharacterController::CursorTrace()
 
 void APlayerCharacterController::Move(const FInputActionValue& Value)
 {
-	if (PlayerCharacter) PlayerCharacter->Move(Value.Get<float>());
+	if (PlayerCharacter) PlayerCharacter->Move(Value.Get<FVector2D>());
 }
 
 void APlayerCharacterController::Jump()

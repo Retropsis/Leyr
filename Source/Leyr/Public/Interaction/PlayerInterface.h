@@ -7,6 +7,7 @@
 #include "UObject/Interface.h"
 #include "PlayerInterface.generated.h"
 
+enum class ECombatState : uint8;
 enum class EArmorType : uint8;
 enum class EContainerType : uint8;
 
@@ -68,5 +69,18 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void ResetInventorySlot(EContainerType ContainerType, int32 SlotIndex);
 
+	UFUNCTION(BlueprintNativeEvent)
+	ECombatState GetPlayerCombatState();
 	
+	UFUNCTION(BlueprintNativeEvent)
+	void SetPlayerCombatState(const ECombatState NewState);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void HandleHangingOnLadder(FVector HangingTarget);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void HandleHangingOnRope(FVector HangingTarget);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void HandleHangingOnLedge(FVector HangingTarget);
 };

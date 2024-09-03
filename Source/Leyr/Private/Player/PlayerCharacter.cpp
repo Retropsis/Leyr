@@ -11,6 +11,7 @@
 #include "Player/PlayerCharacterController.h"
 #include "Player/PlayerCharacterState.h"
 #include "NiagaraComponent.h"
+#include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Game/BaseGameplayTags.h"
 #include "Interaction/PlatformInterface.h"
@@ -46,6 +47,10 @@ APlayerCharacter::APlayerCharacter()
 
 	GroundPoint = CreateDefaultSubobject<USceneComponent>("GroundPoint");
 	GroundPoint->SetupAttachment(GetRootComponent());
+	
+	RopeHangingCollision = CreateDefaultSubobject<UBoxComponent>("RopeHangingCollision");
+	RopeHangingCollision->SetupAttachment(GetRootComponent());
+	RopeHangingCollision->ComponentTags.Add(FName("RopeCollision"));
 
 	TraceObjectType = EOT_EnemyCapsule;
 	
@@ -57,6 +62,7 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	TraceForPlatforms();
+	TraceForLedge();
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)
@@ -65,6 +71,7 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 	// Init Ability Actor Info Server Side
 	InitAbilityActorInfo();
 	AddCharacterAbilities();
+	GravityScale = GetCharacterMovement()->GravityScale;
 }
 
 void APlayerCharacter::OnRep_PlayerState()
@@ -250,6 +257,68 @@ void APlayerCharacter::SetMovementEnabled_Implementation(bool Enabled)
 	}
 }
 
+void APlayerCharacter::HandleCombatState(ECombatState NewState)
+{
+	CombatState = NewState;
+	
+	switch (CombatState) {
+	case ECombatState::Unoccupied:
+		// GetCharacterMovement()->GravityScale = GravityScale;
+		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		break;
+	case ECombatState::Attacking:
+		break;
+	case ECombatState::HangingLedge:
+		GetCharacterMovement()->StopMovementImmediately();
+		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		break;
+	case ECombatState::HangingRope:
+		GetCharacterMovement()->StopMovementImmediately();
+		GetCharacterMovement()->MaxFlySpeed = RopeWalkSpeed;
+		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		break;
+	case ECombatState::HangingLadder:
+		GetCharacterMovement()->StopMovementImmediately();
+		GetCharacterMovement()->MaxFlySpeed = LadderWalkSpeed;
+		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		break;
+	case ECombatState::Falling:
+		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+		break;
+	}
+}
+
+void APlayerCharacter::HandleHangingOnLadder_Implementation(FVector HangingTarget)
+{
+	if (GetCharacterMovement()->IsFalling())
+	{
+		SetActorLocation(FVector(HangingTarget.X, 0.f, GetActorLocation().Z));
+		HandleCombatState(ECombatState::HangingLadder);
+	}
+}
+
+void APlayerCharacter::HandleHangingOnRope_Implementation(FVector HangingTarget)
+{
+	if (GetCharacterMovement()->IsFalling())
+	{
+		SetActorLocation(FVector(GetActorLocation().X, 0.f, HangingTarget.Z - RopeHangingCollision->GetRelativeLocation().Z));
+		HandleCombatState(ECombatState::HangingRope);
+	}
+}
+
+void APlayerCharacter::HandleHangingOnLedge_Implementation(FVector HangingTarget)
+{
+	if (GetCharacterMovement()->IsFalling())
+	{
+		SetActorLocation(FVector(HangingTarget.X, 0.f, HangingTarget.Z));
+		HandleCombatState(ECombatState::HangingLedge);
+	}
+}
+
+void APlayerCharacter::OffLedgeEnd() { bCanGrabLedge = true; }
+
 /*
  * Ability System
  */
@@ -277,10 +346,30 @@ void APlayerCharacter::InitAbilityActorInfo()
 	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::HitReactTagChanged);
 }
 
-void APlayerCharacter::Move(const float ScaleValue)
+void APlayerCharacter::Move(const FVector2D MovementVector)
 {
 	RotateController();
-	AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(ScaleValue));
+
+	GEngine->AddOnScreenDebugMessage(1365, 1.f, FColor::Green, FString::Printf(TEXT("%s"), *MovementVector.ToString()));
+	
+	switch (CombatState) {
+	case ECombatState::Unoccupied:
+		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
+		break;
+	case ECombatState::Attacking:
+		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
+		break;
+	case ECombatState::HangingLedge:
+		break;
+	case ECombatState::HangingRope:
+		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
+		break;
+	case ECombatState::HangingLadder:
+		AddMovementInput(FVector(0.f, 0.f, 1.f), FMath::RoundToFloat(MovementVector.Y));
+		break;
+	case ECombatState::Falling:
+		break;
+	}
 }
 
 void APlayerCharacter::RotateController() const
@@ -297,7 +386,7 @@ void APlayerCharacter::RotateController() const
 
 void APlayerCharacter::HandleCrouching(bool bShouldCrouch)
 {
-	if(bShouldCrouch && bIsCrouched) return;
+	if(bShouldCrouch && bIsCrouched || CombatState >= ECombatState::HangingLedge) return;
 	
 	if(bShouldCrouch && !bIsCrouched) Crouch();
 	if(!bShouldCrouch && bIsCrouched) UnCrouch();
@@ -305,6 +394,13 @@ void APlayerCharacter::HandleCrouching(bool bShouldCrouch)
 
 void APlayerCharacter::JumpButtonPressed()
 {
+	if(CombatState >= ECombatState::HangingLedge)
+	{
+		HandleCombatState(ECombatState::Unoccupied);
+		bCanGrabLedge = false;
+		GetWorld()->GetTimerManager().SetTimer(OffLedgeTimer, this, &APlayerCharacter::OffLedgeEnd, OffLedgeTime);
+	}
+	
 	bIsCrouched ? TryVaultingDown() : Jump();
 }
 
@@ -337,7 +433,6 @@ void APlayerCharacter::TraceForPlatforms() const
 
 void APlayerCharacter::OverlapPlatformEnd()
 {
-	// GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Block);
 	bOverlapPlatformTimerEnded = true;
 }
 
@@ -352,10 +447,48 @@ void APlayerCharacter::TryVaultingDown()
 	UKismetSystemLibrary::LineTraceSingleForObjects(this, Start, End, ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, Hit, true);
 	if(Hit.bBlockingHit && Hit.GetActor()->Implements<UPlatformInterface>() && Hit.GetActor()->ActorHasTag("VaultDownPlatform"))
 	{
-		// IPlatformInterface::Execute_SetBoxCollisionEnabled(Hit.GetActor(), false);
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Overlap);
 		GetWorld()->GetTimerManager().SetTimer(OverlapPlatformTimer, this, &APlayerCharacter::OverlapPlatformEnd, OverlapPlatformTime);
 		bOverlapPlatformTimerEnded = false;
+	}
+}
+
+void APlayerCharacter::TraceForLedge()
+{
+	if(!bCanGrabLedge || !GetCharacterMovement()->IsFalling()) return;;
+	
+	TArray<AActor*> ActorsToIgnore;
+	FHitResult MidHit;
+	FHitResult TopHit;
+	FVector Delta = FVector(GetCapsuleComponent()->GetScaledCapsuleRadius(), 0.f, 0.f) * GetActorForwardVector().X;
+	UKismetSystemLibrary::LineTraceSingle(this, GetActorLocation() , GetActorLocation()  + GetActorForwardVector() * 45.f, TraceTypeQuery1,
+	false, ActorsToIgnore, EDrawDebugTrace::ForOneFrame, MidHit, true);
+	UKismetSystemLibrary::LineTraceSingle(this, RopeHangingCollision->GetComponentLocation() , RopeHangingCollision->GetComponentLocation()  + RopeHangingCollision->GetForwardVector() * 45.f, TraceTypeQuery1,
+		false, ActorsToIgnore, EDrawDebugTrace::ForOneFrame, TopHit, true);
+
+	if(MidHit.bBlockingHit && !TopHit.bBlockingHit)
+	{		
+		FHitResult LedgeHit;		
+		for (int i = 0; i < (RopeHangingCollision->GetComponentLocation() - TopHit.TraceEnd).Length() + 45; i += 5)
+		{
+			FVector Start = RopeHangingCollision->GetComponentLocation() + FVector(static_cast<float>(i), 0.f, 0.f) * GetActorForwardVector().X;
+			UKismetSystemLibrary::LineTraceSingle(this, Start, Start + FVector::DownVector * 82.f, TraceTypeQuery1,
+				false, ActorsToIgnore, EDrawDebugTrace::ForOneFrame, LedgeHit, true);
+
+			// FLinearColor Color = LedgeHit.bBlockingHit ? FLinearColor::Green : FLinearColor::Red;
+			// UKismetSystemLibrary::DrawDebugSphere(this, LedgeHit.bBlockingHit ? LedgeHit.Location : LedgeHit.TraceEnd, 5.f, 12, Color, 2.f);
+			
+			if(LedgeHit.bBlockingHit) break;
+		}
+		// if(LedgeHit.bBlockingHit)
+		// {
+		// 	GEngine->AddOnScreenDebugMessage(1654, 5.f, FColor::Green, FString::Printf(TEXT("Has Found Correct Hit: %s"), *LedgeHit.Location.ToString()));
+		// }
+		// else
+		// {
+		// 	GEngine->AddOnScreenDebugMessage(1654, 5.f, FColor::Red, FString::Printf(TEXT("Has NOT Found Correct Hit: %s"), *LedgeHit.TraceEnd.ToString()));
+		// }
+		Execute_HandleHangingOnLedge(this, LedgeHit.bBlockingHit ? LedgeHit.Location - Delta : LedgeHit.TraceEnd - Delta);
 	}
 }
 

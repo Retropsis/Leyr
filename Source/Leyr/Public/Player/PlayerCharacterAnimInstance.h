@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "PaperZDAnimInstance.h"
+#include "Interaction/CombatInterface.h"
 #include "PlayerCharacterAnimInstance.generated.h"
 
+enum class ECombatState : uint8;
 class APlayerCharacter;
 /**
  * 
@@ -36,4 +38,7 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, Category="PlayerCharacter")
 	bool bIsCrouched;
+
+	UPROPERTY(BlueprintReadOnly, Category="PlayerCharacter")
+	ECombatState CombatState = ECombatState::Unoccupied;
 };

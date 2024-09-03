@@ -48,6 +48,10 @@ enum class ECombatState : uint8
 {
 	Unoccupied UMETA(DisplayName="Unoccupied"),
 	Attacking UMETA(DisplayName="Attacking"),
+	Falling UMETA(DisplayName="Falling"),
+	HangingLedge UMETA(DisplayName="Hanging Ledge"),
+	HangingRope UMETA(DisplayName="Hanging Rope"),
+	HangingLadder UMETA(DisplayName="Hanging Ladder"),
 };
 
 // This class does not need to be modified.

@@ -1,13 +1,13 @@
 // @ Retropsis 2024-2025.
 
 #include "World/Level/VaultDownPlatform.h"
+#include "PaperGroupedSpriteComponent.h"
 #include "Components/BoxComponent.h"
-#include "PaperSpriteComponent.h"
 
 AVaultDownPlatform::AVaultDownPlatform()
-{
-	SpriteComponent = CreateDefaultSubobject<UPaperSpriteComponent>("SpriteComponent");
-	SpriteComponent->SetupAttachment(GetRootComponent());
+{		
+	// TileMap = CreateDefaultSubobject<UPaperGroupedSpriteComponent>("TileMap");
+	// TileMap->SetupAttachment(BoxCollision);
 }
 
 void AVaultDownPlatform::SetBoxCollisionEnabled_Implementation(bool bEnabled)

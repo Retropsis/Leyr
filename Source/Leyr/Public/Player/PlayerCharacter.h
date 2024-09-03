@@ -8,6 +8,7 @@
 #include "Interaction/PlayerInterface.h"
 #include "PlayerCharacter.generated.h"
 
+class UBoxComponent;
 class UHotbarComponent;
 class UNiagaraComponent;
 struct FInventoryItemData;
@@ -30,11 +31,13 @@ public:
 	virtual void OnRep_PlayerState() override;
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 	
-	void Move(float ScaleValue);
+	void Move(const FVector2D MovementVector);
 	void RotateController() const;
 	void HandleCrouching(bool bShouldCrouch);
 	void JumpButtonPressed();
 	void TryVaultingDown();
+
+	void TraceForLedge();
 	
 	/** Combat Interface */
 	virtual int32 GetCharacterLevel_Implementation() override;
@@ -72,6 +75,11 @@ public:
 	virtual void ResetCombatVariables_Implementation() override {}
 	virtual int32 GetAttackComboIndex_Implementation() override { return AttackCount; }
 	virtual void SetAttackComboIndex_Implementation(int32 Index) override { AttackCount = Index; }
+	virtual ECombatState GetPlayerCombatState_Implementation() override { return CombatState; }
+	virtual void SetPlayerCombatState_Implementation(const ECombatState NewState) override { CombatState = NewState; }
+	virtual void HandleHangingOnLadder_Implementation(FVector HangingTarget) override;
+	virtual void HandleHangingOnLedge_Implementation(FVector HangingTarget) override;
+	virtual void HandleHangingOnRope_Implementation(FVector HangingTarget) override;
 	/** end Player Interface */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -79,6 +87,18 @@ public:
 
 protected:
 	virtual void InitAbilityActorInfo() override;
+	void HandleCombatState(ECombatState NewState);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
+	float LadderWalkSpeed = 120.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
+	float RopeWalkSpeed = 120.f;
+
+	FTimerHandle OffLedgeTimer;
+	float OffLedgeTime = .5f;
+	bool bCanGrabLedge = true;
+	UFUNCTION() void OffLedgeEnd();
 	
 	bool bAirborne = false;
 	bool bIsAccelerating = false;
@@ -105,6 +125,9 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<USceneComponent> GroundPoint;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
+	TObjectPtr<UBoxComponent> RopeHangingCollision;
 
 	UPROPERTY(EditDefaultsOnly, Category="Player|Plaforming")
 	float PlatformTraceDistance = 10.f;
@@ -120,6 +143,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
 	float OverlapPlatformTime = .25f;
+
+	float GravityScale = 3.f;
 
 public:
 	FORCEINLINE bool IsAirborne() const { return bAirborne; }

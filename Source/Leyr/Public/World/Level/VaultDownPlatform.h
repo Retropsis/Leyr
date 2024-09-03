@@ -6,7 +6,9 @@
 #include "World/Level/Platform.h"
 #include "VaultDownPlatform.generated.h"
 
-class UPaperSpriteComponent;
+class UPaperSprite;
+class UPaperGroupedSpriteComponent;
+
 /**
  * 
  */
@@ -19,7 +21,19 @@ public:
 	AVaultDownPlatform();
 	virtual void SetBoxCollisionEnabled_Implementation(bool bEnabled) override;
 
-protected:
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UPaperSpriteComponent> SpriteComponent;
+protected:	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	TObjectPtr<UPaperGroupedSpriteComponent> TileMap;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	int32 Length = 3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	UPaperSprite* FirstTile = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	UPaperSprite* LastTile = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	TArray<UPaperSprite*> Tiles;
 };

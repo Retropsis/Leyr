@@ -13,5 +13,15 @@ UCLASS()
 class LEYR_API ARope : public AHanger
 {
 	GENERATED_BODY()
+
+public:
+	ARope();
+
+protected:
+	virtual void BeginPlay() override;
 	
+	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
+
+	virtual void HandleIgnoreCollisionEnd() override;
 };
