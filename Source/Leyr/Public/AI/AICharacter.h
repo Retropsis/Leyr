@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "AI/BaseCharacter.h"
 #include "Interaction/EnemyInterface.h"
 #include "UI/Controller/OverlayWidgetController.h"

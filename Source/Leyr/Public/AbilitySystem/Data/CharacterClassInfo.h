@@ -13,9 +13,11 @@ class UGameplayEffect;
 UENUM(BlueprintType)
 enum class ECharacterClass : uint8
 {
+	Default,
 	Sorcerer,
 	Warrior,
-	Ranger
+	Ranger,
+	Breakable
 };
 
 USTRUCT(BlueprintType)
@@ -25,6 +27,12 @@ struct FCharacterClassDefaultInfo
 
 	UPROPERTY(EditDefaultsOnly, Category = "Class Defaults")
 	TSubclassOf<UGameplayEffect> PrimaryAttributes;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Class Defaults")
+	TSubclassOf<UGameplayEffect> SecondaryAttributes;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Class Defaults")
+	TSubclassOf<UGameplayEffect> VitalAttributes;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Class Defaults")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;

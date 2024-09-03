@@ -77,9 +77,8 @@ public:
 	virtual void SetAttackComboIndex_Implementation(int32 Index) override { AttackCount = Index; }
 	virtual ECombatState GetPlayerCombatState_Implementation() override { return CombatState; }
 	virtual void SetPlayerCombatState_Implementation(const ECombatState NewState) override { CombatState = NewState; }
-	virtual void HandleHangingOnLadder_Implementation(FVector HangingTarget) override;
-	virtual void HandleHangingOnLedge_Implementation(FVector HangingTarget) override;
-	virtual void HandleHangingOnRope_Implementation(FVector HangingTarget) override;
+	virtual void HandleHangingOnLadder_Implementation(FVector HangingTarget, bool bEndOverlap) override;
+	virtual void HandleHangingOnRope_Implementation(FVector HangingTarget, bool bEndOverlap) override;
 	/** end Player Interface */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -88,6 +87,7 @@ public:
 protected:
 	virtual void InitAbilityActorInfo() override;
 	void HandleCombatState(ECombatState NewState);
+	void HandleHangingOnLedge(const FVector& HangingTarget);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
 	float LadderWalkSpeed = 120.f;

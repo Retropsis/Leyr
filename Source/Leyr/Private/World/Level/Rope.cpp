@@ -2,7 +2,6 @@
 
 #include "World/Level/Rope.h"
 #include "Components/BoxComponent.h"
-#include "Interaction/CombatInterface.h"
 #include "Interaction/PlayerInterface.h"
 
 ARope::ARope()
@@ -24,8 +23,8 @@ void ARope::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 {
 	if(OtherComp && OtherComp->ComponentHasTag("RopeCollision"))
 	{
-		FVector Location{0.f, 0.f, HangingCollision->GetComponentLocation().Z};
-		IPlayerInterface::Execute_HandleHangingOnRope(OtherActor, Location);
+		const FVector Location{0.f, 0.f, HangingCollision->GetComponentLocation().Z};
+		IPlayerInterface::Execute_HandleHangingOnRope(OtherActor, Location, false);
 	}
 }
 
@@ -34,10 +33,9 @@ void ARope::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Other
 	if(OtherComp && OtherComp->ComponentHasTag("RopeCollision"))
 	{
 		HangingCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-		if (UWorld* World = GetWorld())
-		{
-			World->GetTimerManager().SetTimer(IgnoreCollisionTimer, this, &ARope::HandleIgnoreCollisionEnd, IgnoreCollisionTime);
-		}
+		if (const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(IgnoreCollisionTimer, this, &ARope::HandleIgnoreCollisionEnd, IgnoreCollisionTime);
+		
+		IPlayerInterface::Execute_HandleHangingOnRope(OtherActor, FVector::ZeroVector, true);
 	}
 }
 

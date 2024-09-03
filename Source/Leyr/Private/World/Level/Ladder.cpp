@@ -1,9 +1,7 @@
 // @ Retropsis 2024-2025.
 
 #include "World/Level/Ladder.h"
-
 #include "Components/BoxComponent.h"
-#include "Interaction/CombatInterface.h"
 #include "Interaction/PlayerInterface.h"
 
 ALadder::ALadder()
@@ -26,8 +24,9 @@ void ALadder::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* O
 	GEngine->AddOnScreenDebugMessage(160, 3.f, FColor::Green, FString::Printf(TEXT("OnBeginOverlap")));
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>())
 	{
-		FVector Location{HangingCollision->GetComponentLocation().X, 0.f, 0.f};
-		IPlayerInterface::Execute_HandleHangingOnLadder(OtherActor, Location);
+		const FVector Location{HangingCollision->GetComponentLocation().X, 0.f, 0.f};
+		
+		IPlayerInterface::Execute_HandleHangingOnLadder(OtherActor, Location, false);
 	}
 }
 
@@ -37,10 +36,9 @@ void ALadder::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>())
 	{
 		HangingCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-		if (UWorld* World = GetWorld())
-		{
-			World->GetTimerManager().SetTimer(IgnoreCollisionTimer, this, &ALadder::HandleIgnoreCollisionEnd, IgnoreCollisionTime);
-		}
+		if (const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(IgnoreCollisionTimer, this, &ALadder::HandleIgnoreCollisionEnd, IgnoreCollisionTime);
+		
+		IPlayerInterface::Execute_HandleHangingOnLadder(OtherActor, FVector::ZeroVector, true);
 	}
 }
 

@@ -76,11 +76,8 @@ public:
 	void SetPlayerCombatState(const ECombatState NewState);
 
 	UFUNCTION(BlueprintNativeEvent)
-	void HandleHangingOnLadder(FVector HangingTarget);
+	void HandleHangingOnLadder(FVector HangingTarget, bool bEndOverlap);
 
 	UFUNCTION(BlueprintNativeEvent)
-	void HandleHangingOnRope(FVector HangingTarget);
-
-	UFUNCTION(BlueprintNativeEvent)
-	void HandleHangingOnLedge(FVector HangingTarget);
+	void HandleHangingOnRope(FVector HangingTarget, bool bEndOverlap);
 };

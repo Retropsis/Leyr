@@ -68,9 +68,11 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
 	TArray<UPaperSprite*> Tiles;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	float IgnoreCollisionTime = .6f;
 
 	FTimerHandle IgnoreCollisionTimer;
-	float IgnoreCollisionTime = 1.f;
 
 	UFUNCTION()
 	virtual void HandleIgnoreCollisionEnd() {}

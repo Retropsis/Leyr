@@ -41,5 +41,5 @@ float UMMC_MaxMana::CalculateBaseMagnitude_Implementation(const FGameplayEffectS
 	{
 		CharacterLevel = ICombatInterface::Execute_GetCharacterLevel(Spec.GetContext().GetSourceObject());
 	}
-	return 50.f + 2.5f * (Intelligence * 0.25 + Wisdom * 0.75) + 15.f * CharacterLevel;
+	return /*50.f + */2.5f * (Intelligence * 0.25 + Wisdom * 0.75) + 15.f * CharacterLevel;
 }
