@@ -415,31 +415,31 @@ void APlayerCharacter::JumpButtonPressed()
 
 void APlayerCharacter::TraceForPlatforms() const
 {
-	if(GetCharacterMovement()->IsFalling() || GetVelocity().Z < 0.f)
+	// if(GetCharacterMovement()->IsFalling() || GetVelocity().Z < 0.f)
+	// {
+	// }
+	const FVector Start = GroundPoint->GetComponentLocation() + FVector::DownVector * GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	const FVector End = Start + FVector::DownVector * PlatformTraceDistance;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(EOT_OneWayPlatform);
+	TArray<AActor*> ActorsToIgnore;
+	FHitResult LeftFoot;
+	UKismetSystemLibrary::LineTraceSingleForObjects(
+		this, Start, End, ObjectTypes, false, TArray<AActor*>(),
+		EDrawDebugTrace::ForOneFrame, LeftFoot, true);
+		
+	if(LeftFoot.bBlockingHit /*&& GetVelocity().Z < 0.f*/)
 	{
-		const FVector Start = /*GroundPoint->GetComponentLocation()*/ GetActorLocation() + FVector::DownVector * GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-		const FVector End = Start + FVector::DownVector * PlatformTraceDistance;
-		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-		ObjectTypes.Add(EOT_OneWayPlatform);
-		TArray<AActor*> ActorsToIgnore;
-		FHitResult Hit;
-		UKismetSystemLibrary::LineTraceSingleForObjects(
-			this, Start, End, ObjectTypes, false, TArray<AActor*>(),
-			EDrawDebugTrace::ForOneFrame, Hit, true);
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Block);
+	}
+	else
+	{
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Overlap);
+	}
 		
-		if(Hit.bBlockingHit && GetVelocity().Z < 0.f)
-		{
-			GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Block);
-		}
-		else
-		{
-			GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Overlap);
-		}
-		
-		if(Hit.GetActor() && Hit.GetActor()->ActorHasTag("VaultDownPlatform"))
-		{
-			GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, bOverlapPlatformTimerEnded ? ECR_Block : ECR_Overlap);
-		}
+	if(LeftFoot.GetActor() && LeftFoot.GetActor()->ActorHasTag("VaultDownPlatform"))
+	{
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, bOverlapPlatformTimerEnded ? ECR_Block : ECR_Overlap);
 	}
 }
 
@@ -452,8 +452,8 @@ void APlayerCharacter::TryVaultingDown()
 {
 	if(GetCharacterMovement()->IsFalling() || GetVelocity().Z < 0.f) return;
 	
- 	const FVector Start = GroundPoint->GetComponentLocation() + FVector(0.f, 0.f, 50.f);
-	const FVector End = Start + FVector::DownVector * 60.f;
+ 	const FVector Start = GetActorLocation() /*+ FVector::DownVector * GetCapsuleComponent()->GetScaledCapsuleRadius()*/;
+	const FVector End = Start + FVector::DownVector * (GetCapsuleComponent()->GetScaledCapsuleRadius() + 60.f);
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(EOT_OneWayPlatform);
 	TArray<AActor*> ActorsToIgnore;

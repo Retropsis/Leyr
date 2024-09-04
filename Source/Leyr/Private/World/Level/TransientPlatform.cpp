@@ -59,7 +59,7 @@ void ATransientPlatform::HandlePlatformTimeEnd()
 	{
 		BoxCollision->SetEnableGravity(true);
 		BoxCollision->SetSimulatePhysics(true);
-		// BoxCollision->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+		BoxCollision->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	}
 	else
 	{
