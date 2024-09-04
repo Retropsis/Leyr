@@ -81,20 +81,6 @@ void AEffectActor::OnEndOverlap(AActor* TargetActor)
 		if(!IsValid(TargetASC)) return;
 
 		TargetASC->RemoveActiveGameplayEffectBySourceEffect(InfiniteGameplayEffectClass, TargetASC, 1);
-
-		// TArray<FActiveGameplayEffectHandle> HandlesToRemove;
-		// for (const TTuple<FActiveGameplayEffectHandle, UAbilitySystemComponent*> HandlePair : ActiveEffectHandles)
-		// {
-		// 	if (TargetASC == HandlePair.Value)
-		// 	{
-		// 		TargetASC->RemoveActiveGameplayEffect(HandlePair.Key, 1);
-		// 		HandlesToRemove.Add(HandlePair.Key);
-		// 	}
-		// }
-		// for (FActiveGameplayEffectHandle& Handle : HandlesToRemove)
-		// {
-		// 	ActiveEffectHandles.FindAndRemoveChecked(Handle);
-		// }
 	}
 }
 

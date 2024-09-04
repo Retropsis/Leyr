@@ -23,10 +23,16 @@ void UPlayerCharacterAnimInstance::Tick(float DeltaTime)
 
 	Velocity = PlayerCharacter->GetCharacterMovement()->Velocity;
 	bIsMoving =  UKismetMathLibrary::VSizeXY(Velocity) > 0.f;
+	bIsClimbing = FMath::Abs(Velocity.Z) > 0.f;
 	bAirborne = PlayerCharacter->GetCharacterMovement()->IsFalling();
 	bIsAccelerating = PlayerCharacter->IsAccelerating();
 	bIsCrouched = PlayerCharacter->bIsCrouched;
 	CombatState = PlayerCharacter->Execute_GetCombatState(PlayerCharacter);
 
 	GEngine->AddOnScreenDebugMessage(159, 1.f, FColor::Cyan, FString::Printf(TEXT("%s"), *UEnum::GetValueAsString(CombatState)));
+}
+
+void UPlayerCharacterAnimInstance::PlayVaultDownSequence()
+{
+	PlayAnimationOverride(VaultDownSequence);
 }

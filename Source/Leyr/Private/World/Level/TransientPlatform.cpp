@@ -42,6 +42,8 @@ void ATransientPlatform::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent
 
 void ATransientPlatform::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	if(bFallingPlatform) return;
+	
 	if (OtherActor && OtherActor->Implements<UPlayerInterface>())
 	{
 		bCanSafelyBlock = true;
@@ -51,14 +53,26 @@ void ATransientPlatform::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, 
 void ATransientPlatform::HandlePlatformTimeEnd()
 {
 	FlipbookComponent->SetPlayRate(TransientFadingSpeed);
-	BoxCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	FlipbookComponent->PlayFromStart();
-	bCanSafelyBlock = false;
+
+	if(bFallingPlatform)
+	{
+		BoxCollision->SetEnableGravity(true);
+		BoxCollision->SetSimulatePhysics(true);
+		// BoxCollision->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	}
+	else
+	{
+		BoxCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+        bCanSafelyBlock = false;
+	}
 }
 
 void ATransientPlatform::HandleOnFinishedPlaying()
 {
-	if (const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(OffCycleTimer, this, &ATransientPlatform::HandleOffCycleEnd, OffCycleDuration);
+	if(bFallingPlatform) SetLifeSpan(.1f);
+	
+	else if (const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(OffCycleTimer, this, &ATransientPlatform::HandleOffCycleEnd, OffCycleDuration);
 }
 
 void ATransientPlatform::HandleOffCycleEnd() const

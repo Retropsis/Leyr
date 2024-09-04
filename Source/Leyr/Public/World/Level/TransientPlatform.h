@@ -23,13 +23,13 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
-	void HandleOnFinishedPlaying();
+	virtual void HandleOnFinishedPlaying();
 
 	UFUNCTION()
 	void HandleOffCycleEnd() const;
 	
 	UFUNCTION()
-	void HandlePlatformTimeEnd();
+	virtual void HandlePlatformTimeEnd();
 	
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
@@ -38,6 +38,9 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, Category="Platform")
 	TObjectPtr<UPaperFlipbookComponent> FlipbookComponent;
+	
+	UPROPERTY(EditAnywhere, Category="Platform")
+	bool bFallingPlatform = false;
 	
 	UPROPERTY(EditAnywhere, Category="Platform")
 	float TransientPosition = .5f;
@@ -50,9 +53,10 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category="Platform")
 	float OffCycleDuration = 2.f;
+	
+	FTimerHandle PlatformTimer;
 
 private:
-	FTimerHandle PlatformTimer;
 	FTimerHandle OffCycleTimer;
 	bool bCanSafelyBlock = true;
 };

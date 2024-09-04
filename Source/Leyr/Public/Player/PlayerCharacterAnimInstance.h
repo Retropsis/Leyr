@@ -20,6 +20,8 @@ class LEYR_API UPlayerCharacterAnimInstance : public UPaperZDAnimInstance
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void OnInit_Implementation() override;
+
+	void PlayVaultDownSequence();
 	
 	UPROPERTY(BlueprintReadOnly, Category="PlayerCharacter")
 	TObjectPtr<APlayerCharacter> PlayerCharacter;
@@ -31,6 +33,9 @@ public:
 	bool bIsMoving;
 	
 	UPROPERTY(BlueprintReadOnly, Category="PlayerCharacter")
+	bool bIsClimbing;
+	
+	UPROPERTY(BlueprintReadOnly, Category="PlayerCharacter")
 	bool bAirborne;
 
 	UPROPERTY(BlueprintReadOnly, Category="PlayerCharacter")
@@ -38,6 +43,9 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, Category="PlayerCharacter")
 	bool bIsCrouched;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="PlayerCharacter")
+	TObjectPtr<UPaperZDAnimSequence> VaultDownSequence = nullptr;
 
 	UPROPERTY(BlueprintReadOnly, Category="PlayerCharacter")
 	ECombatState CombatState = ECombatState::Unoccupied;

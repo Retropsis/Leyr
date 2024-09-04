@@ -111,6 +111,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	bool bDead = false;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="PaperZD")
+	TObjectPtr<UPaperZDAnimationComponent> AnimationComponent;
+	
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	TObjectPtr<UPaperZDAnimSequence> AttackSequence;
 	
@@ -164,7 +167,4 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category = "Character|Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupPassiveAbilities;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="PaperZD", meta=(AllowPrivateAccess="true"))
-	TObjectPtr<UPaperZDAnimationComponent> AnimationComponent;
 };
