@@ -19,7 +19,6 @@ class LEYR_API AVaultDownPlatform : public APlatform
 
 public:
 	AVaultDownPlatform();
-	virtual void SetBoxCollisionEnabled_Implementation(bool bEnabled) override;
 
 protected:	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")

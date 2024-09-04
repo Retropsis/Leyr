@@ -10,4 +10,6 @@ APlatform::APlatform()
 
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>("BoxCollision");
 	SetRootComponent(BoxCollision);
+
+	Tags.Add(FName("Platform"));
 }
