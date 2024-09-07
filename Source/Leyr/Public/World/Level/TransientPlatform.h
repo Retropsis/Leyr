@@ -11,7 +11,7 @@ class UPaperFlipbookComponent;
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable, BlueprintType)
 class LEYR_API ATransientPlatform : public APlatform
 {
 	GENERATED_BODY()

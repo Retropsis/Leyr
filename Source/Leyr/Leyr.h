@@ -15,6 +15,7 @@
 #define EOT_Projectile ObjectTypeQuery9
 #define EOT_OneWayPlatform ObjectTypeQuery10
 #define EOT_VaultDownPlatform ObjectTypeQuery11
+#define EOT_Interaction ObjectTypeQuery12
 
 USTRUCT(BlueprintType)
 struct FValueRange

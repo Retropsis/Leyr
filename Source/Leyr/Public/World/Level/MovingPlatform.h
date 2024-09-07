@@ -6,6 +6,7 @@
 #include "World/Level/Platform.h"
 #include "MovingPlatform.generated.h"
 
+class ALever;
 class USplineComponent;
 
 /**
@@ -35,8 +36,13 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Platform|Route")
 	TObjectPtr<USplineComponent> RouteSpline;
 
+	UPROPERTY(EditAnywhere, Category="Platform")
+	TObjectPtr<ALever> Switch;
+
+
 protected:
 	virtual void BeginPlay() override;
 	FVector CurrentTarget = FVector::Zero();
 	int32 CurrentIndex = 0;
+	bool bIsActivated = true;
 };

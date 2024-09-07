@@ -28,7 +28,7 @@ enum class EInterpMethod : uint8
 	EaseInOut,
 };
 
-UCLASS()
+UCLASS(Blueprintable, BlueprintType)
 class LEYR_API APlatform : public AActor, public IPlatformInterface
 {
 	GENERATED_BODY()
@@ -36,7 +36,7 @@ class LEYR_API APlatform : public AActor, public IPlatformInterface
 public:	
 	APlatform();
 
-protected:
+protected:	
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {}
 	

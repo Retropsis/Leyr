@@ -395,10 +395,20 @@ void APlayerCharacter::RotateController() const
 
 void APlayerCharacter::HandleCrouching(bool bShouldCrouch)
 {
-	if(GetCharacterMovement()->IsFalling() || (bShouldCrouch && bIsCrouched) || CombatState >= ECombatState::HangingLedge) return;
-	
+	if(!bShouldCrouch)
+	{
+		UnCrouch();
+		// GEngine->AddOnScreenDebugMessage(9874, 1.5, FColor::Magenta, FString::Printf(TEXT("UnCrouch From Release")));
+	}
+	if(GetCharacterMovement()->IsFalling())
+	{
+		UnCrouch();
+		// GEngine->AddOnScreenDebugMessage(9875, 1.5f, FColor::Magenta, FString::Printf(TEXT("UnCrouch From Falling")));
+		return;
+	}
+	if((bShouldCrouch && bIsCrouched) || CombatState >= ECombatState::HangingLedge) return;
 	if(bShouldCrouch && !bIsCrouched) Crouch();
-	if(!bShouldCrouch && bIsCrouched) UnCrouch();
+	// GEngine->AddOnScreenDebugMessage(9876, 1.5f, FColor::Magenta, FString::Printf(TEXT("Crouching")));
 }
 
 void APlayerCharacter::JumpButtonPressed()
@@ -409,7 +419,6 @@ void APlayerCharacter::JumpButtonPressed()
 		bCanGrabLedge = false;
 		GetWorld()->GetTimerManager().SetTimer(OffLedgeTimer, this, &APlayerCharacter::OffLedgeEnd, OffLedgeTime);
 	}
-	
 	bIsCrouched ? TryVaultingDown() : Jump();
 }
 

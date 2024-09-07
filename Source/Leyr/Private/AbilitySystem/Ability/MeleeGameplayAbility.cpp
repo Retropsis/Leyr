@@ -3,6 +3,7 @@
 #include "AbilitySystem/Ability/MeleeGameplayAbility.h"
 #include "AbilitySystemComponent.h"
 #include "Interaction/CombatInterface.h"
+#include "Interaction/InteractionInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 FHitResult UMeleeGameplayAbility::BoxTrace()
@@ -19,13 +20,18 @@ FHitResult UMeleeGameplayAbility::BoxTrace()
 		this, BoxTraceStart, BoxTraceEnd, BoxTraceExtent, FRotator::ZeroRotator, ObjectTypes,
 		false, ActorsToIgnore, EDrawDebugTrace::None, Hit, true);
 
-	return Hit;
+	TArray<FHitResult> Hits;
+	UKismetSystemLibrary::BoxTraceMultiForObjects(
+		this, BoxTraceStart, BoxTraceEnd, BoxTraceExtent, FRotator::ZeroRotator, ObjectTypes,
+		false, ActorsToIgnore, EDrawDebugTrace::None, Hits, true);
+	
+	for (FHitResult HitResult : Hits)
+	{
+		if(HitResult.bBlockingHit && HitResult.GetActor() && HitResult.GetActor()->ActorHasTag("HitInteraction"))
+		{
+			IInteractionInterface::Execute_Interact(HitResult.GetActor());
+		}
+	}
 
-	// if(Hit.bBlockingHit && Hit.GetActor())
-	// {
-	// 	if (GetAvatarActorFromActorInfo()->HasAuthority())
-	// 	{
-	// 		CauseDamage(Hit.GetActor());
-	// 	}
-	// }
+	return Hit;
 }

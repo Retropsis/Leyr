@@ -3,6 +3,7 @@
 #include "World/Level/MovingPlatform.h"
 #include "Components/BoxComponent.h"
 #include "Components/SplineComponent.h"
+#include "World/Level/Lever.h"
 
 AMovingPlatform::AMovingPlatform()
 {
@@ -21,13 +22,18 @@ AMovingPlatform::AMovingPlatform()
 void AMovingPlatform::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	Move(DeltaSeconds);
+	if(bIsActivated) Move(DeltaSeconds);
 }
 
 void AMovingPlatform::BeginPlay()
 {
 	Super::BeginPlay();
 	CurrentTarget = RouteSpline->GetLocationAtSplinePoint(CurrentIndex, ESplineCoordinateSpace::World);
+	bIsActivated = !IsValid(Switch);
+	if(IsValid(Switch)) Switch->OnLeverStateChanged.AddLambda([this] (const ELeverState NewState)
+	{
+		bIsActivated = NewState == ELeverState::On ? true : false;
+	});
 }
 
 void AMovingPlatform::Move(float DeltaSeconds)
