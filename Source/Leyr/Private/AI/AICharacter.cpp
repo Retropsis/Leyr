@@ -45,6 +45,7 @@ void AAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+	GetCharacterMovement()->GravityScale = BaseGravityScale;
 	InitAbilityActorInfo();
 	if (HasAuthority())
 	{

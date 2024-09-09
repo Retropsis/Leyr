@@ -124,6 +124,18 @@ void ABaseCharacter::GetAttackAnimationData_Implementation(FVector& InBoxTraceSt
 	InBoxTraceEnd = BoxTraceEnd->GetComponentLocation();
 }
 
+FBoxTraceData ABaseCharacter::GetBoxTraceDataByTag_Implementation(const FGameplayTag MontageTag)
+{
+	const FTaggedMontage TaggedMontage = Execute_GetTaggedMontageByTag(this, MontageTag);
+	BoxTraceStart->SetRelativeLocation(TaggedMontage.BoxTraceStart);
+	BoxTraceEnd->SetRelativeLocation(TaggedMontage.BoxTraceEnd);
+	return FBoxTraceData{
+		BoxTraceStart->GetComponentLocation(),
+		BoxTraceEnd->GetComponentLocation(),
+		TaggedMontage.BoxTraceExtent
+	};
+}
+
 FTaggedMontage ABaseCharacter::GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag)
 {
 	for (FTaggedMontage TaggedMontage : AttackMontages)
@@ -142,6 +154,26 @@ void ABaseCharacter::Die(const FVector& DeathImpulse)
 	//TODO: for 3D meshes, could try also with 2D Weapon
 	// Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
 	MulticastHandleDeath(DeathImpulse);
+}
+
+void ABaseCharacter::SetGravityScale_Implementation(float GravityValue)
+{
+	GetCharacterMovement()->GravityScale = GravityValue;
+}
+
+float ABaseCharacter::GetGravityScale_Implementation()
+{
+	return GetCharacterMovement()->GravityScale;
+}
+
+void ABaseCharacter::ResetGravityScale_Implementation()
+{
+	GetCharacterMovement()->GravityScale = BaseGravityScale;
+}
+
+bool ABaseCharacter::IsCharacterAirborne_Implementation()
+{
+	return GetCharacterMovement()->IsFalling();
 }
 
 void ABaseCharacter::Dissolve()

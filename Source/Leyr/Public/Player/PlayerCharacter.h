@@ -75,6 +75,7 @@ public:
 	virtual void ResetCombatVariables_Implementation() override {}
 	virtual int32 GetAttackComboIndex_Implementation() override { return AttackCount; }
 	virtual void SetAttackComboIndex_Implementation(int32 Index) override { AttackCount = Index; }
+	virtual FTaggedMontage GetTaggedMontageByIndex_Implementation(int32 Index) override;
 	virtual ECombatState GetPlayerCombatState_Implementation() override { return CombatState; }
 	virtual void SetPlayerCombatState_Implementation(const ECombatState NewState) override { CombatState = NewState; }
 	virtual void HandleHangingOnLadder_Implementation(FVector HangingTarget, bool bEndOverlap) override;
@@ -143,8 +144,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
 	float OverlapPlatformTime = .25f;
-
-	float GravityScale = 3.f;
 
 public:
 	FORCEINLINE bool IsAirborne() const { return bAirborne; }

@@ -27,10 +27,10 @@ struct FTaggedMontage
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UPaperZDAnimSequence* Montage = nullptr;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(Categories="Montage"))
 	FGameplayTag MontageTag;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(Categories="CombatSocket"))
 	FGameplayTag SocketTag;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -41,6 +41,19 @@ struct FTaggedMontage
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FVector BoxTraceEnd = FVector::ZeroVector;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FVector BoxTraceExtent = FVector(40.f, 20.f, 30.f);
+};
+
+USTRUCT(BlueprintType)
+struct FBoxTraceData
+{
+	GENERATED_BODY()
+	
+	UPROPERTY() FVector Start = FVector::ZeroVector;
+	UPROPERTY() FVector End = FVector::ZeroVector;
+	UPROPERTY() FVector Extent = FVector(40.f, 20.f, 30.f);
 };
 
 UENUM(BlueprintType)
@@ -100,6 +113,9 @@ public:
 	void GetAttackAnimationData(FVector& InBoxTraceStart, FVector& InBoxTraceEnd);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FBoxTraceData GetBoxTraceDataByTag(FGameplayTag MontageTag);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FTaggedMontage GetTaggedMontage();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
@@ -152,7 +168,22 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	int32 GetAttackComboIndex();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FTaggedMontage GetTaggedMontageByIndex(int32 Index);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetAttackComboIndex(int32 Index);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetGravityScale(float GravityValue);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	float GetGravityScale(); 
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ResetGravityScale();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool IsCharacterAirborne();
 };

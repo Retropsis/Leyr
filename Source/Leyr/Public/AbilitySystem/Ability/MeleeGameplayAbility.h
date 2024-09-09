@@ -17,14 +17,16 @@ class LEYR_API UMeleeGameplayAbility : public UDamageGameplayAbility
 public:
 	UFUNCTION(BlueprintCallable)
 	FHitResult BoxTrace();
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability|BoxTrace")
-	FVector BoxTraceExtent = FVector(40.f, 20.f, 30.f);
 
-protected:
-	UPROPERTY(BlueprintReadWrite)
-	FVector BoxTraceStart = FVector::ZeroVector;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Montage"))
+	FGameplayTag MontageTag = FGameplayTag();
 	
-	UPROPERTY(BlueprintReadWrite)
-	FVector BoxTraceEnd = FVector::ZeroVector;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Montage"))
+	FGameplayTag MainMontageTag = FGameplayTag();
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Montage"))
+	FGameplayTag AlternativeMontageTag = FGameplayTag();
+
+private:
+	FBoxTraceData BoxTraceData = FBoxTraceData();
 };

@@ -73,7 +73,7 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 	// Init Ability Actor Info Server Side
 	InitAbilityActorInfo();
 	AddCharacterAbilities();
-	GravityScale = GetCharacterMovement()->GravityScale;
+	GetCharacterMovement()->GravityScale = BaseGravityScale;
 }
 
 void APlayerCharacter::OnRep_PlayerState()
@@ -341,6 +341,12 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 		break;
 	}
+}
+
+// TODO: Need a less hardcoded way to do, here we suppose first 3 indices are the 3 combos
+FTaggedMontage APlayerCharacter::GetTaggedMontageByIndex_Implementation(int32 Index)
+{
+	return AttackMontages.IsValidIndex(Index) ? AttackMontages[Index] : FTaggedMontage();
 }
 
 void APlayerCharacter::HandleHangingOnLadder_Implementation(FVector HangingTarget, bool bEndOverlap)

@@ -240,7 +240,11 @@ FGameplayTag Event_Montage_Bow_Shot;
 FGameplayTag Montage_Attack_1;
 FGameplayTag Montage_Attack_2;
 FGameplayTag Montage_Attack_3;
-FGameplayTag Montage_Attack_4;
+ FGameplayTag Montage_Attack_4;
+ FGameplayTag Montage_Crouch_Attack;
+ FGameplayTag Montage_Jump_Attack;
+ FGameplayTag Montage_JumpDown_Attack;
+ FGameplayTag Montage_Upward_Attack;
  
  /*
   * Input Tags
@@ -262,6 +266,11 @@ FGameplayTag InputTag_Passive_2;
 FGameplayTag InputTag_Passive_3;
 FGameplayTag InputTag_Passive_4;
 FGameplayTag InputTag_Passive_5;
+ 
+FGameplayTag InputTag_Crouch_Attack;
+FGameplayTag InputTag_Jump_Attack;
+FGameplayTag InputTag_JumpDown_Attack;
+FGameplayTag InputTag_Upward_Attack;
  
 FGameplayTag InputTag_Throw_1;
 FGameplayTag InputTag_Throw_2;

@@ -40,6 +40,8 @@ protected:
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, float Level) const;
 	void AddCharacterAbilities() const;
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) {}
+
+	float BaseGravityScale = 3.f;
 	
 	FOnASCRegistered OnASCRegistered;
 	FOnDeath OnDeath;
@@ -90,6 +92,7 @@ protected:
 	virtual UPaperZDAnimSequence* GetAttackSequence_Implementation() override { return AttackSequence; }
 	virtual UPaperZDAnimInstance* GetPaperAnimInstance_Implementation() override { return AnimationComponent->GetAnimInstance(); }
 	virtual void GetAttackAnimationData_Implementation(FVector& InBoxTraceStart, FVector& InBoxTraceEnd) override;
+	virtual FBoxTraceData GetBoxTraceDataByTag_Implementation(FGameplayTag MontageTag) override;
 	// virtual FTaggedMontage GetTaggedMontage_Implementation() override;
 	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override { return AttackMontages; }
 	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
@@ -103,6 +106,10 @@ protected:
 	virtual FOnDeath& GetOnDeath() override { return OnDeath; }
 	virtual void Die(const FVector& DeathImpulse) override;
 	virtual bool IsDead_Implementation() const override { return  bDead; }
+	virtual void SetGravityScale_Implementation(float GravityValue) override;
+	virtual float GetGravityScale_Implementation() override;
+	virtual void ResetGravityScale_Implementation() override;
+	virtual bool IsCharacterAirborne_Implementation() override;
 	//~ Combat Interface
 
 	UFUNCTION(NetMulticast, Reliable)

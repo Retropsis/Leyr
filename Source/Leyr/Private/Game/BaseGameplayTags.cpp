@@ -256,6 +256,10 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Montage_Attack_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.2"), FString("Montage Attack 2"));
 	GameplayTags.Montage_Attack_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.3"), FString("Montage Attack 3"));
 	GameplayTags.Montage_Attack_4 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.4"), FString("Montage Attack 4"));
+	GameplayTags.Montage_Crouch_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Crouch.Attack"), FString("Montage Crouch Attack"));
+	GameplayTags.Montage_Jump_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Jump.Attack"), FString("Montage Jump Attack"));
+	GameplayTags.Montage_JumpDown_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.JumpDown.Attack"), FString("Montage JumpDown Attack"));
+	GameplayTags.Montage_Upward_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Upward.Attack"), FString("Montage Upward Attack"));
 	
 	/*
 	 * Input Tags
@@ -277,6 +281,11 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.InputTag_Passive_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Passive.3"), FString("Passive 3"));
 	GameplayTags.InputTag_Passive_4 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Passive.4"), FString("Passive 4"));
 	GameplayTags.InputTag_Passive_5 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Passive.5"), FString("Passive 5"));
+	
+	GameplayTags.InputTag_Crouch_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Crouch.Attack"), FString("InputTag Crouch Attack"));
+	GameplayTags.InputTag_Jump_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Jump.Attack"), FString("InputTag Jump Attack"));
+	GameplayTags.InputTag_JumpDown_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.JumpDown.Attack"), FString("InputTag JumpDown Attack"));
+	GameplayTags.InputTag_Upward_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Upward.Attack"), FString("InputTag Upward Attack"));
 	
 	GameplayTags.InputTag_Throw_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Throw.1"), FString("Throw 1"));
 	GameplayTags.InputTag_Throw_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Throw.2"), FString("Throw 2"));

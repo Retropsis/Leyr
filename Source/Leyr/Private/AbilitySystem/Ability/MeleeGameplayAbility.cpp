@@ -8,7 +8,7 @@
 
 FHitResult UMeleeGameplayAbility::BoxTrace()
 {
-	ICombatInterface::Execute_GetAttackAnimationData(GetAvatarActorFromActorInfo(), BoxTraceStart, BoxTraceEnd);
+	BoxTraceData = ICombatInterface::Execute_GetBoxTraceDataByTag(GetAvatarActorFromActorInfo(), MontageTag);
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	TEnumAsByte<EObjectTypeQuery> OT = GetAvatarActorFromActorInfo()->ActorHasTag(FName("Player")) ? EOT_EnemyCapsule : ObjectTypeQuery3;
 	ObjectTypes.Add(OT);
@@ -17,13 +17,13 @@ FHitResult UMeleeGameplayAbility::BoxTrace()
 	ActorsToIgnore.Add(GetAvatarActorFromActorInfo());
 	FHitResult Hit;
 	UKismetSystemLibrary::BoxTraceSingleForObjects(
-		this, BoxTraceStart, BoxTraceEnd, BoxTraceExtent, FRotator::ZeroRotator, ObjectTypes,
-		false, ActorsToIgnore, EDrawDebugTrace::None, Hit, true);
+		this, BoxTraceData.Start, BoxTraceData.End, BoxTraceData.Extent, FRotator::ZeroRotator, ObjectTypes,
+		false, ActorsToIgnore, EDrawDebugTrace::ForDuration, Hit, true);
 
 	TArray<FHitResult> Hits;
 	UKismetSystemLibrary::BoxTraceMultiForObjects(
-		this, BoxTraceStart, BoxTraceEnd, BoxTraceExtent, FRotator::ZeroRotator, ObjectTypes,
-		false, ActorsToIgnore, EDrawDebugTrace::None, Hits, true);
+		this, BoxTraceData.Start, BoxTraceData.End, BoxTraceData.Extent, FRotator::ZeroRotator, ObjectTypes,
+		false, ActorsToIgnore, EDrawDebugTrace::ForDuration, Hits, true);
 	
 	for (FHitResult HitResult : Hits)
 	{

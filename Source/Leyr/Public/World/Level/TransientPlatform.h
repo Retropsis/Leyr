@@ -26,7 +26,7 @@ protected:
 	virtual void HandleOnFinishedPlaying();
 
 	UFUNCTION()
-	void HandleOffCycleEnd() const;
+	void HandleOffCycleEnd();
 	
 	UFUNCTION()
 	virtual void HandlePlatformTimeEnd();
@@ -49,14 +49,14 @@ protected:
 	float TransientFadingSpeed = 1.f;
 	
 	UPROPERTY(EditAnywhere, Category="Platform")
-	float PlatformTime = 1.f;
-	
-	UPROPERTY(EditAnywhere, Category="Platform")
 	float OffCycleDuration = 2.f;
 	
-	FTimerHandle PlatformTimer;
+	UPROPERTY(EditAnywhere, Category="Platform")
+	float PlatformTime = 1.f;
 
 private:
+	FTimerHandle PlatformTimer;
 	FTimerHandle OffCycleTimer;
 	bool bCanSafelyBlock = true;
+	bool bCanOverlap = true;
 };

@@ -6,6 +6,7 @@
 #include "World/Level/Platform.h"
 #include "MovingPlatform.generated.h"
 
+class UPaperSprite;
 class ALever;
 class USplineComponent;
 
@@ -38,6 +39,18 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="Platform")
 	TObjectPtr<ALever> Switch;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	int32 Length = 3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	UPaperSprite* FirstTile = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	UPaperSprite* LastTile = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	TArray<UPaperSprite*> Tiles;
 
 
 protected:

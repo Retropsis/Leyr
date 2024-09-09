@@ -22,9 +22,15 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	void CycleCollision(bool bShouldBlock) const;
+	
+	UFUNCTION()
+	virtual void HandleOnFinishedPlaying();
 
 	UFUNCTION()
 	void HandleOffCycleEnd();
+	
+	UFUNCTION()
+	void HandlePlatformTimeEnd() const;
 
 	UPROPERTY(EditDefaultsOnly, Category="Platform")
 	float CyclingPosition = .5f;
@@ -35,11 +41,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category="Platform")
 	TObjectPtr<UPaperFlipbookComponent> FlipbookComponent;
 	
-	FTimerHandle OffCycleTimer;
-	
 	UPROPERTY(EditDefaultsOnly, Category="Platform")
 	float OffCycleDuration = 2.f;
+	
+	UPROPERTY(EditAnywhere, Category="Platform")
+	float PlatformTime = 2.f;
 
 private:
+	FTimerHandle OffCycleTimer;
+	FTimerHandle PlatformTimer;
 	bool bCanSafelyBlock = true;
 };

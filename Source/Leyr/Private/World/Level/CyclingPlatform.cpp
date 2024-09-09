@@ -10,6 +10,7 @@ ACyclingPlatform::ACyclingPlatform()
 	
 	FlipbookComponent = CreateDefaultSubobject<UPaperFlipbookComponent>("FlipbookComponent");
 	FlipbookComponent->SetupAttachment(GetRootComponent());
+	FlipbookComponent->SetLooping(false);
 	
 	Platform = EPlatformType::Cycling;
 }
@@ -18,17 +19,13 @@ void ACyclingPlatform::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	if (FlipbookComponent->GetPlayRate() > 0.f)
+	if (FlipbookComponent->IsPlaying())
 	{
-		float PlayRate = FlipbookComponent->GetPlaybackPosition() / FlipbookComponent->GetFlipbookLength();
-		if(PlayRate > CyclingPosition) CycleCollision(false);
-		if(PlayRate >= .99f)
+		FString Sup = FlipbookComponent->GetPlaybackPosition() / FlipbookComponent->GetFlipbookLength() > CyclingPosition ? FString("True") : FString("False");
+		GEngine->AddOnScreenDebugMessage(6548, 1.f, FColor::Cyan, FString::Printf(TEXT("%f"), FlipbookComponent->GetPlaybackPosition() / FlipbookComponent->GetFlipbookLength()));
+		if(FlipbookComponent->GetPlaybackPosition() / FlipbookComponent->GetFlipbookLength() > CyclingPosition)
 		{
-			if (const UWorld* World = GetWorld())
-			{
-				World->GetTimerManager().SetTimer(OffCycleTimer, this, &ACyclingPlatform::HandleOffCycleEnd, OffCycleDuration);
-			}
-			FlipbookComponent->SetPlayRate(0.f);
+			CycleCollision(false);
 		}
 	}
 }
@@ -36,6 +33,8 @@ void ACyclingPlatform::Tick(float DeltaSeconds)
 void ACyclingPlatform::BeginPlay()
 {
 	Super::BeginPlay();
+	FlipbookComponent->OnFinishedPlaying.AddDynamic(this, &ACyclingPlatform::HandleOnFinishedPlaying);
+	HandleOffCycleEnd();
 }
 
 void ACyclingPlatform::CycleCollision(bool bShouldBlock) const
@@ -48,9 +47,20 @@ void ACyclingPlatform::CycleCollision(bool bShouldBlock) const
 	else BoxCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 }
 
+void ACyclingPlatform::HandleOnFinishedPlaying()
+{
+	if (const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(OffCycleTimer, this, &ACyclingPlatform::HandleOffCycleEnd, OffCycleDuration);
+	FlipbookComponent->Stop();
+}
+
 void ACyclingPlatform::HandleOffCycleEnd()
 {
 	CycleCollision(true);
 	FlipbookComponent->SetPlaybackPosition(0.f, true);
-	FlipbookComponent->SetPlayRate(CyclingFadingSpeed);
+	if (const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(PlatformTimer, this, &ACyclingPlatform::HandlePlatformTimeEnd, PlatformTime);
+}
+
+void ACyclingPlatform::HandlePlatformTimeEnd() const
+{
+	FlipbookComponent->Play();
 }
