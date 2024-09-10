@@ -256,6 +256,8 @@ FGameplayTag Montage_Jump_Attack;
 FGameplayTag Montage_JumpDown_Attack;
 FGameplayTag Montage_Upward_Attack;
 FGameplayTag Montage_Rope_Attack;
+FGameplayTag Montage_Slope_Attack;
+FGameplayTag Montage_Ladder_Attack;
  
  /*
   * Input Tags

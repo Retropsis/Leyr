@@ -277,6 +277,8 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Montage_JumpDown_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.JumpDown.Attack"), FString("Montage JumpDown Attack"));
 	GameplayTags.Montage_Upward_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Upward.Attack"), FString("Montage Upward Attack"));
 	GameplayTags.Montage_Rope_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Rope.Attack"), FString("Montage Rope Attack"));
+	GameplayTags.Montage_Slope_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Slope.Attack"), FString("Montage Slope Attack"));
+	GameplayTags.Montage_Ladder_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Ladder.Attack"), FString("Montage Ladder Attack"));
 	
 	/*
 	 * Input Tags

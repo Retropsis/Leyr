@@ -64,9 +64,10 @@ enum class ECombatState : uint8
 	Falling UMETA(DisplayName="Falling"),
 	HangingLedge UMETA(DisplayName="Hanging Ledge"),
 	HangingRope UMETA(DisplayName="Hanging Rope"),
+	ClimbingRope UMETA(DisplayName="Climbing Rope"),
 	HangingLadder UMETA(DisplayName="Hanging Ladder"),
 	OnGroundSlope UMETA(DisplayName="OnGroundSlope"),
-	OnRopeSlope UMETA(DisplayName="OnGroundSlope"),
+	OnRopeSlope UMETA(DisplayName="OnRopeSlope"),
 };
 
 // This class does not need to be modified.
@@ -188,4 +189,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool IsCharacterAirborne();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetMovementTarget(FVector Target);
 };

@@ -17,6 +17,7 @@
 #include "Game/BaseGameplayTags.h"
 #include "Interaction/PlatformInterface.h"
 #include "Inventory/HotbarComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Player/PlayerCharacterAnimInstance.h"
 #include "UI/PlayerHUD.h"
@@ -65,7 +66,16 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 	TraceForPlatforms();
 	TraceForLedge();
-	// TraceForSlope();
+	TraceForSlope();
+
+	if(CombatState == ECombatState::ClimbingRope)
+	{
+		SetActorLocation(FMath::VInterpTo(GetActorLocation(), MovementTarget, DeltaSeconds, ClimbingSpeed));
+		if (FMath::IsNearlyZero(UKismetMathLibrary::Vector_Distance(GetActorLocation(), MovementTarget), 5.f))
+		{
+			HandleCombatState(ECombatState::Falling);
+		}
+	}
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)
@@ -291,11 +301,17 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 		break;
 	case ECombatState::HangingRope:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
+		if(MovementVector.Y > 0.f) HandleCombatState(ECombatState::ClimbingRope);
+		break;
+	case ECombatState::ClimbingRope:
 		break;
 	case ECombatState::HangingLadder:
 		AddMovementInput(FVector(0.f, 0.f, 1.f), FMath::RoundToFloat(MovementVector.Y));
+		if(MovementVector.X > 0.f) GetController()->SetControlRotation(FRotator::ZeroRotator);
+		if(MovementVector.X < 0.f) GetController()->SetControlRotation(FRotator(0.f, 180.f, 0.f));
 		break;
 	case ECombatState::OnGroundSlope:
+		GEngine->AddOnScreenDebugMessage(13465, 1.f, FColor::Green, FString::Printf(TEXT("%f"), GetCharacterMovement()->GetCurrentAcceleration().X));
 		break;
 	case ECombatState::OnRopeSlope:
 		break;
@@ -326,7 +342,6 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 	
 	switch (CombatState) {
 	case ECombatState::Unoccupied:
-		// GetCharacterMovement()->GravityScale = GravityScale;
 		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		break;
@@ -340,7 +355,9 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->MaxFlySpeed = RopeWalkSpeed;
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FBaseGameplayTags::Get().CombatState_Rope.GetSingleTagContainer());
+		break;
+	case ECombatState::ClimbingRope:
+		MovementTarget = GetActorLocation() + FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f);
 		break;
 	case ECombatState::HangingLadder:
 		GetCharacterMovement()->StopMovementImmediately();
@@ -352,6 +369,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 		break;
 	case ECombatState::OnGroundSlope:
+		// GetCharacterMovement()->GravityScale = 1.f;
 		break;
 	case ECombatState::OnRopeSlope:
 		break;
@@ -386,7 +404,6 @@ void APlayerCharacter::HandleHangingOnRope_Implementation(FVector HangingTarget,
 	}
 	if(bEndOverlap && CombatState == ECombatState::HangingRope)
 	{
-		// JumpButtonPressed();
 		HandleCombatState(ECombatState::Falling);
 	}
 }
@@ -419,17 +436,14 @@ void APlayerCharacter::HandleCrouching(bool bShouldCrouch)
 	if(!bShouldCrouch)
 	{
 		UnCrouch();
-		// GEngine->AddOnScreenDebugMessage(9874, 1.5, FColor::Magenta, FString::Printf(TEXT("UnCrouch From Release")));
 	}
 	if(GetCharacterMovement()->IsFalling())
 	{
 		UnCrouch();
-		// GEngine->AddOnScreenDebugMessage(9875, 1.5f, FColor::Magenta, FString::Printf(TEXT("UnCrouch From Falling")));
 		return;
 	}
 	if((bShouldCrouch && bIsCrouched) || CombatState >= ECombatState::HangingLedge) return;
 	if(bShouldCrouch && !bIsCrouched) Crouch();
-	// GEngine->AddOnScreenDebugMessage(9876, 1.5f, FColor::Magenta, FString::Printf(TEXT("Crouching")));
 }
 
 void APlayerCharacter::JumpButtonPressed()
@@ -554,20 +568,24 @@ void APlayerCharacter::TraceForSlope()
 		UKismetSystemLibrary::LineTraceSingle(
 			this, Start, End, TraceTypeQuery1,
 			false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, Hit, true);
-
+		
+		ECombatState PreviousState = CombatState;
 		ECombatState NewState = ECombatState::Unoccupied;
 		if(Hit.bBlockingHit)
 		{
-			float Angle = FMath::RadiansToDegrees(acosf(FVector::DotProduct(FVector::UpVector, Hit.Normal)));
-			// UKismetSystemLibrary::DrawDebugLine(this, Start, Start + Hit.Normal * 50.f, FLinearColor::Red);
-			// UKismetSystemLibrary::DrawDebugLine(this, Start, Start + Hit.ImpactNormal * 150.f, FLinearColor::Green);
-			// GEngine->AddOnScreenDebugMessage(9874, 2.f, FColor::Cyan, FString::Printf(TEXT("%f"), Angle));
+			float DotProduct = FVector::DotProduct(FVector::UpVector, Hit.Normal);
+			float Angle = FMath::RadiansToDegrees(acosf(DotProduct));
+			UKismetSystemLibrary::DrawDebugLine(this, Start, Start + Hit.Normal * 50.f, FLinearColor::Red);
+			UKismetSystemLibrary::DrawDebugLine(this, Start, Start + Hit.ImpactNormal * 150.f, FLinearColor::Green);
+			GEngine->AddOnScreenDebugMessage(9875, 2.f, FColor::Magenta, FString::Printf(TEXT("%f"), DotProduct));
 			if (GetCharacterMovement()->GetWalkableFloorAngle() < Angle)
 			{
 				NewState = ECombatState::OnGroundSlope;
+				if(DotProduct > 0.f) GetController()->SetControlRotation(FRotator::ZeroRotator);
+				else if(DotProduct < 0.f) GetController()->SetControlRotation(FRotator(0.f, 180.f, 0.f));
 			}
 		}
-		HandleCombatState(NewState);
+		if(PreviousState != NewState) HandleCombatState(NewState);
 	}
 }
 

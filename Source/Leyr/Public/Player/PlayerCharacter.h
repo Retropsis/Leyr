@@ -81,6 +81,7 @@ public:
 	virtual void SetPlayerCombatState_Implementation(const ECombatState NewState) override { CombatState = NewState; }
 	virtual void HandleHangingOnLadder_Implementation(FVector HangingTarget, bool bEndOverlap) override;
 	virtual void HandleHangingOnRope_Implementation(FVector HangingTarget, bool bEndOverlap) override;
+	virtual void SetMovementTarget_Implementation(const FVector Target) override { MovementTarget = Target; } 
 	/** end Player Interface */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -96,6 +97,12 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
 	float RopeWalkSpeed = 120.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
+	float GroundSlopeWalkSpeed = 20.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
+	float ClimbingSpeed = 3.f;
 
 	FTimerHandle OffLedgeTimer;
 	float OffLedgeTime = .5f;
@@ -146,6 +153,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
 	float OverlapPlatformTime = .25f;
+
+	FVector MovementTarget = FVector::ZeroVector;
 
 public:
 	FORCEINLINE bool IsAirborne() const { return bAirborne; }
