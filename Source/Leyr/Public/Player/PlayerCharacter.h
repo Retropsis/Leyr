@@ -38,6 +38,7 @@ public:
 	void TryVaultingDown();
 
 	void TraceForLedge();
+	void TraceForSlope();
 	
 	/** Combat Interface */
 	virtual int32 GetCharacterLevel_Implementation() override;
@@ -110,6 +111,7 @@ protected:
 	int32 AttackCount = 0;
 	
 	ECombatState CombatState = ECombatState::Unoccupied;
+	ECombatState PreviousCombatState = ECombatState::Unoccupied;
 
 private:	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))

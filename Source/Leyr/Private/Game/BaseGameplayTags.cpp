@@ -190,6 +190,22 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_Throw_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Throw.2"), FString("Abilities Throw 2"));
 
 	/*
+	 * Combo
+	 */
+	GameplayTags.Abilities_Combo_Attack_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Combo.Attack.1"), FString("Abilities Combo Attack 1"));
+	GameplayTags.Abilities_Combo_Attack_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Combo.Attack.2"), FString("Abilities Combo Attack 2"));
+	GameplayTags.Abilities_Combo_Attack_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Combo.Attack.3"), FString("Abilities Combo Attack 3"));
+	GameplayTags.Abilities_Combo_Attack_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Combo.Attack.Execute"), FString("Abilities Combo Attack Execute"));
+
+	/*
+	 * Combat States
+	 */
+	GameplayTags.CombatState_Falling = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Falling"), FString("CombatState Falling"));
+	GameplayTags.CombatState_Crouching = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Crouching"), FString("CombatState Crouching"));
+	GameplayTags.CombatState_Slope = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Slope"), FString("CombatState Slope"));
+	GameplayTags.CombatState_Rope = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rope"), FString("CombatState Rope"));
+	
+	/*
 	 * Gameplay Cues
 	 */
 	GameplayTags.GameplayCue_FireBlast = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.FireBlast"), FString("Gameplay Cue FireBlast"));
@@ -260,6 +276,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Montage_Jump_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Jump.Attack"), FString("Montage Jump Attack"));
 	GameplayTags.Montage_JumpDown_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.JumpDown.Attack"), FString("Montage JumpDown Attack"));
 	GameplayTags.Montage_Upward_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Upward.Attack"), FString("Montage Upward Attack"));
+	GameplayTags.Montage_Rope_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Rope.Attack"), FString("Montage Rope Attack"));
 	
 	/*
 	 * Input Tags

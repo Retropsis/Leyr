@@ -65,6 +65,8 @@ enum class ECombatState : uint8
 	HangingLedge UMETA(DisplayName="Hanging Ledge"),
 	HangingRope UMETA(DisplayName="Hanging Rope"),
 	HangingLadder UMETA(DisplayName="Hanging Ladder"),
+	OnGroundSlope UMETA(DisplayName="OnGroundSlope"),
+	OnRopeSlope UMETA(DisplayName="OnGroundSlope"),
 };
 
 // This class does not need to be modified.

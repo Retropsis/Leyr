@@ -167,10 +167,20 @@ FGameplayTag Abilities_Weapon_Noxious_Bio_1;
 FGameplayTag Abilities_Weapon_Aim;
 FGameplayTag Abilities_Weapon_Bow_Shot;
  
+FGameplayTag Abilities_Combo_Attack_1;
+FGameplayTag Abilities_Combo_Attack_2;
+FGameplayTag Abilities_Combo_Attack_3;
+FGameplayTag Abilities_Combo_Attack_Execute;
+ 
 FGameplayTag Abilities_Monk_Basic;
  
 FGameplayTag Abilities_Throw_1;
 FGameplayTag Abilities_Throw_2;
+ 
+FGameplayTag CombatState_Slope;
+FGameplayTag CombatState_Rope;
+FGameplayTag CombatState_Falling;
+FGameplayTag CombatState_Crouching;
 
  /*
   * Gameplay Cues
@@ -240,11 +250,12 @@ FGameplayTag Event_Montage_Bow_Shot;
 FGameplayTag Montage_Attack_1;
 FGameplayTag Montage_Attack_2;
 FGameplayTag Montage_Attack_3;
- FGameplayTag Montage_Attack_4;
- FGameplayTag Montage_Crouch_Attack;
- FGameplayTag Montage_Jump_Attack;
- FGameplayTag Montage_JumpDown_Attack;
- FGameplayTag Montage_Upward_Attack;
+FGameplayTag Montage_Attack_4;
+FGameplayTag Montage_Crouch_Attack;
+FGameplayTag Montage_Jump_Attack;
+FGameplayTag Montage_JumpDown_Attack;
+FGameplayTag Montage_Upward_Attack;
+FGameplayTag Montage_Rope_Attack;
  
  /*
   * Input Tags

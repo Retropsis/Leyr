@@ -65,6 +65,7 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 	TraceForPlatforms();
 	TraceForLedge();
+	// TraceForSlope();
 }
 
 void APlayerCharacter::PossessedBy(AController* NewController)
@@ -284,7 +285,7 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
 		break;
 	case ECombatState::Attacking:
-		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
+		// AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
 		break;
 	case ECombatState::HangingLedge:
 		break;
@@ -294,19 +295,28 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	case ECombatState::HangingLadder:
 		AddMovementInput(FVector(0.f, 0.f, 1.f), FMath::RoundToFloat(MovementVector.Y));
 		break;
+	case ECombatState::OnGroundSlope:
+		break;
+	case ECombatState::OnRopeSlope:
+		break;
 	}
 }
+
 void APlayerCharacter::SetMovementEnabled_Implementation(bool Enabled)
 {
 	GetCharacterMovement()->MaxWalkSpeed = !Enabled ? 0.f : BaseWalkSpeed;
-	if(Enabled)
+
+	if(CombatState != ECombatState::Attacking) PreviousCombatState = CombatState;
+	
+	if (Enabled)
 	{
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		if(CombatState == ECombatState::Attacking) HandleCombatState(PreviousCombatState);
 	}
 	else
 	{
-		// GetCharacterMovement()->StopActiveMovement();
 		GetCharacterMovement()->StopMovementImmediately();
+		CombatState = ECombatState::Attacking;
 	}
 }
 
@@ -330,6 +340,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->MaxFlySpeed = RopeWalkSpeed;
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(FBaseGameplayTags::Get().CombatState_Rope.GetSingleTagContainer());
 		break;
 	case ECombatState::HangingLadder:
 		GetCharacterMovement()->StopMovementImmediately();
@@ -339,6 +350,10 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 	case ECombatState::Falling:
 		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+		break;
+	case ECombatState::OnGroundSlope:
+		break;
+	case ECombatState::OnRopeSlope:
 		break;
 	}
 }
@@ -430,20 +445,19 @@ void APlayerCharacter::JumpButtonPressed()
 
 void APlayerCharacter::TraceForPlatforms() const
 {
-	// if(GetCharacterMovement()->IsFalling() || GetVelocity().Z < 0.f)
-	// {
-	// }
+	// if(GetCharacterMovement()->IsFalling() || GetVelocity().Z < 0.f) {}
+	
 	const FVector Start = GroundPoint->GetComponentLocation() + FVector::DownVector * GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	const FVector End = Start + FVector::DownVector * PlatformTraceDistance;
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(EOT_OneWayPlatform);
 	TArray<AActor*> ActorsToIgnore;
-	FHitResult LeftFoot;
+	FHitResult Hit;
 	UKismetSystemLibrary::LineTraceSingleForObjects(
 		this, Start, End, ObjectTypes, false, TArray<AActor*>(),
-		EDrawDebugTrace::ForOneFrame, LeftFoot, true);
+		EDrawDebugTrace::ForOneFrame, Hit, true);
 		
-	if(LeftFoot.bBlockingHit /*&& GetVelocity().Z < 0.f*/)
+	if(Hit.bBlockingHit /*&& GetVelocity().Z < 0.f*/)
 	{
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Block);
 	}
@@ -452,7 +466,7 @@ void APlayerCharacter::TraceForPlatforms() const
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Overlap);
 	}
 		
-	if(LeftFoot.GetActor() && LeftFoot.GetActor()->ActorHasTag("VaultDownPlatform"))
+	if(Hit.GetActor() && Hit.GetActor()->ActorHasTag("VaultDownPlatform"))
 	{
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, bOverlapPlatformTimerEnded ? ECR_Block : ECR_Overlap);
 	}
@@ -526,6 +540,34 @@ void APlayerCharacter::TraceForLedge()
 		// }
 		if(LedgeHit.bBlockingHit && LedgeHit.GetActor() && LedgeHit.GetActor()->ActorHasTag("VaultDownPlatform")) return;
 		HandleHangingOnLedge(LedgeHit.bBlockingHit ? LedgeHit.Location - Delta : LedgeHit.TraceEnd - Delta);
+	}
+}
+
+void APlayerCharacter::TraceForSlope()
+{
+	if(GetCharacterMovement()->IsFalling())
+	{
+		const FVector Start = GroundPoint->GetComponentLocation() + FVector::DownVector * GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+		const FVector End = Start + FVector::DownVector * PlatformTraceDistance * 1.5f;
+		TArray<AActor*> ActorsToIgnore;
+		FHitResult Hit;
+		UKismetSystemLibrary::LineTraceSingle(
+			this, Start, End, TraceTypeQuery1,
+			false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, Hit, true);
+
+		ECombatState NewState = ECombatState::Unoccupied;
+		if(Hit.bBlockingHit)
+		{
+			float Angle = FMath::RadiansToDegrees(acosf(FVector::DotProduct(FVector::UpVector, Hit.Normal)));
+			// UKismetSystemLibrary::DrawDebugLine(this, Start, Start + Hit.Normal * 50.f, FLinearColor::Red);
+			// UKismetSystemLibrary::DrawDebugLine(this, Start, Start + Hit.ImpactNormal * 150.f, FLinearColor::Green);
+			// GEngine->AddOnScreenDebugMessage(9874, 2.f, FColor::Cyan, FString::Printf(TEXT("%f"), Angle));
+			if (GetCharacterMovement()->GetWalkableFloorAngle() < Angle)
+			{
+				NewState = ECombatState::OnGroundSlope;
+			}
+		}
+		HandleCombatState(NewState);
 	}
 }
 

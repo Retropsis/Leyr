@@ -30,6 +30,8 @@ void APlayerCharacterController::SetupInputComponent()
 	{
 		
 		BaseInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Move);
+		BaseInputComponent->BindAction(UpwardAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Move);
+		BaseInputComponent->BindAction(DownwardAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Move);
 		BaseInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APlayerCharacterController::Jump);
 		BaseInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &APlayerCharacterController::StopJumping);
 		BaseInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerCharacterController::InteractButtonPressed);
