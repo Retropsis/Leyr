@@ -53,15 +53,16 @@ void ATransientPlatform::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, 
 
 void ATransientPlatform::HandlePlatformTimeEnd()
 {
+	FlipbookComponent->PlayFromStart();
 	if(bFallingPlatform)
 	{
 		BoxCollision->SetEnableGravity(true);
 		BoxCollision->SetSimulatePhysics(true);
 		BoxCollision->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+		BoxCollision->SetCollisionResponseToAllChannels(ECR_Ignore);
 	}
 	else
 	{
-		FlipbookComponent->PlayFromStart();
 		BoxCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
         bCanSafelyBlock = false;
 	}

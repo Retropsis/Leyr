@@ -30,7 +30,18 @@ void AWeightingPlatform::Tick(float DeltaSeconds)
 		MoveTo(UpPosition, UpwardSpeed, UpwardInterpSpeed, DeltaSeconds);
 		break;
 	}
-	if(HasReachedTarget()) MovementDirection = EMovementDirection::Still;
+	if(HasReachedTarget())
+	{
+		if(!bIsDamping || bIsDamping && MovementDirection == EMovementDirection::Upward)
+		{
+			MovementDirection = EMovementDirection::Still;
+		}
+		if(bIsDamping && MovementDirection == EMovementDirection::Downward)
+		{
+			MovementDirection = EMovementDirection::Upward;
+			CurrentTarget = UpPosition;
+		}
+	}
 }
 
 void AWeightingPlatform::BeginPlay()

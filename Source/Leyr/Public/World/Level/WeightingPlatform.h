@@ -38,6 +38,9 @@ protected:
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
 
 	UPROPERTY(EditAnywhere, Category="Platform")
+	bool bIsDamping = false;
+
+	UPROPERTY(EditAnywhere, Category="Platform")
 	float DownwardSpeed = 50.f;
 	
 	UPROPERTY(EditAnywhere, Category="Platform")
