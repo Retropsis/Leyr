@@ -99,7 +99,7 @@ protected:
 	float RopeWalkSpeed = 120.f;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
-	float GroundSlopeWalkSpeed = 20.f;
+	float GroundSlopeGravityScale = 1.f;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
 	float ClimbingSpeed = 3.f;

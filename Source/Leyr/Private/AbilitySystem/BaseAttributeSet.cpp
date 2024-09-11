@@ -82,7 +82,8 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	FEffectProperties Props;
 	SetEffectProperties(Data, Props);
 	
-	if(Props.TargetCharacter->Implements<UCombatInterface>() && ICombatInterface::Execute_IsDead(Props.TargetCharacter)) return;
+	if(Props.TargetAvatarActor->Implements<UCombatInterface>() && ICombatInterface::Execute_IsDead(Props.TargetAvatarActor)) return;
+	// if(Props.TargetCharacter->Implements<UCombatInterface>() && ICombatInterface::Execute_IsDead(Props.TargetCharacter)) return;
 
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
@@ -122,25 +123,29 @@ void UBaseAttributeSet::ShowFloatingText(const FEffectProperties& Props, float D
 {
 	if (Props.SourceCharacter != Props.TargetCharacter)
 	{
-		if(APlayerCharacterController* PC = Cast<APlayerCharacterController>(Props.SourceCharacter->Controller))
+		if(IsValid(Props.SourceCharacter))
 		{
-			PC->ClientShowDamageNumber(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit);
-			return;
+			if(APlayerCharacterController* PC = Cast<APlayerCharacterController>(Props.SourceCharacter->Controller))
+			{
+				PC->ClientShowDamageNumber(Damage, Props.TargetAvatarActor, bBlockedHit, bCriticalHit);
+				return;
+			}
 		}
+		if(!IsValid(Props.TargetCharacter)) return;
 		if(APlayerCharacterController* PC = Cast<APlayerCharacterController>(Props.TargetCharacter->Controller))
 		{
-			PC->ClientShowDamageNumber(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit);
+			PC->ClientShowDamageNumber(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit, true);
 		}
 	}
 }
 
 void UBaseAttributeSet::SendXPEvent(const FEffectProperties& Props)
 {
-	if (Props.TargetCharacter->Implements<UCombatInterface>())
+	if (Props.TargetAvatarActor->Implements<UCombatInterface>())
 	{
-		const int32 TargetLevel = ICombatInterface::Execute_GetCharacterLevel(Props.TargetCharacter);
-		const ECharacterClass TargetClass = ICombatInterface::Execute_GetCharacterClass(Props.TargetCharacter);
-		const int32 XPReward = ULeyrAbilitySystemLibrary::GetXPRewardForClassAndLevel(Props.TargetCharacter, TargetClass, TargetLevel);
+		const int32 TargetLevel = ICombatInterface::Execute_GetCharacterLevel(Props.TargetAvatarActor);
+		const ECharacterClass TargetClass = ICombatInterface::Execute_GetCharacterClass(Props.TargetAvatarActor);
+		const int32 XPReward = ULeyrAbilitySystemLibrary::GetXPRewardForClassAndLevel(Props.TargetAvatarActor, TargetClass, TargetLevel);
 
 		const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 		FGameplayEventData Payload;
@@ -148,6 +153,18 @@ void UBaseAttributeSet::SendXPEvent(const FEffectProperties& Props)
 		Payload.EventMagnitude = XPReward;
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Props.SourceCharacter, GameplayTags.Attributes_Meta_IncomingXP, Payload);
 	}
+	// if (Props.TargetCharacter->Implements<UCombatInterface>())
+	// {
+	// 	const int32 TargetLevel = ICombatInterface::Execute_GetCharacterLevel(Props.TargetCharacter);
+	// 	const ECharacterClass TargetClass = ICombatInterface::Execute_GetCharacterClass(Props.TargetCharacter);
+	// 	const int32 XPReward = ULeyrAbilitySystemLibrary::GetXPRewardForClassAndLevel(Props.TargetCharacter, TargetClass, TargetLevel);
+	//
+	// 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	// 	FGameplayEventData Payload;
+	// 	Payload.EventTag = GameplayTags.Attributes_Meta_IncomingXP;
+	// 	Payload.EventMagnitude = XPReward;
+	// 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Props.SourceCharacter, GameplayTags.Attributes_Meta_IncomingXP, Payload);
+	// }
 }
 
 void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)

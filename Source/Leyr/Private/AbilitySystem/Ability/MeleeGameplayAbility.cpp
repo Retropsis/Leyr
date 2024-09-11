@@ -18,12 +18,12 @@ FHitResult UMeleeGameplayAbility::BoxTrace()
 	FHitResult Hit;
 	UKismetSystemLibrary::BoxTraceSingleForObjects(
 		this, BoxTraceData.Start, BoxTraceData.End, BoxTraceData.Extent, FRotator::ZeroRotator, ObjectTypes,
-		false, ActorsToIgnore, EDrawDebugTrace::ForDuration, Hit, true);
+		false, ActorsToIgnore, bDebugBoxTrace ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None, Hit, true);
 
 	TArray<FHitResult> Hits;
 	UKismetSystemLibrary::BoxTraceMultiForObjects(
 		this, BoxTraceData.Start, BoxTraceData.End, BoxTraceData.Extent, FRotator::ZeroRotator, ObjectTypes,
-		false, ActorsToIgnore, EDrawDebugTrace::ForDuration, Hits, true);
+		false, ActorsToIgnore, bDebugBoxTrace ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None, Hits, true);
 	
 	for (FHitResult HitResult : Hits)
 	{

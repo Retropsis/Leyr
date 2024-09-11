@@ -14,7 +14,7 @@ class UAbilitySystemComponent;
 class UAttributeSet;
 
 UCLASS()
-class LEYR_API AAbilityActor : public APaperCharacter, public IAbilitySystemInterface, public ICombatInterface
+class LEYR_API AAbilityActor : public AActor, public IAbilitySystemInterface, public ICombatInterface
 {
 	GENERATED_BODY()
 	

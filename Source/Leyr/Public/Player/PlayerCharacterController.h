@@ -28,7 +28,7 @@ public:
 	virtual void PlayerTick(float DeltaTime) override;
 
 	UFUNCTION(Client, Reliable)
-	void ClientShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit);
+	void ClientShowDamageNumber(float DamageAmount, AActor* TargetActor, bool bBlockedHit, bool bCriticalHit, bool bOnPlayer = false);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="PlayerCharacter")
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;

@@ -339,6 +339,7 @@ void APlayerCharacter::SetMovementEnabled_Implementation(bool Enabled)
 void APlayerCharacter::HandleCombatState(ECombatState NewState)
 {
 	CombatState = NewState;
+	GetCharacterMovement()->GravityScale = BaseGravityScale;
 	
 	switch (CombatState) {
 	case ECombatState::Unoccupied:
@@ -369,7 +370,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 		break;
 	case ECombatState::OnGroundSlope:
-		// GetCharacterMovement()->GravityScale = 1.f;
+		GetCharacterMovement()->GravityScale = GroundSlopeGravityScale;
 		break;
 	case ECombatState::OnRopeSlope:
 		break;
@@ -538,20 +539,9 @@ void APlayerCharacter::TraceForLedge()
 			FVector Start = RopeHangingCollision->GetComponentLocation() + FVector(static_cast<float>(i), 0.f, 0.f) * GetActorForwardVector().X;
 			UKismetSystemLibrary::LineTraceSingle(this, Start, Start + FVector::DownVector * 82.f, TraceTypeQuery1,
 				false, ActorsToIgnore, EDrawDebugTrace::None, LedgeHit, true);
-
-			// FLinearColor Color = LedgeHit.bBlockingHit ? FLinearColor::Green : FLinearColor::Red;
-			// UKismetSystemLibrary::DrawDebugSphere(this, LedgeHit.bBlockingHit ? LedgeHit.Location : LedgeHit.TraceEnd, 5.f, 12, Color, 2.f);
 			
 			if(LedgeHit.bBlockingHit) break;
 		}
-		// if(LedgeHit.bBlockingHit)
-		// {
-		// 	GEngine->AddOnScreenDebugMessage(1654, 5.f, FColor::Green, FString::Printf(TEXT("Has Found Correct Hit: %s"), *LedgeHit.Location.ToString()));
-		// }
-		// else
-		// {
-		// 	GEngine->AddOnScreenDebugMessage(1654, 5.f, FColor::Red, FString::Printf(TEXT("Has NOT Found Correct Hit: %s"), *LedgeHit.TraceEnd.ToString()));
-		// }
 		if(LedgeHit.bBlockingHit && LedgeHit.GetActor() && LedgeHit.GetActor()->ActorHasTag("VaultDownPlatform")) return;
 		HandleHangingOnLedge(LedgeHit.bBlockingHit ? LedgeHit.Location - Delta : LedgeHit.TraceEnd - Delta);
 	}
@@ -559,7 +549,9 @@ void APlayerCharacter::TraceForLedge()
 
 void APlayerCharacter::TraceForSlope()
 {
-	if(GetCharacterMovement()->IsFalling())
+	if(!GetCharacterMovement()->IsFalling() && CombatState == ECombatState::OnGroundSlope) HandleCombatState(ECombatState::Unoccupied);
+	
+	if(GetCharacterMovement()->IsFalling() && GetVelocity().Z < 0.f)
 	{
 		const FVector Start = GroundPoint->GetComponentLocation() + FVector::DownVector * GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 		const FVector End = Start + FVector::DownVector * PlatformTraceDistance * 1.5f;
@@ -573,12 +565,16 @@ void APlayerCharacter::TraceForSlope()
 		ECombatState NewState = ECombatState::Unoccupied;
 		if(Hit.bBlockingHit)
 		{
-			float DotProduct = FVector::DotProduct(FVector::UpVector, Hit.Normal);
-			float Angle = FMath::RadiansToDegrees(acosf(DotProduct));
-			UKismetSystemLibrary::DrawDebugLine(this, Start, Start + Hit.Normal * 50.f, FLinearColor::Red);
-			UKismetSystemLibrary::DrawDebugLine(this, Start, Start + Hit.ImpactNormal * 150.f, FLinearColor::Green);
-			GEngine->AddOnScreenDebugMessage(9875, 2.f, FColor::Magenta, FString::Printf(TEXT("%f"), DotProduct));
-			if (GetCharacterMovement()->GetWalkableFloorAngle() < Angle)
+			float DotProduct = FVector::DotProduct(FVector(1.f, 0.f, 0.f), Hit.Normal);
+			// FVector CrossProduct = FVector::CrossProduct(FVector::UpVector, Hit.Normal);
+			float Angle = FMath::RadiansToDegrees(acosf( FVector::DotProduct(FVector::UpVector, Hit.Normal)));
+			
+			UKismetSystemLibrary::DrawDebugLine(this, Start, Start + Hit.ImpactNormal * 75.f, FLinearColor::Green);
+			// GEngine->AddOnScreenDebugMessage(9875, 2.f, FColor::Magenta, FString::Printf(TEXT("DotProduct: %f"), DotProduct));
+			// GEngine->AddOnScreenDebugMessage(9877, 2.f, FColor::Magenta, FString::Printf(TEXT("CrossProduct: %f"), CrossProduct.Z));
+			// GEngine->AddOnScreenDebugMessage(9876, 2.f, FColor::Magenta, FString::Printf(TEXT("Angle: %f"), Angle));
+			
+			if (Angle > GetCharacterMovement()->GetWalkableFloorAngle())
 			{
 				NewState = ECombatState::OnGroundSlope;
 				if(DotProduct > 0.f) GetController()->SetControlRotation(FRotator::ZeroRotator);

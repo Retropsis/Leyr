@@ -27,6 +27,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Montage"))
 	FGameplayTag AlternativeMontageTag = FGameplayTag();
 
+protected:
+	UPROPERTY(EditDefaultsOnly)
+	bool bDebugBoxTrace = false;
+
 private:
 	FBoxTraceData BoxTraceData = FBoxTraceData();
 };
