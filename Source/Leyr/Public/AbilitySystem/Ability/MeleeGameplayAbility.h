@@ -16,7 +16,7 @@ class LEYR_API UMeleeGameplayAbility : public UDamageGameplayAbility
 
 public:
 	UFUNCTION(BlueprintCallable)
-	FHitResult BoxTrace();
+	TArray<FHitResult> BoxTrace();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Montage"))
 	FGameplayTag MontageTag = FGameplayTag();

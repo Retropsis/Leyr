@@ -11,24 +11,29 @@
 AAbilityActor::AAbilityActor()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	bReplicates = true;
 	
 	AbilitySystemComponent = CreateDefaultSubobject<UBaseAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
 	
 	AttributeSet = CreateDefaultSubobject<UBaseAttributeSet>("AttributeSet");
-	
-	HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthBar");
-	HealthBar->SetupAttachment(GetRootComponent());
 }
 
 void AAbilityActor::BeginPlay()
 {
 	Super::BeginPlay();
+	InitAbilityActorInfo();
+}
+
+void AAbilityActor::InitAbilityActorInfo()
+{
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	if (HasAuthority())
 	{
 		InitializeDefaultAttributes();		
 	}
+	// OnASCRegistered.Broadcast(AbilitySystemComponent);
 }
 
 void AAbilityActor::InitializeDefaultAttributes() const

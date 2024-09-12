@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
-#include "PaperCharacter.h"
 #include "Interaction/CombatInterface.h"
 #include "AbilityActor.generated.h"
 
+class UPaperSprite;
 class UWidgetComponent;
 class UGameplayEffect;
 class UAbilitySystemComponent;
@@ -37,14 +37,15 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitializeDefaultAttributes() const;
+	virtual void InitAbilityActorInfo();
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Character|Attributes")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="AbilityActor|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
 	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Character|Attributes")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="AbilityActor|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Character|Attributes")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="AbilityActor|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
 
 	UPROPERTY()
@@ -52,9 +53,6 @@ protected:
 
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<UWidgetComponent> HealthBar;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
 	ECharacterClass CharacterClass = ECharacterClass::Breakable;
@@ -73,4 +71,19 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Combat")
 	USoundBase* DestructionSound;
+
+	/*
+	 * Construction
+	 */	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	int32 Length = 3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	UPaperSprite* FirstTile = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	UPaperSprite* LastTile = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	TArray<UPaperSprite*> Tiles;
 };

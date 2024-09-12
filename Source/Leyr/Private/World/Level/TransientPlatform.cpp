@@ -14,6 +14,7 @@ ATransientPlatform::ATransientPlatform()
 	
 	FlipbookComponent = CreateDefaultSubobject<UPaperFlipbookComponent>("FlipbookComponent");
 	FlipbookComponent->SetupAttachment(GetRootComponent());
+	FlipbookComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	FlipbookComponent->SetLooping(false);
 	
 	Platform = EPlatformType::Transient;

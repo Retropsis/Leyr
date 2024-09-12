@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "LevelDesignData.h"
 #include "GameFramework/Actor.h"
 #include "Hanger.generated.h"
 
@@ -16,14 +17,6 @@ enum class EHangingType : uint8
 	Rope,
 	Ladder,
 	Hook,
-};
-
-UENUM(BlueprintType)
-enum class EBuildDirection : uint8
-{
-	None,
-	Horizontal,
-	Vertical,
 };
 
 UCLASS()

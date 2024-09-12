@@ -21,8 +21,8 @@ public:
 	AVaultDownPlatform();
 
 protected:	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
-	TObjectPtr<UPaperGroupedSpriteComponent> TileMap;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	// TObjectPtr<UPaperGroupedSpriteComponent> TileMap;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
 	int32 Length = 3;
