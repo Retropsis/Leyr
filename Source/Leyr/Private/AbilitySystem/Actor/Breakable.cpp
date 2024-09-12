@@ -15,6 +15,8 @@ ABreakable::ABreakable()
 	FlipbookComponent->SetupAttachment(GetRootComponent());
 	FlipbookComponent->SetLooping(false);
 	FlipbookComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	InitialLifeSpan = 0.f;
+	LifeSpan = .2f;
 }
 
 void ABreakable::BeginPlay()

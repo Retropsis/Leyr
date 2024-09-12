@@ -73,7 +73,7 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 		SetActorLocation(FMath::VInterpTo(GetActorLocation(), MovementTarget, DeltaSeconds, ClimbingSpeed));
 		if (FMath::IsNearlyZero(UKismetMathLibrary::Vector_Distance(GetActorLocation(), MovementTarget), 5.f))
 		{
-			HandleCombatState(ECombatState::Falling);
+			HandleCombatState(ECombatState::Unoccupied);
 		}
 	}
 }
@@ -311,7 +311,6 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 		if(MovementVector.X < 0.f) GetController()->SetControlRotation(FRotator(0.f, 180.f, 0.f));
 		break;
 	case ECombatState::OnGroundSlope:
-		GEngine->AddOnScreenDebugMessage(13465, 1.f, FColor::Green, FString::Printf(TEXT("%f"), GetCharacterMovement()->GetCurrentAcceleration().X));
 		break;
 	case ECombatState::OnRopeSlope:
 		break;
@@ -358,7 +357,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		break;
 	case ECombatState::ClimbingRope:
-		MovementTarget = GetActorLocation() + FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f);
+		MovementTarget = GetActorLocation() + FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f - 10.f);
 		break;
 	case ECombatState::HangingLadder:
 		GetCharacterMovement()->StopMovementImmediately();
@@ -492,30 +491,6 @@ void APlayerCharacter::OverlapPlatformEnd()
 	bOverlapPlatformTimerEnded = true;
 }
 
-void APlayerCharacter::TryVaultingDown()
-{
-	if(GetCharacterMovement()->IsFalling() || GetVelocity().Z < 0.f) return;
-	
- 	const FVector Start = GetActorLocation() /*+ FVector::DownVector * GetCapsuleComponent()->GetScaledCapsuleRadius()*/;
-	const FVector End = Start + FVector::DownVector * (GetCapsuleComponent()->GetScaledCapsuleRadius() + 60.f);
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(EOT_OneWayPlatform);
-	TArray<AActor*> ActorsToIgnore;
-	FHitResult Hit;
-	UKismetSystemLibrary::LineTraceSingleForObjects(this, Start, End, ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::None, Hit, true);
-	if(Hit.bBlockingHit && Hit.GetActor()->Implements<UPlatformInterface>() && Hit.GetActor()->ActorHasTag("VaultDownPlatform"))
-	{
-		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Overlap);
-		GetWorld()->GetTimerManager().SetTimer(OverlapPlatformTimer, this, &APlayerCharacter::OverlapPlatformEnd, OverlapPlatformTime);
-		bOverlapPlatformTimerEnded = false;
-		UnCrouch();
-		if (UPlayerCharacterAnimInstance* PlayerCharacterAnimInstance = Cast<UPlayerCharacterAnimInstance>(AnimationComponent->GetAnimInstance()))
-		{
-			PlayerCharacterAnimInstance->PlayVaultDownSequence();
-		}
-	}
-}
-
 void APlayerCharacter::TraceForLedge()
 {
 	if(!bCanGrabLedge || !GetCharacterMovement()->IsFalling()) return;;
@@ -547,6 +522,30 @@ void APlayerCharacter::TraceForLedge()
 	}
 }
 
+void APlayerCharacter::TryVaultingDown()
+{
+	if(GetCharacterMovement()->IsFalling() || GetVelocity().Z < 0.f) return;
+	
+	const FVector Start = GetActorLocation() /*+ FVector::DownVector * GetCapsuleComponent()->GetScaledCapsuleRadius()*/;
+	const FVector End = Start + FVector::DownVector * (GetCapsuleComponent()->GetScaledCapsuleRadius() + 60.f);
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(EOT_OneWayPlatform);
+	TArray<AActor*> ActorsToIgnore;
+	FHitResult Hit;
+	UKismetSystemLibrary::LineTraceSingleForObjects(this, Start, End, ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::None, Hit, true);
+	if(Hit.bBlockingHit && Hit.GetActor()->Implements<UPlatformInterface>() && Hit.GetActor()->ActorHasTag("VaultDownPlatform"))
+	{
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Overlap);
+		GetWorld()->GetTimerManager().SetTimer(OverlapPlatformTimer, this, &APlayerCharacter::OverlapPlatformEnd, OverlapPlatformTime);
+		bOverlapPlatformTimerEnded = false;
+		UnCrouch();
+		if (UPlayerCharacterAnimInstance* PlayerCharacterAnimInstance = Cast<UPlayerCharacterAnimInstance>(AnimationComponent->GetAnimInstance()))
+		{
+			PlayerCharacterAnimInstance->PlayVaultDownSequence();
+		}
+	}
+}
+
 void APlayerCharacter::TraceForSlope()
 {
 	if(!GetCharacterMovement()->IsFalling() && CombatState == ECombatState::OnGroundSlope) HandleCombatState(ECombatState::Unoccupied);
@@ -565,14 +564,8 @@ void APlayerCharacter::TraceForSlope()
 		ECombatState NewState = ECombatState::Unoccupied;
 		if(Hit.bBlockingHit)
 		{
-			float DotProduct = FVector::DotProduct(FVector(1.f, 0.f, 0.f), Hit.Normal);
-			// FVector CrossProduct = FVector::CrossProduct(FVector::UpVector, Hit.Normal);
-			float Angle = FMath::RadiansToDegrees(acosf( FVector::DotProduct(FVector::UpVector, Hit.Normal)));
-			
-			UKismetSystemLibrary::DrawDebugLine(this, Start, Start + Hit.ImpactNormal * 75.f, FLinearColor::Green);
-			// GEngine->AddOnScreenDebugMessage(9875, 2.f, FColor::Magenta, FString::Printf(TEXT("DotProduct: %f"), DotProduct));
-			// GEngine->AddOnScreenDebugMessage(9877, 2.f, FColor::Magenta, FString::Printf(TEXT("CrossProduct: %f"), CrossProduct.Z));
-			// GEngine->AddOnScreenDebugMessage(9876, 2.f, FColor::Magenta, FString::Printf(TEXT("Angle: %f"), Angle));
+			const float DotProduct = FVector::DotProduct(FVector(1.f, 0.f, 0.f), Hit.Normal);
+			const float Angle = FMath::RadiansToDegrees(acosf( FVector::DotProduct(FVector::UpVector, Hit.Normal)));
 			
 			if (Angle > GetCharacterMovement()->GetWalkableFloorAngle())
 			{

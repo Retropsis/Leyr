@@ -32,7 +32,7 @@ void AMovingPlatform::BeginPlay()
 	bIsActivated = !IsValid(Switch);
 	if(IsValid(Switch)) Switch->OnLeverStateChanged.AddLambda([this] (const ELeverState NewState)
 	{
-		bIsActivated = NewState == ELeverState::On ? true : false;
+		bIsActivated = NewState == ELeverState::On;
 	});
 }
 
@@ -52,10 +52,10 @@ void AMovingPlatform::Move(float DeltaSeconds)
 		BoxCollision->SetWorldLocation(FMath::InterpEaseInOut(BoxCollision->GetComponentLocation(), CurrentTarget, DeltaSeconds, InterpSpeed));
 		break;
 	}
-	if(HasReachedTarget()) ChooseNextTarget();
+	if(HasReachedTarget()) ChooseNextStep();
 }
 
-void AMovingPlatform::ChooseNextTarget()
+void AMovingPlatform::ChooseNextStep()
 {
 	CurrentIndex++;
 	if(CurrentIndex >= RouteSpline->GetNumberOfSplinePoints())

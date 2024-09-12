@@ -22,7 +22,7 @@ public:
 	AMovingPlatform();
 	virtual void Tick(float DeltaSeconds) override;
 	void Move(float DeltaSeconds);
-	void ChooseNextTarget();
+	virtual void ChooseNextStep();
 	bool HasReachedTarget() const;
 	
 	UPROPERTY(EditAnywhere, Category="Platform|Route")

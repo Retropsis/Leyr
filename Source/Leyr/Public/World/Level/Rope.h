@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Interaction/PlatformInterface.h"
 #include "World/Level/Hanger.h"
 #include "Rope.generated.h"
 
@@ -10,7 +11,7 @@
  * 
  */
 UCLASS()
-class LEYR_API ARope : public AHanger
+class LEYR_API ARope : public AHanger, public IPlatformInterface
 {
 	GENERATED_BODY()
 

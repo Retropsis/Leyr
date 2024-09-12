@@ -32,8 +32,8 @@ void ARope::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Other
 {
 	if(OtherComp && OtherComp->ComponentHasTag("RopeCollision"))
 	{
-		HangingCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-		if (const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(IgnoreCollisionTimer, this, &ARope::HandleIgnoreCollisionEnd, IgnoreCollisionTime);
+		// HangingCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+		// if (const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(IgnoreCollisionTimer, this, &ARope::HandleIgnoreCollisionEnd, IgnoreCollisionTime);
 		
 		IPlayerInterface::Execute_HandleHangingOnRope(OtherActor, FVector::ZeroVector, true);
 	}
