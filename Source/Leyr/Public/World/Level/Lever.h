@@ -40,7 +40,7 @@ class LEYR_API ALever : public APaperFlipbookActor, public IInteractionInterface
 public:
 	ALever();
 	virtual void Interact_Implementation() override;
-	void HandleLeverVisualState(ELeverState NewState) const;
+	void HandleLeverVisualState(ELeverState NewState);
 	
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -52,31 +52,30 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
+	void HandleOnTimerEnd();
 	
-	UPROPERTY(EditDefaultsOnly, Category="Platform")
+	UPROPERTY(EditAnywhere, Category="Platform")
 	TObjectPtr<UBoxComponent> OverlapBox;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Platform")
-	ELeverState LeverState = ELeverState::Off;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Platform")
+	UPROPERTY(EditAnywhere, Category="Platform")
 	ELeverType LeverType = ELeverType::Switch;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Platform")
+	UPROPERTY(EditAnywhere, Category="Platform")
 	float OnTime = 3.f;
 
-	UPROPERTY(EditDefaultsOnly, Category="Platform|Audio")
+	UPROPERTY(EditAnywhere, Category="Platform|Audio")
 	TObjectPtr<USoundBase> SwitchOnSound = nullptr;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Platform|Audio")
+	UPROPERTY(EditAnywhere, Category="Platform|Audio")
 	TObjectPtr<USoundBase> SwitchOffSound = nullptr;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Platform|Audio")
+	UPROPERTY(EditAnywhere, Category="Platform|Audio")
 	TObjectPtr<USoundBase> TimerTickSound = nullptr;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Platform|Audio")
+	UPROPERTY(EditAnywhere, Category="Platform|Audio")
 	TObjectPtr<USoundBase> TimerEndSound = nullptr;
 
 private:
 	FTimerHandle OnTimer;
+	ELeverState LeverState = ELeverState::Off;
 };

@@ -49,4 +49,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category="PlayerCharacter")
 	ECombatState CombatState = ECombatState::Unoccupied;
+
+private:
+	bool bDead = false;
 };

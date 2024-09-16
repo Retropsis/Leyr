@@ -81,6 +81,7 @@ public:
 	virtual void SetPlayerCombatState_Implementation(const ECombatState NewState) override { CombatState = NewState; }
 	virtual void HandleHangingOnLadder_Implementation(FVector HangingTarget, bool bEndOverlap) override;
 	virtual void HandleHangingOnRope_Implementation(FVector HangingTarget, bool bEndOverlap) override;
+	virtual void HandleEntangled_Implementation(float MinZ, float EntangledWalkSpeed, float EntangledGravityScale, bool bEndOverlap) override;
 	virtual void SetMovementTarget_Implementation(const FVector Target) override { MovementTarget = Target; } 
 	/** end Player Interface */
 
@@ -155,6 +156,7 @@ private:
 	float OverlapPlatformTime = .25f;
 
 	FVector MovementTarget = FVector::ZeroVector;
+	float CurrentMinZ = 0.f;
 
 public:
 	FORCEINLINE bool IsAirborne() const { return bAirborne; }

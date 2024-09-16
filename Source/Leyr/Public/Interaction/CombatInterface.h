@@ -60,6 +60,7 @@ UENUM(BlueprintType)
 enum class ECombatState : uint8
 {
 	Unoccupied UMETA(DisplayName="Unoccupied"),
+	HitReact UMETA(DisplayName="HitReact"),
 	Attacking UMETA(DisplayName="Attacking"),
 	Falling UMETA(DisplayName="Falling"),
 	HangingLedge UMETA(DisplayName="Hanging Ledge"),
@@ -68,6 +69,7 @@ enum class ECombatState : uint8
 	HangingLadder UMETA(DisplayName="Hanging Ladder"),
 	OnGroundSlope UMETA(DisplayName="OnGroundSlope"),
 	OnRopeSlope UMETA(DisplayName="OnRopeSlope"),
+	Entangled UMETA(DisplayName="Entangled"),
 };
 
 // This class does not need to be modified.
@@ -186,6 +188,9 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ResetGravityScale();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetMovementMode(EMovementMode MovementMode,  float NewWalkingSpeed, float GravityValue);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool IsCharacterAirborne();

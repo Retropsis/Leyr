@@ -59,7 +59,7 @@ void APlayerCharacterController::SetupInputComponent()
 
 void APlayerCharacterController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-	// GEngine->AddOnScreenDebugMessage(1, 3.f, FColor::Red, *InputTag.ToString());
+	// GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.f, FColor::Red, *InputTag.ToString());
 }
 
 void APlayerCharacterController::AbilityInputTagReleased(FGameplayTag InputTag)
@@ -158,14 +158,14 @@ void APlayerCharacterController::HotbarButtonPressed(int32 Index)
 /*
  * UI - Damage Numbers
  */
-void APlayerCharacterController::ClientShowDamageNumber_Implementation(float DamageAmount, AActor* TargetActor, bool bBlockedHit, bool bCriticalHit, bool bOnPlayer)
+void APlayerCharacterController::ClientShowDamageNumber_Implementation(const FUIMessageData& MessageData)
 {
-	if (IsValid(TargetActor) && DamageTextComponentClass && IsLocalController())
+	if (IsValid(MessageData.TargetActor) && DamageTextComponentClass && IsLocalController())
 	{
-		UDamageTextComponent* DamageText = NewObject<UDamageTextComponent>(TargetActor, DamageTextComponentClass);
+		UDamageTextComponent* DamageText = NewObject<UDamageTextComponent>(MessageData.TargetActor, DamageTextComponentClass);
 		DamageText->RegisterComponent();
-		DamageText->AttachToComponent(TargetActor->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		DamageText->AttachToComponent(MessageData.TargetActor->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-		DamageText->SetDamageText(DamageAmount, bBlockedHit, bCriticalHit, bOnPlayer);
+		DamageText->SetDamageText(MessageData);
 	}
 }

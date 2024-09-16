@@ -52,8 +52,8 @@ void AWeightingPlatform::BeginPlay()
 		OverlapBox->OnComponentBeginOverlap.AddDynamic(this, &AWeightingPlatform::OnBeginOverlap);
 		OverlapBox->OnComponentEndOverlap.AddDynamic(this, &AWeightingPlatform::OnEndOverlap);
 		
-		DownPosition = RouteSpline->GetLocationAtSplinePoint(0, ESplineCoordinateSpace::World);
-		UpPosition = RouteSpline->GetLocationAtSplinePoint(1, ESplineCoordinateSpace::World);
+		UpPosition = RouteSpline->GetLocationAtSplinePoint(0, ESplineCoordinateSpace::World);
+		DownPosition = RouteSpline->GetLocationAtSplinePoint(1, ESplineCoordinateSpace::World);
 	}
 }
 
@@ -85,7 +85,7 @@ void AWeightingPlatform::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, 
 	SetPlatformDirection(OtherActor, false);
 }
 
-void AWeightingPlatform::SetPlatformDirection(AActor* OtherActor, bool bDownward)
+void AWeightingPlatform::SetPlatformDirection(const AActor* OtherActor, bool bDownward)
 {
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>())
 	{

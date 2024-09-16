@@ -43,7 +43,7 @@ void UBaseAbilitySystemComponent::AddCharacterPassiveAbilities(const TArray<TSub
 void UBaseAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag)
 {
 	if (!InputTag.IsValid()) return;
-
+	
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
 		if (AbilitySpec.DynamicAbilityTags.HasTagExact(InputTag))

@@ -9,6 +9,7 @@
 ABreakable::ABreakable()
 {	
 	HitBox = CreateDefaultSubobject<UBoxComponent>("HitBox");
+	// HitBox->SetupAttachment(GetRootComponent());
 	SetRootComponent(HitBox);
 	
 	FlipbookComponent = CreateDefaultSubobject<UPaperFlipbookComponent>("FlipbookComponent");
@@ -22,7 +23,6 @@ ABreakable::ABreakable()
 void ABreakable::BeginPlay()
 {
 	Super::BeginPlay();
-	// FlipbookComponent->SetPlaybackPositionInFrames(0, true);
 	FlipbookComponent->SetPlayRate(1.f);
 	FlipbookComponent->Stop();
 
@@ -41,7 +41,6 @@ void ABreakable::BeginPlay()
 		// AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAICharacter::HitReactTagChanged);
 		// OnHealthChanged.Broadcast(BaseAS->GetHealth());
 	}
-	GEngine->AddOnScreenDebugMessage(654987, 5.f, FColor::Cyan, FString::Printf(TEXT("BeginPlay")));
 }
 
 void ABreakable::OnConstruction(const FTransform& Transform)

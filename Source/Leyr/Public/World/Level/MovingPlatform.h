@@ -56,6 +56,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	FVector CurrentTarget = FVector::Zero();
+	FVector BoxCollisionOffset = FVector::Zero();
 	int32 CurrentIndex = 0;
 	bool bIsActivated = true;
 };

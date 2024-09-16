@@ -80,4 +80,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void HandleHangingOnRope(FVector HangingTarget, bool bEndOverlap);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void HandleEntangled(float MinZ, float EntangledWalkSpeed, float EntangledGravityScale, bool bEndOverlap);
 };

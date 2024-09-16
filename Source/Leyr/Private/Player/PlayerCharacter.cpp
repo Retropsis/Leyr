@@ -314,6 +314,11 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 		break;
 	case ECombatState::OnRopeSlope:
 		break;
+	case ECombatState::HitReact:
+		break;
+	case ECombatState::Entangled:
+		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
+		break;
 	}
 }
 
@@ -325,7 +330,7 @@ void APlayerCharacter::SetMovementEnabled_Implementation(bool Enabled)
 	
 	if (Enabled)
 	{
-		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		// GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		if(CombatState == ECombatState::Attacking) HandleCombatState(PreviousCombatState);
 	}
 	else
@@ -339,10 +344,21 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 {
 	CombatState = NewState;
 	GetCharacterMovement()->GravityScale = BaseGravityScale;
+
+	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+	FGameplayTagContainer CombatStates;
+	CombatStates.AddTag(GameplayTags.CombatState_Ladder);
+	CombatStates.AddTag(GameplayTags.CombatState_Rope);
+	CombatStates.AddTag(GameplayTags.CombatState_Ledge);
+	CombatStates.AddTag(GameplayTags.CombatState_Slope);
+	// GetAbilitySystemComponent()->RemoveActiveEffectsWithTags(CombatStates);
+	GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(CombatStates);
+	// GetAbilitySystemComponent()->RemoveActiveEffectsWithAppliedTags(CombatStates);
 	
 	switch (CombatState) {
 	case ECombatState::Unoccupied:
 		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+		GetCharacterMovement()->GravityScale = BaseGravityScale;
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		break;
 	case ECombatState::Attacking:
@@ -350,11 +366,13 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 	case ECombatState::HangingLedge:
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(GameplayTags.CombatState_Ledge.GetSingleTagContainer());
 		break;
 	case ECombatState::HangingRope:
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->MaxFlySpeed = RopeWalkSpeed;
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(GameplayTags.CombatState_Rope.GetSingleTagContainer());
 		break;
 	case ECombatState::ClimbingRope:
 		MovementTarget = GetActorLocation() + FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f - 10.f);
@@ -363,6 +381,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->MaxFlySpeed = LadderWalkSpeed;
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(GameplayTags.CombatState_Ladder.GetSingleTagContainer());
 		break;
 	case ECombatState::Falling:
 		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
@@ -370,8 +389,14 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		break;
 	case ECombatState::OnGroundSlope:
 		GetCharacterMovement()->GravityScale = GroundSlopeGravityScale;
+		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(GameplayTags.CombatState_Slope.GetSingleTagContainer());
 		break;
 	case ECombatState::OnRopeSlope:
+		break;
+	case ECombatState::HitReact:
+		break;
+	case ECombatState::Entangled:
+		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		break;
 	}
 }
@@ -417,6 +442,24 @@ void APlayerCharacter::HandleHangingOnLedge(const FVector& HangingTarget)
 	}
 }
 
+void APlayerCharacter::HandleEntangled_Implementation(float MinZ, float EntangledWalkSpeed, float EntangledGravityScale, bool bEndOverlap)
+{
+	if(bEndOverlap)
+	{
+		HandleCombatState(ECombatState::Unoccupied);
+		Jump();
+	}
+	else
+	{
+		GetCharacterMovement()->StopMovementImmediately();
+		CurrentMinZ = MinZ;
+        GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+        GetCharacterMovement()->MaxWalkSpeed = EntangledWalkSpeed;
+        GetCharacterMovement()->GravityScale = EntangledGravityScale;
+        HandleCombatState(ECombatState::Entangled);
+	}
+}
+
 void APlayerCharacter::OffLedgeEnd() { bCanGrabLedge = true; }
 
 void APlayerCharacter::RotateController() const
@@ -443,11 +486,16 @@ void APlayerCharacter::HandleCrouching(bool bShouldCrouch)
 		return;
 	}
 	if((bShouldCrouch && bIsCrouched) || CombatState >= ECombatState::HangingLedge) return;
-	if(bShouldCrouch && !bIsCrouched) Crouch();
+	if(bShouldCrouch && !bIsCrouched && CombatState == ECombatState::Unoccupied) Crouch();
 }
 
 void APlayerCharacter::JumpButtonPressed()
 {
+	if(CombatState == ECombatState::Entangled)
+	{
+		GetCharacterMovement()->AddImpulse(FVector::UpVector * 500.f, true);
+		return;
+	}
 	if(CombatState >= ECombatState::HangingLedge)
 	{
 		HandleCombatState(ECombatState::Unoccupied);

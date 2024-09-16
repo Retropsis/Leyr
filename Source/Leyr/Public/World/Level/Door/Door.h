@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "Door.generated.h"
 
+class ALever;
 class UPaperSpriteComponent;
 class UBoxComponent;
 
@@ -60,12 +61,16 @@ protected:
 	
 	UFUNCTION()
 	virtual void HandleOnFinishedPlaying();
-	
+	void HandleDoorState(bool bOpen);
+
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 	UFUNCTION()
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UPROPERTY(EditAnywhere, Category="Platform")
+	TObjectPtr<ALever> Switch;
 
 private:
 	EDoorState DoorState = EDoorState::Close;

@@ -33,6 +33,13 @@ void ATransientPlatform::BeginPlay()
 	}
 }
 
+void ATransientPlatform::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	FlipbookComponent->SetPlaybackPosition(0.f, true);
+	FlipbookComponent->Stop();
+}
+
 void ATransientPlatform::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor && OtherActor->Implements<UPlayerInterface>() && bCanOverlap)

@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "InputActionValue.h"
 #include "Interaction/ControllerInterface.h"
+#include "UI/Data/UIData.h"
 #include "PlayerCharacterController.generated.h"
 
 class UDamageTextComponent;
@@ -28,7 +29,7 @@ public:
 	virtual void PlayerTick(float DeltaTime) override;
 
 	UFUNCTION(Client, Reliable)
-	void ClientShowDamageNumber(float DamageAmount, AActor* TargetActor, bool bBlockedHit, bool bCriticalHit, bool bOnPlayer = false);
+	void ClientShowDamageNumber(const FUIMessageData& MessageData);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="PlayerCharacter")
 	TObjectPtr<UInputMappingContext> DefaultMappingContext;

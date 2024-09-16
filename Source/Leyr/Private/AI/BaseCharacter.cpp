@@ -176,6 +176,20 @@ bool ABaseCharacter::IsCharacterAirborne_Implementation()
 	return GetCharacterMovement()->IsFalling();
 }
 
+void ABaseCharacter::SetMovementMode_Implementation(EMovementMode MovementMode,  float NewWalkingSpeed, float GravityValue)
+{
+	if(MovementMode == MOVE_Walking)
+	{
+		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+		GetCharacterMovement()->GravityScale = BaseGravityScale;
+		return;
+	}
+	
+	GetCharacterMovement()->MaxWalkSpeed = NewWalkingSpeed;
+	GetCharacterMovement()->GravityScale = GravityValue;
+	GetCharacterMovement()->SetMovementMode(MovementMode);
+}
+
 void ABaseCharacter::Dissolve()
 {
 	// if (IsValid(DissolveMaterialInstance))

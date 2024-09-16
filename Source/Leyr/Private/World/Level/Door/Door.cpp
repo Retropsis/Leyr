@@ -4,6 +4,7 @@
 #include "PaperFlipbookComponent.h"
 #include "Components/BoxComponent.h"
 #include "PaperSpriteComponent.h"
+#include "World/Level/Lever.h"
 
 ADoor::ADoor()
 {
@@ -38,6 +39,16 @@ void ADoor::BeginPlay()
 	Super::BeginPlay();
 	GetRenderComponent()->OnFinishedPlaying.AddDynamic(this, &ADoor::HandleOnFinishedPlaying);
 	GetRenderComponent()->SetPlaybackPosition(0.f, true);
+	
+	if(IsValid(Switch))
+	{
+		bIsProximityDoor = false;
+		Switch->OnLeverStateChanged.AddLambda([this] (const ELeverState NewState)
+		{
+			HandleDoorState(NewState == ELeverState::On);
+		});
+	}
+	
 	if (HasAuthority() && bIsProximityDoor)
 	{
 		OverlapBox->OnComponentBeginOverlap.AddDynamic(this, &ADoor::OnBeginOverlap);
@@ -79,24 +90,22 @@ void ADoor::HandleOnFinishedPlaying()
 	}
 }
 
+void ADoor::HandleDoorState(bool bOpen)
+{
+	DoorState = bOpen ? EDoorState::Opening : EDoorState::Closing;
+	GetRenderComponent()->SetPlayRate(1.f);
+	bOpen ? GetRenderComponent()->Play() : GetRenderComponent()->Reverse();
+	
+	if(!bOpen) GetRenderComponent()->SetPlaybackPosition(GetRenderComponent()->GetFlipbookLength(), true);
+}
+
 void ADoor::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if(OtherActor && OtherActor->ActorHasTag("Player"))
-	{
-		GetRenderComponent()->SetPlayRate(1.f);
-		GetRenderComponent()->Play();
-		DoorState = EDoorState::Opening;
-	}
+	if(OtherActor && OtherActor->ActorHasTag("Player")) HandleDoorState(true);
 }
 
 void ADoor::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if(OtherActor && OtherActor->ActorHasTag("Player"))
-	{
-		GetRenderComponent()->SetPlaybackPosition(GetRenderComponent()->GetFlipbookLength(), true);
-		GetRenderComponent()->Reverse();
-		GetRenderComponent()->SetPlayRate(1.f);
-		DoorState = EDoorState::Closing;
-	}
+	if(OtherActor && OtherActor->ActorHasTag("Player"))HandleDoorState(false);
 }
 

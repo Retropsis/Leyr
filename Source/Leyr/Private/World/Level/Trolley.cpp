@@ -29,7 +29,10 @@ void ATrolley::HandleOverlapWaitTimeEnd() { bIsActivated = true; }
 
 void ATrolley::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if(OtherActor && OtherActor->ActorHasTag("Player")) GetWorld()->GetTimerManager().SetTimer(OverlapWaitTimer, this, &ATrolley::HandleOverlapWaitTimeEnd, OverlapWaitTime);
+	if(OtherActor && OtherActor->ActorHasTag("Player"))
+	{
+		GetWorld()->GetTimerManager().SetTimer(OverlapWaitTimer, this, &ATrolley::HandleOverlapWaitTimeEnd, OverlapWaitTime);
+	}
 }
 
 void ATrolley::ChooseNextStep()

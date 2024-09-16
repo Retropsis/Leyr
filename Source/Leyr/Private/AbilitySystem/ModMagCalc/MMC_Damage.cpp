@@ -43,6 +43,7 @@ void UMMC_Damage::ShowFloatingText(ACharacter* CharacterInstigator, float Damage
 {
 	if(APlayerCharacterController* PC = Cast<APlayerCharacterController>(CharacterInstigator->Controller))
 	{
-		PC->ClientShowDamageNumber(Damage, CharacterInstigator, bBlockedHit, bCriticalHit);
+		const FUIMessageData MessageData{ EMessageType::DamageToPlayer, Damage, CharacterInstigator, bBlockedHit, bCriticalHit };
+		PC->ClientShowDamageNumber(MessageData);
 	}
 }

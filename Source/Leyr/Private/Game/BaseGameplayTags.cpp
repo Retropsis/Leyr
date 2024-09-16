@@ -200,10 +200,13 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	/*
 	 * Combat States
 	 */
+	GameplayTags.CombatState_Slope = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Slope"), FString("CombatState Slope"));
+	GameplayTags.CombatState_Ledge = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Ledge"), FString("CombatState Ledge"));
+	GameplayTags.CombatState_Rope = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rope"), FString("CombatState Rope"));
+	GameplayTags.CombatState_Ladder = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Ladder"), FString("CombatState Ladder"));
 	GameplayTags.CombatState_Falling = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Falling"), FString("CombatState Falling"));
 	GameplayTags.CombatState_Crouching = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Crouching"), FString("CombatState Crouching"));
-	GameplayTags.CombatState_Slope = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Slope"), FString("CombatState Slope"));
-	GameplayTags.CombatState_Rope = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rope"), FString("CombatState Rope"));
+	GameplayTags.CombatState_HitReacting = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.HitReacting"), FString("CombatState HitReacting"));
 	
 	/*
 	 * Gameplay Cues

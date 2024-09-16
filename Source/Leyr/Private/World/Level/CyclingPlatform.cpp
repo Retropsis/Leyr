@@ -38,6 +38,13 @@ void ACyclingPlatform::BeginPlay()
 	HandleOffCycleEnd();
 }
 
+void ACyclingPlatform::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	FlipbookComponent->SetPlaybackPosition(0.f, true);
+	FlipbookComponent->Stop();
+}
+
 void ACyclingPlatform::CycleCollision(bool bShouldBlock) const
 {
 	if(bShouldBlock)

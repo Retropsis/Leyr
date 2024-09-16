@@ -11,11 +11,12 @@ AMovingPlatform::AMovingPlatform()
 	
 	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>("Root");
 	SetRootComponent(Root);
-
-	BoxCollision->SetupAttachment(Root);
 	
 	RouteSpline = CreateDefaultSubobject<USplineComponent>("Route");
 	RouteSpline->SetupAttachment(Root);
+	
+	BoxCollision->SetupAttachment(Root);
+	
 	Platform = EPlatformType::Moving;
 }
 

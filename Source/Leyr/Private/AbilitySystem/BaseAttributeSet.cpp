@@ -127,14 +127,16 @@ void UBaseAttributeSet::ShowFloatingText(const FEffectProperties& Props, float D
 		{
 			if(APlayerCharacterController* PC = Cast<APlayerCharacterController>(Props.SourceCharacter->Controller))
 			{
-				PC->ClientShowDamageNumber(Damage, Props.TargetAvatarActor, bBlockedHit, bCriticalHit);
+				const FUIMessageData MessageData{ EMessageType::DamageToEnemy, Damage, Props.TargetAvatarActor, bBlockedHit, bCriticalHit };
+				PC->ClientShowDamageNumber(MessageData);
 				return;
 			}
 		}
 		if(!IsValid(Props.TargetCharacter)) return;
 		if(APlayerCharacterController* PC = Cast<APlayerCharacterController>(Props.TargetCharacter->Controller))
 		{
-			PC->ClientShowDamageNumber(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit, true);
+			const FUIMessageData MessageData{ EMessageType::DamageToPlayer, Damage, Props.TargetAvatarActor, bBlockedHit, bCriticalHit };
+			PC->ClientShowDamageNumber(MessageData);
 		}
 	}
 }
@@ -152,19 +154,14 @@ void UBaseAttributeSet::SendXPEvent(const FEffectProperties& Props)
 		Payload.EventTag = GameplayTags.Attributes_Meta_IncomingXP;
 		Payload.EventMagnitude = XPReward;
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Props.SourceCharacter, GameplayTags.Attributes_Meta_IncomingXP, Payload);
+
+		
+		// if(APlayerCharacterController* PC = Cast<APlayerCharacterController>(Props.SourceCharacter->Controller))
+		// {
+		// 	const FUIMessageData MessageData{ EMessageType::Experience, static_cast<float>(XPReward), Props.TargetAvatarActor, false, false };
+		// 	PC->ClientShowDamageNumber(MessageData);
+		// }
 	}
-	// if (Props.TargetCharacter->Implements<UCombatInterface>())
-	// {
-	// 	const int32 TargetLevel = ICombatInterface::Execute_GetCharacterLevel(Props.TargetCharacter);
-	// 	const ECharacterClass TargetClass = ICombatInterface::Execute_GetCharacterClass(Props.TargetCharacter);
-	// 	const int32 XPReward = ULeyrAbilitySystemLibrary::GetXPRewardForClassAndLevel(Props.TargetCharacter, TargetClass, TargetLevel);
-	//
-	// 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-	// 	FGameplayEventData Payload;
-	// 	Payload.EventTag = GameplayTags.Attributes_Meta_IncomingXP;
-	// 	Payload.EventMagnitude = XPReward;
-	// 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Props.SourceCharacter, GameplayTags.Attributes_Meta_IncomingXP, Payload);
-	// }
 }
 
 void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)

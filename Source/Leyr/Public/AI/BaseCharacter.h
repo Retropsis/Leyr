@@ -110,6 +110,7 @@ protected:
 	virtual float GetGravityScale_Implementation() override;
 	virtual void ResetGravityScale_Implementation() override;
 	virtual bool IsCharacterAirborne_Implementation() override;
+	virtual void SetMovementMode_Implementation(EMovementMode MovementMode,  float NewWalkingSpeed = -1.f, float GravityValue = -1.f) override;
 	//~ Combat Interface
 
 	UFUNCTION(NetMulticast, Reliable)

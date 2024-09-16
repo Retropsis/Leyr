@@ -179,8 +179,11 @@ FGameplayTag Abilities_Throw_2;
  
 FGameplayTag CombatState_Slope;
 FGameplayTag CombatState_Rope;
+FGameplayTag CombatState_Ladder;
+FGameplayTag CombatState_Ledge;
 FGameplayTag CombatState_Falling;
 FGameplayTag CombatState_Crouching;
+FGameplayTag CombatState_HitReacting;
 
  /*
   * Gameplay Cues

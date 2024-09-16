@@ -36,7 +36,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category="Platform")
 	TObjectPtr<USceneComponent> ApexPosition;
-	
+
+	UPROPERTY(BlueprintReadOnly)
+	float Angle = 0.f;
 
 private:
 	EClockDirection ClockDirection = EClockDirection::Clockwise;
@@ -45,7 +47,6 @@ private:
 	float SpeedY = 1.f;
 	float RadiusX = 100.f;
 	float RadiusY = 100.f;
-	float Angle = -90.f;
 	float MinAngle = 0.f;
 	float MaxAngle = 0.f;
 };

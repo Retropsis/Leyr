@@ -21,23 +21,19 @@ void ALadder::BeginPlay()
 
 void ALadder::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(160, 3.f, FColor::Green, FString::Printf(TEXT("OnBeginOverlap")));
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>())
 	{
 		const FVector Location{HangingCollision->GetComponentLocation().X, 0.f, 0.f};
-		
 		IPlayerInterface::Execute_HandleHangingOnLadder(OtherActor, Location, false);
 	}
 }
 
 void ALadder::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	GEngine->AddOnScreenDebugMessage(161, 3.f, FColor::Red, FString::Printf(TEXT("OnEndOverlap")));
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>())
 	{
 		HangingCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 		if (const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(IgnoreCollisionTimer, this, &ALadder::HandleIgnoreCollisionEnd, IgnoreCollisionTime);
-		
 		IPlayerInterface::Execute_HandleHangingOnLadder(OtherActor, FVector::ZeroVector, true);
 	}
 }

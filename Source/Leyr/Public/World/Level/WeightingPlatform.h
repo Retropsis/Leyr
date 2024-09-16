@@ -31,7 +31,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	void MoveTo(const FVector& InCurrentTarget, float Speed, float InterpolationSpeed, float DeltaSeconds) const;
-	void SetPlatformDirection(AActor* OtherActor, bool bDownward);
+	void SetPlatformDirection(const AActor* OtherActor, bool bDownward);
 
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,  int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	
