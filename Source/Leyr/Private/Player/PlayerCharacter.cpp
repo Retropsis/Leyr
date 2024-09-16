@@ -506,9 +506,7 @@ void APlayerCharacter::JumpButtonPressed()
 }
 
 void APlayerCharacter::TraceForPlatforms() const
-{
-	// if(GetCharacterMovement()->IsFalling() || GetVelocity().Z < 0.f) {}
-	
+{	
 	const FVector Start = GroundPoint->GetComponentLocation() + FVector::DownVector * GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	const FVector End = Start + FVector::DownVector * PlatformTraceDistance;
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
@@ -519,7 +517,7 @@ void APlayerCharacter::TraceForPlatforms() const
 		this, Start, End, ObjectTypes, false, TArray<AActor*>(),
 		EDrawDebugTrace::ForOneFrame, Hit, true);
 		
-	if(Hit.bBlockingHit /*&& GetVelocity().Z < 0.f*/)
+	if(Hit.bBlockingHit)
 	{
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Block);
 	}

@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "AbilitySystem/Data/ActorClassInfo.h"
+#include "Interaction/AbilityActorInterface.h"
 #include "Interaction/CombatInterface.h"
 #include "AbilityActor.generated.h"
 
@@ -14,7 +16,7 @@ class UAbilitySystemComponent;
 class UAttributeSet;
 
 UCLASS()
-class LEYR_API AAbilityActor : public AActor, public IAbilitySystemInterface, public ICombatInterface
+class LEYR_API AAbilityActor : public AActor, public IAbilitySystemInterface, public IAbilityActorInterface
 {
 	GENERATED_BODY()
 	
@@ -23,30 +25,20 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; }
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
-	//~ Combat Interface
-	virtual void Die(const FVector& DeathImpulse) override;
-	virtual bool IsDead_Implementation() const override { return  bDead; }
-	virtual ECharacterClass GetCharacterClass_Implementation() override { return CharacterClass; }
-	virtual int32 GetCharacterLevel_Implementation() override { return Level; }
-	virtual FOnASCRegistered& GetOnASCRegistered() override { return OnASCRegistered; }
-	virtual FOnDeath& GetOnDeath() override { return OnDeath; }
 	FOnASCRegistered OnASCRegistered;
 	FOnDeath OnDeath;
-	//~ Combat Interface
+	
+	//~ AbilityActor Interface
+	virtual void DestroyActor_Implementation() override;
+	virtual bool IsDestroyed_Implementation() const override { return bDestroyed; }
+	virtual int32 GetActorLevel_Implementation() override { return Level; }
+	virtual EActorClass GetActorClass_Implementation() override { return ActorClass; }
+	//~ AbilityActor Interface
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitializeDefaultAttributes() const;
 	virtual void InitAbilityActorInfo();
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="AbilityActor|Attributes")
-	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="AbilityActor|Attributes")
-	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="AbilityActor|Attributes")
-	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
@@ -55,7 +47,7 @@ protected:
 	TObjectPtr<UAttributeSet> AttributeSet;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
-	ECharacterClass CharacterClass = ECharacterClass::Breakable;
+	EActorClass ActorClass = EActorClass::Default;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Combat")
 	float LifeSpan = 1.f;
@@ -64,10 +56,10 @@ protected:
 	int32 Level = 1;
 	
 	UFUNCTION(NetMulticast, Reliable)
-	virtual void MulticastHandleDeath(const FVector& DeathImpulse);
+	void MulticastHandleDestruction();
 
 	UPROPERTY(BlueprintReadOnly)
-	bool bDead = false;
+	bool bDestroyed = false;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Combat")
 	USoundBase* DestructionSound;

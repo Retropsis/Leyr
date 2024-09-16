@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilityTypes.h"
 #include "GameplayEffectTypes.h"
+#include "AbilitySystem/Data/ActorClassInfo.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Engine/OverlapResult.h"
 #include "Game/BaseGameplayTags.h"
@@ -97,6 +98,19 @@ void ULeyrAbilitySystemLibrary::InitializeDefaultAttributes(const UObject* World
 	ASC->ApplyGameplayEffectSpecToSelf(*VitalAttributesSpecHandle.Data.Get());
 }
 
+void ULeyrAbilitySystemLibrary::InitializeActorAttributes(const UObject* WorldContextObject, EActorClass ActorClass, float Level, UAbilitySystemComponent* ASC)
+{
+	const AActor* AvatarActor = ASC->GetAvatarActor();
+	
+	UActorClassInfo* ActorClassInfo = GetActorClassInfo(WorldContextObject);
+	const FActorClassDefaultInfo ClassDefaultInfo = ActorClassInfo->GetClassDefaultInfo(ActorClass);
+
+	FGameplayEffectContextHandle AttributesContextHandle = ASC->MakeEffectContext();
+	AttributesContextHandle.AddSourceObject(AvatarActor);
+	const FGameplayEffectSpecHandle AttributesSpecHandle = ASC->MakeOutgoingSpec(ClassDefaultInfo.Attributes, Level, AttributesContextHandle);
+	ASC->ApplyGameplayEffectSpecToSelf(*AttributesSpecHandle.Data.Get());
+}
+
 void ULeyrAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, ECharacterClass CharacterClass)
 {
 	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);
@@ -123,6 +137,13 @@ UCharacterClassInfo* ULeyrAbilitySystemLibrary::GetCharacterClassInfo(const UObj
 	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
 	if (LeyrGameMode == nullptr) return nullptr;
 	return LeyrGameMode->CharacterClassInfo;
+}
+
+UActorClassInfo* ULeyrAbilitySystemLibrary::GetActorClassInfo(const UObject* WorldContextObject)
+{
+	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (LeyrGameMode == nullptr) return nullptr;
+	return LeyrGameMode->ActorClassInfo;
 }
 
 UAbilityInfo* ULeyrAbilitySystemLibrary::GetAbilityInfo(const UObject* WorldContextObject)

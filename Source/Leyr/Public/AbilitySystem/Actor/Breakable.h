@@ -24,9 +24,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnConstruction(const FTransform& Transform) override;
-	virtual void Die(const FVector& DeathImpulse) override;
+	virtual void DestroyActor_Implementation() override;
 	
-	virtual void MulticastHandleDeath_Implementation(const FVector& DeathImpulse) override;
+	virtual void MulticastHandleDestruction_Implementation() override;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Platform")

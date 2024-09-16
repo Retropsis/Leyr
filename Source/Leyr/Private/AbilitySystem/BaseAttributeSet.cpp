@@ -9,6 +9,7 @@
 #include "Game/BaseGameplayTags.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Interaction/AbilityActorInterface.h"
 #include "Interaction/CombatInterface.h"
 #include "Interaction/PlayerInterface.h"
 #include "Net/UnrealNetwork.h"
@@ -154,13 +155,16 @@ void UBaseAttributeSet::SendXPEvent(const FEffectProperties& Props)
 		Payload.EventTag = GameplayTags.Attributes_Meta_IncomingXP;
 		Payload.EventMagnitude = XPReward;
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Props.SourceCharacter, GameplayTags.Attributes_Meta_IncomingXP, Payload);
-
 		
 		// if(APlayerCharacterController* PC = Cast<APlayerCharacterController>(Props.SourceCharacter->Controller))
 		// {
 		// 	const FUIMessageData MessageData{ EMessageType::Experience, static_cast<float>(XPReward), Props.TargetAvatarActor, false, false };
 		// 	PC->ClientShowDamageNumber(MessageData);
 		// }
+	}
+	if(Props.TargetAvatarActor->Implements<UAbilityActorInterface>())
+	{
+		//TODO: XP from Actors
 	}
 }
 
@@ -178,6 +182,10 @@ void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 			if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor))
 			{
 				CombatInterface->Die(ULeyrAbilitySystemLibrary::GetDeathImpulse(Props.EffectContextHandle));
+			}
+			if (IAbilityActorInterface* AbilityActorInterface = Cast<IAbilityActorInterface>(Props.TargetAvatarActor))
+			{
+				AbilityActorInterface->Execute_DestroyActor(Props.TargetAvatarActor);
 			}
 			SendXPEvent(Props);
 		}

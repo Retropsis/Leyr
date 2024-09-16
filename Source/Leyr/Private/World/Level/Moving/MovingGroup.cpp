@@ -2,7 +2,6 @@
 
 #include "World/Level/Moving/MovingGroup.h"
 #include "Components/BoxComponent.h"
-#include "Interaction/CombatInterface.h"
 #include "Interaction/PlayerInterface.h"
 
 AMovingGroup::AMovingGroup()
@@ -31,6 +30,12 @@ void AMovingGroup::BeginPlay()
 		OverlapBox->OnComponentBeginOverlap.AddDynamic(this, &AMovingGroup::OnBeginOverlap);
 		OverlapBox->OnComponentEndOverlap.AddDynamic(this, &AMovingGroup::OnEndOverlap);
 	}
+}
+
+void AMovingGroup::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	OverlapBox->SetBoxExtent(FVector(Width * 32.f, 0.f, Depth * 32.f));
 }
 
 void AMovingGroup::HandleActiveActors(float DeltaSeconds)

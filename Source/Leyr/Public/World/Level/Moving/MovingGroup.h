@@ -27,6 +27,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void OnConstruction(const FTransform& Transform) override;
 	virtual void HandleActiveActors(float DeltaSeconds);
 	
 	UFUNCTION()
@@ -38,6 +39,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Platform")
 	TObjectPtr<UBoxComponent> OverlapBox;
 
+	UPROPERTY(EditAnywhere, Category="Moving")
+	int32 Width = 3;
+	
+	UPROPERTY(EditAnywhere, Category="Moving")
+	int32 Depth = 3;
+	
 	UPROPERTY(EditAnywhere, Category="Moving")
 	float EntangledWalkSpeed = 50.f;
 

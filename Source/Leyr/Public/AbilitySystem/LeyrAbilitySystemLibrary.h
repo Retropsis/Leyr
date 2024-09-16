@@ -7,17 +7,19 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "LeyrAbilitySystemLibrary.generated.h"
 
+class UActorClassInfo;
+enum class EActorClass : uint8;
+enum class ECharacterClass : uint8;
 struct FAdditionalEffectParams;
-class UAbilityInfo;
-class USkillMenuWidgetController;
 struct FGameplayEffectContextHandle;
+struct FWidgetControllerParams;
+class UAbilityInfo;
 class UCharacterClassInfo;
 class UAbilitySystemComponent;
-enum class ECharacterClass : uint8;
-class UAttributeMenuWidgetController;
 class APlayerHUD;
-struct FWidgetControllerParams;
 class UOverlayWidgetController;
+class USkillMenuWidgetController;
+class UAttributeMenuWidgetController;
 
 /**
  * 
@@ -44,7 +46,7 @@ public:
 	static  bool MakeWidgetControllerParams(const UObject* WorldContextObject, FWidgetControllerParams& OutWCParams, APlayerHUD*& OutPlayerHUD);
 
 	/*
-	 * 
+	 * Characters
 	 */
 	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|CharacterClassDefaults", meta=(WorldContext="WorldContextObject"))
 	static void InitializeDefaultAttributes(const UObject* WorldContextObject, ECharacterClass CharacterClass, float Level, UAbilitySystemComponent* ASC);
@@ -58,6 +60,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|CharacterClassDefaults", meta=(WorldContext="WorldContextObject"))
 	static UAbilityInfo* GetAbilityInfo(const UObject* WorldContextObject);
 
+	/*
+	 * Actors
+	 */
+	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|ActorClassDefaults", meta=(WorldContext="WorldContextObject"))
+	static void InitializeActorAttributes(const UObject* WorldContextObject, EActorClass ActorClass, float Level, UAbilitySystemComponent* ASC);
+	
+	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|ActorClassDefaults", meta=(WorldContext="WorldContextObject"))
+	static UActorClassInfo* GetActorClassInfo(const UObject* WorldContextObject);
+	
 	/*
 	 * Custom Effect Context
 	 */

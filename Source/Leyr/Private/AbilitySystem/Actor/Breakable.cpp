@@ -49,14 +49,14 @@ void ABreakable::OnConstruction(const FTransform& Transform)
 	FlipbookComponent->SetPlaybackPositionInFrames(0, true);
 }
 
-void ABreakable::Die(const FVector& DeathImpulse)
+void ABreakable::DestroyActor_Implementation()
 {
-	Super::Die(DeathImpulse);
-	MulticastHandleDeath(DeathImpulse);
+	Super::DestroyActor_Implementation();
+	MulticastHandleDestruction();
 }
 
-void ABreakable::MulticastHandleDeath_Implementation(const FVector& DeathImpulse)
+void ABreakable::MulticastHandleDestruction_Implementation()
 {
-	Super::MulticastHandleDeath_Implementation(DeathImpulse);
+	Super::MulticastHandleDestruction_Implementation();
 	FlipbookComponent->Play();
 }

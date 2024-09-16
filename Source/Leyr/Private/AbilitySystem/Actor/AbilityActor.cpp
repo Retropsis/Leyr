@@ -5,7 +5,6 @@
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
-#include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 AAbilityActor::AAbilityActor()
@@ -38,22 +37,19 @@ void AAbilityActor::InitAbilityActorInfo()
 
 void AAbilityActor::InitializeDefaultAttributes() const
 {
-	// ApplyEffectToSelf(DefaultPrimaryAttributes, 1.f);
-	// ApplyEffectToSelf(DefaultSecondaryAttributes, 1.f);
-	// ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
-	ULeyrAbilitySystemLibrary::InitializeDefaultAttributes(this, CharacterClass, Level, AbilitySystemComponent);
+	ULeyrAbilitySystemLibrary::InitializeActorAttributes(this, ActorClass, Level, AbilitySystemComponent);
 }
 
-void AAbilityActor::Die(const FVector& DeathImpulse)
+void AAbilityActor::DestroyActor_Implementation()
 {
 	SetLifeSpan(LifeSpan);
-	bDead = true;
-	MulticastHandleDeath(DeathImpulse);
+	bDestroyed = true;
+	MulticastHandleDestruction();
 }
 
-void AAbilityActor::MulticastHandleDeath_Implementation(const FVector& DeathImpulse)
+void AAbilityActor::MulticastHandleDestruction_Implementation()
 {
 	UGameplayStatics::PlaySoundAtLocation(this, DestructionSound, GetActorLocation(), GetActorRotation());
-	bDead = true;
+	bDestroyed = true;
 	OnDeath.Broadcast(this);
 }
