@@ -107,8 +107,13 @@ void ULeyrAbilitySystemLibrary::InitializeActorAttributes(const UObject* WorldCo
 
 	FGameplayEffectContextHandle AttributesContextHandle = ASC->MakeEffectContext();
 	AttributesContextHandle.AddSourceObject(AvatarActor);
-	const FGameplayEffectSpecHandle AttributesSpecHandle = ASC->MakeOutgoingSpec(ClassDefaultInfo.Attributes, Level, AttributesContextHandle);
+	const FGameplayEffectSpecHandle AttributesSpecHandle = ASC->MakeOutgoingSpec(ClassDefaultInfo.PrimaryAttributes, Level, AttributesContextHandle);
 	ASC->ApplyGameplayEffectSpecToSelf(*AttributesSpecHandle.Data.Get());
+
+	FGameplayEffectContextHandle VitalAttributesContextHandle = ASC->MakeEffectContext();
+	VitalAttributesContextHandle.AddSourceObject(AvatarActor);
+	const FGameplayEffectSpecHandle VitalAttributesSpecHandle = ASC->MakeOutgoingSpec(ClassDefaultInfo.VitalAttributes, Level, VitalAttributesContextHandle);
+	ASC->ApplyGameplayEffectSpecToSelf(*VitalAttributesSpecHandle.Data.Get());
 }
 
 void ULeyrAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, ECharacterClass CharacterClass)

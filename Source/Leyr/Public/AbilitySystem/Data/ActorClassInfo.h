@@ -24,7 +24,10 @@ struct FActorClassDefaultInfo
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly, Category = "Class Defaults")
-	TSubclassOf<UGameplayEffect> Attributes;
+	TSubclassOf<UGameplayEffect> PrimaryAttributes;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Class Defaults")
+	TSubclassOf<UGameplayEffect> VitalAttributes;
 	
 	// UPROPERTY(EditDefaultsOnly, Category = "Class Defaults")
 	// TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;

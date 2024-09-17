@@ -35,7 +35,7 @@ void AMovingGroup::BeginPlay()
 void AMovingGroup::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-	OverlapBox->SetBoxExtent(FVector(Width * 32.f, 0.f, Depth * 32.f));
+	OverlapBox->SetBoxExtent(FVector(Width * 32.f, 100.f, Depth * 32.f));
 }
 
 void AMovingGroup::HandleActiveActors(float DeltaSeconds)

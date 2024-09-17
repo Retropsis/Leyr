@@ -84,6 +84,7 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	SetEffectProperties(Data, Props);
 	
 	if(Props.TargetAvatarActor->Implements<UCombatInterface>() && ICombatInterface::Execute_IsDead(Props.TargetAvatarActor)) return;
+	if(Props.TargetAvatarActor->Implements<UAbilityActorInterface>() && IAbilityActorInterface::Execute_IsDestroyed(Props.TargetAvatarActor)) return;
 	// if(Props.TargetCharacter->Implements<UCombatInterface>() && ICombatInterface::Execute_IsDead(Props.TargetCharacter)) return;
 
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
@@ -170,8 +171,14 @@ void UBaseAttributeSet::SendXPEvent(const FEffectProperties& Props)
 
 void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 {
-	const float LocalIncomingDamage = GetIncomingDamage();
+	float LocalIncomingDamage = GetIncomingDamage();
 	SetIncomingDamage(0.f);
+	
+	if (IAbilityActorInterface* AbilityActorInterface = Cast<IAbilityActorInterface>(Props.TargetAvatarActor))
+	{
+		LocalIncomingDamage = 1.f;
+	}
+	
 	if (LocalIncomingDamage > 0.f)
 	{
 		const float NewHealth = GetHealth() - LocalIncomingDamage;
@@ -199,6 +206,9 @@ void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 				Props.TargetCharacter->LaunchCharacter(AirborneForce, true, true);
 			}
 		}
+		
+		if(Props.TargetAvatarActor->Implements<UAbilityActorInterface>()) return;
+		
 		const bool bBlockedHit = ULeyrAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
 		const bool bCriticalHit = ULeyrAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
 		ShowFloatingText(Props, LocalIncomingDamage, bBlockedHit, bCriticalHit);

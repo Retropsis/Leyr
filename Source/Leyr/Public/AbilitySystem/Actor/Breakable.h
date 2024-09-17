@@ -10,6 +10,8 @@
 
 class UBoxComponent;
 
+DECLARE_MULTICAST_DELEGATE(FOnBreakableDestroyed);
+
 /**
  * 
  */
@@ -20,6 +22,7 @@ class LEYR_API ABreakable : public AAbilityActor
 
 public:
 	ABreakable();
+	FOnBreakableDestroyed OnBreakableDestroyed;
 
 protected:
 	virtual void BeginPlay() override;
@@ -34,6 +37,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Platform")
 	TObjectPtr<UPaperFlipbookComponent> FlipbookComponent;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Platform")
+	TObjectPtr<UPaperFlipbookComponent> TopFlipbookComponent;
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature OnHealthChanged;

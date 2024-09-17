@@ -40,8 +40,6 @@ protected:
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, float Level) const;
 	void AddCharacterAbilities() const;
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) {}
-
-	float BaseGravityScale = 3.f;
 	
 	FOnASCRegistered OnASCRegistered;
 	FOnDeath OnDeath;
@@ -79,7 +77,10 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	FName WeaponTipSocketName;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Combat")
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Character|Movement")
+	float BaseGravityScale = 3.25f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Movement")
 	float BaseWalkSpeed = 120.f;
 
 	UPROPERTY(BlueprintReadOnly, Category="Character|Combat")
