@@ -15,6 +15,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Game/BaseGameplayTags.h"
+#include "GameFramework/PhysicsVolume.h"
 #include "Interaction/PlatformInterface.h"
 #include "Inventory/HotbarComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -319,6 +320,9 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	case ECombatState::Entangled:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
 		break;
+	case ECombatState::Swimming:
+		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
+		break;
 	}
 }
 
@@ -358,6 +362,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 	switch (CombatState) {
 	case ECombatState::Unoccupied:
 		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+		GetCharacterMovement()->MaxFlySpeed = BaseFlySpeed;
 		GetCharacterMovement()->GravityScale = BaseGravityScale;
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		break;
@@ -397,6 +402,10 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		break;
 	case ECombatState::Entangled:
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		break;
+	case ECombatState::Swimming:
+		GetCharacterMovement()->SetMovementMode(MOVE_Swimming);
+		GetCharacterMovement()->GetPhysicsVolume()->bWaterVolume = true;
 		break;
 	}
 }
@@ -442,24 +451,51 @@ void APlayerCharacter::HandleHangingOnLedge(const FVector& HangingTarget)
 	}
 }
 
+/*
+ * Entangled
+ */
 void APlayerCharacter::HandleEntangled_Implementation(float MinZ, float EntangledWalkSpeed, float EntangledGravityScale, bool bEndOverlap)
 {
 	if(bEndOverlap)
 	{
-		HandleCombatState(ECombatState::Unoccupied);
-		Jump();
+		if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(EntangledExitTimer, this, &APlayerCharacter::EntangledExitEnd, EntangledExitTime);
 	}
 	else
 	{
 		GetCharacterMovement()->StopMovementImmediately();
 		CurrentMinZ = MinZ;
         GetCharacterMovement()->SetMovementMode(MOVE_Falling);
-        GetCharacterMovement()->MaxWalkSpeed = EntangledWalkSpeed;
+        GetCharacterMovement()->MaxFlySpeed = EntangledWalkSpeed;
         GetCharacterMovement()->GravityScale = EntangledGravityScale;
         HandleCombatState(ECombatState::Entangled);
 	}
 }
 
+void APlayerCharacter::EntangledExitEnd()
+{
+	HandleCombatState(ECombatState::Unoccupied);
+}
+
+void APlayerCharacter::HandleSwimming_Implementation(float MinZ, float SwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap)
+{
+	if(bEndOverlap)
+	{
+		if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(EntangledExitTimer, this, &APlayerCharacter::EntangledExitEnd, EntangledExitTime);
+		GetCharacterMovement()->GetPhysicsVolume()->bWaterVolume = false;
+	}
+	else
+	{
+		GetCharacterMovement()->StopMovementImmediately();
+		CurrentMinZ = MinZ;
+		GetCharacterMovement()->MaxSwimSpeed = SwimmingSpeed;
+		GetCharacterMovement()->GravityScale = SwimmingGravityScale;
+		HandleCombatState(ECombatState::Swimming);
+	}
+}
+
+/*
+ *
+ */
 void APlayerCharacter::OffLedgeEnd() { bCanGrabLedge = true; }
 
 void APlayerCharacter::RotateController() const
@@ -496,6 +532,14 @@ void APlayerCharacter::JumpButtonPressed()
 		GetCharacterMovement()->AddImpulse(FVector::UpVector * 500.f, true);
 		return;
 	}
+	if(CombatState == ECombatState::Swimming)
+	{
+		// GetCharacterMovement()->AddInputVector(FVector::UpVector * 33333.f, true);
+		// AddMovementInput(FVector::UpVector, 33333.f);
+		GetCharacterMovement()->AddImpulse(FVector::UpVector * 333.f, true);
+		GetCharacterMovement()->StopActiveMovement();
+		return;
+	}
 	if(CombatState >= ECombatState::HangingLedge)
 	{
 		HandleCombatState(ECombatState::Unoccupied);
@@ -515,7 +559,7 @@ void APlayerCharacter::TraceForPlatforms() const
 	FHitResult Hit;
 	UKismetSystemLibrary::LineTraceSingleForObjects(
 		this, Start, End, ObjectTypes, false, TArray<AActor*>(),
-		EDrawDebugTrace::ForOneFrame, Hit, true);
+		EDrawDebugTrace::None, Hit, true);
 		
 	if(Hit.bBlockingHit)
 	{
@@ -604,7 +648,7 @@ void APlayerCharacter::TraceForSlope()
 		FHitResult Hit;
 		UKismetSystemLibrary::LineTraceSingle(
 			this, Start, End, TraceTypeQuery1,
-			false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, Hit, true);
+			false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, Hit, true, FLinearColor::Yellow);
 		
 		ECombatState PreviousState = CombatState;
 		ECombatState NewState = ECombatState::Unoccupied;

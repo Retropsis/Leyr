@@ -82,6 +82,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Movement")
 	float BaseWalkSpeed = 120.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Movement")
+	float BaseFlySpeed = 300.f;
 
 	UPROPERTY(BlueprintReadOnly, Category="Character|Combat")
 	bool bHitReacting = false;

@@ -82,6 +82,7 @@ public:
 	virtual void HandleHangingOnLadder_Implementation(FVector HangingTarget, bool bEndOverlap) override;
 	virtual void HandleHangingOnRope_Implementation(FVector HangingTarget, bool bEndOverlap) override;
 	virtual void HandleEntangled_Implementation(float MinZ, float EntangledWalkSpeed, float EntangledGravityScale, bool bEndOverlap) override;
+	virtual void HandleSwimming_Implementation(float MinZ, float SwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap) override;
 	virtual void SetMovementTarget_Implementation(const FVector Target) override { MovementTarget = Target; } 
 	/** end Player Interface */
 
@@ -148,15 +149,23 @@ private:
 
 	void TraceForPlatforms() const;
 	void OverlapPlatformEnd();
+	void EntangledExitEnd();
 
+	/*	OverlapPlatform */
+	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
+	float OverlapPlatformTime = .25f;
+	
 	FTimerHandle OverlapPlatformTimer;
 	bool bOverlapPlatformTimerEnded = true;
 
-	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
-	float OverlapPlatformTime = .25f;
-
 	FVector MovementTarget = FVector::ZeroVector;
 	float CurrentMinZ = 0.f;
+
+	/*	Entangled */
+	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
+	float EntangledExitTime = .1f;
+	
+	FTimerHandle EntangledExitTimer;
 
 public:
 	FORCEINLINE bool IsAirborne() const { return bAirborne; }

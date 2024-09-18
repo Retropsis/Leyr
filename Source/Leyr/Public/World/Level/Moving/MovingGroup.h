@@ -12,6 +12,7 @@ class UBoxComponent;
 UENUM()
 enum class EMovingDirection : uint8
 {
+	Still,
 	Sink,
 	Vector,
 };
@@ -45,24 +46,31 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Moving")
 	int32 Depth = 3;
 	
-	UPROPERTY(EditAnywhere, Category="Moving")
+	UPROPERTY(EditAnywhere, Category="Moving|Entangled")
 	float EntangledWalkSpeed = 50.f;
 
-	UPROPERTY(EditAnywhere, Category="Moving")
+	UPROPERTY(EditAnywhere, Category="Moving|Entangled")
 	float EntangledGravityScale = .2f;
 	
-	UPROPERTY(EditAnywhere, Category="Moving")
-	float InterpolationSpeed = .08f;
+	UPROPERTY(EditAnywhere, Category="Moving|Entangled")
+	float InterpolationSpeed = .1f;
+	
+	UPROPERTY(EditAnywhere, Category="Moving|Entangled")
+	float FlowingInterpSpeed = 1.f;
 	
 	UPROPERTY(EditAnywhere, Category="Moving")
 	FVector Direction { 1.f, 0.f, 0.f };
 
-	FVector InterpTarget = FVector::ZeroVector;
-	float MinZ = 0.f;
+	UPROPERTY(EditAnywhere, Category="Moving")
+	EMovingDirection MovingDirection = EMovingDirection::Sink;
 
-private:
+	FVector InterpTarget = FVector::ZeroVector;
+	float InterpTargetX = 0.f;
+	float MinZ = 0.f;
+	
 	UPROPERTY()
 	TArray<AActor*> ActiveActors = TArray<AActor*>();
-	
+
+private:
 	bool bIsActive = false;
 };

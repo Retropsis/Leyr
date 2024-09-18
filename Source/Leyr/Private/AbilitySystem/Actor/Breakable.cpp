@@ -4,7 +4,6 @@
 #include "PaperFlipbookComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "Components/BoxComponent.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 ABreakable::ABreakable()
@@ -74,13 +73,6 @@ void ABreakable::OnConstruction(const FTransform& Transform)
 	TArray<AActor*> ActorsToIgnore;
 	FHitResult Hit;
 	UKismetSystemLibrary::LineTraceSingle(this, Start, Start + FVector(0.f, 0.f, 10.f), TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, Hit, true);
-	// if(Hit.bBlockingHit && Hit.GetActor())
-	// {
-	// 	if (ABreakable* AboveBreakable = Cast<ABreakable>(Hit.GetActor()))
-	// 	{
-	// 		AboveBreakable->OnBreakableDestroyed.AddLambda([this] () { TopFlipbookComponent->SetVisibility(true); });
-	// 	}
-	// }
 	TopFlipbookComponent->SetVisibility(!Hit.bBlockingHit);	
 }
 
@@ -96,5 +88,4 @@ void ABreakable::MulticastHandleDestruction_Implementation()
 	FlipbookComponent->Play();
 	TopFlipbookComponent->Play();
 	TopFlipbookComponent->SetVisibility(true);
-	// OnBreakableDestroyed.Broadcast();
 }

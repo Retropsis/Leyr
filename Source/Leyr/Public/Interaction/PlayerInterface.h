@@ -83,4 +83,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void HandleEntangled(float MinZ, float EntangledWalkSpeed, float EntangledGravityScale, bool bEndOverlap);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void HandleSwimming(float MinZ, float SwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap);
 };

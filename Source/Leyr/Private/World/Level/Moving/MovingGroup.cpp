@@ -3,6 +3,7 @@
 #include "World/Level/Moving/MovingGroup.h"
 #include "Components/BoxComponent.h"
 #include "Interaction/PlayerInterface.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 AMovingGroup::AMovingGroup()
 {
@@ -22,9 +23,11 @@ void AMovingGroup::Tick(float DeltaSeconds)
 void AMovingGroup::BeginPlay()
 {
 	Super::BeginPlay();
-	MinZ = OverlapBox->GetComponentLocation().Z - OverlapBox->GetScaledBoxExtent().Z / 2.f;
-	InterpTarget = OverlapBox->GetComponentLocation();
-	InterpTarget.Z -=  OverlapBox->GetScaledBoxExtent().Z / 2.f;
+	MinZ = OverlapBox->GetComponentLocation().Z - OverlapBox->GetScaledBoxExtent().Z;
+	InterpTarget = FVector(
+		OverlapBox->GetComponentLocation().X + (OverlapBox->GetScaledBoxExtent().X - 35.f * Direction.X),
+		0.f,
+		OverlapBox->GetComponentLocation().Z - OverlapBox->GetScaledBoxExtent().Z + 88.f);
 	if(HasAuthority())
 	{
 		OverlapBox->OnComponentBeginOverlap.AddDynamic(this, &AMovingGroup::OnBeginOverlap);
@@ -44,8 +47,22 @@ void AMovingGroup::HandleActiveActors(float DeltaSeconds)
 
 	for (AActor* Actor : ActiveActors)
 	{
-		FVector CurrentBottom = FVector(Actor->GetActorLocation().X, 0.f, InterpTarget.Z);
-		Actor->SetActorLocation(FMath::VInterpTo(Actor->GetActorLocation(), CurrentBottom, DeltaSeconds, InterpolationSpeed));
+		if(Actor)
+		{
+			FVector CurrentBottom = FVector(Actor->GetActorLocation().X, 0.f, InterpTarget.Z);
+			UKismetSystemLibrary::DrawDebugPoint(this, InterpTarget, 15.f, FLinearColor::Green);
+			switch (MovingDirection) {
+			case EMovingDirection::Sink:
+				Actor->SetActorLocation(FMath::VInterpTo(Actor->GetActorLocation(), CurrentBottom, DeltaSeconds, InterpolationSpeed));
+				break;
+			case EMovingDirection::Vector:
+				UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + InterpTarget.GetSafeNormal(), 2.f, FLinearColor::Green);
+				Actor->SetActorLocation(FMath::VInterpTo(Actor->GetActorLocation(), InterpTarget, DeltaSeconds, FlowingInterpSpeed));
+				break;
+			case EMovingDirection::Still:
+				break;
+			}
+		}
 	}
 }
 

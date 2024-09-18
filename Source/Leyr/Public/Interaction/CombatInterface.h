@@ -70,6 +70,7 @@ enum class ECombatState : uint8
 	OnGroundSlope UMETA(DisplayName="OnGroundSlope"),
 	OnRopeSlope UMETA(DisplayName="OnRopeSlope"),
 	Entangled UMETA(DisplayName="Entangled"),
+	Swimming UMETA(DisplayName="Swimming"),
 };
 
 // This class does not need to be modified.
