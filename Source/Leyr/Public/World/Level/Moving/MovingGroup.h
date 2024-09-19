@@ -40,10 +40,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Platform")
 	TObjectPtr<UBoxComponent> OverlapBox;
 
-	UPROPERTY(EditAnywhere, Category="Moving")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Moving")
 	int32 Width = 3;
 	
-	UPROPERTY(EditAnywhere, Category="Moving")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Moving")
 	int32 Depth = 3;
 	
 	UPROPERTY(EditAnywhere, Category="Moving|Entangled")

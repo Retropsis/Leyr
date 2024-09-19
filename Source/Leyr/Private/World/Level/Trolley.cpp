@@ -3,6 +3,7 @@
 #include "World/Level/Trolley.h"
 #include "Components/BoxComponent.h"
 #include "Components/SplineComponent.h"
+#include "Leyr/Leyr.h"
 
 ATrolley::ATrolley()
 {
@@ -27,19 +28,44 @@ void ATrolley::BeginPlay()
 
 void ATrolley::HandleOverlapWaitTimeEnd() { bIsActivated = true; }
 
+
+void ATrolley::HandleFallingTimeEnd()
+{
+	if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(RespawnTimer, this, &ATrolley::HandleRespawnTimeEnd, RespawnTime);
+	if(FallingTimer.IsValid()) FallingTimer.Invalidate();
+	OnTrolleyFalling.Broadcast();
+}
+
+void ATrolley::HandleRespawnTimeEnd()
+{
+	BoxCollision->SetSimulatePhysics(false);
+	bIsActivated = false;
+	CurrentIndex = 1;
+	CurrentTarget = RouteSpline->GetLocationAtSplinePoint(CurrentIndex, ESplineCoordinateSpace::World);
+	BoxCollision->SetWorldLocation(RouteSpline->GetLocationAtSplinePoint(0, ESplineCoordinateSpace::World));
+	OverlapBox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	OverlapBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	OverlapBox->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
+	OverlapBox->SetCollisionResponseToChannel(ECC_Enemy, ECR_Overlap);
+	if(RespawnTimer.IsValid()) RespawnTimer.Invalidate();
+	OnTrolleyRespawn.Broadcast();
+}
+
 void ATrolley::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if(OtherActor && OtherActor->ActorHasTag("Player"))
 	{
-		GetWorld()->GetTimerManager().SetTimer(OverlapWaitTimer, this, &ATrolley::HandleOverlapWaitTimeEnd, OverlapWaitTime);
+		if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(OverlapWaitTimer, this, &ATrolley::HandleOverlapWaitTimeEnd, OverlapWaitTime);
 	}
 }
 
 void ATrolley::ChooseNextStep()
 {
-	// CurrentTarget = RouteSpline->GetLocationAtSplinePoint(2, ESplineCoordinateSpace::World);
-	// MovingSpeed = 2000.f;
-	SetLifeSpan(3.f);
+	if(bIsSingleUse) SetLifeSpan(3.f);
+	else if(const UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().SetTimer(FallingTimer, this, &ATrolley::HandleFallingTimeEnd, FallingTime);
+	}
 	BoxCollision->SetSimulatePhysics(true);
-	BoxCollision->SetEnableGravity(true);
+	if(OverlapWaitTimer.IsValid()) OverlapWaitTimer.Invalidate();
 }

@@ -534,10 +534,7 @@ void APlayerCharacter::JumpButtonPressed()
 	}
 	if(CombatState == ECombatState::Swimming)
 	{
-		// GetCharacterMovement()->AddInputVector(FVector::UpVector * 33333.f, true);
-		// AddMovementInput(FVector::UpVector, 33333.f);
 		GetCharacterMovement()->AddImpulse(FVector::UpVector * 333.f, true);
-		GetCharacterMovement()->StopActiveMovement();
 		return;
 	}
 	if(CombatState >= ECombatState::HangingLedge)
