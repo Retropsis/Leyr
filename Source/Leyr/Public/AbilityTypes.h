@@ -39,6 +39,7 @@ struct FBaseGameplayEffectContext : public FGameplayEffectContext
 public:
 	bool IsCriticalHit() const { return bIsCriticalHit; }
 	bool IsBlockedHit () const { return bIsBlockedHit; }
+	bool IsExecuteHit () const { return bIsExecuteHit; }
 	bool IsSuccessfulStatusEffect() const { return bIsSuccessfulStatusEffect; }
 	float GetStatusEffectDamage() const { return StatusEffectDamage; }
 	float GetStatusEffectDuration() const { return StatusEffectDuration; }
@@ -49,6 +50,7 @@ public:
 	
 	void SetIsCriticalHit(bool bInIsCriticalHit) { bIsCriticalHit = bInIsCriticalHit; }
 	void SetIsBlockedHit(bool bInIsBlockedHit) { bIsBlockedHit = bInIsBlockedHit; }
+	void SetIsExecuteHit(bool bInIsExecuteHit) { bIsExecuteHit = bInIsExecuteHit; }
 	void SetIsSuccessfulStatusEffect(bool bInIsStatusEffect) { bIsSuccessfulStatusEffect = bInIsStatusEffect; }
 	void SetStatusEffectDamage(float InDamage) { StatusEffectDamage = InDamage; }
 	void SetStatusEffectDuration(float InDuration) { StatusEffectDuration = InDuration; }
@@ -85,6 +87,9 @@ protected:
 
 	UPROPERTY()
 	bool bIsCriticalHit = false;
+	
+	UPROPERTY()
+	bool bIsExecuteHit = false;
 	
 	UPROPERTY()
 	bool bIsSuccessfulStatusEffect = false;

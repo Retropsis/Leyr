@@ -147,6 +147,8 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	// Status Effect
 	DetermineStatusEffect(ExecutionParams, Spec, EvaluationParameters, TagsToCaptureDefs);
 	
+	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
+	
 	// Get Damage Set by Caller Magnitude
 	float Damage = 0.f;
 	for (const TTuple<FGameplayTag, FGameplayTag>& Pair : FBaseGameplayTags::Get().DamageTypesToResistances)
@@ -154,6 +156,13 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		const FGameplayTag DamageTypeTag = Pair.Key;
 		const FGameplayTag ResistanceTag = Pair.Value;
 
+		if(DamageTypeTag.MatchesTagExact(FBaseGameplayTags::Get().Damage_Execute))
+		{
+			float DamageTypeValue = Spec.GetSetByCallerMagnitude(Pair.Key, false);
+			if(DamageTypeValue <= 0.f) continue;
+			ULeyrAbilitySystemLibrary::SetIsExecuteHit(EffectContextHandle, true);
+			continue;
+		}
 		checkf(TagsToCaptureDefs.Contains(ResistanceTag), TEXT("TagsToCaptureDefs doesn't contain Tag: [%s] in ExecCalc_Damage"), *ResistanceTag.ToString());
 		const FGameplayEffectAttributeCaptureDefinition CaptureDef = TagsToCaptureDefs[ResistanceTag];
 
@@ -176,7 +185,6 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	const bool bBlocked = FMath::RandRange(1, 100) < TargetBlockChance;
 	Damage = bBlocked ? Damage / 2.f : Damage;
 
-	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
 	ULeyrAbilitySystemLibrary::SetIsBlockedHit(EffectContextHandle, bBlocked);
 
 	float TargetPhysicalDefense = 0.f;

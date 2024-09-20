@@ -78,11 +78,17 @@ public:
 	UFUNCTION(BlueprintPure, Category = "LeyrAbilitySystemLibrary|GameplayEffects")
 	static bool IsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle);
 
+	UFUNCTION(BlueprintPure, Category = "LeyrAbilitySystemLibrary|GameplayEffects")
+	static bool IsExecuteHit(const FGameplayEffectContextHandle& EffectContextHandle);
+
 	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects")
 	static void SetIsBlockedHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, bool bInIsBlockedHit);
 
 	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects")
 	static void SetIsCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, bool bInIsCriticalHit);
+
+	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects")
+	static void SetIsExecuteHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, bool bInIsExecuteHit);
 
 	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|AdditionalEffect")
 	static FGameplayEffectContextHandle ApplyAdditionalEffect(const FAdditionalEffectParams& AdditionalEffectParams);

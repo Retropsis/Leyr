@@ -65,6 +65,7 @@ FGameplayTag Attributes_Resistance_Lightning;
 FGameplayTag Attributes_Resistance_Holy;
 FGameplayTag Attributes_Resistance_Dark;
 FGameplayTag Attributes_Resistance_Noxious;
+FGameplayTag Attributes_Resistance_None;
 
  /*
   * Meta Attributes
@@ -91,6 +92,8 @@ FGameplayTag Damage_Lightning;
 FGameplayTag Damage_Holy;
 FGameplayTag Damage_Dark;
 FGameplayTag Damage_Noxious;
+FGameplayTag Damage_Execute;
+FGameplayTag Damage_True;
 
 TMap<FGameplayTag, FGameplayTag> DamageTypesToResistances;
 
@@ -171,6 +174,9 @@ FGameplayTag Abilities_Combo_Attack_1;
 FGameplayTag Abilities_Combo_Attack_2;
 FGameplayTag Abilities_Combo_Attack_3;
 FGameplayTag Abilities_Combo_Attack_Execute;
+ 
+FGameplayTag Abilities_Window_Combo;
+FGameplayTag Abilities_Window_Execute;
  
 FGameplayTag Abilities_Monk_Basic;
  
@@ -261,6 +267,9 @@ FGameplayTag Montage_Upward_Attack;
 FGameplayTag Montage_Rope_Attack;
 FGameplayTag Montage_Slope_Attack;
 FGameplayTag Montage_Ladder_Attack;
+ 
+FGameplayTag Montage_Window_Combo;
+FGameplayTag Montage_Window_Execute;
  
  /*
   * Input Tags

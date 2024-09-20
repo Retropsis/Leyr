@@ -4,6 +4,7 @@
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectTypes.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
+#include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AbilitySystem/Effect/StatusEffectNiagaraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -72,6 +73,8 @@ void ABaseCharacter::AddCharacterAbilities() const
 
 	BaseASC->AddCharacterAbilities(StartupAbilities);
 	BaseASC->AddCharacterPassiveAbilities(StartupPassiveAbilities);
+	BaseASC->AddCharacterCommonAbilities(CommonAbilities);
+	// ULeyrAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent, CharacterClass);
 }
 
 UAbilitySystemComponent* ABaseCharacter::GetAbilitySystemComponent() const

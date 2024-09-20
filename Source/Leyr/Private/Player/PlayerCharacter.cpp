@@ -60,6 +60,7 @@ APlayerCharacter::APlayerCharacter()
 	
 	CharacterClass = ECharacterClass::Warrior;
 	BaseWalkSpeed = 600.f;
+	BaseWalkSpeedCrouched = 300.f;
 }
 
 void APlayerCharacter::Tick(float DeltaSeconds)
@@ -98,14 +99,16 @@ void APlayerCharacter::OnRep_PlayerState()
 void APlayerCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 	bHitReacting = NewCount > 0;
-	GetCharacterMovement()->MaxWalkSpeed = !bHitReacting ? 0.f : BaseWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = bHitReacting ? 0.f : BaseWalkSpeedCrouched;
 	if(bHitReacting)
 	{
-		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		GetCharacterMovement()->StopActiveMovement();
+		UnCrouch();
 	}
 	else
 	{
-		GetCharacterMovement()->StopActiveMovement();
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	}
 }
 
@@ -336,6 +339,7 @@ void APlayerCharacter::SetMovementEnabled_Implementation(bool Enabled)
 	{
 		// GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		if(CombatState == ECombatState::Attacking) HandleCombatState(PreviousCombatState);
+		HandleCrouching(bCrouchButtonHeld);
 	}
 	else
 	{
@@ -512,6 +516,9 @@ void APlayerCharacter::RotateController() const
 
 void APlayerCharacter::HandleCrouching(bool bShouldCrouch)
 {
+	bCrouchButtonHeld = bShouldCrouch;
+	if( CombatState >= ECombatState::Attacking) return;
+	
 	if(!bShouldCrouch)
 	{
 		UnCrouch();

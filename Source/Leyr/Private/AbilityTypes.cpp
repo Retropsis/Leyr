@@ -67,13 +67,17 @@ bool FBaseGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		{
 			RepBits |= 1 << 14;
 		}
-	}
-	if (!AirborneForce.IsZero())
-	{
-		RepBits |= 1 << 15;
+		if (!AirborneForce.IsZero())
+		{
+			RepBits |= 1 << 15;
+		}
+		if (bIsExecuteHit)
+		{
+			RepBits |= 1 << 16;
+		}
 	}
 
-	Ar.SerializeBits(&RepBits, 16);
+	Ar.SerializeBits(&RepBits, 17);
 
 	if (RepBits & (1 << 0))
 	{
@@ -157,6 +161,10 @@ bool FBaseGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 	if (RepBits & (1 << 15))
 	{
 		AirborneForce.NetSerialize(Ar, Map, bOutSuccess);
+	}
+	if (RepBits & (1 << 16))
+	{
+		Ar << bIsExecuteHit;
 	}
 	if (Ar.IsLoading())
 	{

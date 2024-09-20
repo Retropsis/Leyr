@@ -84,6 +84,9 @@ protected:
 	float BaseWalkSpeed = 120.f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Movement")
+	float BaseWalkSpeedCrouched = 120.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Movement")
 	float BaseFlySpeed = 300.f;
 
 	UPROPERTY(BlueprintReadOnly, Category="Character|Combat")
@@ -179,4 +182,7 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category = "Character|Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupPassiveAbilities;
+	
+	UPROPERTY(EditAnywhere, Category = "Character|Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> CommonAbilities;
 };

@@ -60,6 +60,7 @@ void APlayerCharacterController::SetupInputComponent()
 void APlayerCharacterController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
 	// GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.f, FColor::Red, *InputTag.ToString());
+	if (GetASC()) GetASC()->AbilityInputTagPressed(InputTag);
 }
 
 void APlayerCharacterController::AbilityInputTagReleased(FGameplayTag InputTag)

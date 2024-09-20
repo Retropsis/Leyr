@@ -115,6 +115,7 @@ protected:
 	bool bIsAccelerating = false;
 	bool bIsMoving = false;
 	bool bIsComboWindowOpen = false;
+	bool bCrouchButtonHeld = false;
 
 	UPROPERTY(BlueprintReadWrite)
 	int32 AttackCount = 0;

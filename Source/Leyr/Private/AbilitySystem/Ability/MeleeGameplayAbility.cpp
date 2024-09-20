@@ -6,7 +6,7 @@
 #include "Interaction/InteractionInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-TArray<FHitResult> UMeleeGameplayAbility::BoxTrace()
+TArray<FHitResult> UMeleeGameplayAbility::BoxTrace(bool bDebug)
 {
 	BoxTraceData = ICombatInterface::Execute_GetBoxTraceDataByTag(GetAvatarActorFromActorInfo(), MontageTag);
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
@@ -19,7 +19,7 @@ TArray<FHitResult> UMeleeGameplayAbility::BoxTrace()
 	TArray<FHitResult> Hits;
 	UKismetSystemLibrary::BoxTraceMultiForObjects(
 		this, BoxTraceData.Start, BoxTraceData.End, BoxTraceData.Extent, FRotator::ZeroRotator, ObjectTypes,
-		false, ActorsToIgnore, bDebugBoxTrace ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None, Hits, true);
+		false, ActorsToIgnore, bDebug ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None, Hits, true);
 	
 	for (FHitResult HitResult : Hits)
 	{

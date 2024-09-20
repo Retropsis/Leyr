@@ -176,6 +176,15 @@ bool ULeyrAbilitySystemLibrary::IsCriticalHit(const FGameplayEffectContextHandle
 	return false;
 }
 
+bool ULeyrAbilitySystemLibrary::IsExecuteHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FBaseGameplayEffectContext* BaseEffectContext = static_cast<const FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return BaseEffectContext->IsExecuteHit();
+	}
+	return false;
+}
+
 void ULeyrAbilitySystemLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& EffectContextHandle, bool bInIsBlockedHit)
 {
 	if (FBaseGameplayEffectContext* BaseEffectContext = static_cast<FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
@@ -189,6 +198,14 @@ void ULeyrAbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& E
 	if (FBaseGameplayEffectContext* BaseEffectContext = static_cast<FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
 	{
 		BaseEffectContext->SetIsCriticalHit(bInIsCriticalHit);
+	}
+}
+
+void ULeyrAbilitySystemLibrary::SetIsExecuteHit(FGameplayEffectContextHandle& EffectContextHandle, bool bInIsExecuteHit)
+{
+	if (FBaseGameplayEffectContext* BaseEffectContext = static_cast<FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		BaseEffectContext->SetIsExecuteHit(bInIsExecuteHit);
 	}
 }
 

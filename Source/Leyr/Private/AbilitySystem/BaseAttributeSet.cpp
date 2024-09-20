@@ -179,8 +179,13 @@ void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 		LocalIncomingDamage = 1.f;
 	}
 	
-	if (LocalIncomingDamage > 0.f)
+	if(ULeyrAbilitySystemLibrary::IsExecuteHit(Props.EffectContextHandle))
 	{
+		LocalIncomingDamage = GetMaxHealth() - GetHealth() + 1.f;
+	}
+	
+	if (LocalIncomingDamage > 0.f)
+	{		
 		const float NewHealth = GetHealth() - LocalIncomingDamage;
 		SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
 
