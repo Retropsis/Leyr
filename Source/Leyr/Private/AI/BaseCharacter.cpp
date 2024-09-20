@@ -5,10 +5,12 @@
 #include "GameplayEffectTypes.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
+#include "AbilitySystem/Data/AttackSequenceInfo.h"
 #include "AbilitySystem/Effect/StatusEffectNiagaraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Game/BaseGameplayTags.h"
+#include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Leyr/Leyr.h"
@@ -77,6 +79,43 @@ void ABaseCharacter::AddCharacterAbilities() const
 	// ULeyrAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent, CharacterClass);
 }
 
+void ABaseCharacter::MakeAndApplyEffectToSelf(const FGameplayTag Tag, float Level)
+{
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	FGameplayEffectContextHandle EffectContext = GetAbilitySystemComponent()->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
+
+	FString StatusEffectName = FString::Printf(TEXT("CombatState_%s"), *Tag.ToString());
+	UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(StatusEffectName));
+
+	Effect->DurationPolicy = EGameplayEffectDurationType::Infinite;
+	
+	UTargetTagsGameplayEffectComponent& AssetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
+	FInheritedTagContainer InheritedTagContainer;
+	InheritedTagContainer.Added.AddTag(Tag);
+	AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
+	
+	Effect->StackingType = EGameplayEffectStackingType::None;
+	// Effect->StackLimitCount = 1;
+
+	// const int32 Index = Effect->Modifiers.Num();
+	// Effect->Modifiers.Add(FGameplayModifierInfo());
+	// FGameplayModifierInfo& ModifierInfo = Effect->Modifiers[Index];
+	//
+	// ModifierInfo.ModifierMagnitude = FScalableFloat(StatusEffectDamage);
+	// ModifierInfo.ModifierOp = EGameplayModOp::Additive;
+	// ModifierInfo.Attribute = UBaseAttributeSet::GetIncomingDamageAttribute();
+
+	if (FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec(Effect, EffectContext, Level))
+	{
+		// FBaseGameplayEffectContext* BaseContext = static_cast<FBaseGameplayEffectContext*>(MutableSpec->GetContext().Get());
+		// TSharedPtr<FGameplayTag> StatusEffectDamageType = MakeShareable(new FGameplayTag(DamageType));
+		// BaseContext->SetDamageType(StatusEffectDamageType);
+
+		GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*MutableSpec);
+	}
+}
+
 UAbilitySystemComponent* ABaseCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent;
@@ -129,7 +168,7 @@ void ABaseCharacter::GetAttackAnimationData_Implementation(FVector& InBoxTraceSt
 
 FBoxTraceData ABaseCharacter::GetBoxTraceDataByTag_Implementation(const FGameplayTag MontageTag)
 {
-	const FTaggedMontage TaggedMontage = Execute_GetTaggedMontageByTag(this, MontageTag);
+	const FTaggedMontage TaggedMontage = GetTaggedMontageInfoByTag(MontageTag);
 	BoxTraceStart->SetRelativeLocation(TaggedMontage.BoxTraceStart);
 	BoxTraceEnd->SetRelativeLocation(TaggedMontage.BoxTraceEnd);
 	return FBoxTraceData{
@@ -141,7 +180,14 @@ FBoxTraceData ABaseCharacter::GetBoxTraceDataByTag_Implementation(const FGamepla
 
 FTaggedMontage ABaseCharacter::GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag)
 {
-	for (FTaggedMontage TaggedMontage : AttackMontages)
+	return GetTaggedMontageInfoByTag(MontageTag);
+}
+
+FTaggedMontage ABaseCharacter::GetTaggedMontageInfoByTag(const FGameplayTag& MontageTag) const
+{
+	checkf(AttackSequenceInfo, TEXT("AttackSequenceInfo is missing on [%s]"), *GetNameSafe(this));
+	
+	for (FTaggedMontage TaggedMontage : AttackSequenceInfo->OneHandedSequences)
 	{
 		if (TaggedMontage.MontageTag == MontageTag)
 		{

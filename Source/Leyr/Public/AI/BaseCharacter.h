@@ -10,6 +10,7 @@
 #include "Leyr/Leyr.h"
 #include "BaseCharacter.generated.h"
 
+class UAttackSequenceInfo;
 class UGameplayAbility;
 class UGameplayEffect;
 class UAttributeSet;
@@ -40,6 +41,7 @@ protected:
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, float Level) const;
 	void AddCharacterAbilities() const;
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) {}
+	void MakeAndApplyEffectToSelf(const FGameplayTag Tag, float Level = 1.f);
 	
 	FOnASCRegistered OnASCRegistered;
 	FOnDeath OnDeath;
@@ -59,6 +61,9 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
 
+	/*
+	 * Attacking
+	 */
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> Weapon;
 	
@@ -77,6 +82,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	FName WeaponTipSocketName;
 
+	/*
+	 * Movement
+	 */
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Character|Movement")
 	float BaseGravityScale = 3.25f;
 
@@ -119,6 +127,8 @@ protected:
 	virtual bool IsCharacterAirborne_Implementation() override;
 	virtual void SetMovementMode_Implementation(EMovementMode MovementMode,  float NewWalkingSpeed = -1.f, float GravityValue = -1.f) override;
 	//~ Combat Interface
+	
+	FTaggedMontage GetTaggedMontageInfoByTag(const FGameplayTag& MontageTag) const;
 
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath(const FVector& DeathImpulse);
@@ -140,6 +150,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	TArray<FTaggedMontage> AttackMontages;
+
+	UPROPERTY(EditAnywhere, Category="Character|Combat")
+	TObjectPtr<UAttackSequenceInfo> AttackSequenceInfo;
 
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	TEnumAsByte<EObjectTypeQuery> TraceObjectType = EObjectTypeQuery::ObjectTypeQuery3;

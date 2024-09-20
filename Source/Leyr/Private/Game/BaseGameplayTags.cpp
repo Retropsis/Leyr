@@ -216,6 +216,15 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatState_Falling = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Falling"), FString("CombatState Falling"));
 	GameplayTags.CombatState_Crouching = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Crouching"), FString("CombatState Crouching"));
 	GameplayTags.CombatState_HitReacting = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.HitReacting"), FString("CombatState HitReacting"));
+	GameplayTags.CombatState_Swimming = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Swimming"), FString("CombatState Swimming"));
+	GameplayTags.CombatState_Entangled = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Entangled"), FString("CombatState Entangled"));
+	
+	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Ladder);
+	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Rope);
+	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Ledge);
+	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Slope);
+	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Entangled);
+	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Swimming);
 	
 	/*
 	 * Gameplay Cues

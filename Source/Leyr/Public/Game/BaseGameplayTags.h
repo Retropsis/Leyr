@@ -190,6 +190,10 @@ FGameplayTag CombatState_Ledge;
 FGameplayTag CombatState_Falling;
 FGameplayTag CombatState_Crouching;
 FGameplayTag CombatState_HitReacting;
+FGameplayTag CombatState_Swimming;
+FGameplayTag CombatState_Entangled;
+ 
+ FGameplayTagContainer CombatStates;
 
  /*
   * Gameplay Cues

@@ -12,6 +12,7 @@
 #include "Player/PlayerCharacterState.h"
 #include "NiagaraComponent.h"
 #include "PaperZDAnimInstance.h"
+#include "AbilitySystem/Data/AttackSequenceInfo.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Game/BaseGameplayTags.h"
@@ -354,13 +355,8 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 	GetCharacterMovement()->GravityScale = BaseGravityScale;
 
 	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-	FGameplayTagContainer CombatStates;
-	CombatStates.AddTag(GameplayTags.CombatState_Ladder);
-	CombatStates.AddTag(GameplayTags.CombatState_Rope);
-	CombatStates.AddTag(GameplayTags.CombatState_Ledge);
-	CombatStates.AddTag(GameplayTags.CombatState_Slope);
+	GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(GameplayTags.CombatStates);
 	// GetAbilitySystemComponent()->RemoveActiveEffectsWithTags(CombatStates);
-	GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(CombatStates);
 	// GetAbilitySystemComponent()->RemoveActiveEffectsWithAppliedTags(CombatStates);
 	
 	switch (CombatState) {
@@ -375,13 +371,15 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 	case ECombatState::HangingLedge:
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(GameplayTags.CombatState_Ledge.GetSingleTagContainer());
+		// GetAbilitySystemComponent()->TryActivateAbilitiesByTag(GameplayTags.CombatState_Ledge.GetSingleTagContainer());
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Ledge);
 		break;
 	case ECombatState::HangingRope:
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->MaxFlySpeed = RopeWalkSpeed;
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(GameplayTags.CombatState_Rope.GetSingleTagContainer());
+		// GetAbilitySystemComponent()->TryActivateAbilitiesByTag(GameplayTags.CombatState_Rope.GetSingleTagContainer());
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Rope);
 		break;
 	case ECombatState::ClimbingRope:
 		MovementTarget = GetActorLocation() + FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f - 10.f);
@@ -390,7 +388,8 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->MaxFlySpeed = LadderWalkSpeed;
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(GameplayTags.CombatState_Ladder.GetSingleTagContainer());
+		// GetAbilitySystemComponent()->TryActivateAbilitiesByTag(GameplayTags.CombatState_Ladder.GetSingleTagContainer());
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Ladder);
 		break;
 	case ECombatState::Falling:
 		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
@@ -398,7 +397,8 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		break;
 	case ECombatState::OnGroundSlope:
 		GetCharacterMovement()->GravityScale = GroundSlopeGravityScale;
-		GetAbilitySystemComponent()->TryActivateAbilitiesByTag(GameplayTags.CombatState_Slope.GetSingleTagContainer());
+		// GetAbilitySystemComponent()->TryActivateAbilitiesByTag(GameplayTags.CombatState_Slope.GetSingleTagContainer());
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Slope);
 		break;
 	case ECombatState::OnRopeSlope:
 		break;
@@ -406,10 +406,12 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		break;
 	case ECombatState::Entangled:
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Entangled);
 		break;
 	case ECombatState::Swimming:
 		GetCharacterMovement()->SetMovementMode(MOVE_Swimming);
 		GetCharacterMovement()->GetPhysicsVolume()->bWaterVolume = true;
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Swimming);
 		break;
 	}
 }
@@ -417,7 +419,8 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 // TODO: Need a less hardcoded way to do, here we suppose first 3 indices are the 3 combos
 FTaggedMontage APlayerCharacter::GetTaggedMontageByIndex_Implementation(int32 Index)
 {
-	return AttackMontages.IsValidIndex(Index) ? AttackMontages[Index] : FTaggedMontage();
+	return AttackSequenceInfo->OneHandedSequences.IsValidIndex(Index) ? AttackSequenceInfo->OneHandedSequences[Index] : FTaggedMontage();
+	// return AttackMontages.IsValidIndex(Index) ? AttackMontages[Index] : FTaggedMontage();
 }
 
 void APlayerCharacter::HandleHangingOnLadder_Implementation(FVector HangingTarget, bool bEndOverlap)

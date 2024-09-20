@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
-#include "Leyr/Leyr.h"
+#include "Data/CombatData.h"
 #include "UObject/Interface.h"
 #include "CombatInterface.generated.h"
 
@@ -15,63 +15,6 @@ class UPaperZDAnimSequence;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnASCRegistered, UAbilitySystemComponent*);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDeath, AActor*, DeadActor);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnTakeDamage, float /* DamageAmount */);
-
-USTRUCT(BlueprintType)
-struct FTaggedMontage
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FValueRange AbilityPower = FValueRange();
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	UPaperZDAnimSequence* Montage = nullptr;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(Categories="Montage"))
-	FGameplayTag MontageTag;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(Categories="CombatSocket"))
-	FGameplayTag SocketTag;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	USoundBase* ImpactSound = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FVector BoxTraceStart = FVector::ZeroVector;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FVector BoxTraceEnd = FVector::ZeroVector;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FVector BoxTraceExtent = FVector(40.f, 20.f, 30.f);
-};
-
-USTRUCT(BlueprintType)
-struct FBoxTraceData
-{
-	GENERATED_BODY()
-	
-	UPROPERTY() FVector Start = FVector::ZeroVector;
-	UPROPERTY() FVector End = FVector::ZeroVector;
-	UPROPERTY() FVector Extent = FVector(40.f, 20.f, 30.f);
-};
-
-UENUM(BlueprintType)
-enum class ECombatState : uint8
-{
-	Unoccupied UMETA(DisplayName="Unoccupied"),
-	HitReact UMETA(DisplayName="HitReact"),
-	Attacking UMETA(DisplayName="Attacking"),
-	Falling UMETA(DisplayName="Falling"),
-	HangingLedge UMETA(DisplayName="Hanging Ledge"),
-	HangingRope UMETA(DisplayName="Hanging Rope"),
-	ClimbingRope UMETA(DisplayName="Climbing Rope"),
-	HangingLadder UMETA(DisplayName="Hanging Ladder"),
-	OnGroundSlope UMETA(DisplayName="OnGroundSlope"),
-	OnRopeSlope UMETA(DisplayName="OnRopeSlope"),
-	Entangled UMETA(DisplayName="Entangled"),
-	Swimming UMETA(DisplayName="Swimming"),
-};
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)

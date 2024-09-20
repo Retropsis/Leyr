@@ -156,6 +156,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		const FGameplayTag DamageTypeTag = Pair.Key;
 		const FGameplayTag ResistanceTag = Pair.Value;
 
+		// TODO: Not correct way to do this check
 		if(DamageTypeTag.MatchesTagExact(FBaseGameplayTags::Get().Damage_Execute))
 		{
 			float DamageTypeValue = Spec.GetSetByCallerMagnitude(Pair.Key, false);
