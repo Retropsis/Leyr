@@ -11,6 +11,7 @@
 #include "Engine/OverlapResult.h"
 #include "Game/BaseGameplayTags.h"
 #include "Game/LeyrGameMode.h"
+#include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/PlayerCharacterState.h"
@@ -257,6 +258,31 @@ bool ULeyrAbilitySystemLibrary::IsHostile(const AActor* FirstActor, const AActor
 {
 	return !(FirstActor->ActorHasTag(FName("Player")) && SecondActor->ActorHasTag(FName("Player"))
 	|| FirstActor->ActorHasTag(FName("Enemy")) && SecondActor->ActorHasTag(FName("Enemy")));
+}
+
+void ULeyrAbilitySystemLibrary::ApplyInvincibilityToTarget(UAbilitySystemComponent* TargetASC, float Duration)
+{	
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	FGameplayEffectContextHandle EffectContext = TargetASC->MakeEffectContext();
+	EffectContext.AddSourceObject(TargetASC->GetAvatarActor());
+
+	FString EffectName = FString::Printf(TEXT("Invincibility"));
+	UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(EffectName));
+
+	Effect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
+	Effect->DurationMagnitude = FGameplayEffectModifierMagnitude{ Duration };
+	
+	UTargetTagsGameplayEffectComponent& AssetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
+	FInheritedTagContainer InheritedTagContainer;
+	InheritedTagContainer.Added.AddTag(GameplayTags.Invincibility);
+	AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
+	
+	Effect->StackingType = EGameplayEffectStackingType::None;
+
+	if (FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec(Effect, EffectContext, 1))
+	{
+		TargetASC->ApplyGameplayEffectSpecToSelf(*MutableSpec);
+	}
 }
 
 /*

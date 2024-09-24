@@ -227,6 +227,12 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatState_Swimming = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Swimming"), FString("CombatState Swimming"));
 	GameplayTags.CombatState_Entangled = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Entangled"), FString("CombatState Entangled"));
 	
+	GameplayTags.CombatState_Directional_Upward = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Directional.Upward"), FString("CombatState Directional Upward"));
+	GameplayTags.CombatState_Directional_Downward = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Directional.Downward"), FString("CombatState Directional Downward"));
+	GameplayTags.CombatState_Directional_Forward = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Directional.Forward"), FString("CombatState Directional Forward"));
+	GameplayTags.CombatState_Directional_ForwardUp = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Directional.ForwardUp"), FString("CombatState Directional ForwardUp"));
+	GameplayTags.CombatState_Directional_ForwardDown = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Directional.ForwardDown"), FString("CombatState Directional ForwardDown"));
+	
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Unoccupied);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Ladder);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Falling);
@@ -237,6 +243,17 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Swimming);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Crouching);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_UnCrouching);
+	
+	GameplayTags.CombatDirections.AddTag(GameplayTags.CombatState_Directional_Upward);
+	GameplayTags.CombatDirections.AddTag(GameplayTags.CombatState_Directional_Downward);
+	GameplayTags.CombatDirections.AddTag(GameplayTags.CombatState_Directional_Forward);
+	GameplayTags.CombatDirections.AddTag(GameplayTags.CombatState_Directional_ForwardUp);
+	GameplayTags.CombatDirections.AddTag(GameplayTags.CombatState_Directional_ForwardDown);
+
+	/*
+	 * Unique States
+	 */
+	GameplayTags.Invincibility = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Invincibility"), FString("Invincibility"));
 	
 	/*
 	 * Gameplay Cues

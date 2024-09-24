@@ -41,7 +41,7 @@ protected:
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, float Level) const;
 	void AddCharacterAbilities() const;
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) {}
-	void MakeAndApplyEffectToSelf(const FGameplayTag Tag, float Level = 1.f);
+	void MakeAndApplyEffectToSelf(const FGameplayTag Tag, float Level = 1.f) const;
 	
 	FOnASCRegistered OnASCRegistered;
 	FOnDeath OnDeath;

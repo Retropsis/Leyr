@@ -79,14 +79,14 @@ void ABaseCharacter::AddCharacterAbilities() const
 	// ULeyrAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent, CharacterClass);
 }
 
-void ABaseCharacter::MakeAndApplyEffectToSelf(const FGameplayTag Tag, float Level)
+void ABaseCharacter::MakeAndApplyEffectToSelf(const FGameplayTag Tag, float Level) const
 {
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 	FGameplayEffectContextHandle EffectContext = GetAbilitySystemComponent()->MakeEffectContext();
 	EffectContext.AddSourceObject(this);
 
-	FString StatusEffectName = FString::Printf(TEXT("CombatState_%s"), *Tag.ToString());
-	UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(StatusEffectName));
+	FString EffectName = FString::Printf(TEXT("CombatState_%s"), *Tag.ToString());
+	UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(EffectName));
 
 	Effect->DurationPolicy = EGameplayEffectDurationType::Infinite;
 	

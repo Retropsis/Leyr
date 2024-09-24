@@ -201,7 +201,19 @@ FGameplayTag CombatState_HitReacting;
 FGameplayTag CombatState_Swimming;
 FGameplayTag CombatState_Entangled;
  
+FGameplayTag CombatState_Directional_Upward;
+FGameplayTag CombatState_Directional_Downward;
+FGameplayTag CombatState_Directional_Forward;
+FGameplayTag CombatState_Directional_ForwardUp;
+FGameplayTag CombatState_Directional_ForwardDown;
+ 
  FGameplayTagContainer CombatStates;
+ FGameplayTagContainer CombatDirections;
+ 
+ /*
+  * Unique States
+  */
+ FGameplayTag Invincibility;
 
  /*
   * Gameplay Cues

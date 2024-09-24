@@ -70,6 +70,17 @@ enum class ECombatState : uint8
 };
 
 UENUM(BlueprintType)
+enum class ECombatDirection : uint8
+{
+	None UMETA(DisplayName="None"),
+	Upward UMETA(DisplayName="Upward"),
+	Forward UMETA(DisplayName="Forward"),
+	Downward UMETA(DisplayName="Downward"),
+	ForwardUp UMETA(DisplayName="ForwardUp"),
+	ForwardDown UMETA(DisplayName="ForwardDown"),
+};
+
+UENUM(BlueprintType)
 enum class ECombatStance : uint8
 {
 	Unequipped UMETA(DisplayName="Unequipped"),

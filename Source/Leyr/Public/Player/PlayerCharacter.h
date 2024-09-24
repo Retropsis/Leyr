@@ -141,6 +141,11 @@ protected:
 	
 	ECombatState CombatState = ECombatState::Unoccupied;
 	ECombatState PreviousCombatState = ECombatState::Unoccupied;
+	ECombatDirection CombatDirection = ECombatDirection::None;
+	ECombatDirection PreviousCombatDirection = ECombatDirection::None;
+
+	ECombatDirection GetCombatDirectionFromVector2D(FVector2D MovementVector);
+	void HandleCombatDirectionTag() const;
 
 private:	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))

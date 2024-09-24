@@ -29,8 +29,7 @@ void APlayerCharacterController::SetupInputComponent()
 	if (UBaseInputComponent* BaseInputComponent = CastChecked<UBaseInputComponent>(InputComponent))
 	{
 		BaseInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Move);
-		BaseInputComponent->BindAction(UpwardAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Move);
-		BaseInputComponent->BindAction(DownwardAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Move);
+		BaseInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &APlayerCharacterController::Move);
 		BaseInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APlayerCharacterController::Jump);
 		BaseInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &APlayerCharacterController::StopJumping);
 		BaseInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerCharacterController::InteractButtonPressed);
@@ -95,6 +94,7 @@ void APlayerCharacterController::CursorTrace()
 
 void APlayerCharacterController::Move(const FInputActionValue& Value)
 {
+	GEngine->AddOnScreenDebugMessage(654255, .5f, FColor::Cyan, FString::Printf(TEXT("%s"), *Value.Get<FVector2D>().ToString()));
 	if (PlayerCharacter) PlayerCharacter->Move(Value.Get<FVector2D>());
 }
 

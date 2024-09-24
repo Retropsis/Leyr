@@ -72,6 +72,10 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	TraceForPlatforms();
 	TraceForLedge();
 	TraceForSlope();
+	
+	FGameplayTagContainer CDTags;
+	GetAbilitySystemComponent()->GetOwnedGameplayTags(CDTags);
+	GEngine->AddOnScreenDebugMessage(32147, 2.f, FColor::Yellow, FString::Printf(TEXT("%s"), *CDTags.ToString()));
 
 	if(CombatState == ECombatState::ClimbingRope)
 	{
@@ -84,7 +88,7 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 }
 
 void APlayerCharacter::HandleCharacterMovementUpdated(float DeltaSeconds, FVector OldLocation, FVector OldVelocity)
-{
+{	
 	if(GetCharacterMovement()->MovementMode == PreviousMovementMode) return;
 	
 	PreviousMovementMode = GetCharacterMovement()->MovementMode;
@@ -189,12 +193,19 @@ void APlayerCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 
 void APlayerCharacter::Move(const FVector2D MovementVector)
 {
 	RotateController();
+
+	PreviousCombatDirection = CombatDirection;
+	CombatDirection = GetCombatDirectionFromVector2D(MovementVector);
+	if(PreviousCombatDirection != CombatDirection) HandleCombatDirectionTag();
+	
+	HandleCrouching(MovementVector.Y < 0.f);
 	
 	switch (CombatState) {
 	case ECombatState::Unoccupied:
 	case ECombatState::Falling:
 	case ECombatState::Crouching:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
+		if (GetCharacterMovement()->MovementMode == MOVE_Falling) MakeAndApplyEffectToSelf(FBaseGameplayTags::Get().CombatState_Falling);
 		break;
 	case ECombatState::UnCrouching:
 		break;
@@ -225,6 +236,51 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 		break;
 	case ECombatState::Swimming:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
+		break;
+	}
+}
+
+ECombatDirection APlayerCharacter::GetCombatDirectionFromVector2D(FVector2D MovementVector)
+{
+	if(MovementVector.Y > 0.f)
+	{
+		if(FMath::Abs(MovementVector.X) > 0.f) return ECombatDirection::ForwardUp;
+		return ECombatDirection::Upward;
+	}
+	if(MovementVector.Y < 0.f)
+	{
+		if(FMath::Abs(MovementVector.X) > 0.f) return ECombatDirection::ForwardDown;
+		return ECombatDirection::Downward;
+	}
+	return ECombatDirection::None;
+}
+
+void APlayerCharacter::HandleCombatDirectionTag() const
+{
+	// FGameplayTagContainer CDTags;
+	// GetAbilitySystemComponent()->GetOwnedGameplayTags(CDTags);
+	// GEngine->AddOnScreenDebugMessage(32145, 2.f, FColor::Red, FString::Printf(TEXT("%s"), *CDTags.ToString()));
+	
+	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+	GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(GameplayTags.CombatDirections);
+	switch (CombatDirection)
+	{
+	case ECombatDirection::None:
+		break;
+	case ECombatDirection::Upward:
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Directional_Upward);
+		break;
+	case ECombatDirection::Forward:
+		// MakeAndApplyEffectToSelf(GameplayTags.CombatState_Directional_Forward);
+		break;
+	case ECombatDirection::Downward:
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Directional_Downward);
+		break;
+	case ECombatDirection::ForwardUp:
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Directional_ForwardUp);
+		break;
+	case ECombatDirection::ForwardDown:
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Directional_ForwardDown);
 		break;
 	}
 }
@@ -408,7 +464,7 @@ void APlayerCharacter::SetMovementEnabled_Implementation(bool Enabled)
 	}
 	else
 	{
-		GetCharacterMovement()->StopMovementImmediately();
+		// GetCharacterMovement()->StopMovementImmediately();
 		CombatState = ECombatState::Attacking;
 	}
 }

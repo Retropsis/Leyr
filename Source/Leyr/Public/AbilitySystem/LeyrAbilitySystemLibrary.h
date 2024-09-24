@@ -5,8 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "Leyr/Leyr.h"
 #include "LeyrAbilitySystemLibrary.generated.h"
 
+class UGameplayEffect;
 class UActorClassInfo;
 enum class EActorClass : uint8;
 enum class ECharacterClass : uint8;
@@ -101,6 +103,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "LeyrAbilitySystemLibrary|GameplayMechanics")
 	static bool IsHostile(const AActor* FirstActor, const AActor* SecondActor);
+	
+	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayMechanics")
+	static void ApplyInvincibilityToTarget(UAbilitySystemComponent* TargetASC, float Duration = 1.f);
 	
 	/*
 	 *	Status Effects

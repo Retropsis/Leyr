@@ -19,12 +19,15 @@ public:
 	void CauseDamage(AActor* TargetActor);
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="AbilityActor|Attributes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="AbilityActor")
 	FValueRange AbilityPower;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="AbilityActor|Attributes")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="AbilityActor")
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
 	
-	UPROPERTY(EditDefaultsOnly, Category="AbilityActor|Attributes", meta=(Categories="Damage"))
-	FGameplayTag DamageType;	
+	UPROPERTY(EditDefaultsOnly, Category="AbilityActor", meta=(Categories="Damage"))
+	FGameplayTag DamageType;
+	
+	UPROPERTY(EditDefaultsOnly, Category="AbilityActor", meta=(Categories="Damage"))
+	bool bShouldApplyInvincibility = false;	
 };
