@@ -55,6 +55,8 @@ enum class ECombatState : uint8
 {
 	Unoccupied UMETA(DisplayName="Unoccupied"),
 	HitReact UMETA(DisplayName="HitReact"),
+	Crouching UMETA(DisplayName="Crouching"),
+	UnCrouching UMETA(DisplayName="UnCrouching"),
 	Attacking UMETA(DisplayName="Attacking"),
 	Falling UMETA(DisplayName="Falling"),
 	HangingLedge UMETA(DisplayName="Hanging Ledge"),

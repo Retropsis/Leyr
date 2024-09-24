@@ -178,6 +178,12 @@ FBoxTraceData ABaseCharacter::GetBoxTraceDataByTag_Implementation(const FGamepla
 	};
 }
 
+TArray<FTaggedMontage> ABaseCharacter::GetAttackMontages_Implementation()
+{
+	checkf(AttackSequenceInfo, TEXT("AttackSequenceInfo is missing on [%s]"), *GetNameSafe(this));
+	return AttackSequenceInfo->OneHandedSequences;
+}
+
 FTaggedMontage ABaseCharacter::GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag)
 {
 	return GetTaggedMontageInfoByTag(MontageTag);

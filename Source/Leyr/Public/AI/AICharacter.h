@@ -39,6 +39,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature OnMaxHealthChanged;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnGameplayTagAddedOrRemoved OnGameplayTagAddedOrRemoved;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Combat")
 	float LifeSpan = 5.f;
@@ -53,6 +56,9 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> HealthBar;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UWidgetComponent> PassiveIndicatorComponent;
 	
 	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	TObjectPtr<UBehaviorTree> BehaviorTree;

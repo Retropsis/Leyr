@@ -3,19 +3,110 @@
 #include "AbilitySystem/Ability/DamageGameplayAbility.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/LeyrAbilitySystemLibrary.h"
+#include "Game/BaseGameplayTags.h"
+#include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 
-void UDamageGameplayAbility::CauseDamage(AActor* TargetActor)
+void UDamageGameplayAbility::InitAbility()
+{
+	Super::InitAbility();
+	bHasHitTarget = false;
+	ICombatInterface::Execute_SetMovementEnabled(GetAvatarActorFromActorInfo(), false);
+	PaperAnimInstance = ICombatInterface::Execute_GetPaperAnimInstance(GetAvatarActorFromActorInfo());
+}
+
+void UDamageGameplayAbility::PrepareToEndAbility()
+{
+	Super::PrepareToEndAbility();
+	ICombatInterface::Execute_SetMovementEnabled(GetAvatarActorFromActorInfo(), true);
+}
+
+void UDamageGameplayAbility::CauseDamage(UAbilitySystemComponent* TargetASC)
 {
 	FGameplayEffectSpecHandle DamageSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass, GetAbilityLevel());
-	// for (TTuple<FGameplayTag, FValueRange> Pair : DamageTypes)
-	// {
-	// 	const float ScaledMagnitude = Pair.Value.GetRandomFloatFromScalableRange(GetAbilityLevel());
-	// 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, Pair.Key, ScaledMagnitude);
-	// }
-	// Single Type
 	const float ScaledDamage =AbilityPower.GetRandomFloatFromScalableRange(GetAbilityLevel());
+	
+	if (TargetASC->HasMatchingGameplayTag(FBaseGameplayTags::Get().Indicator_Execute))
+	{
+		DamageType = FBaseGameplayTags::Get().Damage_Execute;
+	}
 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, DamageType, ScaledDamage);
-	GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor));
+	if(bShouldApplyExecute) MakeAndApplyExecuteEffectToTarget(FBaseGameplayTags::Get().Indicator_Execute, TargetASC);
+	
+	GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), TargetASC);
+}
+
+void UDamageGameplayAbility::ForEachHitTryCausingDamage(TArray<FHitResult> HitResults)
+{
+	for (FHitResult Hit : HitResults)
+	{
+		if(Hit.bBlockingHit && Hit.GetActor() && ULeyrAbilitySystemLibrary::IsHostile(GetAvatarActorFromActorInfo(), Hit.GetActor()))
+		{
+			HitActor = Hit.GetActor();
+			if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitActor))
+			{
+				CauseDamage(TargetASC);
+			}
+			bHasHitTarget = true;
+		}
+	}
+}
+
+void UDamageGameplayAbility::MakeAndApplyExecuteEffectToTarget(const FGameplayTag& TagToApply, UAbilitySystemComponent* TargetASC, int32 Level)
+{
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	FGameplayEffectContextHandle EffectContext = GetAbilitySystemComponentFromActorInfo()->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
+
+	FString TagName = FString::Printf(TEXT("%s"), *TagToApply.ToString());
+	UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(TagName));
+
+	Effect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
+	Effect->DurationMagnitude = FGameplayEffectModifierMagnitude{ 1.25f };
+	
+	UTargetTagsGameplayEffectComponent& AssetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
+	FInheritedTagContainer InheritedTagContainer;
+	InheritedTagContainer.Added.AddTag(TagToApply);
+	AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
+	
+	Effect->StackingType = EGameplayEffectStackingType::AggregateByTarget;
+	Effect->StackLimitCount = 1;
+
+	// const int32 Index = Effect->Modifiers.Num();
+	// Effect->Modifiers.Add(FGameplayModifierInfo());
+	// FGameplayModifierInfo& ModifierInfo = Effect->Modifiers[Index];
+	//
+	// ModifierInfo.ModifierMagnitude = FScalableFloat(StatusEffectDamage);
+	// ModifierInfo.ModifierOp = EGameplayModOp::Additive;
+	// ModifierInfo.Attribute = UBaseAttributeSet::GetIncomingDamageAttribute();
+
+	if (FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec(Effect, EffectContext, Level))
+	{
+		// FBaseGameplayEffectContext* BaseContext = static_cast<FBaseGameplayEffectContext*>(MutableSpec->GetContext().Get());
+		// TSharedPtr<FGameplayTag> StatusEffectDamageType = MakeShareable(new FGameplayTag(DamageType));
+		// BaseContext->SetDamageType(StatusEffectDamageType);
+
+		GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*MutableSpec, TargetASC);
+	}
+}
+
+bool UDamageGameplayAbility::IsHostile() const
+{
+	return ULeyrAbilitySystemLibrary::IsHostile(GetAvatarActorFromActorInfo(), HitActor);
+}
+
+void UDamageGameplayAbility::SetCurrentComboSequence()
+{
+	const int32 Index = ICombatInterface::Execute_GetAttackComboIndex(GetAvatarActorFromActorInfo());
+	FTaggedMontage TaggedMontage = ICombatInterface::Execute_GetTaggedMontageByIndex(GetAvatarActorFromActorInfo(), Index);
+	SelectedMontage = TaggedMontage.Montage;
+	MontageTag = TaggedMontage.MontageTag;
+}
+
+void UDamageGameplayAbility::SetCurrentSequence()
+{
+	FTaggedMontage TaggedMontage = ICombatInterface::Execute_GetTaggedMontageByTag(GetAvatarActorFromActorInfo(), MontageTag);
+	SelectedMontage = TaggedMontage.Montage;
 }
 
 FAdditionalEffectParams UDamageGameplayAbility::MakeAdditionalEffectParamsFromClassDefaults(AActor* TargetActor) const

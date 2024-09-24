@@ -28,7 +28,6 @@ void APlayerCharacterController::SetupInputComponent()
 	
 	if (UBaseInputComponent* BaseInputComponent = CastChecked<UBaseInputComponent>(InputComponent))
 	{
-		
 		BaseInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Move);
 		BaseInputComponent->BindAction(UpwardAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Move);
 		BaseInputComponent->BindAction(DownwardAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Move);
@@ -38,6 +37,7 @@ void APlayerCharacterController::SetupInputComponent()
 		BaseInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::CrouchButtonPressed);
 		BaseInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &APlayerCharacterController::CrouchButtonReleased);
 		BaseInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &APlayerCharacterController::InventoryButtonPressed);
+		BaseInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerCharacterController::InteractButtonPressed);
 
 		/*
 		 * Hotbar
@@ -59,7 +59,6 @@ void APlayerCharacterController::SetupInputComponent()
 
 void APlayerCharacterController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
-	// GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.f, FColor::Red, *InputTag.ToString());
 	if (GetASC()) GetASC()->AbilityInputTagPressed(InputTag);
 }
 
@@ -125,11 +124,11 @@ void APlayerCharacterController::CrouchButtonReleased()
 
 void APlayerCharacterController::InteractButtonPressed()
 {
+	if (PlayerCharacter) PlayerCharacter->ServerInteract();
 }
 
 void APlayerCharacterController::InventoryButtonPressed_Implementation()
 {
-	// if(APlayerHUD* PlayerHUD = Cast<APlayerHUD>(GetHUD())) PlayerHUD->ToggleInventory();
 	ToggleInventory();
 }
 

@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "InteractionInterface.generated.h"
 
+class APlayerCharacter;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UInteractionInterface : public UInterface
@@ -23,5 +24,5 @@ class LEYR_API IInteractionInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void Interact();
+	void Interact(AActor* InteractingActor);
 };

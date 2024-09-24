@@ -17,8 +17,10 @@
 #include "Components/CapsuleComponent.h"
 #include "Game/BaseGameplayTags.h"
 #include "GameFramework/PhysicsVolume.h"
+#include "Interaction/InteractionInterface.h"
 #include "Interaction/PlatformInterface.h"
 #include "Inventory/HotbarComponent.h"
+#include "Inventory/Container/Container.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Player/PlayerCharacterAnimInstance.h"
@@ -81,6 +83,22 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	}
 }
 
+void APlayerCharacter::HandleCharacterMovementUpdated(float DeltaSeconds, FVector OldLocation, FVector OldVelocity)
+{
+	if(GetCharacterMovement()->MovementMode == PreviousMovementMode) return;
+	
+	PreviousMovementMode = GetCharacterMovement()->MovementMode;
+	if (GetCharacterMovement()->MovementMode == MOVE_Falling)
+	{
+		MakeAndApplyEffectToSelf(FBaseGameplayTags::Get().CombatState_Falling);
+		// CombatState = ECombatState::Falling;
+	}
+	else
+	{
+		GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(FBaseGameplayTags::Get().CombatState_Falling.GetSingleTagContainer());
+	}
+}
+
 void APlayerCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
@@ -88,6 +106,7 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 	InitAbilityActorInfo();
 	AddCharacterAbilities();
 	GetCharacterMovement()->GravityScale = BaseGravityScale;
+	OnCharacterMovementUpdated.AddDynamic(this, &APlayerCharacter::HandleCharacterMovementUpdated);
 }
 
 void APlayerCharacter::OnRep_PlayerState()
@@ -97,168 +116,22 @@ void APlayerCharacter::OnRep_PlayerState()
 	InitAbilityActorInfo();
 }
 
-void APlayerCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+void APlayerCharacter::ServerInteract_Implementation()
 {
-	bHitReacting = NewCount > 0;
-	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
-	GetCharacterMovement()->MaxWalkSpeedCrouched = bHitReacting ? 0.f : BaseWalkSpeedCrouched;
-	if(bHitReacting)
+	FHitResult Hit;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	const TEnumAsByte OT = EOT_Interaction;
+	ObjectTypes.Add(OT);
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	UKismetSystemLibrary::BoxTraceSingleForObjects(
+		this, GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 25.f, FVector(50.f, 100.f, 50.f), FRotator::ZeroRotator,
+		ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::ForDuration, Hit, false);
+
+	if(Hit.bBlockingHit && Hit.GetActor() && Hit.GetActor()->Implements<UInteractionInterface>())
 	{
-		GetCharacterMovement()->StopActiveMovement();
-		UnCrouch();
+		IInteractionInterface::Execute_Interact(Hit.GetActor(), this);
 	}
-	else
-	{
-		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-	}
-}
-
-/*
- * Player Interface
- */
-void APlayerCharacter::OnSlotDrop_Implementation(EContainerType TargetContainer, EContainerType SourceContainer, int32 SourceSlotIndex, int32 TargetSlotIndex, EArmorType ArmorType)
-{
-	ServerOnSlotDrop(TargetContainer, SourceContainer, SourceSlotIndex, TargetSlotIndex, ArmorType);
-}
-
-void APlayerCharacter::ServerOnSlotDrop_Implementation(EContainerType TargetContainer, EContainerType SourceContainer, int32 SourceSlotIndex, int32 TargetSlotIndex, EArmorType ArmorType)
-{
-	UInventoryComponent* TargetInventory = nullptr;
-	UInventoryComponent* SourceInventory = nullptr;
-	
-	switch (TargetContainer)
-	{
-	case EContainerType::Inventory:
-		TargetInventory = PlayerInventory;
-		break;
-	case EContainerType::Hotbar:
-		TargetInventory = HotbarComponent;
-		break;
-	case EContainerType::Storage:
-		break;
-	case EContainerType::Equipment:
-		break;
-	default: ;
-	}
-	
-	switch (SourceContainer)
-	{
-	case EContainerType::Inventory:
-		SourceInventory = PlayerInventory;
-		break;
-	case EContainerType::Hotbar:
-		SourceInventory = HotbarComponent;
-		break;
-	case EContainerType::Storage:
-		break;
-	case EContainerType::Equipment:
-		break;
-	default: ;
-	}
-	if(TargetInventory && SourceInventory) TargetInventory->OnSlotDrop(SourceInventory, SourceSlotIndex, TargetSlotIndex);
-}
-
-void APlayerCharacter::UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData)
-{
-	IControllerInterface::Execute_UpdateInventorySlot(Controller, ContainerType, SlotIndex, ItemData);
-}
-
-void APlayerCharacter::ResetInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex)
-{
-	IControllerInterface::Execute_ResetInventorySlot(Controller, ContainerType, SlotIndex);
-}
-
-void APlayerCharacter::AddToXP_Implementation(int32 InXP)
-{
-	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
-	check(PlayerCharacterState);
-	PlayerCharacterState->AddToXP(InXP);
-}
-
-void APlayerCharacter::LevelUp_Implementation()
-{
-	MulticastLevelUpParticles();
-}
-
-void APlayerCharacter::MulticastLevelUpParticles_Implementation() const
-{
-	if (IsValid(LevelUpNiagaraComponent))
-	{
-		LevelUpNiagaraComponent->Activate(true);
-	}
-}
-
-int32 APlayerCharacter::GetXP_Implementation() const
-{
-	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
-	check(PlayerCharacterState);
-	return PlayerCharacterState->GetXP();
-}
-
-int32 APlayerCharacter::FindLevelForXP_Implementation(int32 InXP) const
-{
-	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
-	check(PlayerCharacterState);
-	return PlayerCharacterState->LevelUpInfo->FindLevelForXP(InXP);
-}
-
-int32 APlayerCharacter::GetAttributePointsReward_Implementation(int32 Level) const
-{
-	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
-	check(PlayerCharacterState);
-	return PlayerCharacterState->LevelUpInfo->LevelUpInformation[Level].AttributePointAward;
-}
-
-int32 APlayerCharacter::GetSkillPointsReward_Implementation(int32 Level) const
-{
-	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
-	check(PlayerCharacterState);
-	return PlayerCharacterState->LevelUpInfo->LevelUpInformation[Level].SkillPointAward;
-}
-
-void APlayerCharacter::AddToPlayerLevel_Implementation(int32 InPlayerLevel)
-{
-	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
-	check(PlayerCharacterState);
-	PlayerCharacterState->AddToLevel(InPlayerLevel);
-	
-	if (UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(GetAbilitySystemComponent()))
-	{
-		BaseASC->UpdateAbilityStatuses(PlayerCharacterState->GetCharacterLevel());
-	}
-}
-
-void APlayerCharacter::AddToAttributePoints_Implementation(int32 InAttributePoints)
-{
-	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
-	check(PlayerCharacterState);
-	PlayerCharacterState->AddToAttributePoints(InAttributePoints);
-}
-
-void APlayerCharacter::AddToSkillPoints_Implementation(int32 InSkillPoints)
-{
-	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
-	check(PlayerCharacterState);
-	PlayerCharacterState->AddToSkillPoints(InSkillPoints);
-}
-
-int32 APlayerCharacter::GetAttributePoints_Implementation() const
-{
-	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
-	check(PlayerCharacterState);
-	return PlayerCharacterState->GetAttributePoints();
-}
-
-int32 APlayerCharacter::GetSkillPoints_Implementation() const
-{
-	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
-	check(PlayerCharacterState);
-	return PlayerCharacterState->GetSkillPoints();
-}
-
-void APlayerCharacter::SetCombatState_Implementation(ECombatState NewState)
-{
-	CombatState = NewState;
 }
 
 /*
@@ -288,16 +161,42 @@ void APlayerCharacter::InitAbilityActorInfo()
 	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::HitReactTagChanged);
 }
 
+// TODO: Need a less hardcoded way to do, here we suppose first 3 indices are the 3 combos
+FTaggedMontage APlayerCharacter::GetTaggedMontageByIndex_Implementation(int32 Index)
+{
+	return AttackSequenceInfo->OneHandedSequences.IsValidIndex(Index) ? AttackSequenceInfo->OneHandedSequences[Index] : FTaggedMontage();
+}
+
+void APlayerCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	bHitReacting = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = bHitReacting ? 0.f : BaseWalkSpeedCrouched;
+	if(bHitReacting)
+	{
+		GetCharacterMovement()->StopActiveMovement();
+		HandleCombatState(ECombatState::UnCrouching);
+	}
+	else
+	{
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	}
+}
+
+/*
+ * Movement
+ */
 void APlayerCharacter::Move(const FVector2D MovementVector)
 {
 	RotateController();
-
-	// GEngine->AddOnScreenDebugMessage(1365, 1.f, FColor::Green, FString::Printf(TEXT("%s"), *MovementVector.ToString()));
 	
 	switch (CombatState) {
 	case ECombatState::Unoccupied:
 	case ECombatState::Falling:
+	case ECombatState::Crouching:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
+		break;
+	case ECombatState::UnCrouching:
 		break;
 	case ECombatState::Attacking:
 		// AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
@@ -330,24 +229,58 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	}
 }
 
-void APlayerCharacter::SetMovementEnabled_Implementation(bool Enabled)
+void APlayerCharacter::RotateController() const
 {
-	GetCharacterMovement()->MaxWalkSpeed = !Enabled ? 0.f : BaseWalkSpeed;
-
-	if(CombatState != ECombatState::Attacking) PreviousCombatState = CombatState;
-	
-	if (Enabled)
+	if(GetCharacterMovement()->GetCurrentAcceleration().X > 0.f)
 	{
-		// GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-		if(CombatState == ECombatState::Attacking) HandleCombatState(PreviousCombatState);
-		HandleCrouching(bCrouchButtonHeld);
+		GetController()->SetControlRotation(FRotator::ZeroRotator);
 	}
-	else
+	else if(GetCharacterMovement()->GetCurrentAcceleration().X < 0.f)
 	{
-		GetCharacterMovement()->StopMovementImmediately();
-		CombatState = ECombatState::Attacking;
+		GetController()->SetControlRotation(FRotator(0.f, 180.f, 0.f));
 	}
 }
+
+void APlayerCharacter::HandleCrouching(bool bShouldCrouch)
+{
+	bCrouchButtonHeld = bShouldCrouch;
+	if(CombatState >= ECombatState::Attacking) return;
+	
+	if(!bShouldCrouch)
+	{
+		HandleCombatState(ECombatState::UnCrouching);
+	}
+	if(GetCharacterMovement()->IsFalling())
+	{
+		HandleCombatState(ECombatState::UnCrouching);
+		return;
+	}
+	if((bShouldCrouch && bIsCrouched) || CombatState >= ECombatState::HangingLedge) return;
+	if(bShouldCrouch && !bIsCrouched && CombatState == ECombatState::Unoccupied) HandleCombatState(ECombatState::Crouching);
+}
+
+void APlayerCharacter::JumpButtonPressed()
+{
+	if(CombatState == ECombatState::Entangled)
+	{
+		GetCharacterMovement()->AddImpulse(FVector::UpVector * 500.f, true);
+		return;
+	}
+	if(CombatState == ECombatState::Swimming)
+	{
+		GetCharacterMovement()->AddImpulse(FVector::UpVector * 333.f, true);
+		return;
+	}
+	if(CombatState >= ECombatState::HangingLedge)
+	{
+		HandleCombatState(ECombatState::Unoccupied);
+		bCanGrabLedge = false;
+		GetWorld()->GetTimerManager().SetTimer(OffLedgeTimer, this, &APlayerCharacter::OffLedgeEnd, OffLedgeTime);
+	}
+	bIsCrouched ? TryVaultingDown() : Jump();
+}
+
+void APlayerCharacter::OffLedgeEnd() { bCanGrabLedge = true; }
 
 void APlayerCharacter::HandleCombatState(ECombatState NewState)
 {
@@ -365,20 +298,36 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetCharacterMovement()->MaxFlySpeed = BaseFlySpeed;
 		GetCharacterMovement()->GravityScale = BaseGravityScale;
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		// MakeAndApplyEffectToSelf(GameplayTags.CombatState_Unoccupied);
+		break;
+	case ECombatState::Falling:
+		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+		break;
+	case ECombatState::Crouching:
+		Crouch();
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Crouching);
+		break;
+	case ECombatState::UnCrouching:
+		UnCrouch();
+		CombatState = ECombatState::Unoccupied;
+		// MakeAndApplyEffectToSelf(GameplayTags.CombatState_UnCrouching);
+		// if(const UWorld* World = GetWorld())
+		// {
+		// 	World->GetTimerManager().SetTimer(UnCrouchingTimer, FTimerDelegate::CreateLambda([this] { HandleCombatState(ECombatState::Unoccupied); }), UnCrouchingTime, false);
+		// }
 		break;
 	case ECombatState::Attacking:
 		break;
 	case ECombatState::HangingLedge:
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-		// GetAbilitySystemComponent()->TryActivateAbilitiesByTag(GameplayTags.CombatState_Ledge.GetSingleTagContainer());
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Ledge);
 		break;
 	case ECombatState::HangingRope:
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->MaxFlySpeed = RopeWalkSpeed;
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-		// GetAbilitySystemComponent()->TryActivateAbilitiesByTag(GameplayTags.CombatState_Rope.GetSingleTagContainer());
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Rope);
 		break;
 	case ECombatState::ClimbingRope:
@@ -388,16 +337,10 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->MaxFlySpeed = LadderWalkSpeed;
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-		// GetAbilitySystemComponent()->TryActivateAbilitiesByTag(GameplayTags.CombatState_Ladder.GetSingleTagContainer());
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Ladder);
-		break;
-	case ECombatState::Falling:
-		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
-		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 		break;
 	case ECombatState::OnGroundSlope:
 		GetCharacterMovement()->GravityScale = GroundSlopeGravityScale;
-		// GetAbilitySystemComponent()->TryActivateAbilitiesByTag(GameplayTags.CombatState_Slope.GetSingleTagContainer());
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Slope);
 		break;
 	case ECombatState::OnRopeSlope:
@@ -414,13 +357,6 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Swimming);
 		break;
 	}
-}
-
-// TODO: Need a less hardcoded way to do, here we suppose first 3 indices are the 3 combos
-FTaggedMontage APlayerCharacter::GetTaggedMontageByIndex_Implementation(int32 Index)
-{
-	return AttackSequenceInfo->OneHandedSequences.IsValidIndex(Index) ? AttackSequenceInfo->OneHandedSequences[Index] : FTaggedMontage();
-	// return AttackMontages.IsValidIndex(Index) ? AttackMontages[Index] : FTaggedMontage();
 }
 
 void APlayerCharacter::HandleHangingOnLadder_Implementation(FVector HangingTarget, bool bEndOverlap)
@@ -455,6 +391,25 @@ void APlayerCharacter::HandleHangingOnLedge(const FVector& HangingTarget)
 	{
 		SetActorLocation(FVector(HangingTarget.X, 0.f, HangingTarget.Z));
 		HandleCombatState(ECombatState::HangingLedge);
+	}
+}
+
+void APlayerCharacter::SetMovementEnabled_Implementation(bool Enabled)
+{
+	GetCharacterMovement()->MaxWalkSpeed = !Enabled ? 0.f : BaseWalkSpeed;
+
+	if(CombatState != ECombatState::Attacking) PreviousCombatState = CombatState;
+	
+	if (Enabled)
+	{
+		// GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		if(CombatState == ECombatState::Attacking) HandleCombatState(PreviousCombatState);
+		HandleCrouching(bCrouchButtonHeld);
+	}
+	else
+	{
+		GetCharacterMovement()->StopMovementImmediately();
+		CombatState = ECombatState::Attacking;
 	}
 }
 
@@ -501,61 +456,8 @@ void APlayerCharacter::HandleSwimming_Implementation(float MinZ, float SwimmingS
 }
 
 /*
- *
+ * Platform Traces
  */
-void APlayerCharacter::OffLedgeEnd() { bCanGrabLedge = true; }
-
-void APlayerCharacter::RotateController() const
-{
-	if(GetCharacterMovement()->GetCurrentAcceleration().X > 0.f)
-	{
-		GetController()->SetControlRotation(FRotator::ZeroRotator);
-	}
-	else if(GetCharacterMovement()->GetCurrentAcceleration().X < 0.f)
-	{
-		GetController()->SetControlRotation(FRotator(0.f, 180.f, 0.f));
-	}
-}
-
-void APlayerCharacter::HandleCrouching(bool bShouldCrouch)
-{
-	bCrouchButtonHeld = bShouldCrouch;
-	if( CombatState >= ECombatState::Attacking) return;
-	
-	if(!bShouldCrouch)
-	{
-		UnCrouch();
-	}
-	if(GetCharacterMovement()->IsFalling())
-	{
-		UnCrouch();
-		return;
-	}
-	if((bShouldCrouch && bIsCrouched) || CombatState >= ECombatState::HangingLedge) return;
-	if(bShouldCrouch && !bIsCrouched && CombatState == ECombatState::Unoccupied) Crouch();
-}
-
-void APlayerCharacter::JumpButtonPressed()
-{
-	if(CombatState == ECombatState::Entangled)
-	{
-		GetCharacterMovement()->AddImpulse(FVector::UpVector * 500.f, true);
-		return;
-	}
-	if(CombatState == ECombatState::Swimming)
-	{
-		GetCharacterMovement()->AddImpulse(FVector::UpVector * 333.f, true);
-		return;
-	}
-	if(CombatState >= ECombatState::HangingLedge)
-	{
-		HandleCombatState(ECombatState::Unoccupied);
-		bCanGrabLedge = false;
-		GetWorld()->GetTimerManager().SetTimer(OffLedgeTimer, this, &APlayerCharacter::OffLedgeEnd, OffLedgeTime);
-	}
-	bIsCrouched ? TryVaultingDown() : Jump();
-}
-
 void APlayerCharacter::TraceForPlatforms() const
 {	
 	const FVector Start = GroundPoint->GetComponentLocation() + FVector::DownVector * GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
@@ -676,6 +578,155 @@ void APlayerCharacter::TraceForSlope()
 }
 
 /*
+ * Player Interface
+ */
+void APlayerCharacter::OnSlotDrop_Implementation(EContainerType TargetContainer, EContainerType SourceContainer, int32 SourceSlotIndex, int32 TargetSlotIndex, EArmorType ArmorType)
+{
+	ServerOnSlotDrop(TargetContainer, SourceContainer, SourceSlotIndex, TargetSlotIndex, ArmorType);
+}
+
+void APlayerCharacter::ServerOnSlotDrop_Implementation(EContainerType TargetContainer, EContainerType SourceContainer, int32 SourceSlotIndex, int32 TargetSlotIndex, EArmorType ArmorType)
+{
+	UInventoryComponent* TargetInventory = nullptr;
+	UInventoryComponent* SourceInventory = nullptr;
+	
+	switch (TargetContainer)
+	{
+	case EContainerType::Inventory:
+		TargetInventory = PlayerInventory;
+		break;
+	case EContainerType::Hotbar:
+		TargetInventory = HotbarComponent;
+		break;
+	case EContainerType::Container:
+		break;
+	case EContainerType::Equipment:
+		break;
+	default: ;
+	}
+	
+	switch (SourceContainer)
+	{
+	case EContainerType::Inventory:
+		SourceInventory = PlayerInventory;
+		break;
+	case EContainerType::Hotbar:
+		SourceInventory = HotbarComponent;
+		break;
+	case EContainerType::Container:
+		break;
+	case EContainerType::Equipment:
+		break;
+	default: ;
+	}
+	if(TargetInventory && SourceInventory) TargetInventory->OnSlotDrop(SourceInventory, SourceSlotIndex, TargetSlotIndex);
+}
+
+void APlayerCharacter::UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData)
+{
+	IControllerInterface::Execute_UpdateInventorySlot(Controller, ContainerType, SlotIndex, ItemData);
+}
+
+void APlayerCharacter::ResetInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex)
+{
+	IControllerInterface::Execute_ResetInventorySlot(Controller, ContainerType, SlotIndex);
+}
+
+void APlayerCharacter::SetContainer_Implementation(AContainer* Container)
+{
+	InteractingContainer = Container;
+	IControllerInterface::Execute_ToggleContainer(Controller, Container->GetSlotCountContainer());
+}
+
+void APlayerCharacter::AddToXP_Implementation(int32 InXP)
+{
+	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	PlayerCharacterState->AddToXP(InXP);
+}
+
+void APlayerCharacter::LevelUp_Implementation()
+{
+	MulticastLevelUpParticles();
+}
+
+void APlayerCharacter::MulticastLevelUpParticles_Implementation() const
+{
+	if (IsValid(LevelUpNiagaraComponent))
+	{
+		LevelUpNiagaraComponent->Activate(true);
+	}
+}
+
+int32 APlayerCharacter::GetXP_Implementation() const
+{
+	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	return PlayerCharacterState->GetXP();
+}
+
+int32 APlayerCharacter::FindLevelForXP_Implementation(int32 InXP) const
+{
+	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	return PlayerCharacterState->LevelUpInfo->FindLevelForXP(InXP);
+}
+
+int32 APlayerCharacter::GetAttributePointsReward_Implementation(int32 Level) const
+{
+	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	return PlayerCharacterState->LevelUpInfo->LevelUpInformation[Level].AttributePointAward;
+}
+
+int32 APlayerCharacter::GetSkillPointsReward_Implementation(int32 Level) const
+{
+	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	return PlayerCharacterState->LevelUpInfo->LevelUpInformation[Level].SkillPointAward;
+}
+
+void APlayerCharacter::AddToPlayerLevel_Implementation(int32 InPlayerLevel)
+{
+	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	PlayerCharacterState->AddToLevel(InPlayerLevel);
+	
+	if (UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(GetAbilitySystemComponent()))
+	{
+		BaseASC->UpdateAbilityStatuses(PlayerCharacterState->GetCharacterLevel());
+	}
+}
+
+void APlayerCharacter::AddToAttributePoints_Implementation(int32 InAttributePoints)
+{
+	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	PlayerCharacterState->AddToAttributePoints(InAttributePoints);
+}
+
+void APlayerCharacter::AddToSkillPoints_Implementation(int32 InSkillPoints)
+{
+	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	PlayerCharacterState->AddToSkillPoints(InSkillPoints);
+}
+
+int32 APlayerCharacter::GetAttributePoints_Implementation() const
+{
+	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	return PlayerCharacterState->GetAttributePoints();
+}
+
+int32 APlayerCharacter::GetSkillPoints_Implementation() const
+{
+	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	return PlayerCharacterState->GetSkillPoints();
+}
+
+/*
  * Combat Interface
  */
 int32 APlayerCharacter::GetCharacterLevel_Implementation()
@@ -683,4 +734,9 @@ int32 APlayerCharacter::GetCharacterLevel_Implementation()
 	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
 	check(PlayerCharacterState);
 	return PlayerCharacterState->GetCharacterLevel();
+}
+
+void APlayerCharacter::SetCombatState_Implementation(ECombatState NewState)
+{
+	CombatState = NewState;
 }

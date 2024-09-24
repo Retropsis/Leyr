@@ -104,12 +104,10 @@ protected:
 	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override { return HitReactMontage; }
 	virtual UPaperZDAnimSequence* GetHitReactSequence_Implementation() override { return HitReactSequence; }
-	virtual UPaperZDAnimSequence* GetAttackSequence_Implementation() override { return AttackSequence; }
 	virtual UPaperZDAnimInstance* GetPaperAnimInstance_Implementation() override { return AnimationComponent->GetAnimInstance(); }
 	virtual void GetAttackAnimationData_Implementation(FVector& InBoxTraceStart, FVector& InBoxTraceEnd) override;
 	virtual FBoxTraceData GetBoxTraceDataByTag_Implementation(FGameplayTag MontageTag) override;
-	// virtual FTaggedMontage GetTaggedMontage_Implementation() override;
-	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override { return AttackMontages; }
+	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override;
 	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
 	virtual UNiagaraSystem* GetImpactEffect_Implementation() override { return ImpactEffect; }
 	virtual int32 GetMinionCount_Implementation() override { return MinionCount; }
@@ -138,18 +136,12 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="PaperZD")
 	TObjectPtr<UPaperZDAnimationComponent> AnimationComponent;
-	
-	UPROPERTY(EditAnywhere, Category="Character|Combat")
-	TObjectPtr<UPaperZDAnimSequence> AttackSequence;
-	
+		
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
 	
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	TObjectPtr<UPaperZDAnimSequence> HitReactSequence;
-
-	UPROPERTY(EditAnywhere, Category="Character|Combat")
-	TArray<FTaggedMontage> AttackMontages;
 
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	TObjectPtr<UAttackSequenceInfo> AttackSequenceInfo;

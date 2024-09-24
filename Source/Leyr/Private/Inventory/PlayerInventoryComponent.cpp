@@ -16,7 +16,7 @@ void UPlayerInventoryComponent::HandleOnSlotDrop(UInventoryComponent* SourceInve
 	{
 	case EContainerType::Inventory:
 	case EContainerType::Hotbar:
-	case EContainerType::Storage:
+	case EContainerType::Container:
 		SourceInventory->TransferItem(this, SourceSlotIndex, TargetSlotIndex);
 		break;
 	case EContainerType::Equipment:

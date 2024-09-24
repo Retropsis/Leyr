@@ -50,7 +50,7 @@ enum class EContainerType : uint8
 {
 	Inventory UMETA(DisplayName="Inventory"),
 	Hotbar UMETA(DisplayName="Hotbar"),
-	Storage UMETA(DisplayName="Storage"),
+	Container UMETA(DisplayName="Container"),
 	Equipment UMETA(DisplayName="Equipment")
 };
 
@@ -81,6 +81,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	EContainerType ContainerType = EContainerType::Inventory;
+
+	FORCEINLINE int32 GetSlotCount() const { return Items.Num(); }
+	FORCEINLINE void SetSlotCount(const int32 NewCount) { Items.SetNum(NewCount); }
 
 protected:
 	virtual void BeginPlay() override;

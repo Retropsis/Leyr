@@ -55,6 +55,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Attributes_Resistance_Holy= UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Resistance.Holy"), FString("Resistance to Holy Damage"));
 	GameplayTags.Attributes_Resistance_Dark = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Resistance.Dark"), FString("Resistance to Dark Damage"));
 	GameplayTags.Attributes_Resistance_Noxious = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Resistance.Noxious"), FString("Resistance to Noxious Damage"));
+	GameplayTags.Attributes_Resistance_Execution = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Resistance.Execution"), FString("Resistance to Execution Damage"));
 	
 	/*
 	 * Meta Attributes
@@ -95,7 +96,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.DamageTypesToResistances.Add(GameplayTags.Damage_Holy, GameplayTags.Attributes_Resistance_Holy);
 	GameplayTags.DamageTypesToResistances.Add(GameplayTags.Damage_Dark, GameplayTags.Attributes_Resistance_Dark);
 	GameplayTags.DamageTypesToResistances.Add(GameplayTags.Damage_Noxious, GameplayTags.Attributes_Resistance_Noxious);
-	GameplayTags.DamageTypesToResistances.Add(GameplayTags.Damage_Execute, GameplayTags.Attributes_Resistance_None);
+	GameplayTags.DamageTypesToResistances.Add(GameplayTags.Damage_Execute, GameplayTags.Attributes_Resistance_Execution);
    	  	
 	/*
 	 * Healing Types
@@ -203,28 +204,39 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	/*
 	 * Ability Window
 	 */
-	GameplayTags.Abilities_Window_Combo = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Window.Combo"), FString("Abilities Window Combo"));
-	GameplayTags.Abilities_Window_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Window.Execute"), FString("Abilities Window Execute"));
+	GameplayTags.Abilities_Combo_Window = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Combo.Window"), FString("Abilities Combo Window"));
+	GameplayTags.Abilities_Combo_Window_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Combo.Window.1"), FString("Abilities Combo Window 1"));
+	GameplayTags.Abilities_Combo_Window_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Combo.Window.2"), FString("Abilities Combo Window 2"));
+	GameplayTags.Abilities_Combo_Window_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Combo.Window.3"), FString("Abilities Combo Window 3"));
+	GameplayTags.Abilities_Combo_Window_Begin = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Combo.Window.Begin"), FString("Abilities Combo Window Begin"));
+	GameplayTags.Abilities_Combo_Window_End = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Combo.Window.End"), FString("Abilities Combo Window End"));
+	GameplayTags.Abilities_Combo_Window_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Combo.Window.Execute"), FString("Abilities Combo Window Execute"));
 
 	/*
 	 * Combat States
 	 */
+	GameplayTags.CombatState_Unoccupied = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Unoccupied"), FString("CombatState Unoccupied"));
 	GameplayTags.CombatState_Slope = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Slope"), FString("CombatState Slope"));
 	GameplayTags.CombatState_Ledge = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Ledge"), FString("CombatState Ledge"));
 	GameplayTags.CombatState_Rope = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rope"), FString("CombatState Rope"));
 	GameplayTags.CombatState_Ladder = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Ladder"), FString("CombatState Ladder"));
 	GameplayTags.CombatState_Falling = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Falling"), FString("CombatState Falling"));
 	GameplayTags.CombatState_Crouching = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Crouching"), FString("CombatState Crouching"));
+	GameplayTags.CombatState_UnCrouching = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.UnCrouching"), FString("CombatState UnCrouching"));
 	GameplayTags.CombatState_HitReacting = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.HitReacting"), FString("CombatState HitReacting"));
 	GameplayTags.CombatState_Swimming = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Swimming"), FString("CombatState Swimming"));
 	GameplayTags.CombatState_Entangled = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Entangled"), FString("CombatState Entangled"));
 	
+	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Unoccupied);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Ladder);
+	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Falling);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Rope);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Ledge);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Slope);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Entangled);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Swimming);
+	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Crouching);
+	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_UnCrouching);
 	
 	/*
 	 * Gameplay Cues
@@ -237,6 +249,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.GameplayCue_Cosmos_Meteor_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Cosmos.Meteor.1"), FString("GameplayCue Cosmos Meteor 1"));
 	GameplayTags.GameplayCue_Weapon_Sword_Slash = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Sword.Slash"), FString("GameplayCue Weapon Sword Slash"));
 	GameplayTags.GameplayCue_Alteration_Berserk_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Alteration.Berserk.1"), FString("GameplayCue Alteration Berserk 1"));
+	GameplayTags.GameplayCue_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Execute"), FString("GameplayCue Execute"));
 	
 	/*
 	 * Abilities Cooldown
@@ -278,7 +291,17 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Message_Potion_Health_Duration = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Message.Potion.Health.Duration"), FString("Message Potion Health Duration"));
 	GameplayTags.Message_Potion_Mana_Instant = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Message.Potion.Mana.Instant"), FString("Message Potion Mana Instant"));
 	GameplayTags.Message_Potion_Mana_Duration = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Message.Potion.Mana.Duration"), FString("Message Potion Mana Duration"));
-		
+	
+	/*
+	 * Indicators
+	 */
+	GameplayTags.Indicator_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Indicator.Execute"), FString("Indicator Execute"));
+	GameplayTags.Indicator_Execute_PercentMissingHealth_Flat = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Indicator.Execute.PercentMissingHealth.Flat"), FString("Indicator Execute PercentMissingHealth Flat"));
+	GameplayTags.Indicator_Execute_PercentMissingHealth_Scaling = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Indicator.Execute.PercentMissingHealth.Scaling"), FString("Indicator Execute PercentMissingHealth Scaling"));
+	GameplayTags.Indicator_Execute_PercentMissingHealth_Stack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Indicator.Execute.PercentMissingHealth.Stack"), FString("Indicator Execute PercentMissingHealth Stack"));
+	GameplayTags.Indicator_Entangled = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Indicator.Entangled"), FString("Indicator Entangled"));
+	GameplayTags.Indicator_Bleeding = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Indicator.Bleeding"), FString("Indicator Bleeding"));
+	
 	/*
 	 * Montages / GameplayEvents
 	 */

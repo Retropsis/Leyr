@@ -53,9 +53,6 @@ public:
 	UPaperZDAnimSequence* GetHitReactSequence();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	UPaperZDAnimSequence* GetAttackSequence();
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UPaperZDAnimInstance* GetPaperAnimInstance();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
@@ -72,6 +69,9 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FTaggedMontage GetTaggedMontageByTag(const FGameplayTag& MontageTag);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FTaggedMontage GetTaggedMontageByIndex(int32 Index);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UNiagaraSystem* GetImpactEffect();
@@ -117,9 +117,6 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	int32 GetAttackComboIndex();
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	FTaggedMontage GetTaggedMontageByIndex(int32 Index);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetAttackComboIndex(int32 Index);

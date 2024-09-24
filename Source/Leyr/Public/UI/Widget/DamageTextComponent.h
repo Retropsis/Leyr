@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/WidgetComponent.h"
+#include "UI/Data/UIData.h"
 #include "DamageTextComponent.generated.h"
 
 /**

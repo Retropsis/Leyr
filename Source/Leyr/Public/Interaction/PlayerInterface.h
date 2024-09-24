@@ -7,6 +7,7 @@
 #include "UObject/Interface.h"
 #include "PlayerInterface.generated.h"
 
+class AContainer;
 enum class ECombatState : uint8;
 enum class EArmorType : uint8;
 enum class EContainerType : uint8;
@@ -86,4 +87,10 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void HandleSwimming(float MinZ, float SwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void SetIsAttack(bool bIsAttacking);
+	
+	UFUNCTION(BlueprintNativeEvent)
+	void SetContainer(AContainer* Container);
 };

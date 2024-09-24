@@ -57,6 +57,7 @@ void UBaseAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, HolyResistance, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, DarkResistance, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, NoxiousResistance, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, ExecutionResistance, COND_None, REPNOTIFY_Always);
 	
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, Health, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, Mana, COND_None, REPNOTIFY_Always);
@@ -171,18 +172,8 @@ void UBaseAttributeSet::SendXPEvent(const FEffectProperties& Props)
 
 void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 {
-	float LocalIncomingDamage = GetIncomingDamage();
+	float LocalIncomingDamage = Props.TargetAvatarActor->Implements<UAbilityActorInterface>() ? 1.f :  GetIncomingDamage();
 	SetIncomingDamage(0.f);
-	
-	if (IAbilityActorInterface* AbilityActorInterface = Cast<IAbilityActorInterface>(Props.TargetAvatarActor))
-	{
-		LocalIncomingDamage = 1.f;
-	}
-	
-	if(ULeyrAbilitySystemLibrary::IsExecuteHit(Props.EffectContextHandle))
-	{
-		LocalIncomingDamage = GetMaxHealth() - GetHealth() + 1.f;
-	}
 	
 	if (LocalIncomingDamage > 0.f)
 	{		
@@ -216,6 +207,7 @@ void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 		
 		const bool bBlockedHit = ULeyrAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
 		const bool bCriticalHit = ULeyrAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
+		const bool bExecuteHit = ULeyrAbilitySystemLibrary::IsExecuteHit(Props.EffectContextHandle);
 		ShowFloatingText(Props, LocalIncomingDamage, bBlockedHit, bCriticalHit);
 		if (ULeyrAbilitySystemLibrary::IsSuccessfulStatusEffect(Props.EffectContextHandle))
 		{
@@ -502,6 +494,11 @@ void UBaseAttributeSet::OnRep_DarkResistance(const FGameplayAttributeData& OldDa
 void UBaseAttributeSet::OnRep_NoxiousResistance(const FGameplayAttributeData& OldNoxiousResistance) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, NoxiousResistance, OldNoxiousResistance);
+}
+
+void UBaseAttributeSet::OnRep_ExecutionResistance(const FGameplayAttributeData& OldExecutionResistance) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, ExecutionResistance, OldExecutionResistance);
 }
 
 /*

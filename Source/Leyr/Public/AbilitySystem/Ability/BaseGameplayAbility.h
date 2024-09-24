@@ -24,6 +24,12 @@ public:
 	static FString GetLockedDescription(int32 Level);
 
 protected:
+	UFUNCTION(BlueprintCallable)
+	virtual void InitAbility() {}
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void PrepareToEndAbility() {}
+	
 	float GetManaCost(float InLevel = 1.f) const;
 	float GetCooldown(float InLevel = 1.f) const;
 	

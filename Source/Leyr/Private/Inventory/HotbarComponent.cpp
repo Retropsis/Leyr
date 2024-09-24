@@ -17,7 +17,7 @@ void UHotbarComponent::HandleOnSlotDrop(UInventoryComponent* SourceInventory, in
 	{
 	case EContainerType::Inventory:
 	case EContainerType::Hotbar:
-	case EContainerType::Storage:
+	case EContainerType::Container:
 		SourceInventory->TransferItem(this, SourceSlotIndex, TargetSlotIndex);
 		break;
 	case EContainerType::Equipment:

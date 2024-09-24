@@ -27,6 +27,11 @@ AAICharacter::AAICharacter()
 	
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthBar");
 	HealthBar->SetupAttachment(GetRootComponent());
+	HealthBar->SetWidgetSpace(EWidgetSpace::Screen);
+	
+	PassiveIndicatorComponent = CreateDefaultSubobject<UWidgetComponent>("PassiveIndicator");
+	PassiveIndicatorComponent->SetupAttachment(GetRootComponent());
+	PassiveIndicatorComponent->SetWidgetSpace(EWidgetSpace::Screen);
 }
 
 void AAICharacter::PossessedBy(AController* NewController)
@@ -56,6 +61,10 @@ void AAICharacter::BeginPlay()
 	{
 		BaseUserWidget->SetWidgetController(this);
 	}
+	if (UBaseUserWidget* BaseUserWidget = Cast<UBaseUserWidget>(PassiveIndicatorComponent->GetUserWidgetObject()))
+	{
+		BaseUserWidget->SetWidgetController(this);
+	}
 
 	if (const UBaseAttributeSet* BaseAS = Cast<UBaseAttributeSet>(AttributeSet))
 	{
@@ -72,6 +81,11 @@ void AAICharacter::BeginPlay()
 			}
 		);
 		AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAICharacter::HitReactTagChanged);
+		AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Indicator_Execute, EGameplayTagEventType::NewOrRemoved).AddLambda(
+		[this] (const FGameplayTag CallbackTag, int32 NewCount)
+		{
+			OnGameplayTagAddedOrRemoved.Broadcast(CallbackTag, NewCount);
+		});
 		
 		OnHealthChanged.Broadcast(BaseAS->GetHealth());
 		OnMaxHealthChanged.Broadcast(BaseAS->GetMaxHealth());

@@ -68,6 +68,10 @@ void UBaseAbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& Inp
 			{
 				InvokeReplicatedEvent(EAbilityGenericReplicatedEvent::InputPressed, AbilitySpec.Handle, AbilitySpec.ActivationInfo.GetActivationPredictionKey());
 			}
+			else
+			{
+				TryActivateAbility(AbilitySpec.Handle);
+			}
 		}
 	}
 }
@@ -84,7 +88,7 @@ void UBaseAbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputT
 			AbilitySpecInputPressed(AbilitySpec);
 			if (!AbilitySpec.IsActive())
 			{
-				TryActivateAbility(AbilitySpec.Handle);
+				// TryActivateAbility(AbilitySpec.Handle);
 			}
 		}
 	}

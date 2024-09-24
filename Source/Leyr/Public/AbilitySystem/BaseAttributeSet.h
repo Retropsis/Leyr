@@ -199,6 +199,10 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_NoxiousResistance, Category="Attributes|Resistances")
 	FGameplayAttributeData NoxiousResistance;
 	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, NoxiousResistance);
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_ExecutionResistance, Category="Attributes|Resistances")
+	FGameplayAttributeData ExecutionResistance;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, ExecutionResistance);
 
 	/*
 	 * Vital Attributes
@@ -323,6 +327,9 @@ public:
 	
 	UFUNCTION()
 	void OnRep_NoxiousResistance(const FGameplayAttributeData& OldNoxiousResistance) const;
+	
+	UFUNCTION()
+	void OnRep_ExecutionResistance(const FGameplayAttributeData& OldExecutionResistance) const;
 	
 	/* Vital Attributes */
 	UFUNCTION()

@@ -107,11 +107,13 @@ protected:
 	 * Inventory
 	 */
 	virtual void UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData) override {}
+	UFUNCTION(BlueprintCallable) virtual void ToggleContainer_Implementation(int32 SlotCount) override {}
 	
 	UFUNCTION(Client, Reliable) void InventoryButtonPressed();
-	UFUNCTION(BlueprintImplementableEvent) void ToggleInventory();
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable) void ToggleInventory();
 	UFUNCTION(BlueprintCallable) void ToggleInputMode();
 	UPROPERTY(BlueprintReadWrite) bool bIsInventoryOpen = false;
+	UPROPERTY(BlueprintReadWrite) bool bIsContainerOpen = false;
 	
 	/*
 	 * Hotbar

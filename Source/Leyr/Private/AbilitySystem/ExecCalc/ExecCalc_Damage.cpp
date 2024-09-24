@@ -7,10 +7,14 @@
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Game/BaseGameplayTags.h"
 #include "Interaction/CombatInterface.h"
+#include "Kismet/KismetMathLibrary.h"
 
 struct BaseDamageStatics
 {
 	DECLARE_ATTRIBUTE_CAPTUREDEF(Strength);
+	
+	DECLARE_ATTRIBUTE_CAPTUREDEF(Health);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(MaxHealth);
 	
 	DECLARE_ATTRIBUTE_CAPTUREDEF(PhysicalAttack);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(PhysicalDefense);
@@ -32,10 +36,14 @@ struct BaseDamageStatics
 	DECLARE_ATTRIBUTE_CAPTUREDEF(HolyResistance);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(DarkResistance);
 	DECLARE_ATTRIBUTE_CAPTUREDEF(NoxiousResistance);
+	DECLARE_ATTRIBUTE_CAPTUREDEF(ExecutionResistance);
 
 	BaseDamageStatics()
 	{
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UBaseAttributeSet, Strength, Source, false);
+		
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UBaseAttributeSet, Health, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UBaseAttributeSet, MaxHealth, Target, false);
 		
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UBaseAttributeSet, PhysicalAttack, Source, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UBaseAttributeSet, PhysicalDefense, Target, false);
@@ -57,6 +65,7 @@ struct BaseDamageStatics
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UBaseAttributeSet, HolyResistance, Target, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UBaseAttributeSet, DarkResistance, Target, false);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UBaseAttributeSet, NoxiousResistance, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UBaseAttributeSet, ExecutionResistance, Target, false);
 	}
 };
 
@@ -69,6 +78,9 @@ static const BaseDamageStatics& GetDamageStatics()
 UExecCalc_Damage::UExecCalc_Damage()
 {
 	RelevantAttributesToCapture.Add(GetDamageStatics().StrengthDef);
+	
+	RelevantAttributesToCapture.Add(GetDamageStatics().HealthDef);
+	RelevantAttributesToCapture.Add(GetDamageStatics().MaxHealthDef);
 	
 	RelevantAttributesToCapture.Add(GetDamageStatics().PhysicalAttackDef);
 	RelevantAttributesToCapture.Add(GetDamageStatics().PhysicalDefenseDef);
@@ -90,6 +102,7 @@ UExecCalc_Damage::UExecCalc_Damage()
 	RelevantAttributesToCapture.Add(GetDamageStatics().HolyResistanceDef);
 	RelevantAttributesToCapture.Add(GetDamageStatics().DarkResistanceDef);
 	RelevantAttributesToCapture.Add(GetDamageStatics().NoxiousResistanceDef);
+	RelevantAttributesToCapture.Add(GetDamageStatics().ExecutionResistanceDef);
 }
 
 void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
@@ -98,6 +111,9 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 	TagsToCaptureDefs.Add(GameplayTags.Attributes_Primary_Strength, GetDamageStatics().StrengthDef);
+	
+	TagsToCaptureDefs.Add(GameplayTags.Attributes_Vital_Health, GetDamageStatics().HealthDef);
+	TagsToCaptureDefs.Add(GameplayTags.Attributes_Secondary_MaxHealth, GetDamageStatics().MaxHealthDef);
 	
 	TagsToCaptureDefs.Add(GameplayTags.Attributes_Secondary_PhysicalAttack, GetDamageStatics().PhysicalAttackDef);
 	TagsToCaptureDefs.Add(GameplayTags.Attributes_Secondary_PhysicalDefense, GetDamageStatics().PhysicalDefenseDef);
@@ -119,6 +135,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	TagsToCaptureDefs.Add(GameplayTags.Attributes_Resistance_Holy, GetDamageStatics().HolyResistanceDef);
 	TagsToCaptureDefs.Add(GameplayTags.Attributes_Resistance_Dark, GetDamageStatics().DarkResistanceDef);
 	TagsToCaptureDefs.Add(GameplayTags.Attributes_Resistance_Noxious, GetDamageStatics().NoxiousResistanceDef);
+	TagsToCaptureDefs.Add(GameplayTags.Attributes_Resistance_Execution, GetDamageStatics().ExecutionResistanceDef);
 	
 	const UAbilitySystemComponent* SourceASC = ExecutionParams.GetSourceAbilitySystemComponent();
 	const UAbilitySystemComponent* TargetASC = ExecutionParams.GetTargetAbilitySystemComponent();
@@ -147,23 +164,13 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	// Status Effect
 	DetermineStatusEffect(ExecutionParams, Spec, EvaluationParameters, TagsToCaptureDefs);
 	
-	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
-	
 	// Get Damage Set by Caller Magnitude
 	float Damage = 0.f;
 	for (const TTuple<FGameplayTag, FGameplayTag>& Pair : FBaseGameplayTags::Get().DamageTypesToResistances)
 	{
 		const FGameplayTag DamageTypeTag = Pair.Key;
 		const FGameplayTag ResistanceTag = Pair.Value;
-
-		// TODO: Not correct way to do this check
-		if(DamageTypeTag.MatchesTagExact(FBaseGameplayTags::Get().Damage_Execute))
-		{
-			float DamageTypeValue = Spec.GetSetByCallerMagnitude(Pair.Key, false);
-			if(DamageTypeValue <= 0.f) continue;
-			ULeyrAbilitySystemLibrary::SetIsExecuteHit(EffectContextHandle, true);
-			continue;
-		}
+		
 		checkf(TagsToCaptureDefs.Contains(ResistanceTag), TEXT("TagsToCaptureDefs doesn't contain Tag: [%s] in ExecCalc_Damage"), *ResistanceTag.ToString());
 		const FGameplayEffectAttributeCaptureDefinition CaptureDef = TagsToCaptureDefs[ResistanceTag];
 
@@ -177,6 +184,8 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		DamageTypeValue *= ( 100.f - Resistance ) / 100.f;
 		Damage += DamageTypeValue;
 	}
+	
+	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
 	
 	// Capture BlockChance on Target, and determine if there was a successful Block
 	float TargetBlockChance = 0.f;
@@ -226,6 +235,27 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	const bool bCriticalHit = FMath::RandRange(1, 100) < EffectiveCriticalHitChance;
 	
 	ULeyrAbilitySystemLibrary::SetIsCriticalHit(EffectContextHandle, bCriticalHit);
+
+	// Capture Execution Tag, then capture health and max health if needed
+	// TODO: Not correct way to do this check
+	float ExecutionDamageValue = Spec.GetSetByCallerMagnitude(GameplayTags.Damage_Execute, false);
+	if (ExecutionDamageValue > 0.f)
+	{
+		ULeyrAbilitySystemLibrary::SetIsExecuteHit(EffectContextHandle, true);
+		
+		float TargetHealth = 0.f;
+		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().HealthDef, EvaluationParameters, TargetHealth);
+		TargetHealth = FMath::Max<float>(TargetHealth, 0.f);
+		
+		float TargetMaxHealth = 0.f;
+		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().MaxHealthDef, EvaluationParameters, TargetMaxHealth);
+		TargetMaxHealth = FMath::Max<float>(TargetMaxHealth, 0.f);
+
+		float PercentMissingHealth = 1.f - UKismetMathLibrary::SafeDivide(TargetHealth, TargetMaxHealth);
+		float CappedPercentMissingHealth = FMath::Max<float>(PercentMissingHealth, .75f);
+		float MissingHealthBonusDamage = TargetMaxHealth * PercentMissingHealth;
+		Damage += MissingHealthBonusDamage;
+	}
 
 	// Double damage plus a bonus if critical hit
 	Damage = bCriticalHit ? 2.f * Damage + SourceCriticalHitDamage : Damage;

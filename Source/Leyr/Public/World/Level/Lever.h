@@ -39,7 +39,7 @@ class LEYR_API ALever : public APaperFlipbookActor, public IInteractionInterface
 
 public:
 	ALever();
-	virtual void Interact_Implementation() override;
+	virtual void Interact_Implementation(AActor* InteractingActor) override;
 	void HandleLeverVisualState(ELeverState NewState);
 	
 	UFUNCTION()

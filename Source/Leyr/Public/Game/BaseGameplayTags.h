@@ -54,6 +54,7 @@ FGameplayTag Attributes_Secondary_MaxMana;
  /*
  * Resistances Attributes
  */
+FGameplayTag Attributes_Resistance_None;
 FGameplayTag Attributes_Resistance_Physical;
 FGameplayTag Attributes_Resistance_Blunt;
 FGameplayTag Attributes_Resistance_Cutting;
@@ -65,7 +66,7 @@ FGameplayTag Attributes_Resistance_Lightning;
 FGameplayTag Attributes_Resistance_Holy;
 FGameplayTag Attributes_Resistance_Dark;
 FGameplayTag Attributes_Resistance_Noxious;
-FGameplayTag Attributes_Resistance_None;
+FGameplayTag Attributes_Resistance_Execution;
 
  /*
   * Meta Attributes
@@ -175,20 +176,27 @@ FGameplayTag Abilities_Combo_Attack_2;
 FGameplayTag Abilities_Combo_Attack_3;
 FGameplayTag Abilities_Combo_Attack_Execute;
  
-FGameplayTag Abilities_Window_Combo;
-FGameplayTag Abilities_Window_Execute;
+FGameplayTag Abilities_Combo_Window;
+FGameplayTag Abilities_Combo_Window_1;
+FGameplayTag Abilities_Combo_Window_2;
+FGameplayTag Abilities_Combo_Window_3;
+FGameplayTag Abilities_Combo_Window_Execute;
+FGameplayTag Abilities_Combo_Window_Begin;
+FGameplayTag Abilities_Combo_Window_End;
  
 FGameplayTag Abilities_Monk_Basic;
  
 FGameplayTag Abilities_Throw_1;
 FGameplayTag Abilities_Throw_2;
  
+FGameplayTag CombatState_Unoccupied;
 FGameplayTag CombatState_Slope;
 FGameplayTag CombatState_Rope;
 FGameplayTag CombatState_Ladder;
 FGameplayTag CombatState_Ledge;
 FGameplayTag CombatState_Falling;
 FGameplayTag CombatState_Crouching;
+FGameplayTag CombatState_UnCrouching;
 FGameplayTag CombatState_HitReacting;
 FGameplayTag CombatState_Swimming;
 FGameplayTag CombatState_Entangled;
@@ -205,6 +213,7 @@ FGameplayTag GameplayCue_Lightning_Bolt_1;
 FGameplayTag GameplayCue_Noxious_Bio_1;
 FGameplayTag GameplayCue_Cosmos_Meteor_1;
 FGameplayTag GameplayCue_Weapon_Sword_Slash;
+FGameplayTag GameplayCue_Execute;
  
 FGameplayTag GameplayCue_Alteration_Berserk_1;
 
@@ -249,7 +258,17 @@ FGameplayTag CombatSocket_RightFeet;
  FGameplayTag Message_Potion_Health_Duration;
  FGameplayTag Message_Potion_Mana_Instant;
  FGameplayTag Message_Potion_Mana_Duration;
-    
+ 
+ /*
+  * Indicators
+  */
+ FGameplayTag Indicator_Execute;
+ FGameplayTag Indicator_Execute_PercentMissingHealth_Flat;
+ FGameplayTag Indicator_Execute_PercentMissingHealth_Scaling;
+ FGameplayTag Indicator_Execute_PercentMissingHealth_Stack;
+ FGameplayTag Indicator_Entangled;
+ FGameplayTag Indicator_Bleeding;
+ 
  /*
   * Montage / Gameplay Events
   */

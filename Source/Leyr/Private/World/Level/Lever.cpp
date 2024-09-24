@@ -38,7 +38,7 @@ void ALever::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 	// LeverState = ELeverState::Off;
 }
 
-void ALever::Interact_Implementation()
+void ALever::Interact_Implementation(AActor* InteractingActor)
 {
 	if(LeverType != ELeverType::Switch && LeverState == ELeverState::On) return;
 	

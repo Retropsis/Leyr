@@ -25,7 +25,7 @@ TArray<FHitResult> UMeleeGameplayAbility::BoxTrace(bool bDebug)
 	{
 		if(HitResult.bBlockingHit && HitResult.GetActor() && HitResult.GetActor()->ActorHasTag("HitInteraction"))
 		{
-			IInteractionInterface::Execute_Interact(HitResult.GetActor());
+			IInteractionInterface::Execute_Interact(HitResult.GetActor(), GetAvatarActorFromActorInfo());
 		}
 	}
 

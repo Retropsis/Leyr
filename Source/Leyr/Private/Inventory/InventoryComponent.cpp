@@ -92,7 +92,7 @@ void UInventoryComponent::UpdateInventorySlotUI(int32 SlotIndex, const FInventor
 	case EContainerType::Hotbar:
 		IPlayerInterface::Execute_UpdateInventorySlot(GetOwner(), ContainerType, SlotIndex, ItemData);
 		break;
-	case EContainerType::Storage:
+	case EContainerType::Container:
 		break;
 	case EContainerType::Equipment:
 		break;

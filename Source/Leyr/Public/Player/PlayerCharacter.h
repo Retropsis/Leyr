@@ -37,16 +37,36 @@ public:
 	void JumpButtonPressed();
 	void TryVaultingDown();
 
+	UFUNCTION()
+	void HandleCharacterMovementUpdated(float DeltaSeconds, FVector OldLocation, FVector OldVelocity);
+	EMovementMode PreviousMovementMode = MOVE_None;
+
 	void TraceForLedge();
 	void TraceForSlope();
 	
 	/** Combat Interface */
 	virtual int32 GetCharacterLevel_Implementation() override;
+	virtual ECombatState GetCombatState_Implementation() const override { return CombatState; }
+	virtual void SetCombatState_Implementation(ECombatState NewState) override;
+	virtual void SetMovementEnabled_Implementation(bool Enabled) override;
+	virtual void SetComboWindow_Implementation(bool bOpen) override { bIsComboWindowOpen = bOpen; }
+	virtual bool IsComboWindowOpen_Implementation() override { return bIsComboWindowOpen; }
+	virtual void ResetAttacking_Implementation() override {}
+	virtual void ResetCombatVariables_Implementation() override {}
+	virtual int32 GetAttackComboIndex_Implementation() override { return AttackCount; }
+	virtual void SetAttackComboIndex_Implementation(int32 Index) override { AttackCount = Index; }
+	virtual ECombatState GetPlayerCombatState_Implementation() override { return CombatState; }
+	virtual void SetPlayerCombatState_Implementation(const ECombatState NewState) override { CombatState = NewState; }
+	virtual void SetMovementTarget_Implementation(const FVector Target) override { MovementTarget = Target; } 
+	virtual FTaggedMontage GetTaggedMontageByIndex_Implementation(int32 Index) override;
 	/** end Combat Interface */
 	
 	/** Inventory Interface */
 	virtual UInventoryComponent* GetInventoryComponent_Implementation() override { return PlayerInventory; }
 	/** end Inventory Interface */
+	
+	UFUNCTION(Server, Reliable)
+	void ServerInteract();
 
 	UFUNCTION(Server, Reliable)
 	void ServerOnSlotDrop(EContainerType TargetContainer, EContainerType SourceContainer, int32 SourceSlotIndex, int32 TargetSlotIndex, EArmorType ArmorType);
@@ -55,7 +75,8 @@ public:
 
 	/** Player Interface */
 	virtual void ResetInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex) override;
-	virtual void UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData) override;	
+	virtual void UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData) override;
+	virtual void SetContainer_Implementation(AContainer* Container) override;
 	virtual void AddToXP_Implementation(int32 InXP) override;
 	virtual void LevelUp_Implementation() override;
 	virtual int32 GetXP_Implementation() const override;
@@ -67,23 +88,10 @@ public:
 	virtual void AddToSkillPoints_Implementation(int32 InSpellPoints) override;
 	virtual int32 GetAttributePoints_Implementation() const override;
 	virtual int32 GetSkillPoints_Implementation() const override;
-	virtual ECombatState GetCombatState_Implementation() const override { return CombatState; }
-	virtual void SetCombatState_Implementation(ECombatState NewState) override;
-	virtual void SetMovementEnabled_Implementation(bool Enabled) override;
-	virtual void SetComboWindow_Implementation(bool bOpen) override { bIsComboWindowOpen = bOpen; }
-	virtual bool IsComboWindowOpen_Implementation() override { return bIsComboWindowOpen; }
-	virtual void ResetAttacking_Implementation() override {}
-	virtual void ResetCombatVariables_Implementation() override {}
-	virtual int32 GetAttackComboIndex_Implementation() override { return AttackCount; }
-	virtual void SetAttackComboIndex_Implementation(int32 Index) override { AttackCount = Index; }
-	virtual FTaggedMontage GetTaggedMontageByIndex_Implementation(int32 Index) override;
-	virtual ECombatState GetPlayerCombatState_Implementation() override { return CombatState; }
-	virtual void SetPlayerCombatState_Implementation(const ECombatState NewState) override { CombatState = NewState; }
 	virtual void HandleHangingOnLadder_Implementation(FVector HangingTarget, bool bEndOverlap) override;
 	virtual void HandleHangingOnRope_Implementation(FVector HangingTarget, bool bEndOverlap) override;
 	virtual void HandleEntangled_Implementation(float MinZ, float EntangledWalkSpeed, float EntangledGravityScale, bool bEndOverlap) override;
 	virtual void HandleSwimming_Implementation(float MinZ, float SwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap) override;
-	virtual void SetMovementTarget_Implementation(const FVector Target) override { MovementTarget = Target; } 
 	/** end Player Interface */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -111,14 +119,25 @@ protected:
 	bool bCanGrabLedge = true;
 	UFUNCTION() void OffLedgeEnd();
 	
+	FTimerHandle UnCrouchingTimer;
+	float UnCrouchingTime = .25f;
+	
 	bool bAirborne = false;
 	bool bIsAccelerating = false;
 	bool bIsMoving = false;
-	bool bIsComboWindowOpen = false;
 	bool bCrouchButtonHeld = false;
 
 	UPROPERTY(BlueprintReadWrite)
 	int32 AttackCount = 0;
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsAttacking = false;
+	
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsComboActivated = false;
+	
+	UPROPERTY(BlueprintReadWrite)
+	bool bIsComboWindowOpen = false;
 	
 	ECombatState CombatState = ECombatState::Unoccupied;
 	ECombatState PreviousCombatState = ECombatState::Unoccupied;
@@ -135,6 +154,8 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UHotbarComponent> HotbarComponent;
+
+	TObjectPtr<AContainer> InteractingContainer;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<USceneComponent> GroundPoint;
