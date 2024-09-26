@@ -67,6 +67,9 @@ enum class ECombatState : uint8
 	OnRopeSlope UMETA(DisplayName="OnRopeSlope"),
 	Entangled UMETA(DisplayName="Entangled"),
 	Swimming UMETA(DisplayName="Swimming"),
+	
+	Dodging UMETA(DisplayName="Dodging"),
+	Rolling UMETA(DisplayName="Rolling"),
 };
 
 UENUM(BlueprintType)

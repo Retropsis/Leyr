@@ -132,6 +132,15 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetMovementMode(EMovementMode MovementMode,  float NewWalkingSpeed, float GravityValue);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void TryDodging();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void TryRolling();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ResetCombatState(ECombatState NewState);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool IsCharacterAirborne();

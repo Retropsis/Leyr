@@ -32,6 +32,7 @@ public:
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 	
 	void Move(const FVector2D MovementVector);
+	void ForceMove(float DeltaSeconds);
 	void RotateController() const;
 	void HandleCrouching(bool bShouldCrouch);
 	void JumpButtonPressed();
@@ -43,6 +44,7 @@ public:
 
 	void TraceForLedge();
 	void TraceForSlope();
+	void TraceForPlatforms() const;
 	
 	/** Combat Interface */
 	virtual int32 GetCharacterLevel_Implementation() override;
@@ -59,6 +61,9 @@ public:
 	virtual void SetPlayerCombatState_Implementation(const ECombatState NewState) override { CombatState = NewState; }
 	virtual void SetMovementTarget_Implementation(const FVector Target) override { MovementTarget = Target; } 
 	virtual FTaggedMontage GetTaggedMontageByIndex_Implementation(int32 Index) override;
+	virtual void TryDodging_Implementation() override;
+	virtual  void TryRolling_Implementation() override;
+	virtual void ResetCombatState_Implementation(ECombatState NewState) override;
 	/** end Combat Interface */
 	
 	/** Inventory Interface */
@@ -102,17 +107,23 @@ protected:
 	void HandleCombatState(ECombatState NewState);
 	void HandleHangingOnLedge(const FVector& HangingTarget);
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
 	float LadderWalkSpeed = 120.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
 	float RopeWalkSpeed = 120.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
 	float GroundSlopeGravityScale = 1.25f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
 	float ClimbingSpeed = 3.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	float DodgingSpeed = 2400.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	float RollingSpeed = 1000.f;
 
 	FTimerHandle OffLedgeTimer;
 	float OffLedgeTime = .5f;
@@ -149,6 +160,9 @@ protected:
 
 private:	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))
+	TObjectPtr<UCapsuleComponent> HalfHeightCapsuleComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<USpringArmComponent> SpringArm;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))
@@ -171,28 +185,35 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category="Player|Plaforming")
 	float PlatformTraceDistance = 10.f;
 
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastLevelUpParticles() const;
-
-	void TraceForPlatforms() const;
-	void OverlapPlatformEnd();
-	void EntangledExitEnd();
-
-	/*	OverlapPlatform */
 	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
 	float OverlapPlatformTime = .25f;
-	
-	FTimerHandle OverlapPlatformTimer;
-	bool bOverlapPlatformTimerEnded = true;
 
-	FVector MovementTarget = FVector::ZeroVector;
-	float CurrentMinZ = 0.f;
-
-	/*	Entangled */
 	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
 	float EntangledExitTime = .1f;
 	
+	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
+	float DodgingTime = .2f;
+
+	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
+	float RollingTime = .2f;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastLevelUpParticles() const;
+
+	void OverlapPlatformEnd();
+	void EntangledExitEnd();
+	void DodgingEnd();
+	void RollingEnd();
+	
 	FTimerHandle EntangledExitTimer;
+	FTimerHandle OverlapPlatformTimer;
+	FTimerHandle DodgingTimer;
+	FTimerHandle RollingTimer;
+	
+	bool bOverlapPlatformTimerEnded = true;
+	FVector MovementTarget = FVector::ZeroVector;
+	float MovementSpeed = 0.f;
+	float CurrentMinZ = 0.f;
 
 public:
 	FORCEINLINE bool IsAirborne() const { return bAirborne; }

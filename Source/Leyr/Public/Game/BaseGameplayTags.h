@@ -200,6 +200,8 @@ FGameplayTag CombatState_UnCrouching;
 FGameplayTag CombatState_HitReacting;
 FGameplayTag CombatState_Swimming;
 FGameplayTag CombatState_Entangled;
+FGameplayTag CombatState_Dodging;
+FGameplayTag CombatState_Rolling;
  
 FGameplayTag CombatState_Directional_Upward;
 FGameplayTag CombatState_Directional_Downward;
@@ -302,6 +304,9 @@ FGameplayTag Montage_Upward_Attack;
 FGameplayTag Montage_Rope_Attack;
 FGameplayTag Montage_Slope_Attack;
 FGameplayTag Montage_Ladder_Attack;
+FGameplayTag Montage_Roll_End;
+FGameplayTag Montage_Dodge_End;
+FGameplayTag Montage_EndAbility;
  
 FGameplayTag Montage_Window_Combo;
 FGameplayTag Montage_Window_Execute;
@@ -311,6 +316,8 @@ FGameplayTag Montage_Window_Execute;
   */
 FGameplayTag InputTag_LMB;
 FGameplayTag InputTag_RMB;
+FGameplayTag InputTag_Shoulder_Left;
+FGameplayTag InputTag_Shoulder_Right;
 FGameplayTag InputTag_1;
 FGameplayTag InputTag_2;
 FGameplayTag InputTag_3;
@@ -325,13 +332,7 @@ FGameplayTag InputTag_Passive_1;
 FGameplayTag InputTag_Passive_2;
 FGameplayTag InputTag_Passive_3;
 FGameplayTag InputTag_Passive_4;
-FGameplayTag InputTag_Passive_5;
- 
-FGameplayTag InputTag_Crouch_Attack;
-FGameplayTag InputTag_Jump_Attack;
-FGameplayTag InputTag_JumpDown_Attack;
-FGameplayTag InputTag_Upward_Attack;
- 
+FGameplayTag InputTag_Passive_5; 
 FGameplayTag InputTag_Throw_1;
 FGameplayTag InputTag_Throw_2;
  

@@ -1,30 +1,30 @@
 // @ Retropsis 2024-2025.
 
 #include "Player/PlayerCharacter.h"
+#include "Player/PlayerCharacterAnimInstance.h"
+#include "Player/PlayerCharacterController.h"
+#include "Player/PlayerCharacterState.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/Data/LevelUpInfo.h"
-#include "Camera/CameraComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "Inventory/PlayerInventoryComponent.h"
-#include "Player/PlayerCharacterController.h"
-#include "Player/PlayerCharacterState.h"
-#include "NiagaraComponent.h"
-#include "PaperZDAnimInstance.h"
 #include "AbilitySystem/Data/AttackSequenceInfo.h"
-#include "Components/BoxComponent.h"
-#include "Components/CapsuleComponent.h"
+#include "Inventory/PlayerInventoryComponent.h"
+#include "PaperZDAnimInstance.h"
 #include "Game/BaseGameplayTags.h"
-#include "GameFramework/PhysicsVolume.h"
 #include "Interaction/InteractionInterface.h"
 #include "Interaction/PlatformInterface.h"
 #include "Inventory/HotbarComponent.h"
 #include "Inventory/Container/Container.h"
+#include "UI/PlayerHUD.h"
+#include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Camera/CameraComponent.h"
+#include "GameFramework/PhysicsVolume.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "Player/PlayerCharacterAnimInstance.h"
-#include "UI/PlayerHUD.h"
+#include "NiagaraComponent.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -59,6 +59,11 @@ APlayerCharacter::APlayerCharacter()
 	RopeHangingCollision->SetupAttachment(GetRootComponent());
 	RopeHangingCollision->ComponentTags.Add(FName("RopeCollision"));
 
+	HalfHeightCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>("HalfHeightCapsuleComponent");
+	HalfHeightCapsuleComponent->SetupAttachment(GetCapsuleComponent());
+	HalfHeightCapsuleComponent->SetCapsuleHalfHeight(44.f);
+	HalfHeightCapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
 	TraceObjectType = EOT_EnemyCapsule;
 	
 	CharacterClass = ECharacterClass::Warrior;
@@ -72,18 +77,27 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	TraceForPlatforms();
 	TraceForLedge();
 	TraceForSlope();
-	
-	FGameplayTagContainer CDTags;
-	GetAbilitySystemComponent()->GetOwnedGameplayTags(CDTags);
-	GEngine->AddOnScreenDebugMessage(32147, 2.f, FColor::Yellow, FString::Printf(TEXT("%s"), *CDTags.ToString()));
 
+	ForceMove(DeltaSeconds);
+}
+
+void APlayerCharacter::ForceMove(float DeltaSeconds)
+{
 	if(CombatState == ECombatState::ClimbingRope)
 	{
-		SetActorLocation(FMath::VInterpTo(GetActorLocation(), MovementTarget, DeltaSeconds, ClimbingSpeed));
+		SetActorLocation(FMath::VInterpTo(GetActorLocation(), MovementTarget, DeltaSeconds, MovementSpeed));
 		if (FMath::IsNearlyZero(UKismetMathLibrary::Vector_Distance(GetActorLocation(), MovementTarget), 5.f))
 		{
 			HandleCombatState(ECombatState::Unoccupied);
 		}
+	}
+	if(CombatState == ECombatState::Dodging)
+	{
+		AddMovementInput(FVector(1.f, 0.f, 0.f), -GetActorForwardVector().X);
+	}
+	if(CombatState == ECombatState::Rolling)
+	{
+		AddMovementInput(FVector(1.f, 0.f, 0.f), GetActorForwardVector().X);
 	}
 }
 
@@ -192,8 +206,10 @@ void APlayerCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 
  */
 void APlayerCharacter::Move(const FVector2D MovementVector)
 {
+	// if(CombatState > ECombatState::Swimming) return;
+	
 	RotateController();
-
+	
 	PreviousCombatDirection = CombatDirection;
 	CombatDirection = GetCombatDirectionFromVector2D(MovementVector);
 	if(PreviousCombatDirection != CombatDirection) HandleCombatDirectionTag();
@@ -207,35 +223,30 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
 		if (GetCharacterMovement()->MovementMode == MOVE_Falling) MakeAndApplyEffectToSelf(FBaseGameplayTags::Get().CombatState_Falling);
 		break;
-	case ECombatState::UnCrouching:
-		break;
-	case ECombatState::Attacking:
-		// AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
-		break;
-	case ECombatState::HangingLedge:
-		break;
 	case ECombatState::HangingRope:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
 		if(MovementVector.Y > 0.f) HandleCombatState(ECombatState::ClimbingRope);
-		break;
-	case ECombatState::ClimbingRope:
 		break;
 	case ECombatState::HangingLadder:
 		AddMovementInput(FVector(0.f, 0.f, 1.f), FMath::RoundToFloat(MovementVector.Y));
 		if(MovementVector.X > 0.f) GetController()->SetControlRotation(FRotator::ZeroRotator);
 		if(MovementVector.X < 0.f) GetController()->SetControlRotation(FRotator(0.f, 180.f, 0.f));
 		break;
-	case ECombatState::OnGroundSlope:
-		break;
-	case ECombatState::OnRopeSlope:
-		break;
-	case ECombatState::HitReact:
-		break;
 	case ECombatState::Entangled:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
 		break;
 	case ECombatState::Swimming:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
+		break;
+	case ECombatState::UnCrouching:
+	case ECombatState::Attacking:
+	case ECombatState::HangingLedge:
+	case ECombatState::ClimbingRope:
+	case ECombatState::OnGroundSlope:
+	case ECombatState::OnRopeSlope:
+	case ECombatState::HitReact:
+	case ECombatState::Dodging:
+	case ECombatState::Rolling:
 		break;
 	}
 }
@@ -256,11 +267,7 @@ ECombatDirection APlayerCharacter::GetCombatDirectionFromVector2D(FVector2D Move
 }
 
 void APlayerCharacter::HandleCombatDirectionTag() const
-{
-	// FGameplayTagContainer CDTags;
-	// GetAbilitySystemComponent()->GetOwnedGameplayTags(CDTags);
-	// GEngine->AddOnScreenDebugMessage(32145, 2.f, FColor::Red, FString::Printf(TEXT("%s"), *CDTags.ToString()));
-	
+{	
 	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
 	GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(GameplayTags.CombatDirections);
 	switch (CombatDirection)
@@ -296,6 +303,10 @@ void APlayerCharacter::RotateController() const
 		GetController()->SetControlRotation(FRotator(0.f, 180.f, 0.f));
 	}
 }
+
+void APlayerCharacter::TryDodging_Implementation(){ HandleCombatState(ECombatState::Dodging); }
+void APlayerCharacter::TryRolling_Implementation() { HandleCombatState(ECombatState::Rolling); }
+void APlayerCharacter::ResetCombatState_Implementation(ECombatState NewState) { HandleCombatState(NewState); }
 
 void APlayerCharacter::HandleCrouching(bool bShouldCrouch)
 {
@@ -342,6 +353,9 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 {
 	CombatState = NewState;
 	GetCharacterMovement()->GravityScale = BaseGravityScale;
+	GetCapsuleComponent()->SetCollisionObjectType(ECC_Pawn);
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	HalfHeightCapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
 	GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(GameplayTags.CombatStates);
@@ -353,6 +367,8 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 		GetCharacterMovement()->MaxFlySpeed = BaseFlySpeed;
 		GetCharacterMovement()->GravityScale = BaseGravityScale;
+		GetCharacterMovement()->MaxAcceleration = 2048.f;
+		GetCharacterMovement()->BrakingFrictionFactor = 2.f;
 		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		// MakeAndApplyEffectToSelf(GameplayTags.CombatState_Unoccupied);
 		break;
@@ -386,9 +402,6 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Rope);
 		break;
-	case ECombatState::ClimbingRope:
-		MovementTarget = GetActorLocation() + FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f - 10.f);
-		break;
 	case ECombatState::HangingLadder:
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->MaxFlySpeed = LadderWalkSpeed;
@@ -411,6 +424,25 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetCharacterMovement()->SetMovementMode(MOVE_Swimming);
 		GetCharacterMovement()->GetPhysicsVolume()->bWaterVolume = true;
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Swimming);
+		break;
+	case ECombatState::ClimbingRope:
+		MovementSpeed = ClimbingSpeed;
+		MovementTarget = GetActorLocation() + FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f - 10.f);
+		break;
+	case ECombatState::Dodging:
+		GetCharacterMovement()->MaxWalkSpeed = DodgingSpeed;
+		GetCharacterMovement()->MaxAcceleration = 5000.f;
+		GetCharacterMovement()->BrakingFrictionFactor = .2f;
+		GetCapsuleComponent()->SetCollisionObjectType(ECC_WorldDynamic);
+		// if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(DodgingTimer, this, &APlayerCharacter::DodgingEnd, DodgingTime);
+		break;
+	case ECombatState::Rolling:
+		GetCharacterMovement()->MaxWalkSpeed = RollingSpeed;
+		GetCharacterMovement()->MaxAcceleration = 5000.f;
+		GetCharacterMovement()->BrakingFrictionFactor = .2f;
+		// HalfHeightCapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		// GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		// if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(RollingTimer, this, &APlayerCharacter::RollingEnd, RollingTime);
 		break;
 	}
 }
@@ -490,6 +522,16 @@ void APlayerCharacter::HandleEntangled_Implementation(float MinZ, float Entangle
 }
 
 void APlayerCharacter::EntangledExitEnd()
+{
+	HandleCombatState(ECombatState::Unoccupied);
+}
+
+void APlayerCharacter::DodgingEnd()
+{
+	HandleCombatState(ECombatState::Unoccupied);
+}
+
+void APlayerCharacter::RollingEnd()
 {
 	HandleCombatState(ECombatState::Unoccupied);
 }

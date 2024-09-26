@@ -28,6 +28,5 @@ TArray<FHitResult> UMeleeGameplayAbility::BoxTrace(bool bDebug)
 			IInteractionInterface::Execute_Interact(HitResult.GetActor(), GetAvatarActorFromActorInfo());
 		}
 	}
-
 	return Hits;
 }
