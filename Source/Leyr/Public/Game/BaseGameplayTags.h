@@ -137,6 +137,8 @@ TArray<FGameplayTag> AlterationEffects;
   */
 FGameplayTag Abilities_None;
 FGameplayTag Abilities_Attack;
+FGameplayTag Abilities_Parry;
+FGameplayTag Abilities_Block;
 FGameplayTag Abilities_Summon;
 FGameplayTag Abilities_HitReact;
 FGameplayTag Abilities_Fire_FireBolt;
@@ -305,8 +307,12 @@ FGameplayTag Montage_Rope_Attack;
 FGameplayTag Montage_Slope_Attack;
 FGameplayTag Montage_Ladder_Attack;
 FGameplayTag Montage_Roll_End;
+FGameplayTag Montage_Roll_Attack;
 FGameplayTag Montage_Dodge_End;
 FGameplayTag Montage_EndAbility;
+FGameplayTag Montage_Parry;
+FGameplayTag Montage_Parry_Begin;
+FGameplayTag Montage_Parry_End;
  
 FGameplayTag Montage_Window_Combo;
 FGameplayTag Montage_Window_Execute;

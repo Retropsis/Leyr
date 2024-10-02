@@ -30,6 +30,7 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void OnRep_PlayerState() override;
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
+	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 	
 	void Move(const FVector2D MovementVector);
 	void ForceMove(float DeltaSeconds);
@@ -50,6 +51,7 @@ public:
 	virtual int32 GetCharacterLevel_Implementation() override;
 	virtual ECombatState GetCombatState_Implementation() const override { return CombatState; }
 	virtual void SetCombatState_Implementation(ECombatState NewState) override;
+	virtual void SetCombatStateToHandle_Implementation(ECombatState NewState) override;
 	virtual void SetMovementEnabled_Implementation(bool Enabled) override;
 	virtual void SetComboWindow_Implementation(bool bOpen) override { bIsComboWindowOpen = bOpen; }
 	virtual bool IsComboWindowOpen_Implementation() override { return bIsComboWindowOpen; }
@@ -61,9 +63,6 @@ public:
 	virtual void SetPlayerCombatState_Implementation(const ECombatState NewState) override { CombatState = NewState; }
 	virtual void SetMovementTarget_Implementation(const FVector Target) override { MovementTarget = Target; } 
 	virtual FTaggedMontage GetTaggedMontageByIndex_Implementation(int32 Index) override;
-	virtual void TryDodging_Implementation() override;
-	virtual  void TryRolling_Implementation() override;
-	virtual void ResetCombatState_Implementation(ECombatState NewState) override;
 	/** end Combat Interface */
 	
 	/** Inventory Interface */
@@ -75,12 +74,13 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void ServerOnSlotDrop(EContainerType TargetContainer, EContainerType SourceContainer, int32 SourceSlotIndex, int32 TargetSlotIndex, EArmorType ArmorType);
-	
 	virtual void OnSlotDrop_Implementation(EContainerType TargetContainer, EContainerType SourceContainer, int32 SourceSlotIndex, int32 TargetSlotIndex, EArmorType ArmorType) override;
+	virtual AContainer* GetContainer_Implementation() override { return InteractingContainer; } 
 
 	/** Player Interface */
 	virtual void ResetInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex) override;
 	virtual void UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData) override;
+	virtual void UpdateContainerSlots_Implementation(int32 TotalSlots) override;
 	virtual void SetContainer_Implementation(AContainer* Container) override;
 	virtual void AddToXP_Implementation(int32 InXP) override;
 	virtual void LevelUp_Implementation() override;
@@ -97,6 +97,7 @@ public:
 	virtual void HandleHangingOnRope_Implementation(FVector HangingTarget, bool bEndOverlap) override;
 	virtual void HandleEntangled_Implementation(float MinZ, float EntangledWalkSpeed, float EntangledGravityScale, bool bEndOverlap) override;
 	virtual void HandleSwimming_Implementation(float MinZ, float SwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap) override;
+	virtual void SetSpriteRelativeLocation_Implementation(FVector NewLocation) override;
 	/** end Player Interface */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -123,12 +124,24 @@ protected:
 	float DodgingSpeed = 2400.f;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	float DodgingMaxAcceleration = 5000.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	float DodgingBrakeFrictionFactor = .2f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
 	float RollingSpeed = 1000.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	float RollingMaxAcceleration = 5000.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	float RollingBrakeFrictionFactor = 500.f;
 
 	FTimerHandle OffLedgeTimer;
 	float OffLedgeTime = .5f;
 	bool bCanGrabLedge = true;
-	UFUNCTION() void OffLedgeEnd();
+	// UFUNCTION() void OffLedgeEnd();
 	
 	FTimerHandle UnCrouchingTimer;
 	float UnCrouchingTime = .25f;
@@ -159,8 +172,8 @@ protected:
 	void HandleCombatDirectionTag() const;
 
 private:	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))
-	TObjectPtr<UCapsuleComponent> HalfHeightCapsuleComponent;
+	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))
+	// TObjectPtr<UCapsuleComponent> HalfHeightCapsuleComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<USpringArmComponent> SpringArm;
@@ -190,25 +203,15 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
 	float EntangledExitTime = .1f;
-	
-	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
-	float DodgingTime = .2f;
-
-	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
-	float RollingTime = .2f;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastLevelUpParticles() const;
 
 	void OverlapPlatformEnd();
-	void EntangledExitEnd();
-	void DodgingEnd();
-	void RollingEnd();
+	// void EntangledExitEnd();
 	
 	FTimerHandle EntangledExitTimer;
 	FTimerHandle OverlapPlatformTimer;
-	FTimerHandle DodgingTimer;
-	FTimerHandle RollingTimer;
 	
 	bool bOverlapPlatformTimerEnded = true;
 	FVector MovementTarget = FVector::ZeroVector;

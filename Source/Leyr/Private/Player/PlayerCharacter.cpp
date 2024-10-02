@@ -25,6 +25,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "NiagaraComponent.h"
+#include "PaperFlipbookComponent.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -58,11 +59,6 @@ APlayerCharacter::APlayerCharacter()
 	RopeHangingCollision = CreateDefaultSubobject<UBoxComponent>("RopeHangingCollision");
 	RopeHangingCollision->SetupAttachment(GetRootComponent());
 	RopeHangingCollision->ComponentTags.Add(FName("RopeCollision"));
-
-	HalfHeightCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>("HalfHeightCapsuleComponent");
-	HalfHeightCapsuleComponent->SetupAttachment(GetCapsuleComponent());
-	HalfHeightCapsuleComponent->SetCapsuleHalfHeight(44.f);
-	HalfHeightCapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	TraceObjectType = EOT_EnemyCapsule;
 	
@@ -201,12 +197,18 @@ void APlayerCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 
 	}
 }
 
+void APlayerCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	Super::OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+	GetSprite()->SetRelativeLocation(FVector::ZeroVector);
+}
+
 /*
  * Movement
  */
 void APlayerCharacter::Move(const FVector2D MovementVector)
 {
-	// if(CombatState > ECombatState::Swimming) return;
+	if(CombatState >= ECombatState::Dodging)  return;
 	
 	RotateController();
 	
@@ -247,6 +249,7 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	case ECombatState::HitReact:
 	case ECombatState::Dodging:
 	case ECombatState::Rolling:
+	case ECombatState::RollingEnd:
 		break;
 	}
 }
@@ -304,10 +307,6 @@ void APlayerCharacter::RotateController() const
 	}
 }
 
-void APlayerCharacter::TryDodging_Implementation(){ HandleCombatState(ECombatState::Dodging); }
-void APlayerCharacter::TryRolling_Implementation() { HandleCombatState(ECombatState::Rolling); }
-void APlayerCharacter::ResetCombatState_Implementation(ECombatState NewState) { HandleCombatState(NewState); }
-
 void APlayerCharacter::HandleCrouching(bool bShouldCrouch)
 {
 	bCrouchButtonHeld = bShouldCrouch;
@@ -342,12 +341,15 @@ void APlayerCharacter::JumpButtonPressed()
 	{
 		HandleCombatState(ECombatState::Unoccupied);
 		bCanGrabLedge = false;
-		GetWorld()->GetTimerManager().SetTimer(OffLedgeTimer, this, &APlayerCharacter::OffLedgeEnd, OffLedgeTime);
+		GetWorld()->GetTimerManager().SetTimer(OffLedgeTimer, FTimerDelegate::CreateLambda([this] () { bCanGrabLedge = true; }), OffLedgeTime, false);
 	}
 	bIsCrouched ? TryVaultingDown() : Jump();
 }
 
-void APlayerCharacter::OffLedgeEnd() { bCanGrabLedge = true; }
+void APlayerCharacter::SetCombatStateToHandle_Implementation(ECombatState NewState)
+{
+	HandleCombatState(NewState);
+}
 
 void APlayerCharacter::HandleCombatState(ECombatState NewState)
 {
@@ -355,7 +357,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 	GetCharacterMovement()->GravityScale = BaseGravityScale;
 	GetCapsuleComponent()->SetCollisionObjectType(ECC_Pawn);
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	HalfHeightCapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	// HalfHeightCapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
 	GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(GameplayTags.CombatStates);
@@ -431,18 +433,30 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		break;
 	case ECombatState::Dodging:
 		GetCharacterMovement()->MaxWalkSpeed = DodgingSpeed;
-		GetCharacterMovement()->MaxAcceleration = 5000.f;
-		GetCharacterMovement()->BrakingFrictionFactor = .2f;
+		GetCharacterMovement()->MaxAcceleration = DodgingMaxAcceleration;
+		GetCharacterMovement()->BrakingFrictionFactor = DodgingBrakeFrictionFactor;
 		GetCapsuleComponent()->SetCollisionObjectType(ECC_WorldDynamic);
-		// if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(DodgingTimer, this, &APlayerCharacter::DodgingEnd, DodgingTime);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Dodging);
 		break;
 	case ECombatState::Rolling:
-		GetCharacterMovement()->MaxWalkSpeed = RollingSpeed;
-		GetCharacterMovement()->MaxAcceleration = 5000.f;
-		GetCharacterMovement()->BrakingFrictionFactor = .2f;
+		// GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		// GetCharacterMovement()->MaxFlySpeed = RollingSpeed;
+		Crouch();
+		GetCharacterMovement()->MaxWalkSpeedCrouched = RollingSpeed;
+		GetCharacterMovement()->MaxAcceleration = RollingMaxAcceleration;
+		GetCharacterMovement()->BrakingFrictionFactor = RollingBrakeFrictionFactor;
+		GetSprite()->SetRelativeLocation(FVector(0.f, 0.f, 44.f));
 		// HalfHeightCapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		// GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		// if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(RollingTimer, this, &APlayerCharacter::RollingEnd, RollingTime);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Rolling);
+		break;
+	case ECombatState::RollingEnd:
+		UnCrouch();
+		GetSprite()->SetRelativeLocation(FVector::ZeroVector);
+		CombatState = ECombatState::Unoccupied;
+		GetCharacterMovement()->MaxWalkSpeedCrouched = BaseWalkSpeedCrouched;
+		GetCharacterMovement()->MaxAcceleration = 2048.f;
+		GetCharacterMovement()->BrakingFrictionFactor = 2.f;
 		break;
 	}
 }
@@ -490,13 +504,11 @@ void APlayerCharacter::SetMovementEnabled_Implementation(bool Enabled)
 	
 	if (Enabled)
 	{
-		// GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		if(CombatState == ECombatState::Attacking) HandleCombatState(PreviousCombatState);
 		HandleCrouching(bCrouchButtonHeld);
 	}
 	else
 	{
-		// GetCharacterMovement()->StopMovementImmediately();
 		CombatState = ECombatState::Attacking;
 	}
 }
@@ -508,7 +520,10 @@ void APlayerCharacter::HandleEntangled_Implementation(float MinZ, float Entangle
 {
 	if(bEndOverlap)
 	{
-		if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(EntangledExitTimer, this, &APlayerCharacter::EntangledExitEnd, EntangledExitTime);
+		if(const UWorld* World = GetWorld())
+		{
+			World->GetTimerManager().SetTimer(EntangledExitTimer, FTimerDelegate::CreateLambda([this] () { HandleCombatState(ECombatState::Unoccupied); }), EntangledExitTime, false);
+		}
 	}
 	else
 	{
@@ -521,26 +536,14 @@ void APlayerCharacter::HandleEntangled_Implementation(float MinZ, float Entangle
 	}
 }
 
-void APlayerCharacter::EntangledExitEnd()
-{
-	HandleCombatState(ECombatState::Unoccupied);
-}
-
-void APlayerCharacter::DodgingEnd()
-{
-	HandleCombatState(ECombatState::Unoccupied);
-}
-
-void APlayerCharacter::RollingEnd()
-{
-	HandleCombatState(ECombatState::Unoccupied);
-}
-
 void APlayerCharacter::HandleSwimming_Implementation(float MinZ, float SwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap)
 {
 	if(bEndOverlap)
 	{
-		if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(EntangledExitTimer, this, &APlayerCharacter::EntangledExitEnd, EntangledExitTime);
+		if(const UWorld* World = GetWorld())
+		{
+			World->GetTimerManager().SetTimer(EntangledExitTimer, FTimerDelegate::CreateLambda([this] () { HandleCombatState(ECombatState::Unoccupied); }), EntangledExitTime, false);
+		}
 		GetCharacterMovement()->GetPhysicsVolume()->bWaterVolume = false;
 	}
 	else
@@ -551,6 +554,11 @@ void APlayerCharacter::HandleSwimming_Implementation(float MinZ, float SwimmingS
 		GetCharacterMovement()->GravityScale = SwimmingGravityScale;
 		HandleCombatState(ECombatState::Swimming);
 	}
+}
+
+void APlayerCharacter::SetSpriteRelativeLocation_Implementation(FVector NewLocation)
+{
+	GetSprite()->SetRelativeLocation(NewLocation);
 }
 
 /*
@@ -697,6 +705,7 @@ void APlayerCharacter::ServerOnSlotDrop_Implementation(EContainerType TargetCont
 		TargetInventory = HotbarComponent;
 		break;
 	case EContainerType::Container:
+		TargetInventory = InteractingContainer->Container;
 		break;
 	case EContainerType::Equipment:
 		break;
@@ -712,6 +721,7 @@ void APlayerCharacter::ServerOnSlotDrop_Implementation(EContainerType TargetCont
 		SourceInventory = HotbarComponent;
 		break;
 	case EContainerType::Container:
+		SourceInventory = InteractingContainer->Container;
 		break;
 	case EContainerType::Equipment:
 		break;
@@ -723,6 +733,11 @@ void APlayerCharacter::ServerOnSlotDrop_Implementation(EContainerType TargetCont
 void APlayerCharacter::UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData)
 {
 	IControllerInterface::Execute_UpdateInventorySlot(Controller, ContainerType, SlotIndex, ItemData);
+}
+
+void APlayerCharacter::UpdateContainerSlots_Implementation(int32 TotalSlots)
+{
+	IControllerInterface::Execute_UpdateContainerSlots(Controller, TotalSlots);
 }
 
 void APlayerCharacter::ResetInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex)

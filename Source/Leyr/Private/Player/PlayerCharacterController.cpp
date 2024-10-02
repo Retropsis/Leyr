@@ -33,8 +33,6 @@ void APlayerCharacterController::SetupInputComponent()
 		BaseInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APlayerCharacterController::Jump);
 		BaseInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &APlayerCharacterController::StopJumping);
 		BaseInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerCharacterController::InteractButtonPressed);
-		BaseInputComponent->BindAction(CrouchAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::CrouchButtonPressed);
-		BaseInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &APlayerCharacterController::CrouchButtonReleased);
 		BaseInputComponent->BindAction(InventoryAction, ETriggerEvent::Started, this, &APlayerCharacterController::InventoryButtonPressed);
 		BaseInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &APlayerCharacterController::InteractButtonPressed);
 
@@ -94,7 +92,6 @@ void APlayerCharacterController::CursorTrace()
 
 void APlayerCharacterController::Move(const FInputActionValue& Value)
 {
-	GEngine->AddOnScreenDebugMessage(654255, .5f, FColor::Cyan, FString::Printf(TEXT("%s"), *Value.Get<FVector2D>().ToString()));
 	if (PlayerCharacter) PlayerCharacter->Move(Value.Get<FVector2D>());
 }
 
@@ -106,20 +103,6 @@ void APlayerCharacterController::Jump()
 void APlayerCharacterController::StopJumping()
 {
 	if (PlayerCharacter) PlayerCharacter->StopJumping();
-}
-
-void APlayerCharacterController::AttackButtonPressed()
-{
-}
-
-void APlayerCharacterController::CrouchButtonPressed()
-{
-	if (PlayerCharacter) PlayerCharacter->HandleCrouching(true);
-}
-
-void APlayerCharacterController::CrouchButtonReleased()
-{
-	if (PlayerCharacter) PlayerCharacter->HandleCrouching(false);
 }
 
 void APlayerCharacterController::InteractButtonPressed()

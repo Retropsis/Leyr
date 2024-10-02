@@ -28,6 +28,9 @@ class LEYR_API IPlayerInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	/*
+	 * Ability System
+	 */
 	UFUNCTION(BlueprintNativeEvent)
 	int32 FindLevelForXP(int32 InXP) const;
 
@@ -60,18 +63,36 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void LevelUp();
-	
+
+	/*
+	 * Inventory
+	 */
 	UFUNCTION(BlueprintNativeEvent)
 	void UpdateInventorySlot(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData);
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void OnSlotDrop(EContainerType TargetContainer, EContainerType SourceContainer, int32 SourceSlotIndex, int32 TargetSlotIndex, EArmorType ArmorType);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void ResetInventorySlot(EContainerType ContainerType, int32 SlotIndex);
 
 	UFUNCTION(BlueprintNativeEvent)
+	void UpdateContainerSlots(int32 TotalSlots);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void OnSlotDrop(EContainerType TargetContainer, EContainerType SourceContainer, int32 SourceSlotIndex, int32 TargetSlotIndex, EArmorType ArmorType);
+	
+	UFUNCTION(BlueprintNativeEvent)
+	void SetContainer(AContainer* Container);
+	
+	UFUNCTION(BlueprintNativeEvent)
+	AContainer* GetContainer();
+	
+	/*
+	 * Combat
+	 */
+	UFUNCTION(BlueprintNativeEvent)
 	ECombatState GetPlayerCombatState();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void SetIsAttack(bool bIsAttacking);
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void SetPlayerCombatState(const ECombatState NewState);
@@ -87,10 +108,4 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void HandleSwimming(float MinZ, float SwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap);
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void SetIsAttack(bool bIsAttacking);
-	
-	UFUNCTION(BlueprintNativeEvent)
-	void SetContainer(AContainer* Container);
 };

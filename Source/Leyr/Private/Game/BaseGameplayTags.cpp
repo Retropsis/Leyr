@@ -141,6 +141,8 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	 */
 	GameplayTags.Abilities_None = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.None"), FString("None"));
 	GameplayTags.Abilities_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Attack"), FString("Melee Attack"));
+	GameplayTags.Abilities_Parry = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Parry"), FString("Melee Parry"));
+	GameplayTags.Abilities_Block = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Block"), FString("Melee Block"));
 	GameplayTags.Abilities_Summon = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Summon"), FString("Ability Summon"));
 	
 	GameplayTags.Abilities_Fire_FireBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Fire.FireBolt"), FString("Fire Element Ability FireBolt"));
@@ -345,8 +347,12 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Montage_Slope_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Slope.Attack"), FString("Montage Slope Attack"));
 	GameplayTags.Montage_Ladder_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Ladder.Attack"), FString("Montage Ladder Attack"));
 	GameplayTags.Montage_Roll_End = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Roll.End"), FString("Montage Roll End"));
+	GameplayTags.Montage_Roll_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Roll.Attack"), FString("Montage Roll Attack"));
 	GameplayTags.Montage_Dodge_End = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Dodge.End"), FString("Montage Dodge End"));
 	GameplayTags.Montage_EndAbility = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.EndAbility"), FString("Montage End Ability"));
+	GameplayTags.Montage_Parry = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Parry"), FString("Montage Parry"));
+	GameplayTags.Montage_Parry_Begin = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Parry.Begin"), FString("Montage Parry Begin"));
+	GameplayTags.Montage_Parry_End = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Parry.End"), FString("Montage Parry End"));
 	
 	GameplayTags.Montage_Window_Combo = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Window.Combo"), FString("Montage Window Combo"));
 	GameplayTags.Montage_Window_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Window.Execute"), FString("Montage Window Execute"));

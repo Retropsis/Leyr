@@ -98,15 +98,13 @@ protected:
 	void Move(const FInputActionValue& Value);
 	void Jump();
 	void StopJumping();
-	void AttackButtonPressed();
-	void CrouchButtonPressed();
-	void CrouchButtonReleased();
 	void InteractButtonPressed();
 
 	/*
 	 * Inventory
 	 */
 	virtual void UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData) override {}
+	virtual void UpdateContainerSlots_Implementation(int32 TotalSlots) override {}
 	UFUNCTION(BlueprintCallable) virtual void ToggleContainer_Implementation(int32 SlotCount) override {}
 	
 	UFUNCTION(Client, Reliable) void InventoryButtonPressed();

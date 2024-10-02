@@ -20,8 +20,26 @@ class LEYR_API AContainer : public AActor, public IInteractionInterface
 public:	
 	AContainer();
 	virtual void Interact_Implementation(AActor* InteractingActor) override;
+	
+	UFUNCTION(Server, Reliable)
+	void StopInteracting(AActor* InteractingActor);
 
-	FORCEINLINE int32 GetSlotCountContainer() const { return ContainerComponent->GetSlotCount(); }
+	UFUNCTION(Server, Reliable)
+	void ForEachActorUpdateInventorySlot(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData Item);
+	
+	UFUNCTION(Server, Reliable)
+	void ForEachActorResetInventorySlot(EContainerType ContainerType, int32 SlotIndex);
+	
+	UFUNCTION(Server, Reliable)
+	void UpdateContainer();
+
+	FORCEINLINE int32 GetSlotCountContainer() const { return Container->GetSlotCount(); }
+
+	UPROPERTY(EditAnywhere, Category="Container")
+	EContainerSubType ContainerSubType = EContainerSubType::Chest;
+
+	UPROPERTY(EditAnywhere, Category="Container")
+	TObjectPtr<UContainerComponent> Container;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -32,9 +50,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Container")
 	TObjectPtr<UBoxComponent> OverlapBox;
 
-	UPROPERTY(EditAnywhere, Category="Container")
-	TObjectPtr<UContainerComponent> ContainerComponent;
-
-	UPROPERTY(EditAnywhere, Category="Container")
-	EContainerSubType ContainerSubType = EContainerSubType::Chest;
+private:
+	UPROPERTY()
+	TArray<AActor*> InteractingActors;
 };

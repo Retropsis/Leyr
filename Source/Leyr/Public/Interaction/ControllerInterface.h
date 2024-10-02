@@ -26,13 +26,16 @@ class LEYR_API IControllerInterface
 public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void CloseInventory();
+	
+	UFUNCTION(BlueprintNativeEvent)
+	void ToggleContainer(int32 SlotCount);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void UpdateInventorySlot(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void ResetInventorySlot(EContainerType ContainerType, int32 SlotIndex);
-	
+
 	UFUNCTION(BlueprintNativeEvent)
-	void ToggleContainer(int32 SlotCount);
+	void UpdateContainerSlots(int32 TotalSlots);
 };

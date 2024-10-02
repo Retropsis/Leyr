@@ -101,6 +101,9 @@ public:
 	void SetCombatState(ECombatState NewState);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetCombatStateToHandle(ECombatState NewState);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetMovementEnabled(bool Enabled);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
@@ -132,19 +135,13 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetMovementMode(EMovementMode MovementMode,  float NewWalkingSpeed, float GravityValue);
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void TryDodging();
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void TryRolling();
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void ResetCombatState(ECombatState NewState);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool IsCharacterAirborne();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetMovementTarget(FVector Target);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetSpriteRelativeLocation(FVector NewLocation);
 };
