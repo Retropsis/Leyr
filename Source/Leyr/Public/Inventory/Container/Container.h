@@ -19,19 +19,25 @@ class LEYR_API AContainer : public AActor, public IInteractionInterface
 	
 public:	
 	AContainer();
+
+	// TODO: This call is Server in the course
 	virtual void Interact_Implementation(AActor* InteractingActor) override;
+	bool IsContainerAccessed() const { return InteractingActors.Num() > 0; }
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ToggleContainerLid(bool bOpen);
 	
 	UFUNCTION(Server, Reliable)
-	void StopInteracting(AActor* InteractingActor);
+	void ServerStopInteracting(AActor* InteractingActor);
 
 	UFUNCTION(Server, Reliable)
-	void ForEachActorUpdateInventorySlot(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData Item);
+	void ServerForEachActorUpdateInventorySlot(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData Item);
 	
 	UFUNCTION(Server, Reliable)
-	void ForEachActorResetInventorySlot(EContainerType ContainerType, int32 SlotIndex);
+	void ServerForEachActorResetInventorySlot(EContainerType ContainerType, int32 SlotIndex);
 	
 	UFUNCTION(Server, Reliable)
-	void UpdateContainer();
+	void ServerUpdateContainer();
 
 	FORCEINLINE int32 GetSlotCountContainer() const { return Container->GetSlotCount(); }
 

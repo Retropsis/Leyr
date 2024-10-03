@@ -751,6 +751,16 @@ void APlayerCharacter::SetContainer_Implementation(AContainer* Container)
 	IControllerInterface::Execute_ToggleContainer(Controller, Container->GetSlotCountContainer());
 }
 
+void APlayerCharacter::ServerCloseContainer_Implementation()
+{
+	InteractingContainer->ServerStopInteracting(this);
+	InteractingContainer = nullptr;
+	IControllerInterface::Execute_ToggleContainer(Controller, 0);
+}
+
+/*
+ *  Player Interface - Ability System
+ */
 void APlayerCharacter::AddToXP_Implementation(int32 InXP)
 {
 	APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();

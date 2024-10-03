@@ -71,6 +71,9 @@ public:
 	
 	UFUNCTION(Server, Reliable)
 	void ServerInteract();
+	
+	UFUNCTION(Server, Reliable)
+	void ServerCloseContainer(); 
 
 	UFUNCTION(Server, Reliable)
 	void ServerOnSlotDrop(EContainerType TargetContainer, EContainerType SourceContainer, int32 SourceSlotIndex, int32 TargetSlotIndex, EArmorType ArmorType);

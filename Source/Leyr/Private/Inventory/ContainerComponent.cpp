@@ -32,7 +32,7 @@ bool UContainerComponent::AddItemToIndex(FInventoryItemData InventoryItemData, i
 
 	if (AContainer* Container = IPlayerInterface::Execute_GetContainer(GetOwner()))
 	{
-		Container->ForEachActorUpdateInventorySlot(ContainerType, TargetSlotIndex, GetItemAtIndex(TargetSlotIndex));
+		Container->ServerForEachActorUpdateInventorySlot(ContainerType, TargetSlotIndex, GetItemAtIndex(TargetSlotIndex));
 	}
 	
 	return bWasSuccessful;
@@ -47,11 +47,11 @@ bool UContainerComponent::RemoveItemAtIndex(int32 SlotIndex)
 		if(Container->ContainerSubType == EContainerSubType::PlayerBag)
 		{
 			Items.RemoveAt(SlotIndex);
-			Container->UpdateContainer();
+			Container->ServerUpdateContainer();
 		}
 		else
 		{
-			Container->ForEachActorResetInventorySlot(ContainerType, SlotIndex);
+			Container->ServerForEachActorResetInventorySlot(ContainerType, SlotIndex);
 		}
 	}
 

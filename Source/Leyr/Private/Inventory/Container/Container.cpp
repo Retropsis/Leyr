@@ -28,6 +28,8 @@ void AContainer::BeginPlay()
 
 void AContainer::Interact_Implementation(AActor* InteractingActor)
 {
+	if(!IsContainerAccessed()) ToggleContainerLid(true);
+	
 	IPlayerInterface::Execute_SetContainer(InteractingActor, this);
 	InteractingActors.AddUnique(InteractingActor);
 
@@ -44,12 +46,13 @@ void AContainer::Interact_Implementation(AActor* InteractingActor)
 	}
 }
 
-void AContainer::StopInteracting_Implementation(AActor* InteractingActor)
+void AContainer::ServerStopInteracting_Implementation(AActor* InteractingActor)
 {
 	InteractingActors.Remove(InteractingActor);
+	if(!IsContainerAccessed()) ToggleContainerLid(false);
 }
 
-void AContainer::ForEachActorUpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData Item)
+void AContainer::ServerForEachActorUpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData Item)
 {
 	for (AActor* Actor : InteractingActors)
 	{
@@ -57,7 +60,7 @@ void AContainer::ForEachActorUpdateInventorySlot_Implementation(EContainerType C
 	}
 }
 
-void AContainer::ForEachActorResetInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex)
+void AContainer::ServerForEachActorResetInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex)
 {
 	for (AActor* Actor : InteractingActors)
 	{
@@ -65,7 +68,7 @@ void AContainer::ForEachActorResetInventorySlot_Implementation(EContainerType Co
 	}
 }
 
-void AContainer::UpdateContainer_Implementation()
+void AContainer::ServerUpdateContainer_Implementation()
 {
 	for (AActor* Actor : InteractingActors)
 	{
