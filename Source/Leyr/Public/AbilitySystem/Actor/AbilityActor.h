@@ -63,19 +63,4 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Combat")
 	USoundBase* DestructionSound;
-
-	/*
-	 * Construction
-	 */	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
-	int32 Length = 3;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
-	UPaperSprite* FirstTile = nullptr;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
-	UPaperSprite* LastTile = nullptr;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
-	TArray<UPaperSprite*> Tiles;
 };

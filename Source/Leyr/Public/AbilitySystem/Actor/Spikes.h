@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystem/Actor/DamageAbilityActor.h"
+#include "World/Level/LevelDesignData.h"
 #include "Spikes.generated.h"
 
+enum class EBuildDirection : uint8;
 class UBoxComponent;
 /**
  * 
@@ -17,6 +19,7 @@ class LEYR_API ASpikes : public ADamageAbilityActor
 
 public:
 	ASpikes();
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -26,4 +29,10 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AbilityActor|Spikes")
 	TObjectPtr<UBoxComponent> BoxCollision;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AbilityActor|Spikes")
+	EBuildDirection BuildDirection = EBuildDirection::Horizontal;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AbilityActor|Spikes")
+	int32 Length = 3;
 };
