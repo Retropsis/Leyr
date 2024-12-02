@@ -59,6 +59,10 @@ APlayerCharacter::APlayerCharacter()
 	RopeHangingCollision = CreateDefaultSubobject<UBoxComponent>("RopeHangingCollision");
 	RopeHangingCollision->SetupAttachment(GetRootComponent());
 	RopeHangingCollision->ComponentTags.Add(FName("RopeCollision"));
+	
+	SwimmingCollision = CreateDefaultSubobject<UBoxComponent>("SwimmingCollision");
+	SwimmingCollision->SetupAttachment(GetRootComponent());
+	SwimmingCollision->ComponentTags.Add(FName("SwimmingCollision"));
 
 	TraceObjectType = EOT_EnemyCapsule;
 	
@@ -239,6 +243,11 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 		break;
 	case ECombatState::Swimming:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
+		AddMovementInput(FVector(0.f, 0.f, 1.f), FMath::RoundToFloat(MovementVector.Y) / 2.f);
+		break;
+	case ECombatState::FreeClimbing:
+		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
+		AddMovementInput(FVector(0.f, 0.f, 1.f), FMath::RoundToFloat(MovementVector.Y));
 		break;
 	case ECombatState::UnCrouching:
 	case ECombatState::Attacking:
@@ -334,7 +343,7 @@ void APlayerCharacter::JumpButtonPressed()
 	}
 	if(CombatState == ECombatState::Swimming)
 	{
-		GetCharacterMovement()->AddImpulse(FVector::UpVector * 333.f, true);
+		// GetCharacterMovement()->AddImpulse(FVector::UpVector * 333.f, true);
 		return;
 	}
 	if(CombatState >= ECombatState::HangingLedge)
@@ -423,8 +432,9 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Entangled);
 		break;
 	case ECombatState::Swimming:
-		GetCharacterMovement()->SetMovementMode(MOVE_Swimming);
-		GetCharacterMovement()->GetPhysicsVolume()->bWaterVolume = true;
+		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		GetCharacterMovement()->MaxFlySpeed = 275.f;
+		// GetCharacterMovement()->GetPhysicsVolume()->bWaterVolume = true;
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Swimming);
 		break;
 	case ECombatState::ClimbingRope:
@@ -457,6 +467,8 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetCharacterMovement()->MaxWalkSpeedCrouched = BaseWalkSpeedCrouched;
 		GetCharacterMovement()->MaxAcceleration = 2048.f;
 		GetCharacterMovement()->BrakingFrictionFactor = 2.f;
+		break;
+	case ECombatState::FreeClimbing:
 		break;
 	}
 }
@@ -540,11 +552,14 @@ void APlayerCharacter::HandleSwimming_Implementation(float MinZ, float SwimmingS
 {
 	if(bEndOverlap)
 	{
-		if(const UWorld* World = GetWorld())
-		{
-			World->GetTimerManager().SetTimer(EntangledExitTimer, FTimerDelegate::CreateLambda([this] () { HandleCombatState(ECombatState::Unoccupied); }), EntangledExitTime, false);
-		}
+		// if(const UWorld* World = GetWorld())
+		// {
+		// 	World->GetTimerManager().SetTimer(EntangledExitTimer, FTimerDelegate::CreateLambda([this] () { HandleCombatState(ECombatState::Unoccupied); }), SwimmingExitTime, false);
+		// }
 		GetCharacterMovement()->GetPhysicsVolume()->bWaterVolume = false;
+		HandleCombatState(ECombatState::Unoccupied);
+		// GetCharacterMovement()->AddImpulse(FVector::UpVector * 1500.f, true);
+		Jump();
 	}
 	else
 	{

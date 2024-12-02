@@ -197,6 +197,9 @@ private:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UBoxComponent> RopeHangingCollision;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
+	TObjectPtr<UBoxComponent> SwimmingCollision;
 
 	UPROPERTY(EditDefaultsOnly, Category="Player|Plaforming")
 	float PlatformTraceDistance = 10.f;
@@ -206,6 +209,9 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
 	float EntangledExitTime = .1f;
+	
+	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
+	float SwimmingExitTime = .09f;
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastLevelUpParticles() const;

@@ -1,7 +1,6 @@
 // @ Retropsis 2024-2025.
 
 #include "World/Level/Moving/WaterGroup.h"
-
 #include "Components/BoxComponent.h"
 #include "Interaction/PlayerInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -19,7 +18,8 @@ void AWaterGroup::OnConstruction(const FTransform& Transform)
 
 void AWaterGroup::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if(OtherActor && OtherActor->Implements<UPlayerInterface>())
+	// if(OtherActor && OtherActor->Implements<UPlayerInterface>())
+	if(OtherComp && OtherComp->ComponentHasTag("SwimmingCollision"))
 	{
 		ActiveActors.AddUnique(OtherActor);
 		IPlayerInterface::Execute_HandleSwimming(OtherActor, MinZ, SwimmingSpeed, SwimmingGravityScale, false);
@@ -28,7 +28,8 @@ void AWaterGroup::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 
 void AWaterGroup::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if(OtherActor && OtherActor->Implements<UPlayerInterface>() && ActiveActors.Contains(OtherActor))
+	// if(OtherActor && OtherActor->Implements<UPlayerInterface>() && ActiveActors.Contains(OtherActor))
+	if(OtherComp && OtherComp->ComponentHasTag("SwimmingCollision") && ActiveActors.Contains(OtherActor))
 	{
 		ActiveActors.Remove(OtherActor);
 		IPlayerInterface::Execute_HandleSwimming(OtherActor, 0.f, 0.f, 0.f, true);
@@ -45,11 +46,17 @@ void AWaterGroup::HandleActiveActors(float DeltaSeconds)
 		{
 			const bool bSinkFaster = Actor->GetActorLocation().Z > SurfaceZ;
 			
-			FVector CurrentBottom = FVector(Actor->GetActorLocation().X, 0.f, InterpTarget.Z);
+			FHitResult Hit;
+			UKismetSystemLibrary::LineTraceSingle(
+				Actor, Actor->GetActorLocation(), Actor->GetActorLocation() - Actor->GetActorUpVector() * 100.f,
+				TraceTypeQuery1, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, Hit, true);
+			
+			FVector CurrentBottom = Hit.bBlockingHit ? Hit.ImpactPoint : FVector(Actor->GetActorLocation().X, 0.f, InterpTarget.Z);
 			UKismetSystemLibrary::DrawDebugPoint(this, InterpTarget, 15.f, FLinearColor::Green);
+			
 			switch (MovingDirection) {
 			case EMovingDirection::Sink:
-				Actor->SetActorLocation(FMath::VInterpTo(Actor->GetActorLocation(), CurrentBottom, DeltaSeconds, 10.f));
+				Actor->SetActorLocation(FMath::VInterpConstantTo(Actor->GetActorLocation(), CurrentBottom, DeltaSeconds, 10.f));
 				// Actor->SetActorLocation(FMath::VInterpTo(Actor->GetActorLocation(), CurrentBottom, DeltaSeconds, bSinkFaster ? 10.f : InterpolationSpeed));
 				break;
 			case EMovingDirection::Vector:
