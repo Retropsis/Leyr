@@ -3,11 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AIData.h"
 #include "AI/BaseCharacter.h"
+#include "Interaction/AIInterface.h"
 #include "Interaction/EnemyInterface.h"
 #include "UI/Controller/OverlayWidgetController.h"
 #include "AICharacter.generated.h"
 
+enum class EBehaviourType : uint8;
 class ABaseAIController;
 class UBehaviorTree;
 class UWidgetComponent;
@@ -15,7 +18,7 @@ class UWidgetComponent;
  * 
  */
 UCLASS()
-class LEYR_API AAICharacter : public ABaseCharacter, public IEnemyInterface
+class LEYR_API AAICharacter : public ABaseCharacter, public IEnemyInterface, public IAIInterface
 {
 	GENERATED_BODY()
 
@@ -30,6 +33,11 @@ public:
 	virtual AActor* GetCombatTarget_Implementation() const override { return CombatTarget; }
 	virtual void Die(const FVector& DeathImpulse) override;
 	/** end Combat Interface */
+	
+	/** AI Interface */
+	virtual FVector FindRandomLocation_Implementation() override;
+	virtual bool MoveToLocation_Implementation(FVector TargetLocation, float Threshold) override;
+	/** end AI Interface */
 	
 	UPROPERTY(BlueprintReadWrite, Category = "Combat")
 	TObjectPtr<AActor> CombatTarget;
@@ -50,7 +58,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;
 	virtual void InitializeDefaultAttributes() const override;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
 	int32 Level = 1;
 	
@@ -59,10 +67,24 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UWidgetComponent> PassiveIndicatorComponent;
-	
+
+	/*
+	 * AI
+	*/
 	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	TObjectPtr<UBehaviorTree> BehaviorTree;
 
 	UPROPERTY()
 	TObjectPtr<ABaseAIController> BaseAIController;
+	
+	UPROPERTY(EditAnywhere, Category = "Character|AI")
+	EBehaviourType BehaviourType = EBehaviourType::Patrol;
+	
+	UPROPERTY(EditAnywhere, Category = "Character|AI")
+	float PatrolRadius = 1000.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Character|AI")
+	float PatrolTickRadius = 300.f;
+	
+	FVector StartLocation = FVector::ZeroVector;
 };

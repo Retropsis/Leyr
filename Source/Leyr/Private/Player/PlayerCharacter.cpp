@@ -603,12 +603,8 @@ void APlayerCharacter::TraceForPlatforms() const
 	if(Hit.GetActor() && Hit.GetActor()->ActorHasTag("VaultDownPlatform"))
 	{
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, bOverlapPlatformTimerEnded ? ECR_Block : ECR_Overlap);
+		IPlatformInterface::Execute_SetBoxCollisionEnabled(Hit.GetActor(), bOverlapPlatformTimerEnded ? true : false);
 	}
-}
-
-void APlayerCharacter::OverlapPlatformEnd()
-{
-	bOverlapPlatformTimerEnded = true;
 }
 
 void APlayerCharacter::TraceForLedge()
@@ -653,10 +649,12 @@ void APlayerCharacter::TryVaultingDown()
 	TArray<AActor*> ActorsToIgnore;
 	FHitResult Hit;
 	UKismetSystemLibrary::LineTraceSingleForObjects(this, Start, End, ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::None, Hit, true);
+	
 	if(Hit.bBlockingHit && Hit.GetActor()->Implements<UPlatformInterface>() && Hit.GetActor()->ActorHasTag("VaultDownPlatform"))
 	{
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Overlap);
-		GetWorld()->GetTimerManager().SetTimer(OverlapPlatformTimer, this, &APlayerCharacter::OverlapPlatformEnd, OverlapPlatformTime);
+		GetWorld()->GetTimerManager().SetTimer(OverlapPlatformTimer, FTimerDelegate::CreateLambda([this] () { bOverlapPlatformTimerEnded = true; }), OverlapPlatformTime, false);
+		IPlatformInterface::Execute_SetBoxCollisionEnabled(Hit.GetActor(), false);
 		bOverlapPlatformTimerEnded = false;
 		UnCrouch();
 		if (UPlayerCharacterAnimInstance* PlayerCharacterAnimInstance = Cast<UPlayerCharacterAnimInstance>(AnimationComponent->GetAnimInstance()))

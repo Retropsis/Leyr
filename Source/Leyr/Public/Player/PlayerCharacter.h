@@ -215,9 +215,6 @@ private:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastLevelUpParticles() const;
-
-	void OverlapPlatformEnd();
-	// void EntangledExitEnd();
 	
 	FTimerHandle EntangledExitTimer;
 	FTimerHandle OverlapPlatformTimer;

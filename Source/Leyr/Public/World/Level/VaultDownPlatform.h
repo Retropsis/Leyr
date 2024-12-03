@@ -19,20 +19,16 @@ class LEYR_API AVaultDownPlatform : public APlatform
 
 public:
 	AVaultDownPlatform();
+	virtual void OnConstruction(const FTransform& Transform) override;
+	virtual void SetBoxCollisionEnabled_Implementation(bool bEnabled) override;
+	virtual void BeginPlay() override;
 
-protected:	
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
-	// TObjectPtr<UPaperGroupedSpriteComponent> TileMap;
+protected:
+	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
+	
+	UPROPERTY(EditAnywhere, Category="Plaform|Mechanics")
+	TObjectPtr<UBoxComponent> OccupancyCollision;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
-	int32 Length = 3;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
-	UPaperSprite* FirstTile = nullptr;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
-	UPaperSprite* LastTile = nullptr;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
-	TArray<UPaperSprite*> Tiles;
+	int32 Length = 2;
 };
