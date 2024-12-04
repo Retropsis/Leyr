@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 
 UENUM(BlueprintType)
-enum class EFlyingState : uint8
+enum class EBehaviourState : uint8
 {
 	Patrol UMETA(DisplayName="Patrol"),
 	Chase UMETA(DisplayName="Chase"),

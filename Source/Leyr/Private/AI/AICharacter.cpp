@@ -150,11 +150,13 @@ void AAICharacter::Die(const FVector& DeathImpulse)
  */
 FVector AAICharacter::FindRandomLocation_Implementation()
 {
+	UKismetSystemLibrary::DrawDebugCircle(this, StartLocation, PatrolRadius, 12, FLinearColor::White, 5.f, 0, FVector(1, 0, 0));
+	UKismetSystemLibrary::DrawDebugCircle(this, GetActorLocation(), PatrolTickRadius, 12, FLinearColor::Green, 5.f, 0, FVector(1, 0, 0));
 	int32 Index = 0;
 	while (Index < 10)
 	{
 		FVector TargetLocation = GetActorLocation() + FVector(FMath::RandRange(-PatrolTickRadius, PatrolTickRadius), 0.f, FMath::RandRange(-PatrolTickRadius, PatrolTickRadius));
-		if (FMath::Abs((StartLocation - TargetLocation).Length()) > PatrolRadius)
+		if (FMath::Abs((StartLocation - TargetLocation).Size()) > PatrolRadius)
 		{
 			Index++;
 		}
@@ -163,21 +165,20 @@ FVector AAICharacter::FindRandomLocation_Implementation()
 			return TargetLocation;
 		}
 	}
-	return FVector::ZeroVector;
+	return StartLocation;
 }
 
 bool AAICharacter::MoveToLocation_Implementation(FVector TargetLocation, float Threshold)
 {
-	if ((GetActorLocation() - TargetLocation).Length() > Threshold)
+	if ((GetActorLocation() - TargetLocation).Size() > Threshold)
 	{
 		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetLocation.X, GetActorLocation().Y, TargetLocation.Z));
 		UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + LookAtRotation.Vector() * 100.f, 5.f, FLinearColor::Red, 1.f);
 		const FRotator WorldDirection = FRotator(LookAtRotation.Pitch, 0.f, 0.f);
 		UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + WorldDirection.Vector() * 100.f, 5.f, FLinearColor::Green, 1.f);
-		AddMovementInput(WorldDirection.Vector(), 1.f, true);
-		UKismetSystemLibrary::PrintString(this, FString::Printf(TEXT("Speed: %f"), GetCharacterMovement()->MaxFlySpeed));
+		AddMovementInput(LookAtRotation.Vector(), 1.f, true);
 		// SetActorRotation() // Set it to 0 or 180
-		return true;
+		return false;
 	}
-	return false;
+	return true;
 }

@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "AIInterface.generated.h"
 
+enum class EBehaviourState : uint8;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UAIInterface : public UInterface
@@ -27,4 +28,7 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool MoveToLocation(FVector TargetLocation, float Threshold);
+
+	virtual EBehaviourState GetBehaviourState() = 0;
+	virtual void SetBehaviourState(EBehaviourState NewState) = 0;
 };

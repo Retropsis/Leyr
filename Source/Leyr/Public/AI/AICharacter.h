@@ -57,7 +57,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;
-	virtual void InitializeDefaultAttributes() const override;
+	virtual void InitializeDefaultAttributes() const override;	
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
 	int32 Level = 1;
@@ -80,11 +80,21 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	EBehaviourType BehaviourType = EBehaviourType::Patrol;
 	
-	UPROPERTY(EditAnywhere, Category = "Character|AI")
-	float PatrolRadius = 1000.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|AI")
+	EBehaviourState BehaviourState = EBehaviourState::Patrol;
 	
 	UPROPERTY(EditAnywhere, Category = "Character|AI")
-	float PatrolTickRadius = 300.f;
+	float PatrolRadius = 750.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Character|AI")
+	float PatrolTickRadius = 450.f;
 	
 	FVector StartLocation = FVector::ZeroVector;
+
+public:
+	UFUNCTION(BlueprintCallable)
+	virtual EBehaviourState GetBehaviourState() override { return BehaviourState; }
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void SetBehaviourState(EBehaviourState NewState) override { BehaviourState = NewState; }
 };
