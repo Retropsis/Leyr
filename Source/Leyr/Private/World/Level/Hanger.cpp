@@ -16,16 +16,6 @@ AHanger::AHanger()
 	TileMap->SetupAttachment(HangingCollision);
 }
 
-void AHanger::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-void AHanger::OnConstruction(const FTransform& Transform)
-{
-	Super::OnConstruction(Transform);
-}
-
 void AHanger::BuildTileMap()
 {
 	if (BuildDirection == EBuildDirection::None) return;

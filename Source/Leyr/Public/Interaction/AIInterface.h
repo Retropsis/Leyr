@@ -28,6 +28,9 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool MoveToLocation(FVector TargetLocation, float Threshold);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool ChaseTarget(AActor* TargetToChase);
 
 	virtual EBehaviourState GetBehaviourState() = 0;
 	virtual void SetBehaviourState(EBehaviourState NewState) = 0;

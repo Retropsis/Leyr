@@ -36,6 +36,13 @@ AAICharacter::AAICharacter()
 	PassiveIndicatorComponent->SetWidgetSpace(EWidgetSpace::Screen);
 }
 
+void AAICharacter::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	// TODO: Might not need to be in Tick
+	if(BaseAIController) BaseAIController->GetBlackboardComponent()->SetValueAsEnum(FName("BehaviourState"), static_cast<uint8>(BehaviourState));
+}
+
 void AAICharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
@@ -179,6 +186,33 @@ bool AAICharacter::MoveToLocation_Implementation(FVector TargetLocation, float T
 		AddMovementInput(LookAtRotation.Vector(), 1.f, true);
 		// SetActorRotation() // Set it to 0 or 180
 		return false;
+	}
+	return true;
+}
+
+bool AAICharacter::ChaseTarget_Implementation(AActor* TargetToChase)
+{
+	switch (ChasingState) {
+	case EChasingState::Chasing:
+		if (GetDistanceTo(TargetToChase) > AttackRange)
+		{
+			const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetToChase->GetActorLocation().X, GetActorLocation().Y, TargetToChase->GetActorLocation().Z));
+			AddMovementInput(LookAtRotation.Vector(), 1.f, true);
+			// SetActorRotation() // Set it to 0 or 180
+			return false;
+		}
+		if (GetDistanceTo(TargetToChase) < CloseRange)
+		{
+			const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetToChase->GetActorLocation().X, GetActorLocation().Y, TargetToChase->GetActorLocation().Z));
+			AddMovementInput(LookAtRotation.Vector(), -.33f, true);
+			// SetActorRotation() // Set it to 0 or 180
+			return false;
+		}
+		break;
+	case EChasingState::HitReacting:
+		break;
+	case EChasingState::Defeat:
+		break;
 	}
 	return true;
 }

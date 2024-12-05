@@ -24,6 +24,7 @@ class LEYR_API AAICharacter : public ABaseCharacter, public IEnemyInterface, pub
 
 public:
 	AAICharacter();
+	virtual void Tick(float DeltaSeconds) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 	
@@ -37,6 +38,7 @@ public:
 	/** AI Interface */
 	virtual FVector FindRandomLocation_Implementation() override;
 	virtual bool MoveToLocation_Implementation(FVector TargetLocation, float Threshold) override;
+	virtual bool ChaseTarget_Implementation(AActor* TargetToChase) override;
 	/** end AI Interface */
 	
 	UPROPERTY(BlueprintReadWrite, Category = "Combat")
@@ -80,14 +82,23 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	EBehaviourType BehaviourType = EBehaviourType::Patrol;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|AI")
+	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	EBehaviourState BehaviourState = EBehaviourState::Patrol;
+	
+	UPROPERTY(EditAnywhere, Category = "Character|AI")
+	EChasingState ChasingState = EChasingState::Chasing;
 	
 	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	float PatrolRadius = 750.f;
 	
 	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	float PatrolTickRadius = 450.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Character|AI")
+	float AttackRange = 300.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Character|AI")
+	float CloseRange = 275.f;
 	
 	FVector StartLocation = FVector::ZeroVector;
 
