@@ -3,6 +3,7 @@
 #include "AI/BaseCharacter.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectTypes.h"
+#include "PaperFlipbookComponent.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AbilitySystem/Data/AttackSequenceInfo.h"
@@ -134,7 +135,7 @@ FVector ABaseCharacter::GetCombatSocketLocation_Implementation(const FGameplayTa
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Weapon) && IsValid(Weapon))
 	{
-		// return Weapon->GetSocketLocation(WeaponSocketName);
+		return GetSprite()->GetSocketLocation(WeaponSocketName);
 	}
 	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_LeftHand))
 	{

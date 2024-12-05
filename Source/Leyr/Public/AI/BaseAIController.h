@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "Perception/AIPerceptionTypes.h"
 #include "BaseAIController.generated.h"
 
+class AAICharacter;
 class UBehaviorTreeComponent;
 
 /**
@@ -18,8 +20,17 @@ class LEYR_API ABaseAIController : public AAIController
 	
 public:
 	ABaseAIController();
+	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void HandlePerceptionUpdated(const TArray<AActor*>& UpdatedActors);
 	
 protected:
 	UPROPERTY()
 	TObjectPtr<UBehaviorTreeComponent> BehaviorTreeComponent;
+
+	// UPROPERTY()
+	// TObjectPtr<UAIPerceptionComponent> PerceptionComponent;
+
+	void UseSightSense(const FAIStimulus& ActiveStimulus) const;
 };

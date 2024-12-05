@@ -81,6 +81,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	FName WeaponTipSocketName;
+	
+	UPROPERTY(EditAnywhere, Category="Character|Combat")
+	FName WeaponSocketName;
 
 	/*
 	 * Movement

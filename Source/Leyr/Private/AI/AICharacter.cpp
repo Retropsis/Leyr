@@ -53,6 +53,7 @@ void AAICharacter::PossessedBy(AController* NewController)
 	BaseAIController->RunBehaviorTree(BehaviorTree);
 	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), false);
 	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("RangedAttacker"), CharacterClass != ECharacterClass::Warrior);
+	BaseAIController->SetPawn(this);
 
 	StartLocation = GetActorLocation();
 	
@@ -62,6 +63,8 @@ void AAICharacter::PossessedBy(AController* NewController)
 	case EBehaviourType::Ranger:
 		break;
 	case EBehaviourType::Turret:
+		GetCharacterMovement()->SetMovementMode(MOVE_None);
+		GetCharacterMovement()->DefaultLandMovementMode = MOVE_None;
 		break;
 	case EBehaviourType::Airborne:
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
@@ -184,7 +187,7 @@ bool AAICharacter::MoveToLocation_Implementation(FVector TargetLocation, float T
 		const FRotator WorldDirection = FRotator(LookAtRotation.Pitch, 0.f, 0.f);
 		UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + WorldDirection.Vector() * 100.f, 5.f, FLinearColor::Green, 1.f);
 		AddMovementInput(LookAtRotation.Vector(), 1.f, true);
-		// SetActorRotation() // Set it to 0 or 180
+		if(FVector::DotProduct(LookAtRotation.Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
 		return false;
 	}
 	return true;
@@ -196,16 +199,16 @@ bool AAICharacter::ChaseTarget_Implementation(AActor* TargetToChase)
 	case EChasingState::Chasing:
 		if (GetDistanceTo(TargetToChase) > AttackRange)
 		{
-			const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetToChase->GetActorLocation().X, GetActorLocation().Y, TargetToChase->GetActorLocation().Z));
+			const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetToChase->GetActorLocation().X, GetActorLocation().Y, TargetToChase->GetActorLocation().Z + ChasingHeightOffset));
 			AddMovementInput(LookAtRotation.Vector(), 1.f, true);
-			// SetActorRotation() // Set it to 0 or 180
+			if(FVector::DotProduct(LookAtRotation.Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
 			return false;
 		}
 		if (GetDistanceTo(TargetToChase) < CloseRange)
 		{
-			const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetToChase->GetActorLocation().X, GetActorLocation().Y, TargetToChase->GetActorLocation().Z));
+			const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetToChase->GetActorLocation().X, GetActorLocation().Y, TargetToChase->GetActorLocation().Z + ChasingHeightOffset));
 			AddMovementInput(LookAtRotation.Vector(), -.33f, true);
-			// SetActorRotation() // Set it to 0 or 180
+			if(FVector::DotProduct(LookAtRotation.Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
 			return false;
 		}
 		break;

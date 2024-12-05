@@ -55,6 +55,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Combat")
 	float LifeSpan = 5.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Character|AI")
+	float ChasingFlyingSpeed = 250.f;
 
 protected:
 	virtual void BeginPlay() override;
@@ -99,6 +102,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	float CloseRange = 275.f;
+	
+	UPROPERTY(EditAnywhere, Category = "Character|AI")
+	float ChasingHeightOffset = 75.f;
 	
 	FVector StartLocation = FVector::ZeroVector;
 
