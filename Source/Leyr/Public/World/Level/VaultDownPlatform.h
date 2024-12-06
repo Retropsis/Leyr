@@ -26,9 +26,9 @@ public:
 protected:
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
 	
-	UPROPERTY(EditAnywhere, Category="Plaform|Mechanics")
+	UPROPERTY(EditAnywhere, Category="Plaform")
 	TObjectPtr<UBoxComponent> OccupancyCollision;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform")
 	int32 Length = 2;
 };

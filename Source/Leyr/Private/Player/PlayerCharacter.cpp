@@ -224,6 +224,7 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	
 	switch (CombatState) {
 	case ECombatState::Unoccupied:
+		if(MovementVector.Y > 0.f) TraceForLadder();
 	case ECombatState::Falling:
 	case ECombatState::Crouching:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
@@ -245,7 +246,7 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
 		AddMovementInput(FVector(0.f, 0.f, 1.f), FMath::RoundToFloat(MovementVector.Y) / 2.f);
 		break;
-	case ECombatState::FreeClimbing:
+	case ECombatState::Climbing:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
 		AddMovementInput(FVector(0.f, 0.f, 1.f), FMath::RoundToFloat(MovementVector.Y));
 		break;
@@ -433,13 +434,18 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		break;
 	case ECombatState::Swimming:
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-		GetCharacterMovement()->MaxFlySpeed = 275.f;
+		GetCharacterMovement()->MaxFlySpeed = SwimmingSpeed;
 		// GetCharacterMovement()->GetPhysicsVolume()->bWaterVolume = true;
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Swimming);
 		break;
 	case ECombatState::ClimbingRope:
 		MovementSpeed = ClimbingSpeed;
-		MovementTarget = GetActorLocation() + FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f - 10.f);
+		MovementTarget = GetActorLocation() + FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f + 10.f);
+		break;
+	case ECombatState::Climbing:
+		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		GetCharacterMovement()->MaxFlySpeed = ClimbingWalkSpeed;
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Climbing);
 		break;
 	case ECombatState::Dodging:
 		GetCharacterMovement()->MaxWalkSpeed = DodgingSpeed;
@@ -468,8 +474,6 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetCharacterMovement()->MaxAcceleration = 2048.f;
 		GetCharacterMovement()->BrakingFrictionFactor = 2.f;
 		break;
-	case ECombatState::FreeClimbing:
-		break;
 	}
 }
 
@@ -494,6 +498,19 @@ void APlayerCharacter::HandleHangingOnRope_Implementation(FVector HangingTarget,
 		HandleCombatState(ECombatState::HangingRope);
 	}
 	if(bEndOverlap && CombatState == ECombatState::HangingRope)
+	{
+		HandleCombatState(ECombatState::Falling);
+	}
+}
+
+void APlayerCharacter::HandleClimbing_Implementation(FVector HangingTarget, bool bEndOverlap)
+{
+	if (!bEndOverlap && GetCharacterMovement()->IsFalling())
+	{
+		// SetActorLocation(FVector(GetActorLocation().X, 0.f, HangingTarget.Z - RopeHangingCollision->GetRelativeLocation().Z));
+		HandleCombatState(ECombatState::Climbing);
+	}
+	if(bEndOverlap && CombatState == ECombatState::Climbing)
 	{
 		HandleCombatState(ECombatState::Falling);
 	}
@@ -548,7 +565,7 @@ void APlayerCharacter::HandleEntangled_Implementation(float MinZ, float Entangle
 	}
 }
 
-void APlayerCharacter::HandleSwimming_Implementation(float MinZ, float SwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap)
+void APlayerCharacter::HandleSwimming_Implementation(float MinZ, float EnvironmentSwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap)
 {
 	if(bEndOverlap)
 	{
@@ -558,7 +575,6 @@ void APlayerCharacter::HandleSwimming_Implementation(float MinZ, float SwimmingS
 		// }
 		GetCharacterMovement()->GetPhysicsVolume()->bWaterVolume = false;
 		HandleCombatState(ECombatState::Unoccupied);
-		// GetCharacterMovement()->AddImpulse(FVector::UpVector * 1500.f, true);
 		Jump();
 	}
 	else
@@ -599,11 +615,34 @@ void APlayerCharacter::TraceForPlatforms() const
 	{
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Overlap);
 	}
-		
+	
 	if(Hit.GetActor() && Hit.GetActor()->ActorHasTag("VaultDownPlatform"))
 	{
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, bOverlapPlatformTimerEnded ? ECR_Block : ECR_Overlap);
-		IPlatformInterface::Execute_SetBoxCollisionEnabled(Hit.GetActor(), bOverlapPlatformTimerEnded ? true : false);
+		IPlatformInterface::Execute_SetBoxCollisionEnabled(Hit.GetActor(), bOverlapPlatformTimerEnded);
+	}
+	
+	if(Hit.GetComponent() && Hit.GetComponent()->ComponentHasTag("Rope") && GetVelocity().Z < -10.f)
+	{
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Overlap);
+	}
+}
+
+void APlayerCharacter::TraceForLadder()
+{
+	if(GetCharacterMovement()->MovementMode != MOVE_Walking || GetVelocity().Z < 0.f) return;
+	
+	const FVector Start = RopeHangingCollision->GetComponentLocation();
+	const FVector End = Start + FVector::UpVector *  20.f;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(ObjectTypeQuery2);
+	TArray<AActor*> ActorsToIgnore;
+	FHitResult Hit;
+	UKismetSystemLibrary::SphereTraceSingleForObjects(this, Start, End, 20.f, ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, Hit, true);
+	
+	if(Hit.bBlockingHit && Hit.GetActor()->ActorHasTag("Ladder"))
+	{
+		HandleCombatState(ECombatState::HangingLadder);
 	}
 }
 

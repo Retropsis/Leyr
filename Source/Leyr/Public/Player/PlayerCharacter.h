@@ -46,6 +46,7 @@ public:
 	void TraceForLedge();
 	void TraceForSlope();
 	void TraceForPlatforms() const;
+	void TraceForLadder();
 	
 	/** Combat Interface */
 	virtual int32 GetCharacterLevel_Implementation() override;
@@ -98,8 +99,9 @@ public:
 	virtual int32 GetSkillPoints_Implementation() const override;
 	virtual void HandleHangingOnLadder_Implementation(FVector HangingTarget, bool bEndOverlap) override;
 	virtual void HandleHangingOnRope_Implementation(FVector HangingTarget, bool bEndOverlap) override;
+	virtual void HandleClimbing_Implementation(FVector HangingTarget, bool bEndOverlap) override;
 	virtual void HandleEntangled_Implementation(float MinZ, float EntangledWalkSpeed, float EntangledGravityScale, bool bEndOverlap) override;
-	virtual void HandleSwimming_Implementation(float MinZ, float SwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap) override;
+	virtual void HandleSwimming_Implementation(float MinZ, float EnvironmentSwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap) override;
 	virtual void SetSpriteRelativeLocation_Implementation(FVector NewLocation) override;
 	/** end Player Interface */
 
@@ -116,6 +118,12 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
 	float RopeWalkSpeed = 120.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	float ClimbingWalkSpeed = 120.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	float SwimmingSpeed = 225.f;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
 	float GroundSlopeGravityScale = 1.25f;
@@ -144,7 +152,6 @@ protected:
 	FTimerHandle OffLedgeTimer;
 	float OffLedgeTime = .5f;
 	bool bCanGrabLedge = true;
-	// UFUNCTION() void OffLedgeEnd();
 	
 	FTimerHandle UnCrouchingTimer;
 	float UnCrouchingTime = .25f;

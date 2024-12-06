@@ -28,7 +28,7 @@ public:
 	AHanger();
 
 protected:
-	void BuildTileMap();
+	// void BuildTileMap();
 
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {}
@@ -36,29 +36,29 @@ protected:
 	UFUNCTION()
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {}
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform")
 	TObjectPtr<UPaperGroupedSpriteComponent> TileMap;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UBoxComponent> HangingCollision;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform")
 	EBuildDirection BuildDirection = EBuildDirection::None;
 	
-	UPROPERTY(EditAnywhere, Category="Plaform|Mechanics")
+	UPROPERTY(EditAnywhere, Category="Plaform")
 	EHangingType HangingType = EHangingType::Ladder;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform")
 	int32 Length = 3;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
-	UPaperSprite* FirstTile = nullptr;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
-	UPaperSprite* LastTile = nullptr;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
-	TArray<UPaperSprite*> Tiles;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	// UPaperSprite* FirstTile = nullptr;
+	//
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	// UPaperSprite* LastTile = nullptr;
+	//
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	// TArray<UPaperSprite*> Tiles;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
 	float IgnoreCollisionTime = .6f;

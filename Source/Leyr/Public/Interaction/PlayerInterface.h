@@ -90,18 +90,21 @@ public:
 	 */
 	UFUNCTION(BlueprintNativeEvent)
 	ECombatState GetPlayerCombatState();
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void SetIsAttack(bool bIsAttacking);
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void SetPlayerCombatState(const ECombatState NewState);
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void SetIsAttack(bool bIsAttacking);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void HandleHangingOnLadder(FVector HangingTarget, bool bEndOverlap);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void HandleHangingOnRope(FVector HangingTarget, bool bEndOverlap);
+	
+	UFUNCTION(BlueprintNativeEvent)
+	void HandleClimbing(FVector HangingTarget, bool bEndOverlap);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void HandleEntangled(float MinZ, float EntangledWalkSpeed, float EntangledGravityScale, bool bEndOverlap);

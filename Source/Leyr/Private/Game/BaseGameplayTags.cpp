@@ -222,6 +222,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatState_Ledge = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Ledge"), FString("CombatState Ledge"));
 	GameplayTags.CombatState_Rope = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rope"), FString("CombatState Rope"));
 	GameplayTags.CombatState_Ladder = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Ladder"), FString("CombatState Ladder"));
+	GameplayTags.CombatState_Climbing = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Climbing"), FString("CombatState Climbing"));
 	GameplayTags.CombatState_Falling = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Falling"), FString("CombatState Falling"));
 	GameplayTags.CombatState_Crouching = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Crouching"), FString("CombatState Crouching"));
 	GameplayTags.CombatState_UnCrouching = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.UnCrouching"), FString("CombatState UnCrouching"));
@@ -242,6 +243,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Falling);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Rope);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Ledge);
+	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Climbing);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Slope);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Entangled);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Swimming);

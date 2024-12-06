@@ -33,6 +33,9 @@ public:
 	bool bIsMoving;
 	
 	UPROPERTY(BlueprintReadOnly, Category="PlayerCharacter")
+	bool bIsClimbingUp;
+	
+	UPROPERTY(BlueprintReadOnly, Category="PlayerCharacter")
 	bool bIsClimbing;
 	
 	UPROPERTY(BlueprintReadOnly, Category="PlayerCharacter")
