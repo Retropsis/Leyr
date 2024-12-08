@@ -14,16 +14,10 @@ class LEYR_API UMeleeGameplayAbility : public UDamageGameplayAbility
 {
 	GENERATED_BODY()
 
-public:	
-	UFUNCTION(BlueprintCallable)
-	TArray<FHitResult> BoxTrace(bool bDebug = false);
-	
+public:		
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Montage"))
 	FGameplayTag MainMontageTag = FGameplayTag();
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Montage"))
 	FGameplayTag AlternativeMontageTag = FGameplayTag();
-
-private:	
-	FBoxTraceData BoxTraceData = FBoxTraceData();
 };

@@ -22,7 +22,7 @@ void UPlayerCharacterAnimInstance::Tick(float DeltaTime)
 	if(!IsValid(PlayerCharacter)) return;
 
 	Velocity = PlayerCharacter->GetCharacterMovement()->Velocity;
-	bIsMoving =  UKismetMathLibrary::VSizeXY(Velocity) > 0.f;
+	bIsMoving =  UKismetMathLibrary::VSize(Velocity) > 0.f;
 	bIsClimbingUp = FMath::Abs(Velocity.Z) > 0.f;
 	bIsClimbing = UKismetMathLibrary::VSize(Velocity) > 0.f;
 	bAirborne = PlayerCharacter->GetCharacterMovement()->IsFalling();

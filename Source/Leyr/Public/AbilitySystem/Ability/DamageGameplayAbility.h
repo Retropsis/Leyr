@@ -22,6 +22,9 @@ public:
 	virtual void PrepareToEndAbility() override;
 	
 	UFUNCTION(BlueprintCallable)
+	TArray<FHitResult> BoxTrace(bool bDebug = false);
+	
+	UFUNCTION(BlueprintCallable)
 	void CauseDamage(UAbilitySystemComponent* TargetASC);
 
 	UFUNCTION(BlueprintCallable)
@@ -94,4 +97,7 @@ protected:
 	FTaggedMontage GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& TaggedMontages) const;
 	
 	// FVector2D GetDamageByDamageType(float InLevel, const FGameplayTag& DamageType);
+
+private:	
+	FBoxTraceData BoxTraceData = FBoxTraceData();
 };

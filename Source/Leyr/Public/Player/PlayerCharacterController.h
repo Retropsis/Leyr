@@ -96,6 +96,7 @@ protected:
 	virtual void SetupInputComponent() override;
 	
 	void Move(const FInputActionValue& Value);
+	void UpButtonPressed(const FInputActionValue& Value);
 	void Jump();
 	void StopJumping();
 	void InteractButtonPressed();

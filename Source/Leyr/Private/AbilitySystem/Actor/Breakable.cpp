@@ -31,6 +31,11 @@ ABreakable::ABreakable()
 	LifeSpan = .2f;
 }
 
+void ABreakable::ShowTopSprite_Implementation(bool bShow)
+{
+	TopFlipbookComponent->SetVisibility(bShow);
+}
+
 void ABreakable::BeginPlay()
 {
 	Super::BeginPlay();

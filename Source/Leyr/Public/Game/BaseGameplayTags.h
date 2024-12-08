@@ -143,6 +143,7 @@ FGameplayTag Abilities_Summon;
 FGameplayTag Abilities_HitReact;
 FGameplayTag Abilities_Fire_FireBolt;
 FGameplayTag Abilities_Fire_FireBlast;
+FGameplayTag Abilities_Fire_FlameThrower;
 FGameplayTag Abilities_Lightning_Electrocute;
 FGameplayTag Abilities_Lightning_Bolt_1;
 FGameplayTag Abilities_Arcane_ArcaneShards;

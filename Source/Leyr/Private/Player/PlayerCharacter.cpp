@@ -224,7 +224,6 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	
 	switch (CombatState) {
 	case ECombatState::Unoccupied:
-		if(MovementVector.Y > 0.f) TraceForLadder();
 	case ECombatState::Falling:
 	case ECombatState::Crouching:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
@@ -630,7 +629,8 @@ void APlayerCharacter::TraceForPlatforms() const
 
 void APlayerCharacter::TraceForLadder()
 {
-	if(GetCharacterMovement()->MovementMode != MOVE_Walking || GetVelocity().Z < 0.f) return;
+	if(CombatState == ECombatState::HangingLadder || GetCharacterMovement()->IsFalling()) return;
+	// if(GetCharacterMovement()->MovementMode != MOVE_Walking || GetVelocity().Z < 0.f) return;
 	
 	const FVector Start = RopeHangingCollision->GetComponentLocation();
 	const FVector End = Start + FVector::UpVector *  20.f;

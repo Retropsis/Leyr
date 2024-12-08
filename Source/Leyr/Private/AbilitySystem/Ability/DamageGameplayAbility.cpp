@@ -6,6 +6,8 @@
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "Game/BaseGameplayTags.h"
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
+#include "Interaction/InteractionInterface.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 void UDamageGameplayAbility::InitAbility()
 {
@@ -19,6 +21,31 @@ void UDamageGameplayAbility::PrepareToEndAbility()
 {
 	Super::PrepareToEndAbility();
 	ICombatInterface::Execute_SetMovementEnabled(GetAvatarActorFromActorInfo(), true);
+}
+
+TArray<FHitResult> UDamageGameplayAbility::BoxTrace(bool bDebug)
+{
+	BoxTraceData = ICombatInterface::Execute_GetBoxTraceDataByTag(GetAvatarActorFromActorInfo(), MontageTag);
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	TEnumAsByte<EObjectTypeQuery> OT = GetAvatarActorFromActorInfo()->ActorHasTag(FName("Player")) ? EOT_EnemyCapsule : ObjectTypeQuery3;
+	ObjectTypes.Add(OT);
+	// ObjectTypes.Add(ICombatInterface::Execute_GetTraceObjectType(GetAvatarActorFromActorInfo()));
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(GetAvatarActorFromActorInfo());
+
+	TArray<FHitResult> Hits;
+	UKismetSystemLibrary::BoxTraceMultiForObjects(
+		this, BoxTraceData.Start, BoxTraceData.End, BoxTraceData.Extent, FRotator::ZeroRotator, ObjectTypes,
+		false, ActorsToIgnore, bDebug ? EDrawDebugTrace::ForDuration : EDrawDebugTrace::None, Hits, true);
+	
+	for (FHitResult HitResult : Hits)
+	{
+		if(HitResult.bBlockingHit && HitResult.GetActor() && HitResult.GetActor()->ActorHasTag("HitInteraction"))
+		{
+			IInteractionInterface::Execute_Interact(HitResult.GetActor(), GetAvatarActorFromActorInfo());
+		}
+	}
+	return Hits;
 }
 
 void UDamageGameplayAbility::CauseDamage(UAbilitySystemComponent* TargetASC)

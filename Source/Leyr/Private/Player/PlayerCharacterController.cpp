@@ -28,6 +28,7 @@ void APlayerCharacterController::SetupInputComponent()
 	
 	if (UBaseInputComponent* BaseInputComponent = CastChecked<UBaseInputComponent>(InputComponent))
 	{
+		BaseInputComponent->BindAction(MoveAction, ETriggerEvent::Started, this, &APlayerCharacterController::UpButtonPressed);
 		BaseInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &APlayerCharacterController::Move);
 		BaseInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &APlayerCharacterController::Move);
 		BaseInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &APlayerCharacterController::Jump);
@@ -93,6 +94,11 @@ void APlayerCharacterController::CursorTrace()
 void APlayerCharacterController::Move(const FInputActionValue& Value)
 {
 	if (PlayerCharacter) PlayerCharacter->Move(Value.Get<FVector2D>());
+}
+
+void APlayerCharacterController::UpButtonPressed(const FInputActionValue& Value)
+{
+	if (PlayerCharacter && Value.Get<FVector2D>().Y > 0.f) PlayerCharacter->TraceForLadder();
 }
 
 void APlayerCharacterController::Jump()

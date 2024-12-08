@@ -57,6 +57,10 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	// if (!DamageEffectSpecHandle.Data.IsValid() || DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor) return;
 	// if (!ULeyrAbilitySystemLibrary::IsHostile(DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser(), OtherActor)) return;
 
+	Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetLifeSpan(5.f);
+	ProjectileMovement->StopMovementImmediately();
+
 	const AActor* SourceAvatarActor = AdditionalEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
 	if (SourceAvatarActor == OtherActor) return;
 	if (!ULeyrAbilitySystemLibrary::IsHostile(SourceAvatarActor, OtherActor)) return;
@@ -80,8 +84,8 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 			}
 			AdditionalEffectParams.TargetAbilitySystemComponent = TargetASC;
 			ULeyrAbilitySystemLibrary::ApplyAdditionalEffect(AdditionalEffectParams);
+			Destroy();
 		}
-		Destroy();
 	}
 	else bHit = true;
 }
