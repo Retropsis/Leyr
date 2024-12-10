@@ -26,6 +26,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "NiagaraComponent.h"
 #include "PaperFlipbookComponent.h"
+#include "Interaction/ElevatorInterface.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -188,7 +189,7 @@ FTaggedMontage APlayerCharacter::GetTaggedMontageByIndex_Implementation(int32 In
 void APlayerCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 	bHitReacting = NewCount > 0;
-	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseRunSpeed;
 	GetCharacterMovement()->MaxWalkSpeedCrouched = bHitReacting ? 0.f : BaseWalkSpeedCrouched;
 	if(bHitReacting)
 	{
@@ -226,12 +227,16 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	case ECombatState::Unoccupied:
 	case ECombatState::Falling:
 	case ECombatState::Crouching:
+	case ECombatState::Walking:
+	case ECombatState::WalkingPeaceful:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
 		if (GetCharacterMovement()->MovementMode == MOVE_Falling) MakeAndApplyEffectToSelf(FBaseGameplayTags::Get().CombatState_Falling);
 		break;
 	case ECombatState::HangingRope:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
 		if(MovementVector.Y > 0.f) HandleCombatState(ECombatState::ClimbingRope);
+		break;
+	case ECombatState::HangingHook:
 		break;
 	case ECombatState::HangingLadder:
 		AddMovementInput(FVector(0.f, 0.f, 1.f), FMath::RoundToFloat(MovementVector.Y));
@@ -248,6 +253,9 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	case ECombatState::Climbing:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
 		AddMovementInput(FVector(0.f, 0.f, 1.f), FMath::RoundToFloat(MovementVector.Y));
+		break;
+	case ECombatState::OnElevator:
+		if(Elevator) IElevatorInterface::Execute_Move(Elevator, MovementVector.Y);
 		break;
 	case ECombatState::UnCrouching:
 	case ECombatState::Attacking:
@@ -343,7 +351,7 @@ void APlayerCharacter::JumpButtonPressed()
 	}
 	if(CombatState == ECombatState::Swimming)
 	{
-		// GetCharacterMovement()->AddImpulse(FVector::UpVector * 333.f, true);
+		GetCharacterMovement()->AddImpulse(GetActorForwardVector() * 375.f + FVector::UpVector * 75.f, true);
 		return;
 	}
 	if(CombatState >= ECombatState::HangingLedge)
@@ -351,6 +359,7 @@ void APlayerCharacter::JumpButtonPressed()
 		HandleCombatState(ECombatState::Unoccupied);
 		bCanGrabLedge = false;
 		GetWorld()->GetTimerManager().SetTimer(OffLedgeTimer, FTimerDelegate::CreateLambda([this] () { bCanGrabLedge = true; }), OffLedgeTime, false);
+		if(GetAttachParentActor()) DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	}
 	bIsCrouched ? TryVaultingDown() : Jump();
 }
@@ -375,7 +384,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 	
 	switch (CombatState) {
 	case ECombatState::Unoccupied:
-		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = BaseRunSpeed;
 		GetCharacterMovement()->MaxFlySpeed = BaseFlySpeed;
 		GetCharacterMovement()->GravityScale = BaseGravityScale;
 		GetCharacterMovement()->MaxAcceleration = 2048.f;
@@ -384,8 +393,16 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		// MakeAndApplyEffectToSelf(GameplayTags.CombatState_Unoccupied);
 		break;
 	case ECombatState::Falling:
-		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = BaseRunSpeed;
 		GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+		break;
+	case ECombatState::Walking:
+		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Walking);
+		break;
+	case ECombatState::WalkingPeaceful:
+		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_WalkingPeaceful);
 		break;
 	case ECombatState::Crouching:
 		Crouch();
@@ -413,11 +430,19 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Rope);
 		break;
+	case ECombatState::HangingHook:
+		GetCharacterMovement()->StopMovementImmediately();
+		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Hook);
+		break;
 	case ECombatState::HangingLadder:
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->MaxFlySpeed = LadderWalkSpeed;
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Ladder);
+		break;
+	case ECombatState::OnElevator:
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Elevator);
 		break;
 	case ECombatState::OnGroundSlope:
 		GetCharacterMovement()->GravityScale = GroundSlopeGravityScale;
@@ -502,11 +527,23 @@ void APlayerCharacter::HandleHangingOnRope_Implementation(FVector HangingTarget,
 	}
 }
 
+void APlayerCharacter::HandleHangingOnHook_Implementation(FVector HangingTarget, bool bEndOverlap)
+{
+	if (!bEndOverlap && GetCharacterMovement()->IsFalling())
+	{
+		SetActorLocation(FVector(HangingTarget.X, 0.f, HangingTarget.Z - RopeHangingCollision->GetRelativeLocation().Z));
+		HandleCombatState(ECombatState::HangingHook);
+	}
+	if(bEndOverlap && CombatState == ECombatState::HangingHook)
+	{
+		HandleCombatState(ECombatState::Falling);
+	}
+}
+
 void APlayerCharacter::HandleClimbing_Implementation(FVector HangingTarget, bool bEndOverlap)
 {
 	if (!bEndOverlap && GetCharacterMovement()->IsFalling())
 	{
-		// SetActorLocation(FVector(GetActorLocation().X, 0.f, HangingTarget.Z - RopeHangingCollision->GetRelativeLocation().Z));
 		HandleCombatState(ECombatState::Climbing);
 	}
 	if(bEndOverlap && CombatState == ECombatState::Climbing)
@@ -526,7 +563,7 @@ void APlayerCharacter::HandleHangingOnLedge(const FVector& HangingTarget)
 
 void APlayerCharacter::SetMovementEnabled_Implementation(bool Enabled)
 {
-	GetCharacterMovement()->MaxWalkSpeed = !Enabled ? 0.f : BaseWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = !Enabled ? 0.f : BaseRunSpeed;
 
 	if(CombatState != ECombatState::Attacking) PreviousCombatState = CombatState;
 	
@@ -586,9 +623,33 @@ void APlayerCharacter::HandleSwimming_Implementation(float MinZ, float Environme
 	}
 }
 
+void APlayerCharacter::HandleElevator_Implementation(APawn* InElevator, bool bEndOverlap)
+{
+	if(bEndOverlap)
+	{
+		Elevator = nullptr;
+		HandleCombatState(ECombatState::Unoccupied);
+	}
+	else
+	{
+		Elevator = InElevator;
+		HandleCombatState(ECombatState::OnElevator);
+	}
+}
+
 void APlayerCharacter::SetSpriteRelativeLocation_Implementation(FVector NewLocation)
 {
 	GetSprite()->SetRelativeLocation(NewLocation);
+}
+
+void APlayerCharacter::ReduceWalkSpeed_Implementation(float AmountToReduce)
+{
+	GetCharacterMovement()->MaxFlySpeed = FMath::Max(0.f, GetCharacterMovement()->MaxFlySpeed - AmountToReduce);
+}
+
+void APlayerCharacter::SetWalkSpeed_Implementation(float NewSpeed)
+{
+	GetCharacterMovement()->MaxFlySpeed = FMath::Max(0.f, NewSpeed);
 }
 
 /*

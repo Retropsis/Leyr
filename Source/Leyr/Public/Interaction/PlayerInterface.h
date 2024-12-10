@@ -96,12 +96,21 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void SetIsAttack(bool bIsAttacking);
+	
+	UFUNCTION(BlueprintNativeEvent)
+	void ReduceWalkSpeed(float AmountToReduce);
+	
+	UFUNCTION(BlueprintNativeEvent)
+	void SetWalkSpeed(float NewSpeed);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void HandleHangingOnLadder(FVector HangingTarget, bool bEndOverlap);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void HandleHangingOnRope(FVector HangingTarget, bool bEndOverlap);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void HandleHangingOnHook(FVector HangingTarget, bool bEndOverlap);
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void HandleClimbing(FVector HangingTarget, bool bEndOverlap);
@@ -111,4 +120,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent)
 	void HandleSwimming(float MinZ, float SwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap);
+	
+	UFUNCTION(BlueprintNativeEvent)
+	void HandleElevator(APawn* InElevator, bool bEndOverlap);
 };

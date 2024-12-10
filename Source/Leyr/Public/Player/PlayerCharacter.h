@@ -99,10 +99,14 @@ public:
 	virtual int32 GetSkillPoints_Implementation() const override;
 	virtual void HandleHangingOnLadder_Implementation(FVector HangingTarget, bool bEndOverlap) override;
 	virtual void HandleHangingOnRope_Implementation(FVector HangingTarget, bool bEndOverlap) override;
+	virtual void HandleHangingOnHook_Implementation(FVector HangingTarget, bool bEndOverlap) override;
 	virtual void HandleClimbing_Implementation(FVector HangingTarget, bool bEndOverlap) override;
 	virtual void HandleEntangled_Implementation(float MinZ, float EntangledWalkSpeed, float EntangledGravityScale, bool bEndOverlap) override;
 	virtual void HandleSwimming_Implementation(float MinZ, float EnvironmentSwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap) override;
+	virtual void HandleElevator_Implementation(APawn* InElevator, bool bEndOverlap) override;
 	virtual void SetSpriteRelativeLocation_Implementation(FVector NewLocation) override;
+	virtual void ReduceWalkSpeed_Implementation(float AmountToReduce) override;
+	virtual void SetWalkSpeed_Implementation(float NewSpeed) override;
 	/** end Player Interface */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -112,6 +116,9 @@ protected:
 	virtual void InitAbilityActorInfo() override;
 	void HandleCombatState(ECombatState NewState);
 	void HandleHangingOnLedge(const FVector& HangingTarget);
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	float BaseRunSpeed = 300.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
 	float LadderWalkSpeed = 120.f;
@@ -230,6 +237,9 @@ private:
 	FVector MovementTarget = FVector::ZeroVector;
 	float MovementSpeed = 0.f;
 	float CurrentMinZ = 0.f;
+
+	UPROPERTY()
+	APawn* Elevator = nullptr;
 
 public:
 	FORCEINLINE bool IsAirborne() const { return bAirborne; }

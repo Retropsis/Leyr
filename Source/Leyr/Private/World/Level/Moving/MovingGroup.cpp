@@ -53,11 +53,12 @@ void AMovingGroup::HandleActiveActors(float DeltaSeconds)
 			UKismetSystemLibrary::DrawDebugPoint(this, InterpTarget, 15.f, FLinearColor::Green);
 			switch (MovingDirection) {
 			case EMovingDirection::Sink:
-				Actor->SetActorLocation(FMath::VInterpTo(Actor->GetActorLocation(), CurrentBottom, DeltaSeconds, InterpolationSpeed));
+				Actor->SetActorLocation(FMath::VInterpConstantTo(Actor->GetActorLocation(), CurrentBottom, DeltaSeconds, InterpolationSpeed));
+				IPlayerInterface::Execute_ReduceWalkSpeed(Actor, DeltaSeconds * EntangledInterpSpeed);
 				break;
 			case EMovingDirection::Vector:
 				UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + InterpTarget.GetSafeNormal(), 2.f, FLinearColor::Green);
-				Actor->SetActorLocation(FMath::VInterpTo(Actor->GetActorLocation(), InterpTarget, DeltaSeconds, FlowingInterpSpeed));
+				Actor->SetActorLocation(FMath::VInterpConstantTo(Actor->GetActorLocation(), InterpTarget, DeltaSeconds, FlowingInterpSpeed));
 				break;
 			case EMovingDirection::Still:
 				break;

@@ -193,10 +193,14 @@ FGameplayTag Abilities_Throw_1;
 FGameplayTag Abilities_Throw_2;
  
 FGameplayTag CombatState_Unoccupied;
+FGameplayTag CombatState_Walking;
+FGameplayTag CombatState_WalkingPeaceful;
 FGameplayTag CombatState_Slope;
 FGameplayTag CombatState_Rope;
+FGameplayTag CombatState_Hook;
 FGameplayTag CombatState_Ladder;
 FGameplayTag CombatState_Ledge;
+FGameplayTag CombatState_Elevator;
 FGameplayTag CombatState_Climbing;
 FGameplayTag CombatState_Falling;
 FGameplayTag CombatState_Crouching;

@@ -54,13 +54,17 @@ UENUM(BlueprintType)
 enum class ECombatState : uint8
 {
 	Unoccupied UMETA(DisplayName="Unoccupied"),
+	Walking UMETA(DisplayName="Walking"),
+	WalkingPeaceful UMETA(DisplayName="WalkingPeaceful"),
 	Crouching UMETA(DisplayName="Crouching"),
 	Attacking UMETA(DisplayName="Attacking"),
 	Falling UMETA(DisplayName="Falling"),
 	HangingLedge UMETA(DisplayName="Hanging Ledge"),
 	HangingRope UMETA(DisplayName="Hanging Rope"),
+	HangingHook UMETA(DisplayName="Hanging Hook"),
 	HangingLadder UMETA(DisplayName="Hanging Ladder"),
 	Climbing UMETA(DisplayName="Climbing"),
+	OnElevator UMETA(DisplayName="OnElevator"),
 	OnGroundSlope UMETA(DisplayName="OnGroundSlope"),
 	OnRopeSlope UMETA(DisplayName="OnRopeSlope"),
 	Entangled UMETA(DisplayName="Entangled"),

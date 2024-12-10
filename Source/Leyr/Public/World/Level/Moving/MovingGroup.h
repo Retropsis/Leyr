@@ -47,13 +47,16 @@ protected:
 	int32 Depth = 3;
 	
 	UPROPERTY(EditAnywhere, Category="Moving|Entangled")
-	float EntangledWalkSpeed = 50.f;
+	float EntangledWalkSpeed = 60.f;
+	
+	UPROPERTY(EditAnywhere, Category="Moving|Entangled")
+	float EntangledInterpSpeed = 50.f;
 
 	UPROPERTY(EditAnywhere, Category="Moving|Entangled")
 	float EntangledGravityScale = .2f;
 	
 	UPROPERTY(EditAnywhere, Category="Moving|Entangled")
-	float InterpolationSpeed = .1f;
+	float InterpolationSpeed = 20.f;
 	
 	UPROPERTY(EditAnywhere, Category="Moving|Entangled")
 	float FlowingInterpSpeed = 1.f;

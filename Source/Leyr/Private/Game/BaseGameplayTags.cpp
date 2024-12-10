@@ -219,10 +219,14 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	 * Combat States
 	 */
 	GameplayTags.CombatState_Unoccupied = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Unoccupied"), FString("CombatState Unoccupied"));
+	GameplayTags.CombatState_Walking = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.CombatState_Walking"), FString("CombatState CombatState_Walking"));
+	GameplayTags.CombatState_WalkingPeaceful = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.CombatState_WalkingPeaceful"), FString("CombatState CombatState_WalkingPeaceful"));
 	GameplayTags.CombatState_Slope = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Slope"), FString("CombatState Slope"));
 	GameplayTags.CombatState_Ledge = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Ledge"), FString("CombatState Ledge"));
 	GameplayTags.CombatState_Rope = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rope"), FString("CombatState Rope"));
+	GameplayTags.CombatState_Hook = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Hook"), FString("CombatState Hook"));
 	GameplayTags.CombatState_Ladder = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Ladder"), FString("CombatState Ladder"));
+	GameplayTags.CombatState_Elevator = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Elevator"), FString("CombatState Elevator"));
 	GameplayTags.CombatState_Climbing = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Climbing"), FString("CombatState Climbing"));
 	GameplayTags.CombatState_Falling = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Falling"), FString("CombatState Falling"));
 	GameplayTags.CombatState_Crouching = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Crouching"), FString("CombatState Crouching"));
