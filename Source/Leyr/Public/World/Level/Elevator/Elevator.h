@@ -7,6 +7,7 @@
 #include "Interaction/ElevatorInterface.h"
 #include "Elevator.generated.h"
 
+class UFloatingPawnMovement;
 class UBoxComponent;
 
 UCLASS()
@@ -28,6 +29,9 @@ protected:
 	UFUNCTION()
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UFloatingPawnMovement> FloatingPawnMovement;
+	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UBoxComponent> FloorCollision;
 	

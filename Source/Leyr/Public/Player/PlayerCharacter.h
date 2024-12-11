@@ -104,6 +104,7 @@ public:
 	virtual void HandleEntangled_Implementation(float MinZ, float EntangledWalkSpeed, float EntangledGravityScale, bool bEndOverlap) override;
 	virtual void HandleSwimming_Implementation(float MinZ, float EnvironmentSwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap) override;
 	virtual void HandleElevator_Implementation(APawn* InElevator, bool bEndOverlap) override;
+	virtual void HandleOverlapZone_Implementation(ECombatState NewState, bool bEndOverlap) override;
 	virtual void SetSpriteRelativeLocation_Implementation(FVector NewLocation) override;
 	virtual void ReduceWalkSpeed_Implementation(float AmountToReduce) override;
 	virtual void SetWalkSpeed_Implementation(float NewSpeed) override;
@@ -118,7 +119,7 @@ protected:
 	void HandleHangingOnLedge(const FVector& HangingTarget);
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
-	float BaseRunSpeed = 300.f;
+	float BaseRunSpeed = 450.f;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
 	float LadderWalkSpeed = 120.f;

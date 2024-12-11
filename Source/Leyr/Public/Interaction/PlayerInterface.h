@@ -123,4 +123,7 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void HandleElevator(APawn* InElevator, bool bEndOverlap);
+	
+	UFUNCTION(BlueprintNativeEvent)
+	void HandleOverlapZone(ECombatState NewState, bool bEndOverlap);
 };

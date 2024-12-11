@@ -249,6 +249,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Rope);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Ledge);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Climbing);
+	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Hook);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Slope);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Entangled);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Swimming);
@@ -256,6 +257,9 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_UnCrouching);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Dodging);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Rolling);
+	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Elevator);
+	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Walking);
+	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_WalkingPeaceful);
 	
 	GameplayTags.CombatDirections.AddTag(GameplayTags.CombatState_Directional_Upward);
 	GameplayTags.CombatDirections.AddTag(GameplayTags.CombatState_Directional_Downward);

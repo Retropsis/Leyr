@@ -68,8 +68,6 @@ APlayerCharacter::APlayerCharacter()
 	TraceObjectType = EOT_EnemyCapsule;
 	
 	CharacterClass = ECharacterClass::Warrior;
-	BaseWalkSpeed = 600.f;
-	BaseWalkSpeedCrouched = 300.f;
 }
 
 void APlayerCharacter::Tick(float DeltaSeconds)
@@ -124,6 +122,7 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 	// Init Ability Actor Info Server Side
 	InitAbilityActorInfo();
 	AddCharacterAbilities();
+	GetCharacterMovement()->MaxWalkSpeed = BaseRunSpeed;
 	GetCharacterMovement()->GravityScale = BaseGravityScale;
 	OnCharacterMovementUpdated.AddDynamic(this, &APlayerCharacter::HandleCharacterMovementUpdated);
 }
@@ -227,10 +226,12 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	case ECombatState::Unoccupied:
 	case ECombatState::Falling:
 	case ECombatState::Crouching:
+		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
+		if (GetCharacterMovement()->MovementMode == MOVE_Falling) MakeAndApplyEffectToSelf(FBaseGameplayTags::Get().CombatState_Falling);
+		break;
 	case ECombatState::Walking:
 	case ECombatState::WalkingPeaceful:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
-		if (GetCharacterMovement()->MovementMode == MOVE_Falling) MakeAndApplyEffectToSelf(FBaseGameplayTags::Get().CombatState_Falling);
 		break;
 	case ECombatState::HangingRope:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
@@ -255,6 +256,7 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 		AddMovementInput(FVector(0.f, 0.f, 1.f), FMath::RoundToFloat(MovementVector.Y));
 		break;
 	case ECombatState::OnElevator:
+		AddMovementInput(FVector(.5f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
 		if(Elevator) IElevatorInterface::Execute_Move(Elevator, MovementVector.Y);
 		break;
 	case ECombatState::UnCrouching:
@@ -442,6 +444,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Ladder);
 		break;
 	case ECombatState::OnElevator:
+		// GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Elevator);
 		break;
 	case ECombatState::OnGroundSlope:
@@ -637,6 +640,18 @@ void APlayerCharacter::HandleElevator_Implementation(APawn* InElevator, bool bEn
 	}
 }
 
+void APlayerCharacter::HandleOverlapZone_Implementation(ECombatState NewState, bool bEndOverlap)
+{
+	if(bEndOverlap)
+	{
+		HandleCombatState(ECombatState::Unoccupied);
+	}
+	else
+	{
+		HandleCombatState(NewState);
+	}
+}
+
 void APlayerCharacter::SetSpriteRelativeLocation_Implementation(FVector NewLocation)
 {
 	GetSprite()->SetRelativeLocation(NewLocation);
@@ -766,6 +781,8 @@ void APlayerCharacter::TryVaultingDown()
 
 void APlayerCharacter::TraceForSlope()
 {
+	if(CombatState == ECombatState::OnElevator || CombatState == ECombatState::WalkingPeaceful) return;
+	
 	if(!GetCharacterMovement()->IsFalling() && CombatState == ECombatState::OnGroundSlope) HandleCombatState(ECombatState::Unoccupied);
 	
 	if(GetCharacterMovement()->IsFalling() && GetVelocity().Z < 0.f)
