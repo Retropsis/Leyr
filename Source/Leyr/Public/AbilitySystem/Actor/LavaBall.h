@@ -6,6 +6,8 @@
 #include "AbilitySystem/Actor/Spikes.h"
 #include "LavaBall.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLand);
+
 /**
  * 
  */
@@ -16,11 +18,14 @@ class LEYR_API ALavaBall : public ASpikes
 
 public:
 	ALavaBall();
-	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShouldRotate(bool bRotate);
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bLanded = false;
 
 protected:
 	void Launch();
@@ -33,5 +38,5 @@ protected:
 
 private:
 	FTimerHandle LaunchTimer;
-	bool bShouldRotate = false;
+	float StoppingHeight = 0.f;
 };

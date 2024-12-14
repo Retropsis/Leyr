@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "LeyrGameMode.generated.h"
 
+class UEncounterInfo;
 class UActorClassInfo;
 class UAbilityInfo;
 class UCharacterClassInfo;
@@ -24,6 +25,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Actor Class Defaults")
 	TObjectPtr<UActorClassInfo> ActorClassInfo;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Encounter Defaults")
+	TObjectPtr<UEncounterInfo> EncounterInfo;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Ability Info")
 	TObjectPtr<UAbilityInfo> AbilityInfo;

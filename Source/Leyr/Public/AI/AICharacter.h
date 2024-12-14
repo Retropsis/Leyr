@@ -10,6 +10,10 @@
 #include "UI/Controller/OverlayWidgetController.h"
 #include "AICharacter.generated.h"
 
+class ASplineComponentActor;
+class ASplineMeshActor;
+class USplineMeshComponent;
+class USplineComponent;
 enum class EBehaviourType : uint8;
 class ABaseAIController;
 class UBehaviorTree;
@@ -39,6 +43,9 @@ public:
 	virtual FVector FindRandomLocation_Implementation() override;
 	virtual bool MoveToLocation_Implementation(FVector TargetLocation, float Threshold) override;
 	virtual bool ChaseTarget_Implementation(AActor* TargetToChase) override;
+	virtual void SineMove_Implementation() override;
+	virtual bool FollowSpline_Implementation(int32 SplineIndex) override;
+	virtual FVector GetNextLocation_Implementation(int32 SplineIndex) override;
 	/** end AI Interface */
 	
 	UPROPERTY(BlueprintReadWrite, Category = "Combat")
@@ -58,12 +65,49 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	float ChasingFlyingSpeed = 250.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|AI")
+	TObjectPtr<ASplineComponentActor> SplineComponentActor;
+	
+	TObjectPtr<USplineComponent> SplineComponent;
+	
+	UPROPERTY(EditAnywhere, Category = "Character|AI")
+	bool bCollisionCauseDamage = false;
+
+	UPROPERTY(EditAnywhere, Category = "Character|AI")
+	EMovementType MovementType = EMovementType::Destination;
+
+	float SineMoveHeight = 0.f;
+
+	/*
+	 * Colliding Damage
+	 */
+	UFUNCTION(BlueprintCallable)
+	void CauseDamage(AActor* TargetActor);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Character|Combat")
+	FValueRange AbilityPower;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Character|Combat")
+	TSubclassOf<UGameplayEffect> DamageEffectClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Character|Combat", meta=(Categories="Damage"))
+	FGameplayTag DamageType;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Character|Combat", meta=(Categories="Damage"))
+	bool bShouldApplyInvincibility = false;	
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;
 	virtual void InitializeDefaultAttributes() const override;	
-
+	
+	UFUNCTION()
+	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Encounter Defaults")
+	FName Name = FName();
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
 	int32 Level = 1;
 	
@@ -111,7 +155,9 @@ protected:
 public:
 	UFUNCTION(BlueprintCallable)
 	virtual EBehaviourState GetBehaviourState() override { return BehaviourState; }
-	
+
 	UFUNCTION(BlueprintCallable)
 	virtual void SetBehaviourState(EBehaviourState NewState) override { BehaviourState = NewState; }
+	
+	virtual EMovementType GetMovementType_Implementation() override { return MovementType; }
 };

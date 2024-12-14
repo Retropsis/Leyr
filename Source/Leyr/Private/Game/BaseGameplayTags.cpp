@@ -271,6 +271,9 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	 * Unique States
 	 */
 	GameplayTags.Invincibility = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Invincibility"), FString("Invincibility"));
+	GameplayTags.Shackled = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Shackled"), FString("Shackled"));
+	GameplayTags.Defeated = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Defeated"), FString("Defeated"));
+	GameplayTags.Peaceful = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Peaceful"), FString("Peaceful"));
 	
 	/*
 	 * Gameplay Cues

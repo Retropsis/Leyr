@@ -1,12 +1,16 @@
 // @ Retropsis 2024-2025.
 
 #include "AI/AICharacter.h"
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AI/BaseAIController.h"
+#include "AI/SplineComponentActor.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "Components/SplineComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Game/BaseGameplayTags.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -56,6 +60,12 @@ void AAICharacter::PossessedBy(AController* NewController)
 	BaseAIController->SetPawn(this);
 
 	StartLocation = GetActorLocation();
+
+	if(bCollisionCauseDamage)
+	{
+		GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBeginOverlap);
+	}
+	SineMoveHeight = GetActorLocation().Z;
 	
 	switch (BehaviourType) {
 	case EBehaviourType::Patrol:
@@ -132,7 +142,22 @@ void AAICharacter::InitAbilityActorInfo()
 
 void AAICharacter::InitializeDefaultAttributes() const
 {
-	ULeyrAbilitySystemLibrary::InitializeDefaultAttributes(this, CharacterClass, Level, AbilitySystemComponent);
+	if(CharacterClass == ECharacterClass::Default && !Name.IsNone())
+	{
+		ULeyrAbilitySystemLibrary::InitializeEncounterAttributes(this, Name, Level, AbilitySystemComponent);
+	}
+	else
+	{
+		ULeyrAbilitySystemLibrary::InitializeCharacterClassAttributes(this, CharacterClass, Level, AbilitySystemComponent);
+	}
+}
+
+void AAICharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if(OtherActor && Cast<IAbilitySystemInterface>(OtherActor) && ULeyrAbilitySystemLibrary::IsHostile(this, OtherActor))
+	{
+		CauseDamage(OtherActor);
+	}
 }
 
 void AAICharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
@@ -218,4 +243,43 @@ bool AAICharacter::ChaseTarget_Implementation(AActor* TargetToChase)
 		break;
 	}
 	return true;
+}
+
+void AAICharacter::SineMove_Implementation()
+{
+	const float SineValue = FMath::Sin(GetActorLocation().X / 100.f);
+	AddMovementInput(GetActorForwardVector() + FVector::UpVector * SineValue, 1.f, true);
+}
+
+bool AAICharacter::FollowSpline_Implementation(const int32 SplineIndex)
+{
+	if(SplineComponentActor == nullptr) return false;
+	if(SplineComponent == nullptr) SplineComponent = SplineComponentActor->GetSplineComponent();
+	const FVector Destination = SplineComponent->GetLocationAtSplinePoint(SplineIndex, ESplineCoordinateSpace::World);
+	const FVector Direction = (Destination - GetActorLocation()).GetSafeNormal();
+	AddMovementInput(Direction, 1.f);
+
+	return FVector::Distance(GetActorLocation(), Destination) < 20.f;
+}
+
+FVector AAICharacter::GetNextLocation_Implementation(const int32 SplineIndex)
+{
+	if(SplineComponentActor == nullptr) return GetActorLocation();
+	if(SplineComponent == nullptr) SplineComponent = SplineComponentActor->GetSplineComponent();
+	return  SplineComponent->GetLocationAtSplinePoint(SplineIndex, ESplineCoordinateSpace::World);
+}
+
+void AAICharacter::CauseDamage(AActor* TargetActor)
+{
+	UAbilitySystemComponent* SourceASC = GetAbilitySystemComponent();
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+
+	if(TargetASC && TargetASC->HasMatchingGameplayTag(FBaseGameplayTags::Get().Invincibility)) return;
+	
+	const FGameplayEffectSpecHandle DamageSpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, Level, SourceASC->MakeEffectContext());	
+	const float ScaledDamage = AbilityPower.GetRandomFloatFromScalableRange(Level);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, DamageType, ScaledDamage);
+	SourceASC->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), TargetASC);
+
+	if (bShouldApplyInvincibility) ULeyrAbilitySystemLibrary::ApplyInvincibilityToTarget(TargetASC, 1.25f);
 }

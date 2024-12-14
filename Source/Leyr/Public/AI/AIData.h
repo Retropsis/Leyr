@@ -27,3 +27,13 @@ enum class EBehaviourType : uint8
 	Turret UMETA(DisplayName="Turret"),
 	Airborne UMETA(DisplayName="Airborne"),
 };
+
+UENUM(BlueprintType)
+enum class EMovementType : uint8
+{
+	Destination UMETA(DisplayName="Destination"),
+	Sine UMETA(DisplayName="Sine"),
+	Spline UMETA(DisplayName="Spline"),
+	Patrol UMETA(DisplayName="Patrol"),
+	Points UMETA(DisplayName="Points"),
+};

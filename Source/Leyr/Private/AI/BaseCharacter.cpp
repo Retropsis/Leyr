@@ -246,39 +246,10 @@ void ABaseCharacter::SetMovementMode_Implementation(EMovementMode MovementMode, 
 	GetCharacterMovement()->SetMovementMode(MovementMode);
 }
 
-void ABaseCharacter::Dissolve()
-{
-	// if (IsValid(DissolveMaterialInstance))
-	// {
-	// 	UMaterialInstanceDynamic* DynamicMatInst = UMaterialInstanceDynamic::Create(DissolveMaterialInstance, this);
-	// 	GetMesh()->SetMaterial(0, DynamicMatInst);
-	// 	StartDissolveTimeline(DynamicMatInst);
-	// }
-	// if (IsValid(WeaponDissolveMaterialInstance))
-	// {
-	// 	UMaterialInstanceDynamic* DynamicMatInst = UMaterialInstanceDynamic::Create(WeaponDissolveMaterialInstance, this);
-	// 	Weapon->SetMaterial(0, DynamicMatInst);
-	// 	StartWeaponDissolveTimeline(DynamicMatInst);
-	// }
-}
-
 void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImpulse)
 {
-	// TODO: Activate this for 3D Meshes
-	// Weapon->SetSimulatePhysics(true);
-	// Weapon->SetEnableGravity(true);
-	// Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-	// Weapon->AddImpulse(DeathImpulse * 0.1f, NAME_None, true);
-	//
-	// GetMesh()->SetSimulatePhysics(true);
-	// GetMesh()->SetEnableGravity(true);
-	// GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-	// GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-	// GetMesh()->AddImpulse(DeathImpulse, NAME_None, true);
-	// Dissolve();
-
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-	// GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	GetCapsuleComponent()->SetSimulatePhysics(true);
 	GetCapsuleComponent()->AddImpulse(DeathImpulse, NAME_None, true);
 	

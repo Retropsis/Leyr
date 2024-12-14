@@ -224,6 +224,9 @@ FGameplayTag CombatState_Directional_ForwardDown;
   * Unique States
   */
  FGameplayTag Invincibility;
+ FGameplayTag Peaceful;
+ FGameplayTag Shackled;
+ FGameplayTag Defeated;
 
  /*
   * Gameplay Cues

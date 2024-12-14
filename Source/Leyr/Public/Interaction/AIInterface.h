@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "AIInterface.generated.h"
 
+enum class EMovementType : uint8;
 enum class EBehaviourState : uint8;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
@@ -32,6 +33,18 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool ChaseTarget(AActor* TargetToChase);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SineMove();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool FollowSpline(int32 SplineIndex);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FVector GetNextLocation(int32 SplineIndex);
+
 	virtual EBehaviourState GetBehaviourState() = 0;
 	virtual void SetBehaviourState(EBehaviourState NewState) = 0;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	EMovementType GetMovementType();
 };
