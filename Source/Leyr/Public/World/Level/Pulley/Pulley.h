@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "World/Level/Lever.h"
 #include "Pulley.generated.h"
 
 class UBoxComponent;
 
 UCLASS()
-class LEYR_API APulley : public AActor
+class LEYR_API APulley : public ALever
 {
 	GENERATED_BODY()
 	
@@ -18,11 +19,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void Interact_Implementation(AActor* InteractingActor) override;
 
 private:
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UBoxComponent> RopeHitBox;
-
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBoxComponent> WeightHitBox;
 };

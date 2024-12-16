@@ -33,6 +33,7 @@ public:
 	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 	
 	void Move(const FVector2D MovementVector);
+	void Pitch(float InPitch);
 	void ForceMove(float DeltaSeconds);
 	void RotateController() const;
 	void HandleCrouching(bool bShouldCrouch);
@@ -64,6 +65,7 @@ public:
 	virtual void SetPlayerCombatState_Implementation(const ECombatState NewState) override { CombatState = NewState; }
 	virtual void SetMovementTarget_Implementation(const FVector Target) override { MovementTarget = Target; } 
 	virtual FTaggedMontage GetTaggedMontageByIndex_Implementation(int32 Index) override;
+	virtual float GetOverridePitch_Implementation() override { return OverridePitch; }
 	/** end Combat Interface */
 	
 	/** Inventory Interface */
@@ -108,6 +110,7 @@ public:
 	virtual void SetSpriteRelativeLocation_Implementation(FVector NewLocation) override;
 	virtual void ReduceWalkSpeed_Implementation(float AmountToReduce) override;
 	virtual void SetWalkSpeed_Implementation(float NewSpeed) override;
+	virtual void ToggleAiming_Implementation(bool bAiming) override;
 	/** end Player Interface */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -129,6 +132,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
 	float ClimbingWalkSpeed = 120.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	float AimingWalkSpeed = 80.f;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
 	float SwimmingSpeed = 225.f;
@@ -189,10 +195,7 @@ protected:
 	ECombatDirection GetCombatDirectionFromVector2D(FVector2D MovementVector);
 	void HandleCombatDirectionTag() const;
 
-private:	
-	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))
-	// TObjectPtr<UCapsuleComponent> HalfHeightCapsuleComponent;
-	
+private:		
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<USpringArmComponent> SpringArm;
 	
@@ -227,17 +230,22 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
 	float SwimmingExitTime = .09f;
-
+	
+	UPROPERTY(EditAnywhere, Category="Player|Combat", meta=(AllowPrivateAccess="true"))
+	float ForgetOverridePitchTime = 3.f;
+	
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastLevelUpParticles() const;
 	
 	FTimerHandle EntangledExitTimer;
 	FTimerHandle OverlapPlatformTimer;
+	FTimerHandle ForgetOverridePitchTimer;
 	
 	bool bOverlapPlatformTimerEnded = true;
 	FVector MovementTarget = FVector::ZeroVector;
 	float MovementSpeed = 0.f;
 	float CurrentMinZ = 0.f;
+	float OverridePitch = 0.f;
 
 	UPROPERTY()
 	APawn* Elevator = nullptr;

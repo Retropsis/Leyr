@@ -9,6 +9,7 @@
 #include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Interaction/InteractionInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Leyr/Leyr.h"
 
@@ -59,9 +60,8 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 
 	Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetLifeSpan(5.f);
-	ProjectileMovement->StopMovementImmediately();
 
-	const AActor* SourceAvatarActor = AdditionalEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
+	AActor* SourceAvatarActor = AdditionalEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
 	if (SourceAvatarActor == OtherActor) return;
 	if (!ULeyrAbilitySystemLibrary::IsHostile(SourceAvatarActor, OtherActor)) return;
 	if (!bHit) OnHit();
@@ -85,6 +85,19 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 			AdditionalEffectParams.TargetAbilitySystemComponent = TargetASC;
 			ULeyrAbilitySystemLibrary::ApplyAdditionalEffect(AdditionalEffectParams);
 			Destroy();
+		}
+			
+		if(OtherActor && OtherActor->ActorHasTag("HitInteraction"))
+		{
+			IInteractionInterface::Execute_Interact(OtherActor, SourceAvatarActor);
+		}
+		if(OtherActor && OtherActor->ActorHasTag("HitInteraction") && !IInteractionInterface::Execute_ShouldBlockProjectile(OtherActor))
+		{
+		}
+		else
+		{
+			ProjectileMovement->StopMovementImmediately();
+			GEngine->AddOnScreenDebugMessage(3216584, 3.f, FColor::White, FString::Printf(TEXT("%s"), *OtherActor->GetName()));
 		}
 	}
 	else bHit = true;

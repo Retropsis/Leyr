@@ -221,6 +221,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatState_Unoccupied = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Unoccupied"), FString("CombatState Unoccupied"));
 	GameplayTags.CombatState_Walking = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.CombatState_Walking"), FString("CombatState CombatState_Walking"));
 	GameplayTags.CombatState_WalkingPeaceful = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.CombatState_WalkingPeaceful"), FString("CombatState CombatState_WalkingPeaceful"));
+	GameplayTags.CombatState_Aiming = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.CombatState_Aiming"), FString("CombatState CombatState_Aiming"));
 	GameplayTags.CombatState_Slope = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Slope"), FString("CombatState Slope"));
 	GameplayTags.CombatState_Ledge = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Ledge"), FString("CombatState Ledge"));
 	GameplayTags.CombatState_Rope = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rope"), FString("CombatState Rope"));
@@ -314,6 +315,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	 */
 	GameplayTags.CombatSocket_Preferred = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.Preferred"), FString("Attack with Preferred Socket"));
 	GameplayTags.CombatSocket_Weapon = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.Weapon"), FString("Attack with Weapon Socket"));
+	GameplayTags.CombatSocket_Weapon_UpperBody = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.Weapon.UpperBody"), FString("Attack with UpperBody Weapon Socket"));
 	GameplayTags.CombatSocket_LeftHand = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.LeftHand"), FString("Attack with Left Hand Socket"));
 	GameplayTags.CombatSocket_RightHand = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.RightHand"), FString("Attack with Right Hand Socket"));
 	GameplayTags.CombatSocket_Fang = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatSocket.Fang"), FString("Attack with Fang Socket"));

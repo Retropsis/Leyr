@@ -138,7 +138,13 @@ protected:
 	bool bDead = false;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="PaperZD")
+	TObjectPtr<UPaperFlipbookComponent> UpperBody;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="PaperZD")
 	TObjectPtr<UPaperZDAnimationComponent> AnimationComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="PaperZD")
+	TObjectPtr<UPaperZDAnimationComponent> UpperBodyAnimationComponent;
 		
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;

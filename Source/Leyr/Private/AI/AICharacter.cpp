@@ -15,19 +15,12 @@
 #include "Game/BaseGameplayTags.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Kismet/KismetSystemLibrary.h"
 
 AAICharacter::AAICharacter()
 {
 	AbilitySystemComponent = CreateDefaultSubobject<UBaseAbilitySystemComponent>("AbilitySystemComponent");
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Minimal);
-
-	// TODO: Only for 3D, 2D should snap
-	// bUseControllerRotationPitch = false;
-	// bUseControllerRotationRoll = false;
-	// bUseControllerRotationYaw = false;
-	// GetCharacterMovement()->bUseControllerDesiredRotation = true;
 	
 	AttributeSet = CreateDefaultSubobject<UBaseAttributeSet>("AttributeSet");
 	
@@ -185,8 +178,8 @@ void AAICharacter::Die(const FVector& DeathImpulse)
  */
 FVector AAICharacter::FindRandomLocation_Implementation()
 {
-	UKismetSystemLibrary::DrawDebugCircle(this, StartLocation, PatrolRadius, 12, FLinearColor::White, 5.f, 0, FVector(1, 0, 0));
-	UKismetSystemLibrary::DrawDebugCircle(this, GetActorLocation(), PatrolTickRadius, 12, FLinearColor::Green, 5.f, 0, FVector(1, 0, 0));
+	// UKismetSystemLibrary::DrawDebugCircle(this, StartLocation, PatrolRadius, 12, FLinearColor::White, 5.f, 0, FVector(1, 0, 0));
+	// UKismetSystemLibrary::DrawDebugCircle(this, GetActorLocation(), PatrolTickRadius, 12, FLinearColor::Green, 5.f, 0, FVector(1, 0, 0));
 	int32 Index = 0;
 	while (Index < 10)
 	{
@@ -208,9 +201,9 @@ bool AAICharacter::MoveToLocation_Implementation(FVector TargetLocation, float T
 	if ((GetActorLocation() - TargetLocation).Size() > Threshold)
 	{
 		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetLocation.X, GetActorLocation().Y, TargetLocation.Z));
-		UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + LookAtRotation.Vector() * 100.f, 5.f, FLinearColor::Red, 1.f);
+		// UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + LookAtRotation.Vector() * 100.f, 5.f, FLinearColor::Red, 1.f);
 		const FRotator WorldDirection = FRotator(LookAtRotation.Pitch, 0.f, 0.f);
-		UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + WorldDirection.Vector() * 100.f, 5.f, FLinearColor::Green, 1.f);
+		// UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + WorldDirection.Vector() * 100.f, 5.f, FLinearColor::Green, 1.f);
 		AddMovementInput(LookAtRotation.Vector(), 1.f, true);
 		if(FVector::DotProduct(LookAtRotation.Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
 		return false;

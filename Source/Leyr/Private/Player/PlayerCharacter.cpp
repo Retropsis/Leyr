@@ -233,6 +233,10 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	case ECombatState::WalkingPeaceful:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
 		break;
+	case ECombatState::Aiming:
+		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
+		Pitch(MovementVector.Y);
+		break;
 	case ECombatState::HangingRope:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
 		if(MovementVector.Y > 0.f) HandleCombatState(ECombatState::ClimbingRope);
@@ -271,6 +275,13 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	case ECombatState::RollingEnd:
 		break;
 	}
+}
+
+void APlayerCharacter::Pitch(float InPitch)
+{
+	OverridePitch = FMath::Clamp(UpperBody->GetRelativeRotation().Pitch + InPitch, -45.f, 45.f);
+	const FRotator ClampedRotation = FRotator(OverridePitch, 0.f, 0.f);
+	UpperBody->SetRelativeRotation(ClampedRotation);
 }
 
 ECombatDirection APlayerCharacter::GetCombatDirectionFromVector2D(FVector2D MovementVector)
@@ -346,6 +357,7 @@ void APlayerCharacter::HandleCrouching(bool bShouldCrouch)
 
 void APlayerCharacter::JumpButtonPressed()
 {
+	if(CombatState == ECombatState::Aiming) return;;
 	if(CombatState == ECombatState::Entangled)
 	{
 		GetCharacterMovement()->AddImpulse(FVector::UpVector * 500.f, true);
@@ -500,6 +512,10 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetCharacterMovement()->MaxWalkSpeedCrouched = BaseWalkSpeedCrouched;
 		GetCharacterMovement()->MaxAcceleration = 2048.f;
 		GetCharacterMovement()->BrakingFrictionFactor = 2.f;
+		break;
+	case ECombatState::Aiming:
+		GetCharacterMovement()->MaxWalkSpeed = AimingWalkSpeed;
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Aiming);
 		break;
 	}
 }
@@ -668,6 +684,24 @@ void APlayerCharacter::ReduceWalkSpeed_Implementation(float AmountToReduce)
 void APlayerCharacter::SetWalkSpeed_Implementation(float NewSpeed)
 {
 	GetCharacterMovement()->MaxFlySpeed = FMath::Max(0.f, NewSpeed);
+}
+
+void APlayerCharacter::ToggleAiming_Implementation(bool bAiming)
+{
+	if(ForgetOverridePitchTimer.IsValid())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(ForgetOverridePitchTimer);
+	}
+	HandleCombatState(bAiming ? ECombatState::Aiming : ECombatState::Unoccupied);
+	if(!bAiming)
+	{
+		GetWorld()->GetTimerManager().SetTimer(ForgetOverridePitchTimer, FTimerDelegate::CreateLambda([this] ()
+		{
+			OverridePitch = 0.f;
+			UpperBody->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
+			GEngine->AddOnScreenDebugMessage(654444, 2.f, FColor::Red, FString("Forgetting Override Pitch NOW"));
+		}), ForgetOverridePitchTime, false);
+	}
 }
 
 /*

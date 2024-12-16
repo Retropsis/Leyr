@@ -63,7 +63,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Combat")
 	float LifeSpan = 5.f;
 	
-	UPROPERTY(EditAnywhere, Category = "Character|AI")
+	UPROPERTY(EditDefaultsOnly, Category = "Character|AI")
 	float ChasingFlyingSpeed = 250.f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|AI")
@@ -71,7 +71,7 @@ public:
 	
 	TObjectPtr<USplineComponent> SplineComponent;
 	
-	UPROPERTY(EditAnywhere, Category = "Character|AI")
+	UPROPERTY(EditDefaultsOnly, Category = "Character|AI")
 	bool bCollisionCauseDamage = false;
 
 	UPROPERTY(EditAnywhere, Category = "Character|AI")
@@ -120,7 +120,7 @@ protected:
 	/*
 	 * AI
 	*/
-	UPROPERTY(EditAnywhere, Category = "Character|AI")
+	UPROPERTY(EditDefaultsOnly, Category = "Character|AI")
 	TObjectPtr<UBehaviorTree> BehaviorTree;
 
 	UPROPERTY()
@@ -129,10 +129,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	EBehaviourType BehaviourType = EBehaviourType::Patrol;
 	
-	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	EBehaviourState BehaviourState = EBehaviourState::Patrol;
-	
-	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	EChasingState ChasingState = EChasingState::Chasing;
 	
 	UPROPERTY(EditAnywhere, Category = "Character|AI")

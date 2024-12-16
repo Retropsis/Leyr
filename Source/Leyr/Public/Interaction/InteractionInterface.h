@@ -25,4 +25,7 @@ class LEYR_API IInteractionInterface
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void Interact(AActor* InteractingActor);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool ShouldBlockProjectile();
 };

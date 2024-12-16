@@ -40,6 +40,7 @@ class LEYR_API ALever : public APaperFlipbookActor, public IInteractionInterface
 public:
 	ALever();
 	virtual void Interact_Implementation(AActor* InteractingActor) override;
+	virtual bool ShouldBlockProjectile_Implementation() override { return bShouldBlockProjectile; }
 	void HandleLeverVisualState(ELeverState NewState);
 	
 	UFUNCTION()
@@ -60,6 +61,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Platform")
 	ELeverType LeverType = ELeverType::Switch;
 	
+	ELeverState LeverState = ELeverState::Off;
+	bool bShouldBlockProjectile = true;
+	
 	UPROPERTY(EditAnywhere, Category="Platform")
 	float OnTime = 3.f;
 
@@ -77,5 +81,4 @@ protected:
 
 private:
 	FTimerHandle OnTimer;
-	ELeverState LeverState = ELeverState::Off;
 };

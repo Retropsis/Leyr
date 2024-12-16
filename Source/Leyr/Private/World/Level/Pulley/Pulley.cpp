@@ -6,15 +6,37 @@
 APulley::APulley()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	RopeHitBox = CreateDefaultSubobject<UBoxComponent>("RopeHitBox");
-	RopeHitBox->SetupAttachment(GetRootComponent());
+	LeverType = ELeverType::SingleUse;
 
 	WeightHitBox = CreateDefaultSubobject<UBoxComponent>("WeightHitBox");
 	WeightHitBox->SetupAttachment(GetRootComponent());
+	bShouldBlockProjectile = false;
 }
 
 void APulley::BeginPlay()
 {
-	Super::BeginPlay();
+	// Skip Lever BeginPlay
+	APaperFlipbookActor::BeginPlay();
+	if (HasAuthority())
+	{
+		OverlapBox->OnComponentBeginOverlap.AddDynamic(this, &ALever::OnBeginOverlap);
+	}
 }
+
+void APulley::Interact_Implementation(AActor* InteractingActor)
+{
+	Super::Interact_Implementation(InteractingActor);
+	WeightHitBox->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	WeightHitBox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	WeightHitBox->SetEnableGravity(true);
+	WeightHitBox->SetSimulatePhysics(true);
+}
+
+// void APulley::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+// {
+// 	if(OtherActor&& OtherActor->ActorHasTag("HitInteraction"))
+// 	{
+// 		// Skip Lever OnBeginOverlap
+// 	}
+// }
 

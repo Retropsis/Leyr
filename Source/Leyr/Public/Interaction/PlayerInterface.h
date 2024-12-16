@@ -65,6 +65,12 @@ public:
 	void LevelUp();
 
 	/*
+	 * Ability
+	 */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ToggleAiming(bool bAiming);
+
+	/*
 	 * Inventory
 	 */
 	UFUNCTION(BlueprintNativeEvent)

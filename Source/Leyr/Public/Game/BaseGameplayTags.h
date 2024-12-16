@@ -195,6 +195,7 @@ FGameplayTag Abilities_Throw_2;
 FGameplayTag CombatState_Unoccupied;
 FGameplayTag CombatState_Walking;
 FGameplayTag CombatState_WalkingPeaceful;
+FGameplayTag CombatState_Aiming;
 FGameplayTag CombatState_Slope;
 FGameplayTag CombatState_Rope;
 FGameplayTag CombatState_Hook;
@@ -269,6 +270,7 @@ FGameplayTag Effects_HitReact;
   */
 FGameplayTag CombatSocket_Preferred;
 FGameplayTag CombatSocket_Weapon;
+FGameplayTag CombatSocket_Weapon_UpperBody;
 FGameplayTag CombatSocket_LeftHand;
 FGameplayTag CombatSocket_RightHand;
 FGameplayTag CombatSocket_Fang;

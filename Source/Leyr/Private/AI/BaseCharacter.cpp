@@ -28,9 +28,6 @@ ABaseCharacter::ABaseCharacter()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Overlap);
 	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
-	// GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
-	// GetMesh()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Overlap);
-	// GetMesh()->SetGenerateOverlapEvents(true);
 
 	Weapon = CreateDefaultSubobject<USceneComponent>("Weapon");
 	Weapon->SetupAttachment(GetRootComponent());
@@ -47,6 +44,12 @@ ABaseCharacter::ABaseCharacter()
 	BurnStatusEffectComponent = CreateDefaultSubobject<UStatusEffectNiagaraComponent>("BurnStatusEffectComponent");
 	BurnStatusEffectComponent->SetupAttachment(GetRootComponent());
 	BurnStatusEffectComponent->StatusEffectTag = GameplayTags.StatusEffect_Burn;
+
+	UpperBody = CreateDefaultSubobject<UPaperFlipbookComponent>("UpperBody");
+	UpperBody->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	UpperBody->SetupAttachment(GetRootComponent());
+
+	UpperBodyAnimationComponent = CreateDefaultSubobject<UPaperZDAnimationComponent>("UpperBodyAnimationComponent");
 }
 
 /*
@@ -136,6 +139,10 @@ FVector ABaseCharacter::GetCombatSocketLocation_Implementation(const FGameplayTa
 	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Weapon) && IsValid(Weapon))
 	{
 		return GetSprite()->GetSocketLocation(WeaponSocketName);
+	}
+	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Weapon_UpperBody))
+	{
+		return UpperBody->GetSocketLocation(WeaponSocketName);
 	}
 	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_LeftHand))
 	{
