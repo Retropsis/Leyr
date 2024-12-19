@@ -47,7 +47,7 @@ public:
 	void TraceForLedge();
 	void TraceForSlope();
 	void TraceForPlatforms() const;
-	void TraceForLadder();
+	void TraceForUpButtonInteraction();
 	
 	/** Combat Interface */
 	virtual int32 GetCharacterLevel_Implementation() override;

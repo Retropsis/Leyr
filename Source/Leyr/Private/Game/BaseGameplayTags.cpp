@@ -219,9 +219,9 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	 * Combat States
 	 */
 	GameplayTags.CombatState_Unoccupied = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Unoccupied"), FString("CombatState Unoccupied"));
-	GameplayTags.CombatState_Walking = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.CombatState_Walking"), FString("CombatState CombatState_Walking"));
-	GameplayTags.CombatState_WalkingPeaceful = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.CombatState_WalkingPeaceful"), FString("CombatState CombatState_WalkingPeaceful"));
-	GameplayTags.CombatState_Aiming = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.CombatState_Aiming"), FString("CombatState CombatState_Aiming"));
+	GameplayTags.CombatState_Walking = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Walking"), FString("CombatState Walking"));
+	GameplayTags.CombatState_WalkingPeaceful = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.WalkingPeaceful"), FString("CombatState WalkingPeaceful"));
+	GameplayTags.CombatState_Aiming = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Aiming"), FString("CombatState Aiming"));
 	GameplayTags.CombatState_Slope = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Slope"), FString("CombatState Slope"));
 	GameplayTags.CombatState_Ledge = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Ledge"), FString("CombatState Ledge"));
 	GameplayTags.CombatState_Rope = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rope"), FString("CombatState Rope"));
@@ -261,6 +261,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Elevator);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Walking);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_WalkingPeaceful);
+	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Aiming);
 	
 	GameplayTags.CombatDirections.AddTag(GameplayTags.CombatState_Directional_Upward);
 	GameplayTags.CombatDirections.AddTag(GameplayTags.CombatState_Directional_Downward);

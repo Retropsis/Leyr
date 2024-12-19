@@ -5,6 +5,7 @@
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
+#include "AbilitySystem/Data/EncounterInfo.h"
 #include "AI/BaseAIController.h"
 #include "AI/SplineComponentActor.h"
 #include "BehaviorTree/BehaviorTree.h"
@@ -13,7 +14,9 @@
 #include "Components/SplineComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Game/BaseGameplayTags.h"
+#include "Game/LeyrGameMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
 AAICharacter::AAICharacter()
@@ -33,6 +36,23 @@ AAICharacter::AAICharacter()
 	PassiveIndicatorComponent->SetWidgetSpace(EWidgetSpace::Screen);
 }
 
+void AAICharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+	
+	if(MovementType == EMovementType::Spline && !SplineComponentActor)
+	{
+		FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
+		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SplineComponentActor = GetWorld()->SpawnActor<ASplineComponentActor>(ASplineComponentActor::StaticClass(), GetActorTransform(), SpawnParameters);
+	}
+	if(MovementType != EMovementType::Spline && SplineComponentActor)
+	{
+		SplineComponentActor->Destroy();
+		SplineComponentActor = nullptr;
+	}
+}
+
 void AAICharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -45,6 +65,7 @@ void AAICharacter::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 	
 	if (!HasAuthority()) return;
+	InitializeBehaviourInfo();
 	BaseAIController = Cast<ABaseAIController>(NewController);
 	BaseAIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
 	BaseAIController->RunBehaviorTree(BehaviorTree);
@@ -143,6 +164,25 @@ void AAICharacter::InitializeDefaultAttributes() const
 	{
 		ULeyrAbilitySystemLibrary::InitializeCharacterClassAttributes(this, CharacterClass, Level, AbilitySystemComponent);
 	}
+}
+
+void AAICharacter::InitializeBehaviourInfo()
+{
+	if(!HasAuthority()) return;
+
+	const ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this));
+	if (LeyrGameMode == nullptr || Name.IsNone()) return;
+
+	const FBehaviourDefaultInfo Info = LeyrGameMode->EncounterInfo->GetEncounterDefaultInfo(Name).BehaviourDefaultInfo;
+	BehaviorTree = Info.BehaviorTree;
+	BehaviourType = Info.BehaviourType;
+	SineMoveHeight = Info.SineMoveHeight;
+	PatrolRadius = Info.PatrolRadius;
+	PatrolTickRadius = Info.PatrolTickRadius;
+	AttackRange = Info.AttackRange;
+	CloseRange = Info.CloseRange;
+	ChasingHeightOffset = Info.ChasingHeightOffset;
+	bCollisionCauseDamage = Info.bCollisionCauseDamage;
 }
 
 void AAICharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

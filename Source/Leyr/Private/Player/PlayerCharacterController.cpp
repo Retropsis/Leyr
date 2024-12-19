@@ -98,7 +98,7 @@ void APlayerCharacterController::Move(const FInputActionValue& Value)
 
 void APlayerCharacterController::UpButtonPressed(const FInputActionValue& Value)
 {
-	if (PlayerCharacter && Value.Get<FVector2D>().Y > 0.f) PlayerCharacter->TraceForLadder();
+	if (PlayerCharacter && Value.Get<FVector2D>().Y > 0.f) PlayerCharacter->TraceForUpButtonInteraction();
 }
 
 void APlayerCharacterController::Jump()

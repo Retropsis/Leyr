@@ -5,13 +5,14 @@
 #include "CoreMinimal.h"
 #include "Data/CombatData.h"
 #include "GameFramework/Actor.h"
+#include "Interaction/InteractionInterface.h"
 #include "OverlapZone.generated.h"
 
 enum class ECombatState : uint8;
 class UBoxComponent;
 
 UCLASS()
-class LEYR_API AOverlapZone : public AActor
+class LEYR_API AOverlapZone : public AActor, public IInteractionInterface
 {
 	GENERATED_BODY()
 	

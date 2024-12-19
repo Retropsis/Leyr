@@ -31,6 +31,10 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
+
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 	
 	/** Combat Interface */
 	virtual int32 GetCharacterLevel_Implementation() override { return Level; }
@@ -70,14 +74,10 @@ public:
 	TObjectPtr<ASplineComponentActor> SplineComponentActor;
 	
 	TObjectPtr<USplineComponent> SplineComponent;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Character|AI")
-	bool bCollisionCauseDamage = false;
 
 	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	EMovementType MovementType = EMovementType::Destination;
 
-	float SineMoveHeight = 0.f;
 
 	/*
 	 * Colliding Damage
@@ -100,7 +100,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;
-	virtual void InitializeDefaultAttributes() const override;	
+	virtual void InitializeDefaultAttributes() const override;
+	void InitializeBehaviourInfo();
 	
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -118,36 +119,26 @@ protected:
 	TObjectPtr<UWidgetComponent> PassiveIndicatorComponent;
 
 	/*
-	 * AI
+	 * AI 
 	*/
-	UPROPERTY(EditDefaultsOnly, Category = "Character|AI")
-	TObjectPtr<UBehaviorTree> BehaviorTree;
-
-	UPROPERTY()
-	TObjectPtr<ABaseAIController> BaseAIController;
+	UPROPERTY() TObjectPtr<UBehaviorTree> BehaviorTree;
+	UPROPERTY() 	TObjectPtr<ABaseAIController> BaseAIController;
 	
-	UPROPERTY(EditAnywhere, Category = "Character|AI")
-	EBehaviourType BehaviourType = EBehaviourType::Patrol;
-	
+	FVector StartLocation = FVector::ZeroVector;
 	EBehaviourState BehaviourState = EBehaviourState::Patrol;
 	EChasingState ChasingState = EChasingState::Chasing;
 	
-	UPROPERTY(EditAnywhere, Category = "Character|AI")
+	/*
+	 * AI Data
+	*/
+	EBehaviourType BehaviourType = EBehaviourType::Patrol;
+	bool bCollisionCauseDamage = false;
+	float SineMoveHeight = 0.f;
 	float PatrolRadius = 750.f;
-	
-	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	float PatrolTickRadius = 450.f;
-	
-	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	float AttackRange = 300.f;
-	
-	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	float CloseRange = 275.f;
-	
-	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	float ChasingHeightOffset = 75.f;
-	
-	FVector StartLocation = FVector::ZeroVector;
 
 public:
 	UFUNCTION(BlueprintCallable)

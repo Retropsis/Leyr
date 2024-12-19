@@ -27,6 +27,7 @@
 #include "NiagaraComponent.h"
 #include "PaperFlipbookComponent.h"
 #include "Interaction/ElevatorInterface.h"
+#include "World/Map/ParallaxController.h"
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -125,6 +126,15 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 	GetCharacterMovement()->MaxWalkSpeed = BaseRunSpeed;
 	GetCharacterMovement()->GravityScale = BaseGravityScale;
 	OnCharacterMovementUpdated.AddDynamic(this, &APlayerCharacter::HandleCharacterMovementUpdated);
+
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	if(AParallaxController* ParallaxController = GetWorld()->SpawnActor<AParallaxController>(AParallaxController::StaticClass(), GetActorLocation(), FRotator::ZeroRotator, SpawnParameters))
+	{
+		ParallaxController->CurrentMapName = FName("Dorn");
+		ParallaxController->InitializeMapParallax(this);
+		ParallaxController->AttachToComponent(SpringArm, FAttachmentTransformRules::KeepWorldTransform);
+	}
 }
 
 void APlayerCharacter::OnRep_PlayerState()
@@ -212,9 +222,9 @@ void APlayerCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeigh
  */
 void APlayerCharacter::Move(const FVector2D MovementVector)
 {
-	if(CombatState >= ECombatState::Dodging)  return;
+	if(CombatState >= ECombatState::Dodging) return;
 	
-	RotateController();
+	if(CombatState != ECombatState::Aiming) RotateController();
 	
 	PreviousCombatDirection = CombatDirection;
 	CombatDirection = GetCombatDirectionFromVector2D(MovementVector);
@@ -420,6 +430,10 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		break;
 	case ECombatState::Crouching:
 		Crouch();
+		if (UPlayerCharacterAnimInstance* PlayerCharacterAnimInstance = Cast<UPlayerCharacterAnimInstance>(AnimationComponent->GetAnimInstance()))
+		{
+			PlayerCharacterAnimInstance->bIsCrouched = true;
+		}
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Crouching);
 		break;
 	case ECombatState::UnCrouching:
@@ -699,7 +713,6 @@ void APlayerCharacter::ToggleAiming_Implementation(bool bAiming)
 		{
 			OverridePitch = 0.f;
 			UpperBody->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
-			GEngine->AddOnScreenDebugMessage(654444, 2.f, FColor::Red, FString("Forgetting Override Pitch NOW"));
 		}), ForgetOverridePitchTime, false);
 	}
 }
@@ -740,7 +753,7 @@ void APlayerCharacter::TraceForPlatforms() const
 	}
 }
 
-void APlayerCharacter::TraceForLadder()
+void APlayerCharacter::TraceForUpButtonInteraction()
 {
 	if(CombatState == ECombatState::HangingLadder || GetCharacterMovement()->IsFalling()) return;
 	// if(GetCharacterMovement()->MovementMode != MOVE_Walking || GetVelocity().Z < 0.f) return;
@@ -756,6 +769,13 @@ void APlayerCharacter::TraceForLadder()
 	if(Hit.bBlockingHit && Hit.GetActor()->ActorHasTag("Ladder"))
 	{
 		HandleCombatState(ECombatState::HangingLadder);
+	}
+	if(Hit.bBlockingHit && Hit.GetActor()->ActorHasTag("BackEntrance"))
+	{
+		SpringArm->bEnableCameraLag = false;
+		IInteractionInterface::Execute_TryBackEntrance(Hit.GetActor(), this, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+		FTimerHandle DisableCameraLagTimer;
+		GetWorld()->GetTimerManager().SetTimer(DisableCameraLagTimer, FTimerDelegate::CreateLambda([this](){ SpringArm->bEnableCameraLag = true; }), 1.f, false);		
 	}
 }
 

@@ -31,6 +31,7 @@ enum class EBehaviourType : uint8
 UENUM(BlueprintType)
 enum class EMovementType : uint8
 {
+	Immobile UMETA(DisplayName="Immobile"),
 	Destination UMETA(DisplayName="Destination"),
 	Sine UMETA(DisplayName="Sine"),
 	Spline UMETA(DisplayName="Spline"),

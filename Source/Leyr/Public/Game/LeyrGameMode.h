@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "LeyrGameMode.generated.h"
 
+class UMapInfo;
+class UBehaviourInfo;
 class UEncounterInfo;
 class UActorClassInfo;
 class UAbilityInfo;
@@ -31,4 +33,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Ability Info")
 	TObjectPtr<UAbilityInfo> AbilityInfo;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Map Info")
+	TObjectPtr<UMapInfo> MapInfo;
 };

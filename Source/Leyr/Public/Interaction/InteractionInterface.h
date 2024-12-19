@@ -28,4 +28,7 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool ShouldBlockProjectile();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool TryBackEntrance(AActor* InteractingActor, float CapsuleHalfHeight);
 };
