@@ -7,6 +7,7 @@
 #include "UObject/Interface.h"
 #include "PlayerInterface.generated.h"
 
+class USpringArmComponent;
 class AContainer;
 enum class ECombatState : uint8;
 enum class EArmorType : uint8;
@@ -28,6 +29,12 @@ class LEYR_API IPlayerInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	/*
+	 * Camera
+	 */
+	UFUNCTION(BlueprintNativeEvent)
+	USpringArmComponent* GetSpringArmComponent();
+	
 	/*
 	 * Ability System
 	 */

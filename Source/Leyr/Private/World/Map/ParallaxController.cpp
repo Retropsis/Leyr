@@ -76,17 +76,16 @@ AParallaxController::AParallaxController()
 void AParallaxController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+	DeltaSecondsNormalized = DeltaSecondsNormalized + DeltaSeconds;
 	if(DynamicLayersToSpeed.Num() > 0)
 	{
 		for (TTuple<UMaterialInstanceDynamic*, FParallaxLayerData> Data : DynamicLayersToSpeed)
 		{
 			if(Data.Key)
 			{
-				Data.Key->SetScalarParameterValue(FName("CameraPosX"), GetActorLocation().X * Data.Value.ScrollingRatio.X);
+				Data.Key->SetScalarParameterValue(FName("CameraPosX"), GetActorLocation().X * Data.Value.ScrollingRatio.X + Data.Value.ScrollingSpeed != 0.f ? Data.Value.ScrollingSpeed * DeltaSecondsNormalized : 0.f);
 				if(Data.Value.ScrollingRatio.Y != 0.f) Data.Key->SetScalarParameterValue(FName("CameraPosY"), 1.f / FMath::Abs(GetActorLocation().Z * Data.Value.ScrollingRatio.Y));
 				if(Data.Value.OffsetY != 0.f) Data.Key->SetScalarParameterValue(FName("OffsetY"), Data.Value.OffsetY);
-				if(Data.Value.ScrollingSpeed != 0.f)
-				GEngine->AddOnScreenDebugMessage(46711, 1.f, FColor::Magenta, FString::Printf(TEXT("%f"), DeltaSeconds));
 			}
 		}
 	}

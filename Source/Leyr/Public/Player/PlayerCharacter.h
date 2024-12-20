@@ -84,6 +84,7 @@ public:
 	virtual AContainer* GetContainer_Implementation() override { return InteractingContainer; } 
 
 	/** Player Interface */
+	virtual USpringArmComponent* GetSpringArmComponent_Implementation() override { return SpringArm; }
 	virtual void ResetInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex) override;
 	virtual void UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData) override;
 	virtual void UpdateContainerSlots_Implementation(int32 TotalSlots) override;
@@ -195,7 +196,7 @@ protected:
 	ECombatDirection GetCombatDirectionFromVector2D(FVector2D MovementVector);
 	void HandleCombatDirectionTag() const;
 
-private:		
+private:			
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<USpringArmComponent> SpringArm;
 	

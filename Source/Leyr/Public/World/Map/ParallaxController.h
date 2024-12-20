@@ -81,4 +81,6 @@ protected:
 private:
 	UPROPERTY()
 	TMap<UMaterialInstanceDynamic*, FParallaxLayerData> DynamicLayersToSpeed;
+	
+	float DeltaSecondsNormalized = 0.f;
 };
