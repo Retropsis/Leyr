@@ -7,6 +7,8 @@
 
 AWaterGroup::AWaterGroup()
 {
+	OverlapBox->SetCollisionResponseToAllChannels(ECR_Overlap);
+	Tags.Add(FName("OverlapProjectiles"));
 }
 
 void AWaterGroup::OnConstruction(const FTransform& Transform)

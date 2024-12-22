@@ -173,6 +173,7 @@ FGameplayTag Abilities_Weapon_Fire_FireBolt;
 FGameplayTag Abilities_Weapon_Noxious_Bio_1;
 FGameplayTag Abilities_Weapon_Aim;
 FGameplayTag Abilities_Weapon_Bow_Shot;
+FGameplayTag Abilities_Weapon_Spear_Throw;
  
 FGameplayTag Abilities_Combo_Attack_1;
 FGameplayTag Abilities_Combo_Attack_2;

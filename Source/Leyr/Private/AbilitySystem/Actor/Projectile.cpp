@@ -91,13 +91,11 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 		{
 			IInteractionInterface::Execute_Interact(OtherActor, SourceAvatarActor);
 		}
-		if(OtherActor && OtherActor->ActorHasTag("HitInteraction") && !IInteractionInterface::Execute_ShouldBlockProjectile(OtherActor))
-		{
-		}
-		else
+		bool bActorOverlappingProjectiles = OtherActor && OtherActor->ActorHasTag("OverlapProjectiles");
+		bool bInteractiveActorBlockingProjectile = OtherActor && OtherActor->Implements<UInteractionInterface>() && IInteractionInterface::Execute_ShouldBlockProjectile(OtherActor);
+		if(!bActorOverlappingProjectiles || bInteractiveActorBlockingProjectile)
 		{
 			ProjectileMovement->StopMovementImmediately();
-			GEngine->AddOnScreenDebugMessage(3216584, 3.f, FColor::White, FString::Printf(TEXT("%s"), *OtherActor->GetName()));
 		}
 	}
 	else bHit = true;

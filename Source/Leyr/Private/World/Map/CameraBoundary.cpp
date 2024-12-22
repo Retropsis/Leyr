@@ -73,7 +73,7 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 		if (SpringArm)
 		{
 			SpringArm->AttachToComponent(OtherActor->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
-			// SpringArm->bEnableCameraLag = true;
+			SpringArm->bEnableCameraLag = true;
 			ResetSocketOffset = SpringArm->SocketOffset;
 			ResetSocketOffset = FVector(0.f);
 			SetActorTickEnabled(false);
