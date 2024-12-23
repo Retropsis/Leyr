@@ -27,4 +27,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	AActor* GetCombatTarget() const;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void SetShouldAttack(bool InShouldAttack);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	bool ShouldAttack() const;
 };

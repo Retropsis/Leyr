@@ -11,6 +11,13 @@ class UGameplayAbility;
 class UGameplayEffect;
 
 UENUM(BlueprintType)
+enum class EActorName : uint8
+{
+	Default UMETA(DisplayName="Default"),
+	Breakable UMETA(DisplayName="Breakable"),
+};
+
+UENUM(BlueprintType)
 enum class EActorClass : uint8
 {
 	Default,

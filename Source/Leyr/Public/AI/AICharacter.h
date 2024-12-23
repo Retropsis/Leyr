@@ -3,18 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AIData.h"
 #include "AI/BaseCharacter.h"
+#include "AIData.h"
+#include "AbilitySystem/Data/EncounterInfo.h"
 #include "Interaction/AIInterface.h"
 #include "Interaction/EnemyInterface.h"
 #include "UI/Controller/OverlayWidgetController.h"
 #include "AICharacter.generated.h"
 
+enum class EEncounterName : uint8;
+enum class EBehaviourType : uint8;
 class ASplineComponentActor;
 class ASplineMeshActor;
 class USplineMeshComponent;
 class USplineComponent;
-enum class EBehaviourType : uint8;
 class ABaseAIController;
 class UBehaviorTree;
 class UWidgetComponent;
@@ -51,6 +53,11 @@ public:
 	virtual bool FollowSpline_Implementation(int32 SplineIndex) override;
 	virtual FVector GetNextLocation_Implementation(int32 SplineIndex) override;
 	/** end AI Interface */
+
+	/** Enemy Interface */
+	virtual void SetShouldAttack_Implementation(bool InShouldAttack) override { bShouldAttack = InShouldAttack; }
+	virtual bool ShouldAttack_Implementation() const override { return bShouldAttack; }
+	/** Enemy Interface */
 	
 	UPROPERTY(BlueprintReadWrite, Category = "Combat")
 	TObjectPtr<AActor> CombatTarget;
@@ -78,38 +85,26 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	EMovementType MovementType = EMovementType::Destination;
 
-
-	/*
-	 * Colliding Damage
-	 */
-	UFUNCTION(BlueprintCallable)
-	void CauseDamage(AActor* TargetActor);
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Character|Combat")
-	FValueRange AbilityPower;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Character|Combat")
-	TSubclassOf<UGameplayEffect> DamageEffectClass;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Character|Combat", meta=(Categories="Damage"))
-	FGameplayTag DamageType;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Character|Combat", meta=(Categories="Damage"))
-	bool bShouldApplyInvincibility = false;	
-
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;
 	virtual void InitializeDefaultAttributes() const override;
 	void InitializeBehaviourInfo();
+	void AddAICharacterAbilities() const;
+	
+	UFUNCTION(BlueprintCallable)
+	void CauseDamage(AActor* TargetActor);
+
+	UFUNCTION(BlueprintCallable)
+	void ResetShouldAttack();
 	
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Encounter Defaults")
-	FName Name = FName();
+	EEncounterName EncounterName = EEncounterName::Default;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Encounter Defaults")
 	int32 Level = 1;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -122,23 +117,28 @@ protected:
 	 * AI 
 	*/
 	UPROPERTY() TObjectPtr<UBehaviorTree> BehaviorTree;
-	UPROPERTY() 	TObjectPtr<ABaseAIController> BaseAIController;
+	UPROPERTY() TObjectPtr<ABaseAIController> BaseAIController;
 	
 	FVector StartLocation = FVector::ZeroVector;
 	EBehaviourState BehaviourState = EBehaviourState::Patrol;
 	EChasingState ChasingState = EChasingState::Chasing;
+	bool bShouldAttack = true;
 	
 	/*
 	 * AI Data
 	*/
 	EBehaviourType BehaviourType = EBehaviourType::Patrol;
-	bool bCollisionCauseDamage = false;
 	float SineMoveHeight = 0.f;
 	float PatrolRadius = 750.f;
 	float PatrolTickRadius = 450.f;
 	float AttackRange = 300.f;
 	float CloseRange = 275.f;
 	float ChasingHeightOffset = 75.f;
+	bool bCollisionCauseDamage = false;
+	bool bShouldApplyInvincibility = false;	
+	FValueRange AbilityPower;
+	TSubclassOf<UGameplayEffect> DamageEffectClass;
+	FGameplayTag DamageType;
 
 public:
 	UFUNCTION(BlueprintCallable)
@@ -148,4 +148,5 @@ public:
 	virtual void SetBehaviourState(EBehaviourState NewState) override { BehaviourState = NewState; }
 	
 	virtual EMovementType GetMovementType_Implementation() override { return MovementType; }
+	
 };

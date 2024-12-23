@@ -7,21 +7,22 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "LeyrAbilitySystemLibrary.generated.h"
 
-class UEncounterInfo;
-class UGameplayEffect;
-class UActorClassInfo;
 enum class EActorClass : uint8;
 enum class ECharacterClass : uint8;
+enum class EEncounterName : uint8;
 struct FAdditionalEffectParams;
 struct FGameplayEffectContextHandle;
 struct FWidgetControllerParams;
+class UAbilitySystemComponent;
+class UGameplayEffect;
+class UEncounterInfo;
+class UActorClassInfo;
 class UAbilityInfo;
 class UCharacterClassInfo;
-class UAbilitySystemComponent;
-class APlayerHUD;
 class UOverlayWidgetController;
 class USkillMenuWidgetController;
 class UAttributeMenuWidgetController;
+class APlayerHUD;
 
 /**
  * 
@@ -66,7 +67,10 @@ public:
 	 * Encounters
 	*/
 	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|EncounterInfo", meta=(WorldContext="WorldContextObject"))
-	static void InitializeEncounterAttributes(const UObject* WorldContextObject, FName EncounterName, float Level, UAbilitySystemComponent* ASC);
+	static void InitializeEncounterAttributes(const UObject* WorldContextObject, EEncounterName EncounterName, float Level, UAbilitySystemComponent* ASC);
+	
+	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|CharacterClassDefaults", meta=(WorldContext="WorldContextObject"))
+	static void GiveEncounterAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, EEncounterName EncounterName);
 	
 	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|EncounterInfo", meta=(WorldContext="WorldContextObject"))
 	static UEncounterInfo* GetEncounterInfo(const UObject* WorldContextObject);

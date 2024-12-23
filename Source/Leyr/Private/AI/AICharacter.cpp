@@ -44,6 +44,7 @@ void AAICharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 	{
 		FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		// SpawnParameters.Name = FName((TEXT("%s_PatrolSpline"), *GetName()));
 		SplineComponentActor = GetWorld()->SpawnActor<ASplineComponentActor>(ASplineComponentActor::StaticClass(), GetActorTransform(), SpawnParameters);
 	}
 	if(MovementType != EMovementType::Spline && SplineComponentActor)
@@ -94,6 +95,10 @@ void AAICharacter::PossessedBy(AController* NewController)
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		GetCharacterMovement()->DefaultLandMovementMode = MOVE_Flying;
 		break;
+	case EBehaviourType::Aquatic:
+		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		GetCharacterMovement()->DefaultLandMovementMode = MOVE_Flying;
+		break;
 	}
 }
 
@@ -103,10 +108,7 @@ void AAICharacter::BeginPlay()
 	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 	GetCharacterMovement()->GravityScale = BaseGravityScale;
 	InitAbilityActorInfo();
-	if (HasAuthority())
-	{
-		ULeyrAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent, CharacterClass);
-	}
+	AddAICharacterAbilities();
 	
 	if (UBaseUserWidget* BaseUserWidget = Cast<UBaseUserWidget>(HealthBar->GetUserWidgetObject()))
 	{
@@ -147,22 +149,23 @@ void AAICharacter::InitAbilityActorInfo()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
-	if (HasAuthority())
-	{
-		InitializeDefaultAttributes();		
-	}
+	InitializeDefaultAttributes();
 	OnASCRegistered.Broadcast(AbilitySystemComponent);
 }
 
 void AAICharacter::InitializeDefaultAttributes() const
 {
-	if(CharacterClass == ECharacterClass::Default && !Name.IsNone())
+	if(HasAuthority())
 	{
-		ULeyrAbilitySystemLibrary::InitializeEncounterAttributes(this, Name, Level, AbilitySystemComponent);
+		ULeyrAbilitySystemLibrary::InitializeEncounterAttributes(this, EncounterName, Level, AbilitySystemComponent);
 	}
-	else
+}
+
+void AAICharacter::AddAICharacterAbilities() const
+{
+	if (HasAuthority())
 	{
-		ULeyrAbilitySystemLibrary::InitializeCharacterClassAttributes(this, CharacterClass, Level, AbilitySystemComponent);
+		ULeyrAbilitySystemLibrary::GiveEncounterAbilities(this, AbilitySystemComponent, EncounterName);
 	}
 }
 
@@ -171,9 +174,9 @@ void AAICharacter::InitializeBehaviourInfo()
 	if(!HasAuthority()) return;
 
 	const ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this));
-	if (LeyrGameMode == nullptr || Name.IsNone()) return;
+	if (LeyrGameMode == nullptr || EncounterName == EEncounterName::Default) return;
 
-	const FBehaviourDefaultInfo Info = LeyrGameMode->EncounterInfo->GetEncounterDefaultInfo(Name).BehaviourDefaultInfo;
+	const FBehaviourDefaultInfo Info = LeyrGameMode->EncounterInfo->GetEncounterDefaultInfo(EncounterName).BehaviourDefaultInfo;
 	BehaviorTree = Info.BehaviorTree;
 	BehaviourType = Info.BehaviourType;
 	SineMoveHeight = Info.SineMoveHeight;
@@ -183,6 +186,13 @@ void AAICharacter::InitializeBehaviourInfo()
 	CloseRange = Info.CloseRange;
 	ChasingHeightOffset = Info.ChasingHeightOffset;
 	bCollisionCauseDamage = Info.bCollisionCauseDamage;
+	if(bCollisionCauseDamage)
+	{
+		bShouldApplyInvincibility = Info.bShouldApplyInvincibility;	
+		AbilityPower = Info.AbilityPower;
+		DamageEffectClass = Info.DamageEffectClass;
+		DamageType = Info.DamageType;
+	}
 }
 
 void AAICharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -315,4 +325,14 @@ void AAICharacter::CauseDamage(AActor* TargetActor)
 	SourceASC->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), TargetASC);
 
 	if (bShouldApplyInvincibility) ULeyrAbilitySystemLibrary::ApplyInvincibilityToTarget(TargetASC, 1.25f);
+}
+
+void AAICharacter::ResetShouldAttack()
+{
+	FTimerHandle ResetAttackTimer;
+	GetWorld()->GetTimerManager().SetTimer(ResetAttackTimer, FTimerDelegate::CreateLambda([this] ()
+	{
+		bShouldAttack = true;
+		if(BaseAIController) BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("ShouldAttack"), true);
+	}), 5.f, false);
 }

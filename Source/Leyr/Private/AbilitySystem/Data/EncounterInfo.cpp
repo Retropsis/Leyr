@@ -2,7 +2,7 @@
 
 #include "AbilitySystem/Data/EncounterInfo.h"
 
-FEncounterDefaultInfo UEncounterInfo::GetEncounterDefaultInfo(FName EncounterName)
+FEncounterDefaultInfo UEncounterInfo::GetEncounterDefaultInfo(EEncounterName EncounterName)
 {
 	return EncounterInformation.FindChecked(EncounterName);
 }

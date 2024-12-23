@@ -100,7 +100,7 @@ void ULeyrAbilitySystemLibrary::InitializeCharacterClassAttributes(const UObject
 	ASC->ApplyGameplayEffectSpecToSelf(*VitalAttributesSpecHandle.Data.Get());
 }
 
-void ULeyrAbilitySystemLibrary::InitializeEncounterAttributes(const UObject* WorldContextObject, FName EncounterName, float Level, UAbilitySystemComponent* ASC)
+void ULeyrAbilitySystemLibrary::InitializeEncounterAttributes(const UObject* WorldContextObject, EEncounterName EncounterName, float Level, UAbilitySystemComponent* ASC)
 {
 	const AActor* AvatarActor = ASC->GetAvatarActor();
 
@@ -121,6 +121,27 @@ void ULeyrAbilitySystemLibrary::InitializeEncounterAttributes(const UObject* Wor
 	VitalAttributesContextHandle.AddSourceObject(AvatarActor);
 	const FGameplayEffectSpecHandle VitalAttributesSpecHandle = ASC->MakeOutgoingSpec(EncounterDefaultInfo.VitalAttributes, Level, VitalAttributesContextHandle);
 	ASC->ApplyGameplayEffectSpecToSelf(*VitalAttributesSpecHandle.Data.Get());
+}
+
+void ULeyrAbilitySystemLibrary::GiveEncounterAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, EEncounterName EncounterName)
+{
+	UEncounterInfo* EncounterInfo = GetEncounterInfo(WorldContextObject);
+	if(EncounterInfo == nullptr) return;
+	
+	for (const TSubclassOf<UGameplayAbility> AbilityClass : EncounterInfo->CommonAbilities)
+	{
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		ASC->GiveAbility(AbilitySpec);
+	}
+	const FEncounterDefaultInfo& DefaultInfo = EncounterInfo->GetEncounterDefaultInfo(EncounterName);
+	for (TSubclassOf<UGameplayAbility> AbilityClass : DefaultInfo.EncounterAbilities)
+	{
+		if (ASC->GetAvatarActor()->Implements<UCombatInterface>())
+		{
+			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, ICombatInterface::Execute_GetCharacterLevel(ASC->GetAvatarActor()));
+			ASC->GiveAbility(AbilitySpec);
+		}
+	}
 }
 
 void ULeyrAbilitySystemLibrary::InitializeActorAttributes(const UObject* WorldContextObject, EActorClass ActorClass, float Level, UAbilitySystemComponent* ASC)

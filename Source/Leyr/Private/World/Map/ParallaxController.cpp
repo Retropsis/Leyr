@@ -84,7 +84,8 @@ void AParallaxController::Tick(float DeltaSeconds)
 			if(Data.Key)
 			{
 				Data.Key->SetScalarParameterValue(FName("CameraPosX"), GetActorLocation().X * Data.Value.ScrollingRatio.X + Data.Value.ScrollingSpeed != 0.f ? Data.Value.ScrollingSpeed * DeltaSecondsNormalized : 0.f);
-				if(Data.Value.ScrollingRatio.Y != 0.f) Data.Key->SetScalarParameterValue(FName("CameraPosY"), 1.f / FMath::Abs(GetActorLocation().Z * Data.Value.ScrollingRatio.Y));
+				if(Data.Value.ScrollingRatio.Y != 0.f) Data.Key->SetScalarParameterValue(FName("CameraPosY"), GetActorLocation().Z * Data.Value.ScrollingRatio.Y);
+				// if(Data.Value.ScrollingRatio.Y != 0.f) Data.Key->SetScalarParameterValue(FName("CameraPosY"), 1.f / FMath::Abs(GetActorLocation().Z * Data.Value.ScrollingRatio.Y));
 				if(Data.Value.OffsetY != 0.f) Data.Key->SetScalarParameterValue(FName("OffsetY"), Data.Value.OffsetY);
 			}
 		}

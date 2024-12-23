@@ -3,15 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AI/AICharacter.h"
+#include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
+#include "Leyr/Leyr.h"
+#include "AI/AIData.h"
 #include "EncounterInfo.generated.h"
 
+class UBehaviorTree;
 class UGameplayAbility;
 class UGameplayEffect;
 /**
  * 
 */
+
 USTRUCT(BlueprintType)
 struct FBehaviourDefaultInfo
 {
@@ -43,6 +47,18 @@ struct FBehaviourDefaultInfo
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Behaviour")
 	bool bCollisionCauseDamage = false;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Combat", meta=(Categories="Damage", EditCondition="bCollisionCauseDamage", EditConditionHides))
+	bool bShouldApplyInvincibility = false;	
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Combat", meta=(EditCondition="bCollisionCauseDamage", EditConditionHides))
+	FValueRange AbilityPower;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Combat", meta=(EditCondition="bCollisionCauseDamage", EditConditionHides))
+	TSubclassOf<UGameplayEffect> DamageEffectClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Combat", meta=(Categories="Damage", EditCondition="bCollisionCauseDamage", EditConditionHides))
+	FGameplayTag DamageType;
 };
 
 USTRUCT(BlueprintType)
@@ -76,7 +92,7 @@ class LEYR_API UEncounterInfo : public UDataAsset
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Encounter Defaults")
-	TMap<FName, FEncounterDefaultInfo> EncounterInformation;
+	TMap<EEncounterName, FEncounterDefaultInfo> EncounterInformation;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Encounter Defaults")
 	TSubclassOf<UGameplayEffect> SecondaryAttributes;
@@ -86,9 +102,6 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Encounter Defaults")
 	TArray<TSubclassOf<UGameplayAbility>> CommonAbilities;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Encounter Defaults|Damage")
-	TObjectPtr<UCurveTable> DamageCalculationCoefficients;
 
-	FEncounterDefaultInfo GetEncounterDefaultInfo(FName EncounterName);
+	FEncounterDefaultInfo GetEncounterDefaultInfo(EEncounterName EncounterName);
 };

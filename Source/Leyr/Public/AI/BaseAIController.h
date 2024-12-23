@@ -29,8 +29,5 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UBehaviorTreeComponent> BehaviorTreeComponent;
 
-	// UPROPERTY()
-	// TObjectPtr<UAIPerceptionComponent> PerceptionComponent;
-
 	void UseSightSense(const FAIStimulus& ActiveStimulus) const;
 };
