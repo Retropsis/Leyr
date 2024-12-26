@@ -253,6 +253,14 @@ void ABaseCharacter::SetMovementMode_Implementation(EMovementMode MovementMode, 
 	GetCharacterMovement()->SetMovementMode(MovementMode);
 }
 
+void ABaseCharacter::AdjustDirection_Implementation()
+{
+	if((FMath::Sign(GetActorForwardVector().X) < 0.f && GetActorRotation().Yaw != 180.f) || (FMath::Sign(GetActorForwardVector().X) > 0.f && GetActorRotation().Yaw != 0.f))
+	{
+		SetActorRotation(UKismetMathLibrary::ComposeRotators(GetActorRotation(), FRotator(0.f, 180.f, 0.f)));
+	}
+}
+
 void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImpulse)
 {
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);

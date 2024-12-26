@@ -127,6 +127,7 @@ protected:
 	virtual void ResetGravityScale_Implementation() override;
 	virtual bool IsCharacterAirborne_Implementation() override;
 	virtual void SetMovementMode_Implementation(EMovementMode MovementMode,  float NewWalkingSpeed = -1.f, float GravityValue = -1.f) override;
+	virtual void AdjustDirection_Implementation() override;
 	//~ Combat Interface
 	
 	FTaggedMontage GetTaggedMontageInfoByTag(const FGameplayTag& MontageTag) const;

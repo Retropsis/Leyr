@@ -56,6 +56,9 @@ public:
 	UPaperZDAnimInstance* GetPaperAnimInstance();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void AdjustDirection();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void GetAttackAnimationData(FVector& InBoxTraceStart, FVector& InBoxTraceEnd);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)

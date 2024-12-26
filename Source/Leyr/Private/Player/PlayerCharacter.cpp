@@ -203,11 +203,13 @@ void APlayerCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 
 	if(bHitReacting)
 	{
 		GetCharacterMovement()->StopActiveMovement();
+		PreviousCombatState = CombatState;
 		HandleCombatState(ECombatState::UnCrouching);
 	}
 	else
 	{
-		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		// GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		HandleCombatState(PreviousCombatState);
 	}
 }
 
@@ -764,7 +766,7 @@ void APlayerCharacter::TraceForUpButtonInteraction()
 	ObjectTypes.Add(ObjectTypeQuery2);
 	TArray<AActor*> ActorsToIgnore;
 	FHitResult Hit;
-	UKismetSystemLibrary::SphereTraceSingleForObjects(this, Start, End, 20.f, ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, Hit, true);
+	UKismetSystemLibrary::SphereTraceSingleForObjects(this, Start, End, 20.f, ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::None, Hit, true);
 	
 	if(Hit.bBlockingHit && Hit.GetActor()->ActorHasTag("Ladder"))
 	{
