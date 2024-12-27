@@ -55,6 +55,8 @@ void ABaseAIController::UseSightSense(const FAIStimulus& ActiveStimulus) const
 				break;
 			case EBehaviourState::Fall:
 				break;
+			case EBehaviourState::Dive:
+				break;
 			}
 		}
 	}

@@ -17,6 +17,8 @@ enum class EEncounterName : uint8
 	Merman UMETA(DisplayName="Merman"),
 	Crocodile UMETA(DisplayName="Crocodile"),
 	Shark UMETA(DisplayName="Shark"),
+	Pterodactyl UMETA(DisplayName="Pterodactyl"),
+	TheScourge UMETA(DisplayName="TheScourge"),
 };
 
 UENUM(BlueprintType)
@@ -24,6 +26,7 @@ enum class EBehaviourState : uint8
 {
 	Patrol UMETA(DisplayName="Patrol"),
 	Chase UMETA(DisplayName="Chase"),
+	Dive UMETA(DisplayName="Dive"),
 	Fall UMETA(DisplayName="Fall"),
 	Search UMETA(DisplayName="Search"),
 };

@@ -23,7 +23,13 @@ class LEYR_API IAIInterface
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
-public:	
+public:
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StartSplineMovement();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool FollowSplinePoints(int32 SplineIndex);
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FVector FindRandomLocation();
 	
@@ -47,4 +53,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	EMovementType GetMovementType();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetNewMovementSpeed(EMovementMode InMovementMode, float NewSpeed);
 };

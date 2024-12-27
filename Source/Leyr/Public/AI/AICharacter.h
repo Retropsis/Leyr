@@ -52,6 +52,9 @@ public:
 	virtual void SineMove_Implementation() override;
 	virtual bool FollowSpline_Implementation(int32 SplineIndex) override;
 	virtual FVector GetNextLocation_Implementation(int32 SplineIndex) override;
+	virtual void StartSplineMovement_Implementation() override;
+	virtual bool FollowSplinePoints_Implementation(int32 SplineIndex) override;
+	virtual void SetNewMovementSpeed_Implementation(EMovementMode InMovementMode, float NewSpeed) override;
 	/** end AI Interface */
 
 	/** Enemy Interface */
@@ -81,6 +84,7 @@ public:
 	TObjectPtr<ASplineComponentActor> SplineComponentActor;
 	
 	TObjectPtr<USplineComponent> SplineComponent;
+	TArray<FVector> SplinePoints;
 
 	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	EMovementType MovementType = EMovementType::Destination;

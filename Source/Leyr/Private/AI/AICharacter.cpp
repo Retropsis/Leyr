@@ -312,6 +312,53 @@ FVector AAICharacter::GetNextLocation_Implementation(const int32 SplineIndex)
 	return  SplineComponent->GetLocationAtSplinePoint(SplineIndex, ESplineCoordinateSpace::World);
 }
 
+void AAICharacter::StartSplineMovement_Implementation()
+{
+	// FActorSpawnParameters SpawnParameters;
+	// ASplineComponentActor* SplineComponentActor = GetWorld()->SpawnActor<ASplineComponentActor>(GetActorLocation(), FRotator::ZeroRotator, SpawnParameters);
+	if(CombatTarget == nullptr) return;
+	
+	SplinePoints.Empty();
+	SplinePoints.Add(GetActorLocation());
+	SplinePoints.Add(CombatTarget->GetActorLocation());
+	SplinePoints.Add(CombatTarget->GetActorLocation() + GetActorForwardVector() * 300.f);
+	SplinePoints.Add(GetActorLocation() + GetActorForwardVector() * 600.f);
+	// SplineComponentActor->GetSplineComponent()->SetSplinePoints(SplinePoints, ESplineCoordinateSpace::World);
+}
+
+bool AAICharacter::FollowSplinePoints_Implementation(int32 SplineIndex)
+{
+	if(SplinePoints.IsEmpty()) return false;
+	const FVector Destination = SplinePoints.IsValidIndex(SplineIndex) ? SplinePoints[SplineIndex] : FVector::ZeroVector;
+	const FVector Direction = (Destination - GetActorLocation()).GetSafeNormal();
+	AddMovementInput(Direction, 1.f);
+
+	return FVector::Distance(GetActorLocation(), Destination) < 40.f;
+}
+
+void AAICharacter::SetNewMovementSpeed_Implementation(EMovementMode InMovementMode, float NewSpeed)
+{
+	switch (InMovementMode) {
+	case MOVE_None:
+		break;
+	case MOVE_Walking:
+		GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
+		break;
+	case MOVE_NavWalking:
+		break;
+	case MOVE_Falling:
+		break;
+	case MOVE_Swimming:
+	case MOVE_Flying:
+		GetCharacterMovement()->MaxFlySpeed = NewSpeed;
+		break;
+	case MOVE_Custom:
+		break;
+	case MOVE_MAX:
+		break;
+	}
+}
+
 void AAICharacter::CauseDamage(AActor* TargetActor)
 {
 	UAbilitySystemComponent* SourceASC = GetAbilitySystemComponent();
