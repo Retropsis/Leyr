@@ -44,8 +44,12 @@ void AAICharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 	{
 		FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		// SpawnParameters.Name = FName((TEXT("%s_PatrolSpline"), *GetName()));
 		SplineComponentActor = GetWorld()->SpawnActor<ASplineComponentActor>(ASplineComponentActor::StaticClass(), GetActorTransform(), SpawnParameters);
+		SplineComponentActor->SetActorLabel(FString::Printf(TEXT("%s_PatrolSpline"), *GetName()));
+		for (int i = 0; i < SplineComponentActor->GetSplineComponent()->GetNumberOfSplinePoints(); ++i)
+		{
+			SplineComponentActor->GetSplineComponent()->SetSplinePointType(i, ESplinePointType::Linear);
+		}
 	}
 	if(MovementType != EMovementType::Spline && SplineComponentActor)
 	{
@@ -169,6 +173,32 @@ void AAICharacter::AddAICharacterAbilities() const
 	}
 }
 
+void AAICharacter::HandleBehaviourState(EBehaviourState NewState)
+{
+	BehaviourState = NewState;
+	
+	switch (BehaviourState)
+	{
+	case EBehaviourState::Patrol:
+		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+		GetCharacterMovement()->MaxFlySpeed = BaseFlySpeed;
+		break;
+	case EBehaviourState::Search:
+		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+		GetCharacterMovement()->MaxFlySpeed = BaseFlySpeed;
+		break;
+	case EBehaviourState::Chase:
+		GetCharacterMovement()->MaxWalkSpeed = ChasingSpeed;
+		GetCharacterMovement()->MaxFlySpeed = ChasingSpeed;
+		break;
+	case EBehaviourState::Fall:
+		break;
+	case EBehaviourState::Dive:
+		GetCharacterMovement()->MaxFlySpeed = DivingSpeed;
+		break;
+	}
+}
+
 void AAICharacter::InitializeBehaviourInfo()
 {
 	if(!HasAuthority()) return;
@@ -183,8 +213,11 @@ void AAICharacter::InitializeBehaviourInfo()
 	PatrolRadius = Info.PatrolRadius;
 	PatrolTickRadius = Info.PatrolTickRadius;
 	AttackRange = Info.AttackRange;
+	AttackCooldown = Info.AttackCooldown;
 	CloseRange = Info.CloseRange;
+	ChasingSpeed = Info.ChasingSpeed;
 	ChasingHeightOffset = Info.ChasingHeightOffset;
+	DivingSpeed = Info.DivingSpeed;
 	bCollisionCauseDamage = Info.bCollisionCauseDamage;
 	if(bCollisionCauseDamage)
 	{
@@ -359,6 +392,17 @@ void AAICharacter::SetNewMovementSpeed_Implementation(EMovementMode InMovementMo
 	}
 }
 
+void AAICharacter::SetShouldAttack_Implementation(bool InShouldAttack)
+{
+	ShouldAttack(InShouldAttack);
+}
+
+void AAICharacter::ShouldAttack(bool InShouldAttack)
+{
+	bShouldAttack = InShouldAttack;
+	if(BaseAIController) BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("ShouldAttack"), InShouldAttack);
+}
+
 void AAICharacter::CauseDamage(AActor* TargetActor)
 {
 	UAbilitySystemComponent* SourceASC = GetAbilitySystemComponent();
@@ -376,10 +420,9 @@ void AAICharacter::CauseDamage(AActor* TargetActor)
 
 void AAICharacter::ResetShouldAttack()
 {
-	FTimerHandle ResetAttackTimer;
+	if(ResetAttackTimer.IsValid()) ResetAttackTimer.Invalidate();
 	GetWorld()->GetTimerManager().SetTimer(ResetAttackTimer, FTimerDelegate::CreateLambda([this] ()
 	{
-		bShouldAttack = true;
-		if(BaseAIController) BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("ShouldAttack"), true);
-	}), 5.f, false);
+		ShouldAttack(true);
+	}), AttackCooldown, false);
 }

@@ -166,6 +166,9 @@ FGameplayTag Abilities_Type_Offensive;
 FGameplayTag Abilities_Type_Passive;
 FGameplayTag Abilities_Type_None;
 
+ /*
+  * Player Abilities
+  */
 FGameplayTag Abilities_Weapon_Sword_1;
 FGameplayTag Abilities_Weapon_Sword_2;
 FGameplayTag Abilities_Weapon_Sword_Slash;
@@ -192,7 +195,14 @@ FGameplayTag Abilities_Monk_Basic;
  
 FGameplayTag Abilities_Throw_1;
 FGameplayTag Abilities_Throw_2;
- 
+
+ /*
+  * AI Abilities
+  */
+
+ /*
+  * Combat States
+  */
 FGameplayTag CombatState_Unoccupied;
 FGameplayTag CombatState_Walking;
 FGameplayTag CombatState_WalkingPeaceful;

@@ -25,6 +25,7 @@ void UAICharacterAnimInstance::Tick(float DeltaTime)
 	bIsMoving =  UKismetMathLibrary::VSize(Velocity) > 0.f;
 	bAirborne = AICharacter->GetCharacterMovement()->IsFalling();
 	// bIsAccelerating = AICharacter->IsAccelerating();
+	bIsDiving = AICharacter->GetBehaviourState() == EBehaviourState::Dive;
 
 	if(AICharacter->Execute_IsDead(AICharacter) && !bDead)
 	{

@@ -53,5 +53,5 @@ protected:
 	EPlatformType Platform = EPlatformType::Default;
 
 	UPROPERTY(EditAnywhere, Category="Platform")
-	EInterpMethod InterpMethod = EInterpMethod::EaseInOut;
+	EInterpMethod InterpMethod = EInterpMethod::Default;
 };

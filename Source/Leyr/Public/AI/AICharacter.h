@@ -33,6 +33,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
+	void HandleBehaviourState(EBehaviourState NewState);
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
@@ -58,7 +59,7 @@ public:
 	/** end AI Interface */
 
 	/** Enemy Interface */
-	virtual void SetShouldAttack_Implementation(bool InShouldAttack) override { bShouldAttack = InShouldAttack; }
+	virtual void SetShouldAttack_Implementation(bool InShouldAttack) override;
 	virtual bool ShouldAttack_Implementation() const override { return bShouldAttack; }
 	/** Enemy Interface */
 	
@@ -76,9 +77,6 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Combat")
 	float LifeSpan = 5.f;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Character|AI")
-	float ChasingFlyingSpeed = 250.f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|AI")
 	TObjectPtr<ASplineComponentActor> SplineComponentActor;
@@ -136,14 +134,21 @@ protected:
 	float PatrolRadius = 750.f;
 	float PatrolTickRadius = 450.f;
 	float AttackRange = 300.f;
+	float AttackCooldown = 5.f;
 	float CloseRange = 275.f;
+	float ChasingSpeed = 250.f;
+	float DivingSpeed = 750.f;
 	float ChasingHeightOffset = 75.f;
 	bool bCollisionCauseDamage = false;
 	bool bShouldApplyInvincibility = false;	
 	FValueRange AbilityPower;
-	TSubclassOf<UGameplayEffect> DamageEffectClass;
 	FGameplayTag DamageType;
+	TSubclassOf<UGameplayEffect> DamageEffectClass;
 
+private:
+	void ShouldAttack(bool InShouldAttack);
+	FTimerHandle ResetAttackTimer;
+	
 public:
 	UFUNCTION(BlueprintCallable)
 	virtual EBehaviourState GetBehaviourState() override { return BehaviourState; }

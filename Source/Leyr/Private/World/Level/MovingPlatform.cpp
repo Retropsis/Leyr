@@ -20,6 +20,16 @@ AMovingPlatform::AMovingPlatform()
 	Platform = EPlatformType::Moving;
 }
 
+void AMovingPlatform::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+	if(RouteSpline == nullptr) return;
+	for (int i = 0; i < RouteSpline->GetNumberOfSplinePoints(); ++i)
+	{
+		RouteSpline->SetSplinePointType(i, ESplinePointType::Linear);
+	}
+}
+
 void AMovingPlatform::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);

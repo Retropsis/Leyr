@@ -39,11 +39,20 @@ struct FBehaviourDefaultInfo
 	UPROPERTY(EditDefaultsOnly, Category = "Behaviour") // Distance to reach for attacking
 	float AttackRange = 300.f;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "Behaviour") // How long before attacking again
+	float AttackCooldown = 5.f;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "Behaviour") // Distance to reach until it falls back
 	float CloseRange = 275.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Behaviour") // Height offset to adjust and stay above player
 	float ChasingHeightOffset = 75.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Behaviour") // How fast to chase the player
+	float ChasingSpeed = 250.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Behaviour") // How fast to dive
+	float DivingSpeed = 750.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Behaviour")
 	bool bCollisionCauseDamage = false;

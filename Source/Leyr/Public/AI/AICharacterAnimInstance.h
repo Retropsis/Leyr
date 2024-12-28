@@ -36,4 +36,7 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category="AICharacter")
 	bool bDead = false;
+	
+	UPROPERTY(BlueprintReadOnly, Category="AICharacter")
+	bool bIsDiving = false;
 };

@@ -4,7 +4,6 @@
 #include "AI/AICharacter.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
 #include "Perception/AIPerceptionComponent.h"
 
 ABaseAIController::ABaseAIController()
@@ -32,7 +31,12 @@ void ABaseAIController::HandlePerceptionUpdated(const TArray<AActor*>& UpdatedAc
 			PerceptionComponent->GetActorsPerception(Actor, Info);
 			for (const FAIStimulus AIStimulus : Info.LastSensedStimuli)
 			{
-				UseSightSense(AIStimulus);
+				AAICharacter* ControlledCharacter = Cast<AAICharacter>(GetPawn());
+				EBehaviourState State = ControlledCharacter->GetBehaviourState();
+				if(IEnemyInterface::Execute_ShouldAttack(GetPawn()) && (State == EBehaviourState::Patrol || State == EBehaviourState::Search))
+				{
+					UseSightSense(AIStimulus);
+				}
 			}
 		}
 	}
@@ -45,19 +49,7 @@ void ABaseAIController::UseSightSense(const FAIStimulus& ActiveStimulus) const
 		GEngine->AddOnScreenDebugMessage(9877, 3.5f, FColor::Green, FString::Printf(TEXT("Player On Sight !!")));
 		if(AAICharacter* ControlledCharacter = Cast<AAICharacter>(GetPawn()))
 		{
-			switch (ControlledCharacter->GetBehaviourState()) {
-			case EBehaviourState::Patrol:
-			case EBehaviourState::Search:
-				ControlledCharacter->SetBehaviourState(EBehaviourState::Chase);
-				ControlledCharacter->GetCharacterMovement()->MaxFlySpeed = ControlledCharacter->ChasingFlyingSpeed;
-				break;
-			case EBehaviourState::Chase:
-				break;
-			case EBehaviourState::Fall:
-				break;
-			case EBehaviourState::Dive:
-				break;
-			}
+			ControlledCharacter->HandleBehaviourState(EBehaviourState::Chase);
 		}
 	}
 	else

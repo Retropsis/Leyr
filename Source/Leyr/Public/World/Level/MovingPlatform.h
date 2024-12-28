@@ -24,6 +24,10 @@ public:
 	void Move(float DeltaSeconds);
 	virtual void ChooseNextStep();
 	bool HasReachedTarget() const;
+
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 	
 	UPROPERTY(EditAnywhere, Category="Platform|Route")
 	float TargetTolerance = 5.f;
