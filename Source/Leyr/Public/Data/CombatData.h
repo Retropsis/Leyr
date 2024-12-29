@@ -61,6 +61,7 @@ enum class ECombatState : uint8
 	HangingRope UMETA(DisplayName="Hanging Rope"),
 	HangingHook UMETA(DisplayName="Hanging Hook"),
 	HangingLadder UMETA(DisplayName="Hanging Ladder"),
+	HoppingLedge UMETA(DisplayName="Hopping Ledge"),
 	Climbing UMETA(DisplayName="Climbing"),
 	OnElevator UMETA(DisplayName="OnElevator"),
 	OnGroundSlope UMETA(DisplayName="OnGroundSlope"),

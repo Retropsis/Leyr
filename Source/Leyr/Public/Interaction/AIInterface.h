@@ -6,6 +6,7 @@
 #include "UObject/Interface.h"
 #include "AIInterface.generated.h"
 
+enum class EEncounterSize : uint8;
 enum class EMovementType : uint8;
 enum class EBehaviourState : uint8;
 // This class does not need to be modified.
@@ -50,6 +51,9 @@ public:
 
 	virtual EBehaviourState GetBehaviourState() = 0;
 	virtual void SetBehaviourState(EBehaviourState NewState) = 0;
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	EEncounterSize GetEncounterSize();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	EMovementType GetMovementType();

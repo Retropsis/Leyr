@@ -230,6 +230,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatState_Ladder = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Ladder"), FString("CombatState Ladder"));
 	GameplayTags.CombatState_Elevator = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Elevator"), FString("CombatState Elevator"));
 	GameplayTags.CombatState_Climbing = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Climbing"), FString("CombatState Climbing"));
+	GameplayTags.CombatState_Hopping = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Hopping"), FString("CombatState Hopping"));
 	GameplayTags.CombatState_Falling = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Falling"), FString("CombatState Falling"));
 	GameplayTags.CombatState_Crouching = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Crouching"), FString("CombatState Crouching"));
 	GameplayTags.CombatState_UnCrouching = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.UnCrouching"), FString("CombatState UnCrouching"));
@@ -251,6 +252,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Rope);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Ledge);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Climbing);
+	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Hopping);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Hook);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Slope);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Entangled);
@@ -366,6 +368,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Montage_Ladder_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Ladder.Attack"), FString("Montage Ladder Attack"));
 	GameplayTags.Montage_Roll_End = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Roll.End"), FString("Montage Roll End"));
 	GameplayTags.Montage_Roll_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Roll.Attack"), FString("Montage Roll Attack"));
+	GameplayTags.Montage_Swim_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Swim.Attack"), FString("Montage Swim Attack"));
 	GameplayTags.Montage_Dodge_End = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Dodge.End"), FString("Montage Dodge End"));
 	GameplayTags.Montage_EndAbility = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.EndAbility"), FString("Montage End Ability"));
 	GameplayTags.Montage_Parry = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Parry"), FString("Montage Parry"));

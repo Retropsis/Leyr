@@ -91,6 +91,14 @@ void APlayerCharacter::ForceMove(float DeltaSeconds)
 			HandleCombatState(ECombatState::Unoccupied);
 		}
 	}
+	if(CombatState == ECombatState::HoppingLedge)
+	{
+		SetActorLocation(FMath::VInterpTo(GetActorLocation(), MovementTarget, DeltaSeconds, 8.f));
+		if (FMath::IsNearlyZero(UKismetMathLibrary::Vector_Distance(GetActorLocation(), MovementTarget), 5.f))
+		{
+			HandleCombatState(ECombatState::Unoccupied);
+		}
+	}
 	if(CombatState == ECombatState::Dodging)
 	{
 		AddMovementInput(FVector(1.f, 0.f, 0.f), -GetActorForwardVector().X);
@@ -275,10 +283,14 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 		AddMovementInput(FVector(.5f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
 		if(Elevator) IElevatorInterface::Execute_Move(Elevator, MovementVector.Y);
 		break;
+	case ECombatState::HangingLedge:
+		if(MovementVector.X > 0.f && GetActorForwardVector().X > 0.f) HandleCombatState(ECombatState::HoppingLedge);
+		if(MovementVector.X < 0.f && GetActorForwardVector().X < 0.f) HandleCombatState(ECombatState::HoppingLedge);
+		break;
 	case ECombatState::UnCrouching:
 	case ECombatState::Attacking:
-	case ECombatState::HangingLedge:
 	case ECombatState::ClimbingRope:
+	case ECombatState::HoppingLedge:
 	case ECombatState::OnGroundSlope:
 	case ECombatState::OnRopeSlope:
 	case ECombatState::HitReact:
@@ -496,6 +508,10 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 	case ECombatState::ClimbingRope:
 		MovementSpeed = ClimbingSpeed;
 		MovementTarget = GetActorLocation() + FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f + 10.f);
+		break;
+	case ECombatState::HoppingLedge:
+		MovementSpeed = ClimbingWalkSpeed;
+		MovementTarget = GetActorLocation() + FVector(GetActorForwardVector().X * 50.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 15.f);
 		break;
 	case ECombatState::Climbing:
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);

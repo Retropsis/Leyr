@@ -2,6 +2,8 @@
 
 #include "AbilitySystem/ModMagCalc/MMC_MaxHealth.h"
 #include "AbilitySystem/BaseAttributeSet.h"
+#include "AI/AIData.h"
+#include "Interaction/AIInterface.h"
 #include "Interaction/CombatInterface.h"
 
 UMMC_MaxHealth::UMMC_MaxHealth()
@@ -32,5 +34,23 @@ float UMMC_MaxHealth::CalculateBaseMagnitude_Implementation(const FGameplayEffec
 	{
 		CharacterLevel = ICombatInterface::Execute_GetCharacterLevel(Spec.GetContext().GetSourceObject());
 	}
-	return /*80.f + */2.5f * Vitality + 10.f * CharacterLevel;
+	float EncounterSizeFactor = 1.f;
+	if (Spec.GetContext().GetSourceObject()->Implements<UAIInterface>())
+	{
+		switch (IAIInterface::Execute_GetEncounterSize(Spec.GetContext().GetSourceObject()))
+		{
+		case EEncounterSize::Default: EncounterSizeFactor = 2.f;
+			break;
+		case EEncounterSize::Critter: EncounterSizeFactor = 1.f;
+			break;
+		case EEncounterSize::Humanoid: EncounterSizeFactor = 2.f;
+			break;
+		case EEncounterSize::Large: EncounterSizeFactor = 3.f;
+			break;
+		case EEncounterSize::Boss: EncounterSizeFactor = 5.f;
+			break;
+		}
+	}
+	// return /*80.f + */2.5f * Vitality + 10.f * CharacterLevel;
+	return EncounterSizeFactor * Vitality + 5.f * CharacterLevel;
 }

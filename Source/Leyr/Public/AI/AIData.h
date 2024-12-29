@@ -3,6 +3,16 @@
 #include "CoreMinimal.h"
 
 UENUM(BlueprintType)
+enum class EEncounterSize : uint8
+{
+	Default UMETA(DisplayName="Default"),
+	Critter UMETA(DisplayName="Critter"),
+	Humanoid UMETA(DisplayName="Humanoid"),
+	Large UMETA(DisplayName="Large"),
+	Boss UMETA(DisplayName="Boss"),
+};
+
+UENUM(BlueprintType)
 enum class EEncounterName : uint8
 {
 	Default UMETA(DisplayName="Default"),

@@ -26,6 +26,9 @@ struct FBehaviourDefaultInfo
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Behaviour") // AI flow chart: patrol, airborne, ranger, turret
 	EBehaviourType BehaviourType = EBehaviourType::Patrol;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Behaviour") // Encounter Size for Max Health and other purposes ?
+	EEncounterSize EncounterSize = EEncounterSize::Default;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Behaviour")
 	float SineMoveHeight = 0.f;

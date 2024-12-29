@@ -209,6 +209,7 @@ void AAICharacter::InitializeBehaviourInfo()
 	const FBehaviourDefaultInfo Info = LeyrGameMode->EncounterInfo->GetEncounterDefaultInfo(EncounterName).BehaviourDefaultInfo;
 	BehaviorTree = Info.BehaviorTree;
 	BehaviourType = Info.BehaviourType;
+	EncounterSize = Info.EncounterSize;
 	SineMoveHeight = Info.SineMoveHeight;
 	PatrolRadius = Info.PatrolRadius;
 	PatrolTickRadius = Info.PatrolTickRadius;
@@ -355,7 +356,7 @@ void AAICharacter::StartSplineMovement_Implementation()
 	SplinePoints.Add(GetActorLocation());
 	SplinePoints.Add(CombatTarget->GetActorLocation());
 	SplinePoints.Add(CombatTarget->GetActorLocation() + GetActorForwardVector() * 300.f);
-	SplinePoints.Add(GetActorLocation() + GetActorForwardVector() * 600.f);
+	SplinePoints.Add(FVector(CombatTarget->GetActorLocation().X + GetActorForwardVector().X * 900.f, 0.f, GetActorLocation().Z));
 	// SplineComponentActor->GetSplineComponent()->SetSplinePoints(SplinePoints, ESplineCoordinateSpace::World);
 }
 

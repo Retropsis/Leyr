@@ -56,6 +56,7 @@ public:
 	virtual void StartSplineMovement_Implementation() override;
 	virtual bool FollowSplinePoints_Implementation(int32 SplineIndex) override;
 	virtual void SetNewMovementSpeed_Implementation(EMovementMode InMovementMode, float NewSpeed) override;
+	virtual EEncounterSize GetEncounterSize_Implementation() override { return EncounterSize; }
 	/** end AI Interface */
 
 	/** Enemy Interface */
@@ -130,6 +131,7 @@ protected:
 	 * AI Data
 	*/
 	EBehaviourType BehaviourType = EBehaviourType::Patrol;
+	EEncounterSize EncounterSize = EEncounterSize::Default;
 	float SineMoveHeight = 0.f;
 	float PatrolRadius = 750.f;
 	float PatrolTickRadius = 450.f;
