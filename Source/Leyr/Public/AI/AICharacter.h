@@ -11,6 +11,7 @@
 #include "UI/Controller/OverlayWidgetController.h"
 #include "AICharacter.generated.h"
 
+class ANavMeshBoundsVolume;
 enum class EEncounterName : uint8;
 enum class EBehaviourType : uint8;
 class ASplineComponentActor;
@@ -82,6 +83,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|AI")
 	TObjectPtr<ASplineComponentActor> SplineComponentActor;
 	
+	UPROPERTY(EditAnywhere, Category = "Character|AI")
+	TObjectPtr<ANavMeshBoundsVolume> NavMeshBoundsVolume;
+	
+	UPROPERTY(EditAnywhere, Category = "Character|AI")
+	bool bShouldBuildNavMesh = false;
+	
 	TObjectPtr<USplineComponent> SplineComponent;
 	TArray<FVector> SplinePoints;
 
@@ -92,7 +99,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;
 	virtual void InitializeDefaultAttributes() const override;
-	void InitializeBehaviourInfo();
+	virtual void InitializeCharacterInfo() override;
 	void AddAICharacterAbilities() const;
 	
 	UFUNCTION(BlueprintCallable)

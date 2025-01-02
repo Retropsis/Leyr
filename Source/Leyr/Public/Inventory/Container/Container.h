@@ -44,7 +44,7 @@ public:
 	UPROPERTY(EditAnywhere, Category="Container")
 	EContainerSubType ContainerSubType = EContainerSubType::Chest;
 
-	UPROPERTY(EditAnywhere, Category="Container")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Container")
 	TObjectPtr<UContainerComponent> Container;
 	
 protected:

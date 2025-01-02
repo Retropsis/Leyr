@@ -30,7 +30,8 @@ bool UContainerComponent::AddItemToIndex(FInventoryItemData InventoryItemData, i
 {
 	const bool bWasSuccessful = Super::AddItemToIndex(InventoryItemData, SourceSlotIndex, TargetSlotIndex);
 
-	if (AContainer* Container = IPlayerInterface::Execute_GetContainer(GetOwner()))
+	if (AContainer* Container = Cast<AContainer>(GetOwner()))
+	// if (AContainer* Container = IPlayerInterface::Execute_GetContainer(GetOwner()))
 	{
 		Container->ServerForEachActorUpdateInventorySlot(ContainerType, TargetSlotIndex, GetItemAtIndex(TargetSlotIndex));
 	}
@@ -42,7 +43,8 @@ bool UContainerComponent::RemoveItemAtIndex(int32 SlotIndex)
 {
 	const bool bWasSuccessful = Super::RemoveItemAtIndex(SlotIndex);
 
-	if (AContainer* Container = IPlayerInterface::Execute_GetContainer(GetOwner()))
+	if (AContainer* Container = Cast<AContainer>(GetOwner()))
+	// if (AContainer* Container = IPlayerInterface::Execute_GetContainer(GetOwner()))
 	{
 		if(Container->ContainerSubType == EContainerSubType::PlayerBag)
 		{

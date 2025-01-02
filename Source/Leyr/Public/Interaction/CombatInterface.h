@@ -45,9 +45,6 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void UpdateFacingTarget(const FVector& Target);
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	UAnimMontage* GetHitReactMontage();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UPaperZDAnimSequence* GetHitReactSequence();

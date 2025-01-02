@@ -98,6 +98,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	AContainer* GetContainer();
 	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void CloseContainer();
+	
 	/*
 	 * Combat
 	 */

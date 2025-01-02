@@ -21,7 +21,7 @@ void AItem::BeginPlay()
 	{
 		Sphere->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnBeginOverlap);
 		Sphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-
+	
 		if(ItemData.ID == 0)
 		{
 			
@@ -34,5 +34,14 @@ void AItem::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 	if (UInventoryComponent* InventoryComponent = IInventoryInterface::Execute_GetInventoryComponent(OtherActor))
 	{
 		// if (InventoryComponent->TryAddItem(ItemData)) Destroy();
+	}
+}
+
+void AItem::Interact_Implementation(AActor* InteractingActor)
+{	
+	if (UInventoryComponent* InventoryComponent = IInventoryInterface::Execute_GetInventoryComponent(InteractingActor))
+	{
+		InventoryComponent->ServerAddItem(ItemData);
+		Destroy();
 	}
 }

@@ -7,9 +7,11 @@
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AbilitySystem/Data/EncounterInfo.h"
 #include "AI/BaseAIController.h"
+#include "AI/NavigationSystemBase.h"
 #include "AI/SplineComponentActor.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Components/BrushComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SplineComponent.h"
 #include "Components/WidgetComponent.h"
@@ -18,6 +20,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "NavMesh/NavMeshBoundsVolume.h"
 
 AAICharacter::AAICharacter()
 {
@@ -56,6 +59,24 @@ void AAICharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 		SplineComponentActor->Destroy();
 		SplineComponentActor = nullptr;
 	}
+	if(MovementType == EMovementType::NavMesh && !NavMeshBoundsVolume && bShouldBuildNavMesh)
+	{
+		FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
+		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		NavMeshBoundsVolume = GetWorld()->SpawnActor<ANavMeshBoundsVolume>(ANavMeshBoundsVolume::StaticClass(), GetActorTransform(), SpawnParameters);
+		NavMeshBoundsVolume->SetActorLabel(FString::Printf(TEXT("%s_NavMesh"), *GetName()));
+		// UBrushComponent* Brush = NavMeshBoundsVolume->GetBrushComponent();
+		// Brush->Brush->Bounds = FBox(FVector(100.f), FVector(200.f));
+		// GetWorld()->GetNavigationSystem()->OnNavigationBoundsUpdated(NavMeshBoundsVolume);
+
+		NavMeshBoundsVolume->GetRootComponent()->Bounds = FBox(FVector(100.f), FVector(200.f));
+		// GetWorld()->GetNavigationSystem()->OnNavAreaRegisteredDelegate(NavMeshBoundsVolume);
+	}
+	if((MovementType != EMovementType::NavMesh || !bShouldBuildNavMesh) && NavMeshBoundsVolume)
+	{
+		NavMeshBoundsVolume->Destroy();
+		NavMeshBoundsVolume = nullptr;
+	}
 }
 
 void AAICharacter::Tick(float DeltaSeconds)
@@ -70,7 +91,7 @@ void AAICharacter::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 	
 	if (!HasAuthority()) return;
-	InitializeBehaviourInfo();
+	InitializeCharacterInfo();
 	BaseAIController = Cast<ABaseAIController>(NewController);
 	BaseAIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
 	BaseAIController->RunBehaviorTree(BehaviorTree);
@@ -199,10 +220,10 @@ void AAICharacter::HandleBehaviourState(EBehaviourState NewState)
 	}
 }
 
-void AAICharacter::InitializeBehaviourInfo()
+void AAICharacter::InitializeCharacterInfo()
 {
 	if(!HasAuthority()) return;
-
+	
 	const ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this));
 	if (LeyrGameMode == nullptr || EncounterName == EEncounterName::Default) return;
 
@@ -220,6 +241,10 @@ void AAICharacter::InitializeBehaviourInfo()
 	ChasingHeightOffset = Info.ChasingHeightOffset;
 	DivingSpeed = Info.DivingSpeed;
 	bCollisionCauseDamage = Info.bCollisionCauseDamage;
+	ImpactEffect = Info.ImpactEffect;
+	DeathSound = Info.DeathSound;
+	HitReactSequence = Info.HitReactSequence;
+	AttackSequenceInfo = Info.AttackSequenceInfo;
 	if(bCollisionCauseDamage)
 	{
 		bShouldApplyInvincibility = Info.bShouldApplyInvincibility;	
@@ -262,8 +287,6 @@ void AAICharacter::Die(const FVector& DeathImpulse)
  */
 FVector AAICharacter::FindRandomLocation_Implementation()
 {
-	// UKismetSystemLibrary::DrawDebugCircle(this, StartLocation, PatrolRadius, 12, FLinearColor::White, 5.f, 0, FVector(1, 0, 0));
-	// UKismetSystemLibrary::DrawDebugCircle(this, GetActorLocation(), PatrolTickRadius, 12, FLinearColor::Green, 5.f, 0, FVector(1, 0, 0));
 	int32 Index = 0;
 	while (Index < 10)
 	{
@@ -285,9 +308,7 @@ bool AAICharacter::MoveToLocation_Implementation(FVector TargetLocation, float T
 	if ((GetActorLocation() - TargetLocation).Size() > Threshold)
 	{
 		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetLocation.X, GetActorLocation().Y, TargetLocation.Z));
-		// UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + LookAtRotation.Vector() * 100.f, 5.f, FLinearColor::Red, 1.f);
 		const FRotator WorldDirection = FRotator(LookAtRotation.Pitch, 0.f, 0.f);
-		// UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + WorldDirection.Vector() * 100.f, 5.f, FLinearColor::Green, 1.f);
 		AddMovementInput(LookAtRotation.Vector(), 1.f, true);
 		if(FVector::DotProduct(LookAtRotation.Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
 		return false;

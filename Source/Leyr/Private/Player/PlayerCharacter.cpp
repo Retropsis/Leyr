@@ -26,6 +26,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "NiagaraComponent.h"
 #include "PaperFlipbookComponent.h"
+#include "AbilitySystem/Data/CharacterInfo.h"
 #include "Interaction/ElevatorInterface.h"
 #include "World/Map/ParallaxController.h"
 
@@ -130,11 +131,24 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 	// Init Ability Actor Info Server Side
 	InitAbilityActorInfo();
+	InitializeCharacterInfo();
 	AddCharacterAbilities();
 	GetCharacterMovement()->MaxWalkSpeed = BaseRunSpeed;
 	GetCharacterMovement()->GravityScale = BaseGravityScale;
 	OnCharacterMovementUpdated.AddDynamic(this, &APlayerCharacter::HandleCharacterMovementUpdated);
 
+	InitializeParallaxController();
+}
+
+void APlayerCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+	// Init Ability Actor Info Client Side
+	InitAbilityActorInfo();
+}
+
+void APlayerCharacter::InitializeParallaxController()
+{
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	if(AParallaxController* ParallaxController = GetWorld()->SpawnActor<AParallaxController>(AParallaxController::StaticClass(), GetActorLocation(), FRotator::ZeroRotator, SpawnParameters))
@@ -143,13 +157,6 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 		ParallaxController->InitializeMapParallax(this);
 		ParallaxController->AttachToComponent(SpringArm, FAttachmentTransformRules::KeepWorldTransform);
 	}
-}
-
-void APlayerCharacter::OnRep_PlayerState()
-{
-	Super::OnRep_PlayerState();
-	// Init Ability Actor Info Client Side
-	InitAbilityActorInfo();
 }
 
 void APlayerCharacter::ServerInteract_Implementation()
@@ -195,6 +202,20 @@ void APlayerCharacter::InitAbilityActorInfo()
 
 	//TODO: Move this to some other (PlayerState, BeginPlay)
 	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::HitReactTagChanged);
+}
+
+void APlayerCharacter::InitializeCharacterInfo()
+{
+	if(!HasAuthority()) return;
+	//
+	// const ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this));
+	// if (LeyrGameMode == nullptr || EncounterName == EEncounterName::Default) return;
+	//
+	const FCharacterDefaultInfo Info = CharacterInfo->GetCharacterDefaultInfo(CharacterName);
+	ImpactEffect = Info.ImpactEffect;
+	DeathSound = Info.DeathSound;
+	HitReactSequence = Info.HitReactSequence;
+	AttackSequenceInfo = Info.AttackSequenceInfo;
 }
 
 // TODO: Need a less hardcoded way to do, here we suppose first 3 indices are the 3 combos
@@ -284,8 +305,7 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 		if(Elevator) IElevatorInterface::Execute_Move(Elevator, MovementVector.Y);
 		break;
 	case ECombatState::HangingLedge:
-		if(MovementVector.X > 0.f && GetActorForwardVector().X > 0.f) HandleCombatState(ECombatState::HoppingLedge);
-		if(MovementVector.X < 0.f && GetActorForwardVector().X < 0.f) HandleCombatState(ECombatState::HoppingLedge);
+		TraceForHoppingLedge(MovementVector.X);
 		break;
 	case ECombatState::UnCrouching:
 	case ECombatState::Attacking:
@@ -797,6 +817,20 @@ void APlayerCharacter::TraceForUpButtonInteraction()
 	}
 }
 
+void APlayerCharacter::TraceForHoppingLedge(float MovementVectorX)
+{
+	TArray<AActor*> ActorsToIgnore;
+	FHitResult Hit;
+	const FVector Start = RopeHangingCollision->GetComponentLocation() + GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	const FVector End = Start + RopeHangingCollision->GetForwardVector() * 45.f;
+	UKismetSystemLibrary::LineTraceSingle(this, Start, End, TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::None, Hit, true);
+
+	if(!Hit.bBlockingHit)
+	{
+		if(MovementVectorX > 0.f && GetActorForwardVector().X > 0.f || MovementVectorX < 0.f && GetActorForwardVector().X < 0.f) HandleCombatState(ECombatState::HoppingLedge);
+	}
+}
+
 void APlayerCharacter::TraceForLedge()
 {
 	if(!bCanGrabLedge || !GetCharacterMovement()->IsFalling()) return;;
@@ -805,9 +839,9 @@ void APlayerCharacter::TraceForLedge()
 	FHitResult MidHit;
 	FHitResult TopHit;
 	FVector Delta = FVector(GetCapsuleComponent()->GetScaledCapsuleRadius(), 0.f, 0.f) * GetActorForwardVector().X;
-	UKismetSystemLibrary::LineTraceSingle(this, GetActorLocation() , GetActorLocation()  + GetActorForwardVector() * 45.f, TraceTypeQuery1,
+	UKismetSystemLibrary::LineTraceSingle(this, GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 45.f, TraceTypeQuery1,
 	false, ActorsToIgnore, EDrawDebugTrace::None, MidHit, true);
-	UKismetSystemLibrary::LineTraceSingle(this, RopeHangingCollision->GetComponentLocation() , RopeHangingCollision->GetComponentLocation()  + RopeHangingCollision->GetForwardVector() * 45.f, TraceTypeQuery1,
+	UKismetSystemLibrary::LineTraceSingle(this, RopeHangingCollision->GetComponentLocation(), RopeHangingCollision->GetComponentLocation() + RopeHangingCollision->GetForwardVector() * 45.f, TraceTypeQuery1,
 		false, ActorsToIgnore, EDrawDebugTrace::None, TopHit, true);
 
 	if(MidHit.bBlockingHit && MidHit.GetActor() && MidHit.GetActor()->ActorHasTag("Platform")) return;
@@ -956,11 +990,16 @@ void APlayerCharacter::SetContainer_Implementation(AContainer* Container)
 	IControllerInterface::Execute_ToggleContainer(Controller, Container->GetSlotCountContainer());
 }
 
+void APlayerCharacter::CloseContainer_Implementation()
+{
+	ServerCloseContainer();
+}
+
 void APlayerCharacter::ServerCloseContainer_Implementation()
 {
 	InteractingContainer->ServerStopInteracting(this);
 	InteractingContainer = nullptr;
-	IControllerInterface::Execute_ToggleContainer(Controller, 0);
+	// IControllerInterface::Execute_ToggleContainer(Controller, 0);
 }
 
 /*

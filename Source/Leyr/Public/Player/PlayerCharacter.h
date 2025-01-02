@@ -3,11 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystem/Data/CharacterInfo.h"
 #include "AI/BaseCharacter.h"
 #include "Interaction/InventoryInterface.h"
 #include "Interaction/PlayerInterface.h"
 #include "PlayerCharacter.generated.h"
 
+enum class ECharacterName : uint8;
+class UCharacterInfo;
 class UBoxComponent;
 class UHotbarComponent;
 class UNiagaraComponent;
@@ -42,12 +45,14 @@ public:
 
 	UFUNCTION()
 	void HandleCharacterMovementUpdated(float DeltaSeconds, FVector OldLocation, FVector OldVelocity);
+	void InitializeParallaxController();
 	EMovementMode PreviousMovementMode = MOVE_None;
 
 	void TraceForLedge();
 	void TraceForSlope();
 	void TraceForPlatforms() const;
 	void TraceForUpButtonInteraction();
+	void TraceForHoppingLedge(float MovementVectorX);
 	
 	/** Combat Interface */
 	virtual int32 GetCharacterLevel_Implementation() override;
@@ -89,6 +94,8 @@ public:
 	virtual void UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData) override;
 	virtual void UpdateContainerSlots_Implementation(int32 TotalSlots) override;
 	virtual void SetContainer_Implementation(AContainer* Container) override;
+	virtual void CloseContainer_Implementation() override;
+	
 	virtual void AddToXP_Implementation(int32 InXP) override;
 	virtual void LevelUp_Implementation() override;
 	virtual int32 GetXP_Implementation() const override;
@@ -100,6 +107,7 @@ public:
 	virtual void AddToSkillPoints_Implementation(int32 InSpellPoints) override;
 	virtual int32 GetAttributePoints_Implementation() const override;
 	virtual int32 GetSkillPoints_Implementation() const override;
+	
 	virtual void HandleHangingOnLadder_Implementation(FVector HangingTarget, bool bEndOverlap) override;
 	virtual void HandleHangingOnRope_Implementation(FVector HangingTarget, bool bEndOverlap) override;
 	virtual void HandleHangingOnHook_Implementation(FVector HangingTarget, bool bEndOverlap) override;
@@ -119,8 +127,15 @@ public:
 
 protected:
 	virtual void InitAbilityActorInfo() override;
+	virtual void InitializeCharacterInfo() override;
 	void HandleCombatState(ECombatState NewState);
 	void HandleHangingOnLedge(const FVector& HangingTarget);
+	
+	UPROPERTY(EditDefaultsOnly, Category="Player")
+	ECharacterName CharacterName = ECharacterName::FirstCharacter;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Player")
+	TObjectPtr<UCharacterInfo> CharacterInfo = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
 	float BaseRunSpeed = 450.f;

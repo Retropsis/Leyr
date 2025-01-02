@@ -28,6 +28,8 @@ enum class EEncounterName : uint8
 	Crocodile UMETA(DisplayName="Crocodile"),
 	Shark UMETA(DisplayName="Shark"),
 	Pterodactyl UMETA(DisplayName="Pterodactyl"),
+
+	// Bosses
 	TheScourge UMETA(DisplayName="TheScourge"),
 };
 
@@ -63,6 +65,7 @@ UENUM(BlueprintType)
 enum class EMovementType : uint8
 {
 	Immobile UMETA(DisplayName="Immobile"),
+	NavMesh UMETA(DisplayName="NavMesh"),
 	Destination UMETA(DisplayName="Destination"),
 	Sine UMETA(DisplayName="Sine"),
 	Spline UMETA(DisplayName="Spline"),

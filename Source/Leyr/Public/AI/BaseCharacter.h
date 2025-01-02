@@ -84,6 +84,8 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	FName WeaponSocketName;
+	
+	TEnumAsByte<EObjectTypeQuery> TraceObjectType = EObjectTypeQuery::ObjectTypeQuery3;
 
 	/*
 	 * Movement
@@ -105,7 +107,6 @@ protected:
 
 	//~ Combat Interface
 	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
-	virtual UAnimMontage* GetHitReactMontage_Implementation() override { return HitReactMontage; }
 	virtual UPaperZDAnimSequence* GetHitReactSequence_Implementation() override { return HitReactSequence; }
 	virtual UPaperZDAnimInstance* GetPaperAnimInstance_Implementation() override { return AnimationComponent->GetAnimInstance(); }
 	virtual void GetAttackAnimationData_Implementation(FVector& InBoxTraceStart, FVector& InBoxTraceEnd) override;
@@ -146,38 +147,33 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="PaperZD")
 	TObjectPtr<UPaperZDAnimationComponent> UpperBodyAnimationComponent;
-		
-	UPROPERTY(EditAnywhere, Category="Character|Combat")
-	TObjectPtr<UAnimMontage> HitReactMontage;
+
+	/*
+	 * Data Asset
+	 */
+	virtual void InitializeCharacterInfo() {}
+	UPROPERTY() TObjectPtr<UNiagaraSystem> ImpactEffect;
+	UPROPERTY() TObjectPtr<USoundBase> DeathSound;
 	
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	TObjectPtr<UPaperZDAnimSequence> HitReactSequence;
 
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	TObjectPtr<UAttackSequenceInfo> AttackSequenceInfo;
-
-	UPROPERTY(EditAnywhere, Category="Character|Combat")
-	TEnumAsByte<EObjectTypeQuery> TraceObjectType = EObjectTypeQuery::ObjectTypeQuery3;
-
+	
 	/* Minions */
 	int32 MinionCount = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
 	ECharacterClass CharacterClass = ECharacterClass::Warrior;
-	
+
 	/*
 	 * Visual Effects
-	 */ 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Combat")
-	UNiagaraSystem* ImpactEffect;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Combat")
-	USoundBase* DeathSound;
-
+	 */ 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStatusEffectNiagaraComponent> BurnStatusEffectComponent;
 	
-private:
+private:	
 	UPROPERTY(EditAnywhere, Category="Character|Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
 	

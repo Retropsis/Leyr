@@ -17,7 +17,6 @@ void ALavaBall::Tick(float DeltaSeconds)
 		BoxCollision->SetSimulatePhysics(false);
 		BoxCollision->SetEnableGravity(0.f);
 		bLanded = true;
-		GEngine->AddOnScreenDebugMessage(35777, 3.f, FColor::Purple, FString("Landed"));
 	}
 }
 

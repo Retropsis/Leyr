@@ -9,6 +9,9 @@
 #include "AI/AIData.h"
 #include "EncounterInfo.generated.h"
 
+class UAttackSequenceInfo;
+class UPaperZDAnimSequence;
+class UNiagaraSystem;
 class UBehaviorTree;
 class UGameplayAbility;
 class UGameplayEffect;
@@ -71,6 +74,18 @@ struct FBehaviourDefaultInfo
 	
 	UPROPERTY(EditDefaultsOnly, Category="Combat", meta=(Categories="Damage", EditCondition="bCollisionCauseDamage", EditConditionHides))
 	FGameplayTag DamageType;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Behaviour")
+	TObjectPtr<UNiagaraSystem> ImpactEffect;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Behaviour")
+	TObjectPtr<USoundBase> DeathSound;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Behaviour")
+	TObjectPtr<UPaperZDAnimSequence> HitReactSequence;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Behaviour")
+	TObjectPtr<UAttackSequenceInfo> AttackSequenceInfo;
 };
 
 USTRUCT(BlueprintType)
