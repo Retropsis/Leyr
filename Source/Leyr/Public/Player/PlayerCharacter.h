@@ -51,7 +51,6 @@ public:
 	void TraceForLedge();
 	void TraceForSlope();
 	void TraceForPlatforms() const;
-	void TraceForUpButtonInteraction();
 	void TraceForHoppingLedge(float MovementVectorX);
 	
 	/** Combat Interface */

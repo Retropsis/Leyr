@@ -3,10 +3,14 @@
 #include "World/Level/Ladder.h"
 #include "Components/BoxComponent.h"
 #include "Interaction/PlayerInterface.h"
+#include "Leyr/Leyr.h"
 
 ALadder::ALadder()
 {
 	BuildDirection = EBuildDirection::Vertical;
+	HangingCollision->SetCollisionObjectType(ECC_Interaction);
+	HangingCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	HangingCollision->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
 }
 
 void ALadder::BeginPlay()

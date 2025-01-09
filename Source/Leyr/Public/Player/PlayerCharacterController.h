@@ -36,27 +36,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="PlayerCharacter")
 	TObjectPtr<UInputAction> MoveAction;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="PlayerCharacter")
-	TObjectPtr<UInputAction> UpwardAction;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="PlayerCharacter")
-	TObjectPtr<UInputAction> DownwardAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="PlayerCharacter")
 	TObjectPtr<UInputAction> JumpAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="PlayerCharacter")
-	TObjectPtr<UInputAction> AttackAction;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="PlayerCharacter")
-	TObjectPtr<UInputAction> InteractAction;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="PlayerCharacter")
-	TObjectPtr<UInputAction> EquipAction;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="PlayerCharacter")
-	TObjectPtr<UInputAction> CrouchAction;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="PlayerCharacter")
 	TObjectPtr<UInputAction> InventoryAction;
@@ -96,10 +78,9 @@ protected:
 	virtual void SetupInputComponent() override;
 	
 	void Move(const FInputActionValue& Value);
-	void UpButtonPressed(const FInputActionValue& Value);
+	void InteractButtonPressed(const FInputActionValue& Value);
 	void Jump();
 	void StopJumping();
-	void InteractButtonPressed();
 
 	/*
 	 * Inventory

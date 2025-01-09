@@ -10,12 +10,12 @@
 #define ECC_Enemy ECollisionChannel::ECC_GameTraceChannel2
 #define ECC_Projectile ECollisionChannel::ECC_GameTraceChannel3
 #define ECC_OneWayPlatform ECollisionChannel::ECC_GameTraceChannel4
+#define ECC_Interaction ECollisionChannel::ECC_GameTraceChannel5
 #define EOT_PlayerCapsule ObjectTypeQuery7
 #define EOT_EnemyCapsule ObjectTypeQuery8
 #define EOT_Projectile ObjectTypeQuery9
 #define EOT_OneWayPlatform ObjectTypeQuery10
-#define EOT_VaultDownPlatform ObjectTypeQuery11
-#define EOT_Interaction ObjectTypeQuery12
+#define EOT_Interaction ObjectTypeQuery11
 
 USTRUCT(BlueprintType)
 struct FValueRange

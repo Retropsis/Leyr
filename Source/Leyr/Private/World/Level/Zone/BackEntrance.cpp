@@ -2,11 +2,16 @@
 
 #include "World/Level/Zone/BackEntrance.h"
 #include "Components/BoxComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/Character.h"
 
 ABackEntrance::ABackEntrance()
 {
 	Tags.Add("BackEntrance");
 	RequiredState = ECombatState::Unoccupied;
+	OverlapZone->SetCollisionObjectType(ECC_Interaction);
+	OverlapZone->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	OverlapZone->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
 }
 
 void ABackEntrance::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -26,10 +31,12 @@ void ABackEntrance::PostEditChangeProperty(FPropertyChangedEvent& PropertyChange
 	}
 }
 
-bool ABackEntrance::TryBackEntrance_Implementation(AActor* InteractingActor, float CapsuleHalfHeight)
+void ABackEntrance::Interact_Implementation(AActor* InteractingActor)
 {
-	FVector NewLocation = PairedBackEntrance->GetActorLocation();
-	NewLocation.Z += OverlapZone->GetScaledBoxExtent().Z / 2.f - CapsuleHalfHeight;
-	InteractingActor->SetActorLocation(NewLocation);
-	return true;
+	if(const ACharacter* Character = Cast<ACharacter>(InteractingActor))
+	{
+		FVector NewLocation = PairedBackEntrance->GetActorLocation();
+        NewLocation.Z += OverlapZone->GetScaledBoxExtent().Z / 2.f - Character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+        InteractingActor->SetActorLocation(NewLocation);
+	}
 }

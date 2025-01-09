@@ -41,6 +41,7 @@ APlayerCharacter::APlayerCharacter()
 	
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Overlap);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Interaction, ECR_Overlap);
 	
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCamera");
 	FollowCamera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
@@ -160,7 +161,9 @@ void APlayerCharacter::InitializeParallaxController()
 }
 
 void APlayerCharacter::ServerInteract_Implementation()
-{
+{	
+	if(CombatState == ECombatState::HangingLadder || GetCharacterMovement()->IsFalling()) return;
+
 	FHitResult Hit;
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	const TEnumAsByte OT = EOT_Interaction;
@@ -168,12 +171,25 @@ void APlayerCharacter::ServerInteract_Implementation()
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
 	UKismetSystemLibrary::BoxTraceSingleForObjects(
-		this, GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 25.f, FVector(50.f, 100.f, 50.f), FRotator::ZeroRotator,
+		this, GetActorLocation(), GetActorLocation() + FVector::UpVector * 25.f, FVector(40.f, 100.f, 40.f), FRotator::ZeroRotator,
 		ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::ForDuration, Hit, false);
 
 	if(Hit.bBlockingHit && Hit.GetActor() && Hit.GetActor()->Implements<UInteractionInterface>())
 	{
 		IInteractionInterface::Execute_Interact(Hit.GetActor(), this);
+		return;
+	}	
+	if(Hit.bBlockingHit && Hit.GetActor()->ActorHasTag("Ladder"))
+	{
+		HandleCombatState(ECombatState::HangingLadder);
+		return;
+	}
+	if(Hit.bBlockingHit && Hit.GetActor()->ActorHasTag("BackEntrance"))
+	{
+		IInteractionInterface::Execute_Interact(Hit.GetActor(), this);
+		SpringArm->bEnableCameraLag = false;
+		FTimerHandle DisableCameraLagTimer;
+		GetWorld()->GetTimerManager().SetTimer(DisableCameraLagTimer, FTimerDelegate::CreateLambda([this](){ SpringArm->bEnableCameraLag = true; }), 1.f, false);		
 	}
 }
 
@@ -788,32 +804,6 @@ void APlayerCharacter::TraceForPlatforms() const
 	if(Hit.GetComponent() && Hit.GetComponent()->ComponentHasTag("Rope") && GetVelocity().Z < -10.f)
 	{
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Overlap);
-	}
-}
-
-void APlayerCharacter::TraceForUpButtonInteraction()
-{
-	if(CombatState == ECombatState::HangingLadder || GetCharacterMovement()->IsFalling()) return;
-	// if(GetCharacterMovement()->MovementMode != MOVE_Walking || GetVelocity().Z < 0.f) return;
-	
-	const FVector Start = RopeHangingCollision->GetComponentLocation();
-	const FVector End = Start + FVector::UpVector *  20.f;
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(ObjectTypeQuery2);
-	TArray<AActor*> ActorsToIgnore;
-	FHitResult Hit;
-	UKismetSystemLibrary::SphereTraceSingleForObjects(this, Start, End, 20.f, ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::None, Hit, true);
-	
-	if(Hit.bBlockingHit && Hit.GetActor()->ActorHasTag("Ladder"))
-	{
-		HandleCombatState(ECombatState::HangingLadder);
-	}
-	if(Hit.bBlockingHit && Hit.GetActor()->ActorHasTag("BackEntrance"))
-	{
-		SpringArm->bEnableCameraLag = false;
-		IInteractionInterface::Execute_TryBackEntrance(Hit.GetActor(), this, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
-		FTimerHandle DisableCameraLagTimer;
-		GetWorld()->GetTimerManager().SetTimer(DisableCameraLagTimer, FTimerDelegate::CreateLambda([this](){ SpringArm->bEnableCameraLag = true; }), 1.f, false);		
 	}
 }
 

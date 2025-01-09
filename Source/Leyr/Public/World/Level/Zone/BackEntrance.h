@@ -16,7 +16,7 @@ class LEYR_API ABackEntrance : public AOverlapZone
 
 public:
 	ABackEntrance();
-	virtual bool TryBackEntrance_Implementation(AActor* InteractingActor, float CapsuleHalfHeight) override;
+	virtual void Interact_Implementation(AActor* InteractingActor) override;
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
