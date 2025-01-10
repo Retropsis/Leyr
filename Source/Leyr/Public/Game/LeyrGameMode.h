@@ -11,6 +11,7 @@ class UBehaviourInfo;
 class UEncounterInfo;
 class UActorClassInfo;
 class UAbilityInfo;
+class UItemAbilityInfo;
 class UCharacterClassInfo;
 
 /**
@@ -33,6 +34,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Ability Info")
 	TObjectPtr<UAbilityInfo> AbilityInfo;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Ability Info")
+	TObjectPtr<UItemAbilityInfo> ItemAbilityInfo;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Map Info")
 	TObjectPtr<UMapInfo> MapInfo;

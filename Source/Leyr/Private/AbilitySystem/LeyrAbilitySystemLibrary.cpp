@@ -1,14 +1,15 @@
 // @ Retropsis 2024-2025.
 
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
-
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilityTypes.h"
 #include "GameplayEffectTypes.h"
+#include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/Data/ActorClassInfo.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "AbilitySystem/Data/EncounterInfo.h"
+#include "AbilitySystem/Data/ItemAbilityInfo.h"
 #include "Engine/OverlapResult.h"
 #include "Game/BaseGameplayTags.h"
 #include "Game/LeyrGameMode.h"
@@ -19,6 +20,7 @@
 #include "Player/PlayerCharacterState.h"
 #include "UI/PlayerHUD.h"
 #include "UI/Controller/WidgetController.h"
+#include "World/Item.h"
 
 /*
  * Widget Controllers
@@ -224,6 +226,79 @@ UAbilityInfo* ULeyrAbilitySystemLibrary::GetAbilityInfo(const UObject* WorldCont
 	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
 	if (LeyrGameMode == nullptr) return nullptr;
 	return LeyrGameMode->AbilityInfo;
+}
+
+void ULeyrAbilitySystemLibrary::GiveItemAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag InputTag)
+{
+	UItemAbilityInfo* ItemAbilityInfo = GetItemAbilityInfo(WorldContextObject);
+	if(ItemAbilityInfo == nullptr || ItemData.ID == 0) return;
+	
+	for (FGameplayTag AbilityTag : ItemData.ItemClass.GetDefaultObject()->GetAbilities())
+	{
+		const FBaseItemAbilityInfo AbilityInfo = ItemAbilityInfo->FindItemAbilityInfoForTag(AbilityTag);
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityInfo.Ability, 1);
+		AbilitySpec.DynamicAbilityTags.AddTag(InputTag);
+		ASC->GiveAbility(AbilitySpec);
+		ASC->MarkAbilitySpecDirty(AbilitySpec);
+
+		// TODO: Allows ASC to broadcast the new equipped ability
+		// if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
+		// {
+		// 	BaseASC->ClientEquipItemAbility(Ability.Key, FBaseGameplayTags::Get().Abilities_Status_Equipped, Ability.Value, FGameplayTag());
+		// }
+	}
+}
+
+void ULeyrAbilitySystemLibrary::RemoveItemAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag PreviousInputTag)
+{
+	UItemAbilityInfo* ItemAbilityInfo = GetItemAbilityInfo(WorldContextObject);
+	if(ItemAbilityInfo == nullptr || ItemData.ID == 0) return;
+	
+	for (FGameplayTag AbilityTag : ItemData.ItemClass.GetDefaultObject()->GetAbilities())
+	{
+		if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
+		{
+			if(FGameplayAbilitySpec* AbilitySpec = BaseASC->GetSpecFromAbilityTag(AbilityTag))
+			{
+				AbilitySpec->DynamicAbilityTags.RemoveTag(PreviousInputTag);
+				ASC->ClearAbility(AbilitySpec->Handle);
+				ASC->MarkAbilitySpecDirty(*AbilitySpec);
+				
+				// TODO: Allows ASC to broadcast the removed ability
+				// const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+				// BaseASC->ClientEquipToolAbility(GameplayTags.Abilities_None, GameplayTags.Abilities_Status_Unlocked, Ability.Value, FGameplayTag());
+			}
+		}
+	}
+}
+
+void ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag InputTag, FGameplayTag TagToRemove)
+{
+	UItemAbilityInfo* ItemAbilityInfo = GetItemAbilityInfo(WorldContextObject);
+	if(ItemAbilityInfo == nullptr || ItemData.ID == 0) return;
+	
+	for (FGameplayTag AbilityTag : ItemData.ItemClass.GetDefaultObject()->GetAbilities())
+	{
+		if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
+		{
+			if(FGameplayAbilitySpec* AbilitySpec = BaseASC->GetSpecFromAbilityTag(AbilityTag))
+			{
+				AbilitySpec->DynamicAbilityTags.RemoveTag(TagToRemove);
+				AbilitySpec->DynamicAbilityTags.AddTag(InputTag);
+				
+				// TODO: Allows ASC to broadcast the removed ability
+				// const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+				// BaseASC->ClientEquipToolAbility(GameplayTags.Abilities_None, GameplayTags.Abilities_Status_Unlocked, Ability.Value, FGameplayTag());
+			}
+		}
+	}
+}
+
+UItemAbilityInfo* ULeyrAbilitySystemLibrary::GetItemAbilityInfo(const UObject* WorldContextObject)
+{
+	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (LeyrGameMode == nullptr) return nullptr;
+	return LeyrGameMode->ItemAbilityInfo;
 }
 
 bool ULeyrAbilitySystemLibrary::IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)

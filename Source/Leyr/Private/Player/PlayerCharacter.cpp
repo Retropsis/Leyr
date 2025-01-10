@@ -171,7 +171,7 @@ void APlayerCharacter::ServerInteract_Implementation()
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
 	UKismetSystemLibrary::BoxTraceSingleForObjects(
-		this, GetActorLocation(), GetActorLocation() + FVector::UpVector * 25.f, FVector(40.f, 100.f, 40.f), FRotator::ZeroRotator,
+		this, GetActorLocation(), GetActorLocation() + FVector::UpVector * 25.f, FVector(20.f, 100.f, 20.f), FRotator::ZeroRotator,
 		ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::ForDuration, Hit, false);
 
 	if(Hit.bBlockingHit && Hit.GetActor() && Hit.GetActor()->Implements<UInteractionInterface>())

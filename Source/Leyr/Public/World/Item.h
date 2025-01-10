@@ -3,12 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/Actor.h"
 #include "PaperSpriteActor.h"
 #include "Interaction/InteractionInterface.h"
 #include "Inventory/InventoryComponent.h"
 #include "Item.generated.h"
 
+class UGameplayAbility;
 class UPaperSprite;
 class USphereComponent;
 
@@ -27,12 +29,18 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FInventoryItemData ItemData;
+
+	UFUNCTION()
+	TArray<FGameplayTag> GetAbilities() { return Abilities; }
 	
 protected:
 	virtual void BeginPlay() override;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USphereComponent> Sphere;
+
+	UPROPERTY(EditDefaultsOnly)
+	TArray<FGameplayTag> Abilities;
 
 private:
 	UPROPERTY() TObjectPtr<AActor> OverlappingActor;
