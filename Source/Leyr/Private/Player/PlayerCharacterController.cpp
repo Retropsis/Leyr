@@ -8,6 +8,7 @@
 #include "GameplayTagContainer.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "Player/Input/BaseInputComponent.h"
+#include "UI/Controller/InventoryWidgetController.h"
 #include "UI/Widget/DamageTextComponent.h"
 
 void APlayerCharacterController::BeginPlay()
@@ -114,7 +115,7 @@ void APlayerCharacterController::InventoryButtonPressed_Implementation()
 	ToggleInventory();
 }
 
-void APlayerCharacterController::ToggleInputMode()
+void APlayerCharacterController::ToggleInputMode(UWidget* InWidgetToFocus)
 {
 	if (bIsInventoryOpen)
 	{
@@ -126,11 +127,23 @@ void APlayerCharacterController::ToggleInputMode()
 	else
 	{
 		FInputModeUIOnly InputModeUIOnly;
+		InputModeUIOnly.SetWidgetToFocus(InWidgetToFocus->TakeWidget());
 		SetInputMode(InputModeUIOnly);
 		FlushPressedKeys();
 		SetShowMouseCursor(true);
 		bIsInventoryOpen = true;
 	}
+}
+
+UInventoryWidgetController* APlayerCharacterController::GetInventoryWidgetController(const FWidgetControllerParams& WCParams)
+{
+	if (InventoryWidgetController == nullptr)
+	{
+		InventoryWidgetController = NewObject<UInventoryWidgetController>(this, InventoryWidgetControllerClass);
+		InventoryWidgetController->SetWidgetControllerParams(WCParams);
+		InventoryWidgetController->BindCallbacksToDependencies();
+	}
+	return InventoryWidgetController;
 }
 
 void APlayerCharacterController::HotbarButtonPressed(int32 Index)

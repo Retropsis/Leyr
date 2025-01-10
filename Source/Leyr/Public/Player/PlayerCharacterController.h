@@ -9,6 +9,9 @@
 #include "UI/Data/UIData.h"
 #include "PlayerCharacterController.generated.h"
 
+struct FWidgetControllerParams;
+class UInventoryWidgetController;
+class UWidget;
 class UDamageTextComponent;
 class UBaseAbilitySystemComponent;
 struct FGameplayTag;
@@ -27,6 +30,8 @@ class LEYR_API APlayerCharacterController : public APlayerController, public ICo
 
 public:
 	virtual void PlayerTick(float DeltaTime) override;
+	
+	UInventoryWidgetController* GetInventoryWidgetController(const FWidgetControllerParams& WCParams);
 
 	UFUNCTION(Client, Reliable)
 	void ClientShowDamageNumber(const FUIMessageData& MessageData);
@@ -91,9 +96,15 @@ protected:
 	
 	UFUNCTION(Client, Reliable) void InventoryButtonPressed();
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable) void ToggleInventory();
-	UFUNCTION(BlueprintCallable) void ToggleInputMode();
+	UFUNCTION(BlueprintCallable) void ToggleInputMode(UWidget* InWidgetToFocus);
 	UPROPERTY(BlueprintReadWrite) bool bIsInventoryOpen = false;
 	UPROPERTY(BlueprintReadWrite) bool bIsContainerOpen = false;
+	
+	UPROPERTY()
+	TObjectPtr<UInventoryWidgetController> InventoryWidgetController;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UInventoryWidgetController> InventoryWidgetControllerClass;
 	
 	/*
 	 * Hotbar

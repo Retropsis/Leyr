@@ -7,6 +7,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "LeyrAbilitySystemLibrary.generated.h"
 
+class UInventoryWidgetController;
 enum class EActorClass : uint8;
 enum class ECharacterClass : uint8;
 enum class EEncounterName : uint8;
@@ -44,6 +45,9 @@ public:
 	
 	UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary", meta=(WorldContext="WorldContextObject"))
 	static  USkillMenuWidgetController* GetSkillMenuWidgetController(const UObject* WorldContextObject);
+	
+	UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary", meta=(WorldContext="WorldContextObject"))
+	static  UInventoryWidgetController* GetInventoryWidgetController(const UObject* WorldContextObject);
 	
 	UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary", meta=(WorldContext="WorldContextObject"))
 	static  bool MakeWidgetControllerParams(const UObject* WorldContextObject, FWidgetControllerParams& OutWCParams, APlayerHUD*& OutPlayerHUD);

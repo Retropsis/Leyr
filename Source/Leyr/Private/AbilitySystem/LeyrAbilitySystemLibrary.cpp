@@ -15,6 +15,7 @@
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/PlayerCharacterController.h"
 #include "Player/PlayerCharacterState.h"
 #include "UI/PlayerHUD.h"
 #include "UI/Controller/WidgetController.h"
@@ -51,6 +52,20 @@ USkillMenuWidgetController* ULeyrAbilitySystemLibrary::GetSkillMenuWidgetControl
 	if (MakeWidgetControllerParams(WorldContextObject, WCParams, PlayerHUD))
 	{
 		return PlayerHUD->GetSkillMenuWidgetController(WCParams);
+	}
+	return nullptr;
+}
+
+UInventoryWidgetController* ULeyrAbilitySystemLibrary::GetInventoryWidgetController(const UObject* WorldContextObject)
+{
+	FWidgetControllerParams WCParams;
+	APlayerHUD* PlayerHUD = nullptr;
+	if (MakeWidgetControllerParams(WorldContextObject, WCParams, PlayerHUD))
+	{
+		if(APlayerCharacterController* PC = Cast<APlayerCharacterController>(WCParams.PlayerController))
+		{
+			return PC->GetInventoryWidgetController(WCParams);
+		}
 	}
 	return nullptr;
 }
