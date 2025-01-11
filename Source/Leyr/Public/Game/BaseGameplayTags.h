@@ -341,6 +341,8 @@ FGameplayTag Montage_Parry_End;
 FGameplayTag Montage_Window_Combo;
 FGameplayTag Montage_Window_Execute;
  
+ TMap<FGameplayTag, FGameplayTag> CombatStatesToMontageTags;
+ 
  /*
   * Input Tags
   */

@@ -9,6 +9,15 @@
 struct FGameplayTag;
 struct FTaggedMontage;
 
+UENUM(BlueprintType)
+enum class ESequenceType : uint8
+{
+	Default,
+	MartialArt,
+	OneHanded,
+	TwoHanded,
+};
+
 /**
  * 
  */
@@ -19,7 +28,17 @@ class LEYR_API UAttackSequenceInfo : public UDataAsset
 	
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation")
+	TArray<FTaggedMontage> DefaultSequences;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation")
+	TArray<FTaggedMontage> MartialArtSequences;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation")
 	TArray<FTaggedMontage> OneHandedSequences;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation")
+	TArray<FTaggedMontage> TowHandedSequences;
 
-	FTaggedMontage FindSequenceInfoForTag(const FGameplayTag& MontageTag, bool bLogNotFound = false) const;
+	FTaggedMontage FindSequenceInfoForTag(const FGameplayTag& MontageTag, ESequenceType SequenceType, bool bLogNotFound = false) const;
+	TArray<FTaggedMontage> GetSequencesByType(ESequenceType SequenceType);
 };

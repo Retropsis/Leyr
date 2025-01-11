@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilityTypes.h"
 #include "AbilitySystem/Ability/BaseGameplayAbility.h"
+#include "AbilitySystem/Data/AttackSequenceInfo.h"
 #include "Interaction/CombatInterface.h"
 #include "DamageGameplayAbility.generated.h"
 
@@ -41,6 +42,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentSequence();
 	
+	UFUNCTION(BlueprintCallable)
+	void SelectMontageTagFromCombatState();
+	
 	UFUNCTION(BlueprintPure)
 	FAdditionalEffectParams MakeAdditionalEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
 	
@@ -62,6 +66,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Montage"), Category="Ability|Defaults")
 	FGameplayTag MontageTag = FGameplayTag();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability|Defaults")
+	ESequenceType SequenceType = ESequenceType::Default;
 
 	/*
 	 * Damage

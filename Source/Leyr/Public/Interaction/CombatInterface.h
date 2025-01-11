@@ -9,6 +9,7 @@
 #include "UObject/Interface.h"
 #include "CombatInterface.generated.h"
 
+enum class ESequenceType : uint8;
 class UNiagaraSystem;
 class UPaperZDAnimSequence;
 
@@ -59,16 +60,16 @@ public:
 	void GetAttackAnimationData(FVector& InBoxTraceStart, FVector& InBoxTraceEnd);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	FBoxTraceData GetBoxTraceDataByTag(FGameplayTag MontageTag);
+	FBoxTraceData GetBoxTraceDataByTag(FGameplayTag MontageTag, ESequenceType SequenceType);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FTaggedMontage GetTaggedMontage();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	TArray<FTaggedMontage> GetAttackMontages();
+	TArray<FTaggedMontage> GetAttackMontages(ESequenceType SequenceType);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	FTaggedMontage GetTaggedMontageByTag(const FGameplayTag& MontageTag);
+	FTaggedMontage GetTaggedMontageByTag(const FGameplayTag& MontageTag, ESequenceType SequenceType);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FTaggedMontage GetTaggedMontageByIndex(int32 Index);

@@ -25,7 +25,7 @@ void UDamageGameplayAbility::PrepareToEndAbility()
 
 TArray<FHitResult> UDamageGameplayAbility::BoxTrace(bool bDebug)
 {
-	BoxTraceData = ICombatInterface::Execute_GetBoxTraceDataByTag(GetAvatarActorFromActorInfo(), MontageTag);
+	BoxTraceData = ICombatInterface::Execute_GetBoxTraceDataByTag(GetAvatarActorFromActorInfo(), MontageTag, SequenceType);
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	TEnumAsByte<EObjectTypeQuery> OT = GetAvatarActorFromActorInfo()->ActorHasTag(FName("Player")) ? EOT_EnemyCapsule : ObjectTypeQuery3;
 	ObjectTypes.Add(OT);
@@ -132,8 +132,58 @@ void UDamageGameplayAbility::SetCurrentComboSequence()
 
 void UDamageGameplayAbility::SetCurrentSequence()
 {
-	FTaggedMontage TaggedMontage = ICombatInterface::Execute_GetTaggedMontageByTag(GetAvatarActorFromActorInfo(), MontageTag);
+	FTaggedMontage TaggedMontage = ICombatInterface::Execute_GetTaggedMontageByTag(GetAvatarActorFromActorInfo(), MontageTag, SequenceType);
 	SelectedMontage = TaggedMontage.Montage;
+}
+
+void UDamageGameplayAbility::SelectMontageTagFromCombatState()
+{
+	const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+	FGameplayTagContainer OwnedTags = GetAbilitySystemComponentFromActorInfo()->GetOwnedGameplayTags();
+	MontageTag = GameplayTags.Montage_Attack_1;
+	
+	if (OwnedTags.HasAllExact(FGameplayTagContainer{ GameplayTags.CombatState_Falling }))
+	{
+		MontageTag = GameplayTags.Montage_Jump_Attack;
+	}
+	TArray<FGameplayTag>JumpDownAttackTags;
+	JumpDownAttackTags.Add(GameplayTags.CombatState_Unoccupied);
+	JumpDownAttackTags.Add(GameplayTags.CombatState_Directional_Upward);
+	if (OwnedTags.HasAllExact(FGameplayTagContainer::CreateFromArray(JumpDownAttackTags)))
+	{
+		MontageTag = GameplayTags.Montage_JumpDown_Attack;
+	}
+	if (OwnedTags.HasAllExact(FGameplayTagContainer{ GameplayTags.CombatState_Crouching }))
+	{
+		MontageTag = GameplayTags.Montage_Crouch_Attack;
+	}
+	TArray<FGameplayTag>UpwardAttackTags;
+	UpwardAttackTags.Add(GameplayTags.CombatState_Unoccupied);
+	UpwardAttackTags.Add(GameplayTags.CombatState_Directional_Upward);
+	if (OwnedTags.HasAllExact(FGameplayTagContainer::CreateFromArray(UpwardAttackTags)))
+	{
+		MontageTag = GameplayTags.Montage_Upward_Attack;
+	}
+	if (OwnedTags.HasAllExact(FGameplayTagContainer{ GameplayTags.CombatState_Rolling }))
+	{
+		MontageTag = GameplayTags.Montage_Roll_Attack;
+	}
+	if (OwnedTags.HasAllExact(FGameplayTagContainer{ GameplayTags.CombatState_Rope }))
+	{
+		MontageTag = GameplayTags.Montage_Rope_Attack;
+	}
+	if (OwnedTags.HasAllExact(FGameplayTagContainer{ GameplayTags.CombatState_Ladder }))
+	{
+		MontageTag = GameplayTags.Montage_Ladder_Attack;
+	}
+	if (OwnedTags.HasAllExact(FGameplayTagContainer{ GameplayTags.CombatState_Slope }))
+	{
+		MontageTag = GameplayTags.Montage_Slope_Attack;
+	}
+	if (OwnedTags.HasAllExact(FGameplayTagContainer{ GameplayTags.CombatState_Swimming }))
+	{
+		MontageTag = GameplayTags.Montage_Swim_Attack;
+	}
 }
 
 FAdditionalEffectParams UDamageGameplayAbility::MakeAdditionalEffectParamsFromClassDefaults(AActor* TargetActor) const

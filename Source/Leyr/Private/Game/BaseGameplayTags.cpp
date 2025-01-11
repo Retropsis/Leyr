@@ -377,6 +377,17 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	
 	GameplayTags.Montage_Window_Combo = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Window.Combo"), FString("Montage Window Combo"));
 	GameplayTags.Montage_Window_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Window.Execute"), FString("Montage Window Execute"));
+
+	GameplayTags.CombatStatesToMontageTags.Add(GameplayTags.CombatState_Unoccupied, GameplayTags.Montage_Attack_1);
+	GameplayTags.CombatStatesToMontageTags.Add(GameplayTags.CombatState_Falling, GameplayTags.Montage_Jump_Attack);
+	GameplayTags.CombatStatesToMontageTags.Add(GameplayTags.CombatState_Crouching, GameplayTags.Montage_Crouch_Attack);
+	GameplayTags.CombatStatesToMontageTags.Add(GameplayTags.CombatState_Ladder, GameplayTags.Montage_Ladder_Attack);
+	GameplayTags.CombatStatesToMontageTags.Add(GameplayTags.CombatState_Rope, GameplayTags.Montage_Rope_Attack);
+	GameplayTags.CombatStatesToMontageTags.Add(GameplayTags.CombatState_Rolling, GameplayTags.Montage_Roll_Attack);
+	GameplayTags.CombatStatesToMontageTags.Add(GameplayTags.CombatState_Slope, GameplayTags.Montage_Slope_Attack);
+	GameplayTags.CombatStatesToMontageTags.Add(GameplayTags.CombatState_Swimming, GameplayTags.Montage_Swim_Attack);
+	GameplayTags.CombatStatesToMontageTags.Add(GameplayTags.CombatState_Directional_Upward, GameplayTags.Montage_Upward_Attack);
+	GameplayTags.CombatStatesToMontageTags.Add(GameplayTags.CombatState_Directional_Downward, GameplayTags.Montage_JumpDown_Attack);
 	
 	/*
 	 * Input Tags

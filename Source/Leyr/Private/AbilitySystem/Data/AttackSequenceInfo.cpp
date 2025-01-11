@@ -4,9 +4,23 @@
 #include "LeyrLogChannels.h"
 #include "Data/CombatData.h"
 
-FTaggedMontage UAttackSequenceInfo::FindSequenceInfoForTag(const FGameplayTag& MontageTag, bool bLogNotFound) const
+FTaggedMontage UAttackSequenceInfo::FindSequenceInfoForTag(const FGameplayTag& MontageTag, ESequenceType SequenceType, bool bLogNotFound) const
 {
-	for (const FTaggedMontage& Info : OneHandedSequences)
+	TArray<FTaggedMontage> Sequences;
+	
+	switch (SequenceType)
+	{
+	case ESequenceType::Default: Sequences = DefaultSequences;
+		break;
+	case ESequenceType::MartialArt: Sequences = MartialArtSequences;
+		break;
+	case ESequenceType::OneHanded: Sequences = OneHandedSequences;
+		break;
+	case ESequenceType::TwoHanded: Sequences = MartialArtSequences;
+		break;
+	}
+	
+	for (const FTaggedMontage& Info : Sequences)
 	{
 		if (Info.MontageTag == MontageTag)
 		{
@@ -20,4 +34,16 @@ FTaggedMontage UAttackSequenceInfo::FindSequenceInfoForTag(const FGameplayTag& M
 	}
 
 	return FTaggedMontage();
+}
+
+TArray<FTaggedMontage> UAttackSequenceInfo::GetSequencesByType(ESequenceType SequenceType)
+{
+	switch (SequenceType)
+	{
+	case ESequenceType::Default: return DefaultSequences;
+	case ESequenceType::MartialArt: return MartialArtSequences;
+	case ESequenceType::OneHanded: return OneHandedSequences;
+	case ESequenceType::TwoHanded: return MartialArtSequences;
+	}
+	return DefaultSequences;
 }

@@ -174,9 +174,9 @@ void ABaseCharacter::GetAttackAnimationData_Implementation(FVector& InBoxTraceSt
 	InBoxTraceEnd = BoxTraceEnd->GetComponentLocation();
 }
 
-FBoxTraceData ABaseCharacter::GetBoxTraceDataByTag_Implementation(const FGameplayTag MontageTag)
+FBoxTraceData ABaseCharacter::GetBoxTraceDataByTag_Implementation(const FGameplayTag MontageTag, ESequenceType SequenceType)
 {
-	const FTaggedMontage TaggedMontage = GetTaggedMontageInfoByTag(MontageTag);
+	const FTaggedMontage TaggedMontage = GetTaggedMontageInfoByTag(MontageTag, SequenceType);
 	BoxTraceStart->SetRelativeLocation(TaggedMontage.BoxTraceStart);
 	BoxTraceEnd->SetRelativeLocation(TaggedMontage.BoxTraceEnd);
 	return FBoxTraceData{
@@ -186,29 +186,22 @@ FBoxTraceData ABaseCharacter::GetBoxTraceDataByTag_Implementation(const FGamepla
 	};
 }
 
-TArray<FTaggedMontage> ABaseCharacter::GetAttackMontages_Implementation()
+TArray<FTaggedMontage> ABaseCharacter::GetAttackMontages_Implementation(ESequenceType SequenceType)
 {
 	checkf(AttackSequenceInfo, TEXT("AttackSequenceInfo is missing on [%s]"), *GetNameSafe(this));
-	return AttackSequenceInfo->OneHandedSequences;
+	return AttackSequenceInfo->GetSequencesByType(SequenceType);
 }
 
-FTaggedMontage ABaseCharacter::GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag)
+FTaggedMontage ABaseCharacter::GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag, ESequenceType SequenceType)
 {
-	return GetTaggedMontageInfoByTag(MontageTag);
+	return GetTaggedMontageInfoByTag(MontageTag, SequenceType);
 }
 
-FTaggedMontage ABaseCharacter::GetTaggedMontageInfoByTag(const FGameplayTag& MontageTag) const
+FTaggedMontage ABaseCharacter::GetTaggedMontageInfoByTag(const FGameplayTag& MontageTag, ESequenceType SequenceType) const
 {
 	checkf(AttackSequenceInfo, TEXT("AttackSequenceInfo is missing on [%s]"), *GetNameSafe(this));
-	
-	for (FTaggedMontage TaggedMontage : AttackSequenceInfo->OneHandedSequences)
-	{
-		if (TaggedMontage.MontageTag == MontageTag)
-		{
-			return TaggedMontage;
-		}
-	}
-	return FTaggedMontage();
+
+	return AttackSequenceInfo->FindSequenceInfoForTag(MontageTag, SequenceType);
 }
 
 void ABaseCharacter::Die(const FVector& DeathImpulse)

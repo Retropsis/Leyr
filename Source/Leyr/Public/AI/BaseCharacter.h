@@ -110,9 +110,9 @@ protected:
 	virtual UPaperZDAnimSequence* GetHitReactSequence_Implementation() override { return HitReactSequence; }
 	virtual UPaperZDAnimInstance* GetPaperAnimInstance_Implementation() override { return AnimationComponent->GetAnimInstance(); }
 	virtual void GetAttackAnimationData_Implementation(FVector& InBoxTraceStart, FVector& InBoxTraceEnd) override;
-	virtual FBoxTraceData GetBoxTraceDataByTag_Implementation(FGameplayTag MontageTag) override;
-	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation() override;
-	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
+	virtual FBoxTraceData GetBoxTraceDataByTag_Implementation(FGameplayTag MontageTag, ESequenceType SequenceType) override;
+	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation(ESequenceType SequenceType) override;
+	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag, ESequenceType SequenceType) override;
 	virtual UNiagaraSystem* GetImpactEffect_Implementation() override { return ImpactEffect; }
 	virtual int32 GetMinionCount_Implementation() override { return MinionCount; }
 	virtual void IncrementMinionCount_Implementation(const int32 Amount) override { MinionCount += Amount; }
@@ -131,7 +131,7 @@ protected:
 	virtual void AdjustDirection_Implementation() override;
 	//~ Combat Interface
 	
-	FTaggedMontage GetTaggedMontageInfoByTag(const FGameplayTag& MontageTag) const;
+	FTaggedMontage GetTaggedMontageInfoByTag(const FGameplayTag& MontageTag, ESequenceType SequenceType) const;
 
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath(const FVector& DeathImpulse);
