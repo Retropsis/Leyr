@@ -45,6 +45,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SelectMontageTagFromCombatState();
 	
+	UFUNCTION(BlueprintCallable, meta = (GameplayTagFilter = "GameplayCue"))
+	void ExecuteDamageGameplayCue(FGameplayTag GameplayCueTag);
+	
 	UFUNCTION(BlueprintPure)
 	FAdditionalEffectParams MakeAdditionalEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
 	

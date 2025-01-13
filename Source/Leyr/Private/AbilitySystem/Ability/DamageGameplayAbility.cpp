@@ -164,6 +164,18 @@ void UDamageGameplayAbility::SelectMontageTagFromCombatState()
 	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Swimming ))	{ MontageTag = GameplayTags.Montage_Swim_Attack; }
 }
 
+void UDamageGameplayAbility::ExecuteDamageGameplayCue(FGameplayTag GameplayCueTag)
+{
+	FGameplayCueParameters GameplayCueParameters;
+	GameplayCueParameters.Location = HitLocation;
+	GameplayCueParameters.EffectCauser = GetAvatarActorFromActorInfo();
+	GameplayCueParameters.SourceObject = HitActor;
+	GameplayCueParameters.AggregatedSourceTags = MontageTag.GetSingleTagContainer();
+	
+	UAbilitySystemComponent* const AbilitySystemComponent = GetAbilitySystemComponentFromActorInfo_Checked();
+	AbilitySystemComponent->ExecuteGameplayCue(GameplayCueTag, GameplayCueParameters);
+}
+
 FAdditionalEffectParams UDamageGameplayAbility::MakeAdditionalEffectParamsFromClassDefaults(AActor* TargetActor) const
 {
 	FAdditionalEffectParams Params;
