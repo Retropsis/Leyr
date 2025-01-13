@@ -228,6 +228,46 @@ UAbilityInfo* ULeyrAbilitySystemLibrary::GetAbilityInfo(const UObject* WorldCont
 	return LeyrGameMode->AbilityInfo;
 }
 
+void ULeyrAbilitySystemLibrary::AssignMonkAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FGameplayTag InputTag)
+{
+	// UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);
+	// if(CharacterClassInfo == nullptr) return;
+	//
+	// for (const TSubclassOf<UGameplayAbility> AbilityClass : CharacterClassInfo->CommonAbilities)
+	// {
+	// 	FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+	// 	ASC->GiveAbility(AbilitySpec);
+	// }
+	if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
+	{
+		if(FGameplayAbilitySpec* AbilitySpec = BaseASC->GetSpecFromAbilityTag(FBaseGameplayTags::Get().Abilities_Weapon_Monk_States))
+		{
+			AbilitySpec->DynamicAbilityTags.AddTag(InputTag);
+			ASC->MarkAbilitySpecDirty(*AbilitySpec);
+				
+			// TODO: Allows ASC to broadcast the removed ability
+			// const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+			// BaseASC->ClientEquipToolAbility(GameplayTags.Abilities_None, GameplayTags.Abilities_Status_Unlocked, Ability.Value, FGameplayTag());
+		}
+	}
+}
+
+void ULeyrAbilitySystemLibrary::ClearInputFromMonkAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FGameplayTag InputTag)
+{
+	if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
+	{
+		if(FGameplayAbilitySpec* AbilitySpec = BaseASC->GetSpecFromAbilityTag(FBaseGameplayTags::Get().Abilities_Weapon_Monk_States))
+		{
+			AbilitySpec->DynamicAbilityTags.RemoveTag(InputTag);
+			ASC->MarkAbilitySpecDirty(*AbilitySpec);
+				
+			// TODO: Allows ASC to broadcast the removed ability
+			// const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+			// BaseASC->ClientEquipToolAbility(GameplayTags.Abilities_None, GameplayTags.Abilities_Status_Unlocked, Ability.Value, FGameplayTag());
+		}
+	}
+}
+
 void ULeyrAbilitySystemLibrary::GiveItemAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag InputTag)
 {
 	UItemAbilityInfo* ItemAbilityInfo = GetItemAbilityInfo(WorldContextObject);

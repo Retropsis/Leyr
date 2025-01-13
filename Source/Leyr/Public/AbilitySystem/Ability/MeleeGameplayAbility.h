@@ -13,11 +13,4 @@ UCLASS()
 class LEYR_API UMeleeGameplayAbility : public UDamageGameplayAbility
 {
 	GENERATED_BODY()
-
-public:		
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Montage"))
-	FGameplayTag MainMontageTag = FGameplayTag();
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Montage"))
-	FGameplayTag AlternativeMontageTag = FGameplayTag();
 };

@@ -65,14 +65,21 @@ void UDamageGameplayAbility::CauseDamage(UAbilitySystemComponent* TargetASC)
 
 void UDamageGameplayAbility::ForEachHitTryCausingDamage(TArray<FHitResult> HitResults)
 {
+	HitActors.Empty();
+	
 	for (FHitResult Hit : HitResults)
 	{
 		if(Hit.bBlockingHit && Hit.GetActor() && ULeyrAbilitySystemLibrary::IsHostile(GetAvatarActorFromActorInfo(), Hit.GetActor()))
 		{
 			HitActor = Hit.GetActor();
+			if(HitActors.Contains(HitActor)) continue;
+			
 			if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitActor))
 			{
 				CauseDamage(TargetASC);
+				HitLocation = (Hit.GetActor()->GetActorLocation() + Hit.ImpactPoint) / 2.f;
+				HitLocation.Y = 0.f;
+				HitActors.AddUnique(HitActor);
 			}
 			bHasHitTarget = true;
 		}
@@ -139,51 +146,22 @@ void UDamageGameplayAbility::SetCurrentSequence()
 void UDamageGameplayAbility::SelectMontageTagFromCombatState()
 {
 	const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-	FGameplayTagContainer OwnedTags = GetAbilitySystemComponentFromActorInfo()->GetOwnedGameplayTags();
+	const FGameplayTagContainer OwnedTags = GetAbilitySystemComponentFromActorInfo()->GetOwnedGameplayTags();
 	MontageTag = GameplayTags.Montage_Attack_1;
+	bShouldAddImpulseOnHit = false; 
 	
-	if (OwnedTags.HasAllExact(FGameplayTagContainer{ GameplayTags.CombatState_Falling }))
+	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Falling ))
 	{
-		MontageTag = GameplayTags.Montage_Jump_Attack;
+		if (OwnedTags.HasTagExact(GameplayTags.CombatState_Directional_Downward )) { MontageTag = GameplayTags.Montage_Falling_Attack; bShouldAddImpulseOnHit = true; return; }
+		MontageTag = GameplayTags.Montage_Jump_Attack; return;
 	}
-	TArray<FGameplayTag>JumpDownAttackTags;
-	JumpDownAttackTags.Add(GameplayTags.CombatState_Unoccupied);
-	JumpDownAttackTags.Add(GameplayTags.CombatState_Directional_Upward);
-	if (OwnedTags.HasAllExact(FGameplayTagContainer::CreateFromArray(JumpDownAttackTags)))
-	{
-		MontageTag = GameplayTags.Montage_JumpDown_Attack;
-	}
-	if (OwnedTags.HasAllExact(FGameplayTagContainer{ GameplayTags.CombatState_Crouching }))
-	{
-		MontageTag = GameplayTags.Montage_Crouch_Attack;
-	}
-	TArray<FGameplayTag>UpwardAttackTags;
-	UpwardAttackTags.Add(GameplayTags.CombatState_Unoccupied);
-	UpwardAttackTags.Add(GameplayTags.CombatState_Directional_Upward);
-	if (OwnedTags.HasAllExact(FGameplayTagContainer::CreateFromArray(UpwardAttackTags)))
-	{
-		MontageTag = GameplayTags.Montage_Upward_Attack;
-	}
-	if (OwnedTags.HasAllExact(FGameplayTagContainer{ GameplayTags.CombatState_Rolling }))
-	{
-		MontageTag = GameplayTags.Montage_Roll_Attack;
-	}
-	if (OwnedTags.HasAllExact(FGameplayTagContainer{ GameplayTags.CombatState_Rope }))
-	{
-		MontageTag = GameplayTags.Montage_Rope_Attack;
-	}
-	if (OwnedTags.HasAllExact(FGameplayTagContainer{ GameplayTags.CombatState_Ladder }))
-	{
-		MontageTag = GameplayTags.Montage_Ladder_Attack;
-	}
-	if (OwnedTags.HasAllExact(FGameplayTagContainer{ GameplayTags.CombatState_Slope }))
-	{
-		MontageTag = GameplayTags.Montage_Slope_Attack;
-	}
-	if (OwnedTags.HasAllExact(FGameplayTagContainer{ GameplayTags.CombatState_Swimming }))
-	{
-		MontageTag = GameplayTags.Montage_Swim_Attack;
-	}
+	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Crouching )) { MontageTag = GameplayTags.Montage_Crouch_Attack; return; }
+	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Directional_Upward )) { MontageTag = GameplayTags.Montage_Upward_Attack; return; }
+	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Rolling )) { MontageTag = GameplayTags.Montage_Roll_Attack; return; }
+	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Rope )) { MontageTag = GameplayTags.Montage_Rope_Attack; return; }
+	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Ladder )) { MontageTag = GameplayTags.Montage_Ladder_Attack; return; }
+	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Slope )) { MontageTag = GameplayTags.Montage_Slope_Attack; return; }
+	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Swimming ))	{ MontageTag = GameplayTags.Montage_Swim_Attack; }
 }
 
 FAdditionalEffectParams UDamageGameplayAbility::MakeAdditionalEffectParamsFromClassDefaults(AActor* TargetActor) const

@@ -15,6 +15,7 @@ void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData,
 	{
 		// Clear
 		ULeyrAbilitySystemLibrary::RemoveItemAbilities(this, AbilitySystemComponent, *ItemToRemove, InputTag);
+		ULeyrAbilitySystemLibrary::AssignMonkAbilities(this, AbilitySystemComponent, InputTag);
 		EquippedItemAbilities.Remove(InputTag);
 		OnInputAssigned.Broadcast(ItemToRemove->ID, FBaseGameplayTags::Get().Abilities_None);
 		
@@ -34,6 +35,7 @@ void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData,
 	}
 	// New Assignment
 	ULeyrAbilitySystemLibrary::GiveItemAbilities(this, AbilitySystemComponent, ItemData, InputTag);
+	ULeyrAbilitySystemLibrary::ClearInputFromMonkAbilities(this, AbilitySystemComponent, InputTag);
 	EquippedItemAbilities.Add(InputTag, ItemData);
 	OnInputAssigned.Broadcast(ItemData.ID, InputTag);
 }

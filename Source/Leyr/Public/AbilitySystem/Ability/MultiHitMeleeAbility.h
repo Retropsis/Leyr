@@ -14,10 +14,23 @@ class LEYR_API UMultiHitMeleeAbility : public UMeleeGameplayAbility
 {
 	GENERATED_BODY()
 
-public:	
-	UPROPERTY(BlueprintReadWrite)
-	int32 ComboSequenceIndex = 0;
+public:
+	UFUNCTION(BlueprintCallable)
+	void SelectMontageTagFromComboSequenceIndex();
+	
+	UFUNCTION(BlueprintCallable)
+	void SelectMontageTagCombo();
+	
+	UFUNCTION(BlueprintCallable)
+	void OnComboWindowBegin();
+	
+	UFUNCTION(BlueprintCallable)
+	void OnComboWindowEnd();
 	
 	UPROPERTY(BlueprintReadWrite)
+	bool bShouldEndAbility = true;
+	
+private:	
+	int32 ComboSequenceIndex = 0;
 	bool bComboActivated = false;
 };

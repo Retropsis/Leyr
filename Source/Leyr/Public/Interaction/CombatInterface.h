@@ -147,5 +147,8 @@ public:
 	void SetSpriteRelativeLocation(FVector NewLocation);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	float GetOverridePitch(); 
+	float GetOverridePitch();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void AddImpulse(FVector Impulse); 
 };

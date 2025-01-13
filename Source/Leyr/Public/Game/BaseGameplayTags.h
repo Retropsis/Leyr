@@ -178,6 +178,16 @@ FGameplayTag Abilities_Weapon_Aim;
 FGameplayTag Abilities_Weapon_Bow_Shot;
 FGameplayTag Abilities_Weapon_Spear_Throw;
  
+FGameplayTag Abilities_Weapon_Monk_States;
+FGameplayTag Abilities_Weapon_Monk_Combo;
+FGameplayTag Abilities_Weapon_Monk_Extra;
+FGameplayTag Abilities_Weapon_OneHanded_States;
+FGameplayTag Abilities_Weapon_OneHanded_Combo;
+ FGameplayTag Abilities_Weapon_OneHanded_Extra;
+ FGameplayTag Abilities_Weapon_TwoHanded_States;
+ FGameplayTag Abilities_Weapon_TwoHanded_Combo;
+ FGameplayTag Abilities_Weapon_TwoHanded_Extra;
+ 
 FGameplayTag Abilities_Combo_Attack_1;
 FGameplayTag Abilities_Combo_Attack_2;
 FGameplayTag Abilities_Combo_Attack_3;
@@ -190,8 +200,6 @@ FGameplayTag Abilities_Combo_Window_3;
 FGameplayTag Abilities_Combo_Window_Execute;
 FGameplayTag Abilities_Combo_Window_Begin;
 FGameplayTag Abilities_Combo_Window_End;
- 
-FGameplayTag Abilities_Monk_Basic;
  
 FGameplayTag Abilities_Throw_1;
 FGameplayTag Abilities_Throw_2;
@@ -324,7 +332,8 @@ FGameplayTag Montage_Attack_3;
 FGameplayTag Montage_Attack_4;
 FGameplayTag Montage_Crouch_Attack;
 FGameplayTag Montage_Jump_Attack;
-FGameplayTag Montage_JumpDown_Attack;
+FGameplayTag Montage_Falling_Attack;
+FGameplayTag Montage_Ascent_Attack;
 FGameplayTag Montage_Upward_Attack;
 FGameplayTag Montage_Rope_Attack;
 FGameplayTag Montage_Slope_Attack;
@@ -340,8 +349,6 @@ FGameplayTag Montage_Parry_End;
  
 FGameplayTag Montage_Window_Combo;
 FGameplayTag Montage_Window_Execute;
- 
- TMap<FGameplayTag, FGameplayTag> CombatStatesToMontageTags;
  
  /*
   * Input Tags

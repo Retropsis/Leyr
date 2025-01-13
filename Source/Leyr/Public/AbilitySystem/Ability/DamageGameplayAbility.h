@@ -49,26 +49,38 @@ public:
 	FAdditionalEffectParams MakeAdditionalEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
 	
 protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability|Defaults")
+	ESequenceType SequenceType = ESequenceType::Default;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Defaults")
 	bool bShouldApplyExecute = false;
 	
-	UPROPERTY(BlueprintReadWrite, Category="Ability|Defaults")
-	bool bHasHitTarget = false;
-
-	UPROPERTY(BlueprintReadWrite, Category="Ability|Defaults")
-	TObjectPtr<AActor> HitActor = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability|Defaults")
+	FVector HitImpulse = FVector::ZeroVector;
 	
-	UPROPERTY(BlueprintReadOnly, Category="Ability|Defaults")
+	UPROPERTY(BlueprintReadOnly)
+	bool bHasHitTarget = false;
+	
+	UPROPERTY(BlueprintReadOnly)
+	bool bShouldAddImpulseOnHit = false;
+
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<AActor> HitActor = nullptr;
+
+	UPROPERTY()
+	TArray<AActor*> HitActors;
+	
+	UPROPERTY(BlueprintReadOnly)
+	FVector HitLocation = FVector::ZeroVector;
+	
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UPaperZDAnimInstance> PaperAnimInstance = nullptr;
 
-	UPROPERTY(BlueprintReadOnly, Category="Ability|Defaults")
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UPaperZDAnimSequence> SelectedMontage = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Montage"), Category="Ability|Defaults")
 	FGameplayTag MontageTag = FGameplayTag();
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability|Defaults")
-	ESequenceType SequenceType = ESequenceType::Default;
 
 	/*
 	 * Damage

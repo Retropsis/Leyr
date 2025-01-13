@@ -129,6 +129,7 @@ protected:
 	virtual bool IsCharacterAirborne_Implementation() override;
 	virtual void SetMovementMode_Implementation(EMovementMode MovementMode,  float NewWalkingSpeed = -1.f, float GravityValue = -1.f) override;
 	virtual void AdjustDirection_Implementation() override;
+	virtual void AddImpulse_Implementation(FVector Impulse) override;
 	//~ Combat Interface
 	
 	FTaggedMontage GetTaggedMontageInfoByTag(const FGameplayTag& MontageTag, ESequenceType SequenceType) const;
@@ -152,6 +153,7 @@ protected:
 	 * Data Asset
 	 */
 	virtual void InitializeCharacterInfo() {}
+
 	UPROPERTY() TObjectPtr<UNiagaraSystem> ImpactEffect;
 	UPROPERTY() TObjectPtr<USoundBase> DeathSound;
 	

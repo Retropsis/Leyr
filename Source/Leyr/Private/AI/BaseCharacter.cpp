@@ -267,6 +267,11 @@ void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImp
 	OnDeath.Broadcast(this);
 }
 
+void ABaseCharacter::AddImpulse_Implementation(FVector Impulse)
+{
+	GetCharacterMovement()->AddImpulse(Impulse, true);
+}
+
 /*
  * Paper 2D
  */
