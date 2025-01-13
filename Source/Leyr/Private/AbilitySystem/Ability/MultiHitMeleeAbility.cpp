@@ -1,20 +1,8 @@
 // @ Retropsis 2024-2025.
 
 #include "AbilitySystem/Ability/MultiHitMeleeAbility.h"
-
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Game/BaseGameplayTags.h"
-
-void UMultiHitMeleeAbility::SelectMontageTagFromComboSequenceIndex()
-{
-	switch (ComboSequenceIndex)
-	{
-	case 1: MontageTag = FBaseGameplayTags::Get().Montage_Attack_2; break;
-	case 2: MontageTag = FBaseGameplayTags::Get().Montage_Attack_3; break;
-	case 3: MontageTag = FBaseGameplayTags::Get().Montage_Attack_4; break;
-	default: MontageTag = FBaseGameplayTags::Get().Montage_Attack_1; break;
-	}
-}
 
 void UMultiHitMeleeAbility::SelectMontageTagCombo()
 {
