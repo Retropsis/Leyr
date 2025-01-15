@@ -169,7 +169,15 @@ bool UInventoryComponent::UseItem(int32 ItemID, int32 Amount)
 		if (Items[i].ID == ItemID && Items[i].Quantity >= Amount)
 		{
 			Items[i].Quantity -= Amount;
-			Items[i].Quantity > 0 ? UpdateInventorySlotUI(i, Items[i]) : ResetInventorySlotUI(i, Items[i]);
+			if (Items[i].Quantity > 0)
+			{
+				UpdateInventorySlotUI(i, Items[i]);
+			}
+			else
+			{
+				ResetInventorySlotUI(i, Items[i]);
+				RemoveItemAtIndex(i);
+			}
 			return true;
 		}
 	}

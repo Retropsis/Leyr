@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
 
+struct FGameplayTag;
 class UItemData;
 class AItem;
 
@@ -41,6 +43,9 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite)
 	int32 MaxAmmunition = 0;
+	
+	UPROPERTY(BlueprintReadWrite)
+	FGameplayTag InputTag = FGameplayTag();
 };
 
 UENUM(BlueprintType)
@@ -81,6 +86,7 @@ public:
 
 	virtual void TransferItem(UInventoryComponent* TargetInventory, int32 SourceSlotIndex, int32 TargetSlotIndex);
 	virtual bool UseItem(int32 ItemID, int32 Amount);
+	virtual bool UpdateItemInputTag(FInventoryItemData ItemData, FGameplayTag InputTag) { return false; }
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FInventoryItemData> Items;

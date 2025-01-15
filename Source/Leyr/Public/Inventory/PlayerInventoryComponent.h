@@ -16,6 +16,7 @@ class LEYR_API UPlayerInventoryComponent : public UInventoryComponent
 
 public:
 	UPlayerInventoryComponent();
+	virtual bool UpdateItemInputTag(FInventoryItemData ItemData, FGameplayTag InputTag) override;
 	
 protected:
 	virtual void HandleOnSlotDrop(UInventoryComponent* SourceInventory, int32 SourceSlotIndex, int32 TargetSlotIndex) override;

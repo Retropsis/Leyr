@@ -42,3 +42,19 @@ bool UPlayerInventoryComponent::RemoveItemAtIndex(int32 SlotIndex)
 
 	return bWasSuccessful;
 }
+
+/*
+ * Custom Functions
+ */
+bool UPlayerInventoryComponent::UpdateItemInputTag(FInventoryItemData ItemData, FGameplayTag InputTag)
+{
+	for (int i = 0; i < Items.Num(); ++i)
+	{
+		if(Items[i].ID == ItemData.ID)
+		{
+			Items[i].InputTag = InputTag;
+			return true;
+		}
+	}
+	return false;
+}

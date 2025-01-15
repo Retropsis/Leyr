@@ -23,6 +23,7 @@ void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData,
 		ULeyrAbilitySystemLibrary::AssignMonkAbilities(this, AbilitySystemComponent, InputTag);
 		EquippedItemAbilities.Remove(InputTag);
 		OnInputAssigned.Broadcast(ItemToRemove->ID, FBaseGameplayTags::Get().Abilities_None);
+		if(InventoryComponent) InventoryComponent->UpdateItemInputTag(*ItemToRemove, FBaseGameplayTags::Get().Abilities_None);
 		
 		if(ItemToRemove->ID == ItemData.ID) return; // We required same input for same item so we cleared and leave
 	}
@@ -36,6 +37,7 @@ void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData,
 			EquippedItemAbilities.Remove(EquippedAbility.Key);
 			EquippedItemAbilities.Add(InputTag, ItemData);
 			OnInputAssigned.Broadcast(ItemData.ID, InputTag);
+			if(InventoryComponent) InventoryComponent->UpdateItemInputTag(ItemData, InputTag);
 			return;
 		}
 	}
@@ -44,6 +46,7 @@ void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData,
 	ULeyrAbilitySystemLibrary::GiveItemAbilities(this, AbilitySystemComponent, ItemData, InputTag);
 	EquippedItemAbilities.Add(InputTag, ItemData);
 	OnInputAssigned.Broadcast(ItemData.ID, InputTag);
+	if(InventoryComponent) InventoryComponent->UpdateItemInputTag(ItemData, InputTag);
 }
 
 void UInventoryWidgetController::HandleItemUpdated(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData Item)
@@ -64,6 +67,7 @@ void UInventoryWidgetController::ClearEquipButtonByItemData(const FInventoryItem
 			ULeyrAbilitySystemLibrary::AssignMonkAbilities(this, AbilitySystemComponent, EquippedAbility.Key);
 			EquippedItemAbilities.Remove(EquippedAbility.Key);
 			OnInputAssigned.Broadcast(ItemData.ID, FBaseGameplayTags::Get().Abilities_None);
+			if(InventoryComponent) InventoryComponent->UpdateItemInputTag(ItemData, FBaseGameplayTags::Get().Abilities_None);
 			return;
 		}
 	}
@@ -77,5 +81,6 @@ void UInventoryWidgetController::ClearEquipButtonByInputTag(const FGameplayTag I
 		ULeyrAbilitySystemLibrary::AssignMonkAbilities(this, AbilitySystemComponent, InputTag);
 		EquippedItemAbilities.Remove(InputTag);
 		OnInputAssigned.Broadcast(ItemToRemove->ID, FBaseGameplayTags::Get().Abilities_None);
+		if(InventoryComponent) InventoryComponent->UpdateItemInputTag(*ItemToRemove, FBaseGameplayTags::Get().Abilities_None);
 	}
 }
