@@ -172,7 +172,7 @@ void APlayerCharacter::ServerInteract_Implementation()
 	ActorsToIgnore.Add(this);
 	UKismetSystemLibrary::BoxTraceSingleForObjects(
 		this, GetActorLocation(), GetActorLocation() + FVector::UpVector * 25.f, FVector(20.f, 100.f, 20.f), FRotator::ZeroRotator,
-		ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::ForDuration, Hit, false);
+		ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::None, Hit, false);
 
 	if(Hit.bBlockingHit && Hit.GetActor() && Hit.GetActor()->Implements<UInteractionInterface>())
 	{
@@ -892,7 +892,7 @@ void APlayerCharacter::TraceForSlope()
 		FHitResult Hit;
 		UKismetSystemLibrary::LineTraceSingle(
 			this, Start, End, TraceTypeQuery1,
-			false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, Hit, true, FLinearColor::Yellow);
+			false, TArray<AActor*>(), EDrawDebugTrace::None, Hit, true, FLinearColor::Yellow);
 		
 		ECombatState PreviousState = CombatState;
 		ECombatState NewState = ECombatState::Unoccupied;

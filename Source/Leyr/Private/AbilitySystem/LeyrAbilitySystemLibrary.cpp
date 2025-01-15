@@ -6,10 +6,10 @@
 #include "AbilityTypes.h"
 #include "GameplayEffectTypes.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
+#include "AbilitySystem/Data/AbilityInfo.h"
 #include "AbilitySystem/Data/ActorClassInfo.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "AbilitySystem/Data/EncounterInfo.h"
-#include "AbilitySystem/Data/ItemAbilityInfo.h"
 #include "Data/ItemData.h"
 #include "Engine/OverlapResult.h"
 #include "Game/BaseGameplayTags.h"
@@ -259,14 +259,14 @@ void ULeyrAbilitySystemLibrary::UpdateMonkAbilities(const UObject* WorldContextO
 
 void ULeyrAbilitySystemLibrary::GiveItemAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag InputTag)
 {
-	UItemAbilityInfo* ItemAbilityInfo = GetItemAbilityInfo(WorldContextObject);
-	if(ItemAbilityInfo == nullptr || ItemData.ID == 0) return;
+	UAbilityInfo* AbilityInfo = GetAbilityInfo(WorldContextObject);
+	if(AbilityInfo == nullptr || ItemData.ID == 0) return;
 	
 	for (FGameplayTag AbilityTag : ItemData.ItemClass.GetDefaultObject()->GetAbilities())
 	{
-		const FBaseItemAbilityInfo AbilityInfo = ItemAbilityInfo->FindItemAbilityInfoForTag(AbilityTag);
+		const FBaseAbilityInfo BaseAbilityInfo = AbilityInfo->FindAbilityInfoForTag(AbilityTag);
 		const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityInfo.Ability, 1);
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(BaseAbilityInfo.Ability, 1);
 		FGameplayTagContainer PreviousTags = AbilitySpec.DynamicAbilityTags.Filter(GameplayTags.InputTag.GetSingleTagContainer());
 		AbilitySpec.DynamicAbilityTags.RemoveTags(PreviousTags);
 		AbilitySpec.DynamicAbilityTags.AddTag(InputTag);
@@ -287,8 +287,7 @@ void ULeyrAbilitySystemLibrary::GiveItemAbilities(const UObject* WorldContextObj
 
 void ULeyrAbilitySystemLibrary::RemoveItemAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag PreviousInputTag)
 {
-	UItemAbilityInfo* ItemAbilityInfo = GetItemAbilityInfo(WorldContextObject);
-	if(ItemAbilityInfo == nullptr || ItemData.ID == 0) return;
+	if(ItemData.ID == 0) return;
 	
 	for (FGameplayTag AbilityTag : ItemData.ItemClass.GetDefaultObject()->GetAbilities())
 	{
@@ -309,8 +308,8 @@ void ULeyrAbilitySystemLibrary::RemoveItemAbilities(const UObject* WorldContextO
 
 void ULeyrAbilitySystemLibrary::UpdateItemAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag InputTag, bool bShouldClear)
 {
-	UItemAbilityInfo* ItemAbilityInfo = GetItemAbilityInfo(WorldContextObject);
-	if(ItemAbilityInfo == nullptr || ItemData.ID == 0) return;
+	UAbilityInfo* AbilityInfo = GetAbilityInfo(WorldContextObject);
+	if(AbilityInfo == nullptr || ItemData.ID == 0) return;
 	
 	const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
 	if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
@@ -329,8 +328,8 @@ void ULeyrAbilitySystemLibrary::UpdateItemAbilities(const UObject* WorldContextO
 			}
 			else
 			{
-				const FBaseItemAbilityInfo AbilityInfo = ItemAbilityInfo->FindItemAbilityInfoForTag(AbilityTag);
-				FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityInfo.Ability, 1);
+				const FBaseAbilityInfo BaseAbilityInfo = AbilityInfo->FindAbilityInfoForTag(AbilityTag);
+				FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(BaseAbilityInfo.Ability, 1);
 				FGameplayTagContainer PreviousTags = AbilitySpec.DynamicAbilityTags.Filter(GameplayTags.InputTag.GetSingleTagContainer());
 				AbilitySpec.DynamicAbilityTags.RemoveTags(PreviousTags);
 				AbilitySpec.DynamicAbilityTags.AddTag(InputTag);
@@ -350,8 +349,7 @@ void ULeyrAbilitySystemLibrary::UpdateItemAbilities(const UObject* WorldContextO
 
 void ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag InputTag, FGameplayTag TagToRemove)
 {
-	UItemAbilityInfo* ItemAbilityInfo = GetItemAbilityInfo(WorldContextObject);
-	if(ItemAbilityInfo == nullptr || ItemData.ID == 0) return;
+	if(ItemData.ID == 0) return;
 	
 	if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
 	{
@@ -367,13 +365,6 @@ void ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(const UObject* WorldConte
 			}
 		}
 	}
-}
-
-UItemAbilityInfo* ULeyrAbilitySystemLibrary::GetItemAbilityInfo(const UObject* WorldContextObject)
-{
-	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
-	if (LeyrGameMode == nullptr) return nullptr;
-	return LeyrGameMode->ItemAbilityInfo;
 }
 
 bool ULeyrAbilitySystemLibrary::IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)
