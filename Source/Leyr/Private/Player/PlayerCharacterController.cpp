@@ -141,6 +141,8 @@ UInventoryWidgetController* APlayerCharacterController::GetInventoryWidgetContro
 	{
 		InventoryWidgetController = NewObject<UInventoryWidgetController>(this, InventoryWidgetControllerClass);
 		InventoryWidgetController->SetWidgetControllerParams(WCParams);
+		PlayerCharacter = Cast<APlayerCharacter>(GetCharacter());
+		if(PlayerCharacter) InventoryWidgetController->InventoryComponent = PlayerCharacter->GetPlayerInventory();
 		InventoryWidgetController->BindCallbacksToDependencies();
 	}
 	return InventoryWidgetController;

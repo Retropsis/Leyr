@@ -76,6 +76,7 @@ public:
 	bool IsSlotEmpty(int32 SlotIndex);
 	FInventoryItemData GetItemAtIndex(int32 SlotIndex);
 	void UpdateInventorySlotUI(int32 SlotIndex, const FInventoryItemData& ItemData) const;
+	void ResetInventorySlotUI(int32 SlotIndex, const FInventoryItemData& ItemData) const;
 	void SetInventorySize(int32 Size);
 
 	virtual void TransferItem(UInventoryComponent* TargetInventory, int32 SourceSlotIndex, int32 TargetSlotIndex);

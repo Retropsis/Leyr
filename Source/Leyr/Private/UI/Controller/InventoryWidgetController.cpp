@@ -7,7 +7,7 @@
 
 void UInventoryWidgetController::BindCallbacksToDependencies()
 {
-	InventoryComponent->OnItemUpdated.AddDynamic(this, &UInventoryWidgetController::HandleItemUpdated);
+	if(InventoryComponent) InventoryComponent->OnItemUpdated.AddDynamic(this, &UInventoryWidgetController::HandleItemUpdated);
 }
 
 void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData, const FGameplayTag& InputTag)
@@ -64,6 +64,7 @@ void UInventoryWidgetController::ClearEquipButtonByItemData(const FInventoryItem
 			ULeyrAbilitySystemLibrary::AssignMonkAbilities(this, AbilitySystemComponent, EquippedAbility.Key);
 			EquippedItemAbilities.Remove(EquippedAbility.Key);
 			OnInputAssigned.Broadcast(ItemData.ID, FBaseGameplayTags::Get().Abilities_None);
+			return;
 		}
 	}
 }

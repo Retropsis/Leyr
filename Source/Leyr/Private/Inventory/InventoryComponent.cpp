@@ -123,6 +123,24 @@ void UInventoryComponent::UpdateInventorySlotUI(int32 SlotIndex, const FInventor
 	}
 }
 
+void UInventoryComponent::ResetInventorySlotUI(int32 SlotIndex, const FInventoryItemData& ItemData) const
+{
+	// TODO: Remainder if custom behaviour is needed, don't forget to break
+	switch (ContainerType)
+	{
+	case EContainerType::Inventory:
+	case EContainerType::Hotbar:
+		IPlayerInterface::Execute_ResetInventorySlot(GetOwner(), ContainerType, SlotIndex);
+		OnItemUpdated.Broadcast(ContainerType, SlotIndex, ItemData);
+		break;
+	case EContainerType::Container:
+		break;
+	case EContainerType::Equipment:
+		break;
+	default: ;
+	}
+}
+
 void UInventoryComponent::SetInventorySize(int32 Size)
 {
 	Items.SetNum(Size, EAllowShrinking::No);
@@ -151,7 +169,7 @@ bool UInventoryComponent::UseItem(int32 ItemID, int32 Amount)
 		if (Items[i].ID == ItemID && Items[i].Quantity >= Amount)
 		{
 			Items[i].Quantity -= Amount;
-			Items[i].Quantity > 0 ? UpdateInventorySlotUI(i, Items[i]) : IPlayerInterface::Execute_ResetInventorySlot(GetOwner(), ContainerType, i);
+			Items[i].Quantity > 0 ? UpdateInventorySlotUI(i, Items[i]) : ResetInventorySlotUI(i, Items[i]);
 			return true;
 		}
 	}
