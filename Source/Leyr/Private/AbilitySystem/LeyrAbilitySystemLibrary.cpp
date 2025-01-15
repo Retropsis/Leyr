@@ -229,7 +229,7 @@ UAbilityInfo* ULeyrAbilitySystemLibrary::GetAbilityInfo(const UObject* WorldCont
 	return LeyrGameMode->AbilityInfo;
 }
 
-void ULeyrAbilitySystemLibrary::AssignMonkAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FGameplayTag InputTag)
+void ULeyrAbilitySystemLibrary::UpdateMonkAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FGameplayTag InputTag, bool bShouldClear)
 {
 	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);
 	if(CharacterClassInfo == nullptr) return;
@@ -239,35 +239,19 @@ void ULeyrAbilitySystemLibrary::AssignMonkAbilities(const UObject* WorldContextO
 		for (const FGameplayTag AbilityTag : CharacterClassInfo->MonkAbilities)
 		{
 			if(FGameplayAbilitySpec* AbilitySpec = BaseASC->GetSpecFromAbilityTag(AbilityTag))
-			{
-				AbilitySpec->DynamicAbilityTags.AddTag(InputTag);
-				ASC->MarkAbilitySpecDirty(*AbilitySpec);
-				
-				// TODO: Allows ASC to broadcast the removed ability
+			{				
 				const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-				BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
-			}
-		}
-	}
-}
-
-void ULeyrAbilitySystemLibrary::ClearInputFromMonkAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FGameplayTag InputTag)
-{
-	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);
-	if(CharacterClassInfo == nullptr) return;
-	
-	if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
-	{
-		for (const FGameplayTag AbilityTag : CharacterClassInfo->MonkAbilities)
-		{
-			if(FGameplayAbilitySpec* AbilitySpec = BaseASC->GetSpecFromAbilityTag(AbilityTag))
-			{
-				AbilitySpec->DynamicAbilityTags.RemoveTag(InputTag);
+				if(bShouldClear)
+				{
+					AbilitySpec->DynamicAbilityTags.RemoveTag(InputTag);
+					BaseASC->ClientEquipAbility(GameplayTags.Abilities_None, GameplayTags.Abilities_None, InputTag, FGameplayTag());
+				}
+				else
+				{
+					AbilitySpec->DynamicAbilityTags.AddTag(InputTag);
+					BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
+				}
 				ASC->MarkAbilitySpecDirty(*AbilitySpec);
-				
-				// TODO: Allows ASC to broadcast the removed ability
-				const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-				BaseASC->ClientEquipAbility(GameplayTags.Abilities_None, GameplayTags.Abilities_None, InputTag, FGameplayTag());
 			}
 		}
 	}
@@ -281,22 +265,22 @@ void ULeyrAbilitySystemLibrary::GiveItemAbilities(const UObject* WorldContextObj
 	for (FGameplayTag AbilityTag : ItemData.ItemClass.GetDefaultObject()->GetAbilities())
 	{
 		const FBaseItemAbilityInfo AbilityInfo = ItemAbilityInfo->FindItemAbilityInfoForTag(AbilityTag);
+		const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityInfo.Ability, 1);
-		FGameplayTagContainer PreviousTags = AbilitySpec.DynamicAbilityTags.Filter(FGameplayTag::RequestGameplayTag("Input").GetSingleTagContainer());
+		FGameplayTagContainer PreviousTags = AbilitySpec.DynamicAbilityTags.Filter(GameplayTags.InputTag.GetSingleTagContainer());
 		AbilitySpec.DynamicAbilityTags.RemoveTags(PreviousTags);
 		AbilitySpec.DynamicAbilityTags.AddTag(InputTag);
 		AbilitySpec.SourceObject = ItemData.Asset.Get();
 		ASC->GiveAbility(AbilitySpec);
 		ASC->MarkAbilitySpecDirty(AbilitySpec);
 
-		// TODO: Allows ASC to broadcast the new equipped ability
 		if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
 		{
 			for (FGameplayTag PreviousTag : PreviousTags)
 			{
-				BaseASC->ClientEquipAbility(AbilityTag, FBaseGameplayTags::Get().Abilities_None, PreviousTag, FGameplayTag());
+				BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_None, PreviousTag, FGameplayTag());
 			}
-			BaseASC->ClientEquipAbility(AbilityTag, FBaseGameplayTags::Get().Abilities_Status_Equipped, InputTag, FGameplayTag());
+			BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
 		}
 	}
 }
@@ -316,7 +300,6 @@ void ULeyrAbilitySystemLibrary::RemoveItemAbilities(const UObject* WorldContextO
 				ASC->ClearAbility(AbilitySpec->Handle);
 				ASC->MarkAbilitySpecDirty(*AbilitySpec);
 				
-				// TODO: Allows ASC to broadcast the removed ability
 				const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
 				BaseASC->ClientEquipAbility(GameplayTags.Abilities_None, GameplayTags.Abilities_None, PreviousInputTag, FGameplayTag());
 			}
@@ -324,21 +307,61 @@ void ULeyrAbilitySystemLibrary::RemoveItemAbilities(const UObject* WorldContextO
 	}
 }
 
+void ULeyrAbilitySystemLibrary::UpdateItemAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag InputTag, bool bShouldClear)
+{
+	UItemAbilityInfo* ItemAbilityInfo = GetItemAbilityInfo(WorldContextObject);
+	if(ItemAbilityInfo == nullptr || ItemData.ID == 0) return;
+	
+	const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+	if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
+	{
+		for (FGameplayTag AbilityTag : ItemData.ItemClass.GetDefaultObject()->GetAbilities())
+        {
+			if(bShouldClear)
+			{
+				if(FGameplayAbilitySpec* AbilitySpec = BaseASC->GetSpecFromAbilityTag(AbilityTag))
+				{
+					AbilitySpec->DynamicAbilityTags.RemoveTag(InputTag);
+					ASC->ClearAbility(AbilitySpec->Handle);
+					ASC->MarkAbilitySpecDirty(*AbilitySpec);
+					BaseASC->ClientEquipAbility(GameplayTags.Abilities_None, GameplayTags.Abilities_None, InputTag, FGameplayTag());
+				}
+			}
+			else
+			{
+				const FBaseItemAbilityInfo AbilityInfo = ItemAbilityInfo->FindItemAbilityInfoForTag(AbilityTag);
+				FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityInfo.Ability, 1);
+				FGameplayTagContainer PreviousTags = AbilitySpec.DynamicAbilityTags.Filter(GameplayTags.InputTag.GetSingleTagContainer());
+				AbilitySpec.DynamicAbilityTags.RemoveTags(PreviousTags);
+				AbilitySpec.DynamicAbilityTags.AddTag(InputTag);
+				AbilitySpec.SourceObject = ItemData.Asset.Get();
+				ASC->GiveAbility(AbilitySpec);
+				ASC->MarkAbilitySpecDirty(AbilitySpec);
+				for (FGameplayTag PreviousTag : PreviousTags)
+				{
+					BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_None, PreviousTag, FGameplayTag());
+				}
+				BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
+			}
+        }
+	}
+	
+}
+
 void ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag InputTag, FGameplayTag TagToRemove)
 {
 	UItemAbilityInfo* ItemAbilityInfo = GetItemAbilityInfo(WorldContextObject);
 	if(ItemAbilityInfo == nullptr || ItemData.ID == 0) return;
 	
-	for (FGameplayTag AbilityTag : ItemData.ItemClass.GetDefaultObject()->GetAbilities())
+	if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
 	{
-		if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
+		for (FGameplayTag AbilityTag : ItemData.ItemClass.GetDefaultObject()->GetAbilities())
 		{
 			if(FGameplayAbilitySpec* AbilitySpec = BaseASC->GetSpecFromAbilityTag(AbilityTag))
 			{
 				AbilitySpec->DynamicAbilityTags.RemoveTag(TagToRemove);
 				AbilitySpec->DynamicAbilityTags.AddTag(InputTag);
-				
-				// TODO: Allows ASC to broadcast the removed ability
+						
 				const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
 				BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
 			}

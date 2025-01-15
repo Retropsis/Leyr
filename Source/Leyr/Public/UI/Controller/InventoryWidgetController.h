@@ -22,12 +22,15 @@ class LEYR_API UInventoryWidgetController : public UWidgetController
 
 public:
 	virtual void BindCallbacksToDependencies() override;
-	
+	void ClearInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag);
+	bool ReplaceInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag);
+	void AssignInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag);
+
 	UFUNCTION(BlueprintCallable)
 	void EquipButtonPressed(FInventoryItemData ItemData, const FGameplayTag& InputTag);
 	
 	void ClearEquipButtonByItemData(const FInventoryItemData& ItemData);
-	void ClearEquipButtonByInputTag(const FGameplayTag InputTag);
+	bool ClearEquipButtonByInputTag(const FGameplayTag InputTag, const int32 ItemID);
 
 	UFUNCTION()
 	void HandleItemUpdated(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData Item);

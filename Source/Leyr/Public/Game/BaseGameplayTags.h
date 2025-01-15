@@ -359,6 +359,8 @@ FGameplayTag Montage_Window_Execute;
  /*
   * Input Tags
   */
+FGameplayTag InputTag;
+FGameplayTag InputTag_None;
 FGameplayTag InputTag_LMB;
 FGameplayTag InputTag_RMB;
 FGameplayTag InputTag_Shoulder_Left;

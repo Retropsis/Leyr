@@ -396,6 +396,8 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	/*
 	 * Input Tags
 	 */
+	GameplayTags.InputTag = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag"), FString("Input Parent Tag"));
+	GameplayTags.InputTag_None = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.None"), FString("No Input"));
 	GameplayTags.InputTag_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.LMB"), FString("Left Mouse Button"));
 	GameplayTags.InputTag_RMB = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.RMB"), FString("Right Mouse Button"));
 	GameplayTags.InputTag_Shoulder_Left = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Shoulder.Left"), FString("Left Shoulder Button"));
