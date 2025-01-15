@@ -7,6 +7,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "LeyrAbilitySystemLibrary.generated.h"
 
+enum class EContainerType : uint8;
 class UItemAbilityInfo;
 struct FInventoryItemData;
 class UInventoryWidgetController;

@@ -19,6 +19,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Input", meta=(Categories="InputTag"))
 	FGameplayTag StartupInputTag;
 	
+	void MakeAndApplyExecuteEffectToTarget(const FGameplayTag& TagToApply, UAbilitySystemComponent* TargetASC, int32 Level = 1);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UObject* GetSourceObjectFromAbilitySpec();
+	
+	UFUNCTION(BlueprintCallable)
+	bool CommitInventoryCost();
+	
 	virtual FString GetDescription(int32 Level);
 	virtual FString GetNextLevelDescription(int32 Level);
 	static FString GetLockedDescription(int32 Level);
@@ -33,9 +41,9 @@ protected:
 	float GetManaCost(float InLevel = 1.f) const;
 	float GetCooldown(float InLevel = 1.f) const;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability|Damage")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability")
 	FValueRange AbilityPower;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite)
 	FVector CursorHitLocation;
 };

@@ -8,8 +8,9 @@ enum class EMessageType : uint8
 {
 	DamageToEnemy,
 	DamageToPlayer,
+	HealingToPlayer,
+	HealingToEnemy,
 	Experience,
-	
 };
 
 USTRUCT(BlueprintType, Blueprintable)

@@ -317,6 +317,11 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Cooldown_Weapon_Fire_FireBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Weapon.Fire.FireBolt"), FString("Cooldown Fire FireBolt Weapon Version"));
 	GameplayTags.Cooldown_Alteration_Berserk_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Alteration.Berserk.1"), FString("Cooldown Alteration Berserk 1"));
 	GameplayTags.Cooldown_Weapon_Bow_Shot = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Weapon.Bow.Shot"), FString("Cooldown Weapon Bow Shot"));
+	GameplayTags.Cooldown_Item_Instant = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Item.Instant"), FString("Cooldown Item Instant"));
+	GameplayTags.Cooldown_Item_Short = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Item.Short"), FString("Cooldown Item Short"));
+	GameplayTags.Cooldown_Item_Average = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Item.Average"), FString("Cooldown Item Average"));
+	GameplayTags.Cooldown_Item_Long = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Item.Long"), FString("Cooldown Item Long"));
+	GameplayTags.Cooldown_Item_VeryLong = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Item.VeryLong"), FString("Cooldown Item VeryLong"));
 	
 	/*
 	 * Side Effects

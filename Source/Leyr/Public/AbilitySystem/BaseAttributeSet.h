@@ -13,6 +13,8 @@ GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName) \
 GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
+struct FUIMessageData;
+
 USTRUCT()
 struct FEffectProperties
 {
@@ -340,10 +342,11 @@ public:
 
 private:
 	void SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const;
-	void ShowFloatingText(const FEffectProperties& Props, float Damage, bool bBlockedHit, bool bCriticalHit) const;
+	void ShowFloatingText(const FEffectProperties& Props, FUIMessageData& MessageData) const;
 	void SendXPEvent(const FEffectProperties& Props);
 	
 	void HandleIncomingDamage(const FEffectProperties& Props);
+	void HandleIncomingHealing(const FEffectProperties& Props);
 	void HandleIncomingXP(const FEffectProperties& Props);
 	void HandleStatusEffect(const FEffectProperties& Props);
 	

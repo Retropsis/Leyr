@@ -94,6 +94,8 @@ public:
 	virtual void UpdateContainerSlots_Implementation(int32 TotalSlots) override;
 	virtual void SetContainer_Implementation(AContainer* Container) override;
 	virtual void CloseContainer_Implementation() override;
+	virtual UInventoryComponent* GetInventoryComponentByType_Implementation(EContainerType Type) override;
+	virtual bool UseItem_Implementation(int32 ItemID, int32 Amount = 1) override;
 	
 	virtual void AddToXP_Implementation(int32 InXP) override;
 	virtual void LevelUp_Implementation() override;

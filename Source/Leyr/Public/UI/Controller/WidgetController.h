@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "WidgetController.generated.h"
 
+class UInventoryComponent;
 class UBaseAttributeSet;
 class UBaseAbilitySystemComponent;
 class APlayerCharacterState;

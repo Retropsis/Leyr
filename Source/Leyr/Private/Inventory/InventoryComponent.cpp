@@ -1,6 +1,8 @@
 // @ Retropsis 2024-2025.
 
 #include "Inventory/InventoryComponent.h"
+
+#include "Data/ItemData.h"
 #include "Interaction/PlayerInterface.h"
 
 UInventoryComponent::UInventoryComponent()
@@ -23,10 +25,30 @@ void UInventoryComponent::ServerAddItem_Implementation(FInventoryItemData ItemTo
 	AddItem(ItemToAdd);
 }
 
-void UInventoryComponent::AddItem(const FInventoryItemData& ItemToAdd)
+// bItemStackWasSplit is for splitting a stack, set it to true to skip stacking and add the new split in a new slot
+void UInventoryComponent::AddItem(FInventoryItemData& ItemToAdd, const bool bItemStackWasSplit)
 {
+	UItemData* Item = ItemToAdd.Asset.LoadSynchronous();
+	const int32 ItemID = ItemToAdd.ID;
+	int32 ItemQuantityToAdd = ItemToAdd.Quantity;
+	
+	if(Item && Item->bIsStackable && !bItemStackWasSplit)
+	{
+		for (int i = 0; i < Items.Num(); ++i)
+		{
+			if (Items[i].ID == ItemID && Items[i].Quantity < Items[i].StackSize)
+			{
+				const int32 Amount = FMath::Min(ItemQuantityToAdd, Items[i].StackSize - Items[i].Quantity);
+				Items[i].Quantity += Amount;
+				ItemQuantityToAdd -= Amount;
+				ItemToAdd.Quantity = ItemQuantityToAdd;
+				UpdateInventorySlotUI(i, Items[i]);
+				if(ItemQuantityToAdd == 0) break;
+			}
+		}
+	}
 	int32 EmptySlotIndex;
-	if(FindEmptySlot(EmptySlotIndex))
+	if(FindEmptySlot(EmptySlotIndex) && ItemQuantityToAdd > 0 && EmptySlotIndex != INDEX_NONE)
 	{
 		Items[EmptySlotIndex] = ItemToAdd;
 		UpdateInventorySlotUI(EmptySlotIndex, ItemToAdd);
@@ -91,6 +113,7 @@ void UInventoryComponent::UpdateInventorySlotUI(int32 SlotIndex, const FInventor
 	case EContainerType::Inventory:
 	case EContainerType::Hotbar:
 		IPlayerInterface::Execute_UpdateInventorySlot(GetOwner(), ContainerType, SlotIndex, ItemData);
+		OnItemUpdated.Broadcast(ContainerType, SlotIndex, ItemData);
 		break;
 	case EContainerType::Container:
 		break;
@@ -112,6 +135,23 @@ bool UInventoryComponent::FindEmptySlot(int32& EmptySlotIndex)
 		if (Items[i].ID == 0)
 		{
 			EmptySlotIndex = i;
+			return true;
+		}
+	}
+	return false;
+}
+
+/*
+ * Custom Functions
+ */
+bool UInventoryComponent::UseItem(int32 ItemID, int32 Amount)
+{
+	for (int i = 0; i < Items.Num(); ++i)
+	{
+		if (Items[i].ID == ItemID && Items[i].Quantity >= Amount)
+		{
+			Items[i].Quantity -= Amount;
+			Items[i].Quantity > 0 ? UpdateInventorySlotUI(i, Items[i]) : IPlayerInterface::Execute_ResetInventorySlot(GetOwner(), ContainerType, i);
 			return true;
 		}
 	}

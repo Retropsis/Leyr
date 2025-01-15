@@ -6,8 +6,6 @@
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChanged);
-
 class UItemData;
 class AItem;
 
@@ -54,6 +52,9 @@ enum class EContainerType : uint8
 	Equipment UMETA(DisplayName="Equipment")
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChanged);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnItemUpdated, EContainerType, ContainerType, int32, SlotIndex, FInventoryItemData, Item);
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class LEYR_API UInventoryComponent : public UActorComponent
 {
@@ -62,6 +63,9 @@ class LEYR_API UInventoryComponent : public UActorComponent
 public:	
 	UInventoryComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnItemUpdated OnItemUpdated;
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void ServerAddItem(FInventoryItemData ItemToAdd);
@@ -75,6 +79,7 @@ public:
 	void SetInventorySize(int32 Size);
 
 	virtual void TransferItem(UInventoryComponent* TargetInventory, int32 SourceSlotIndex, int32 TargetSlotIndex);
+	virtual bool UseItem(int32 ItemID, int32 Amount);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<FInventoryItemData> Items;
@@ -93,5 +98,5 @@ protected:
 
 private:
 	bool FindEmptySlot(int32& EmptySlotIndex);
-	void AddItem(const FInventoryItemData& ItemToAdd);
+	void AddItem(FInventoryItemData& ItemToAdd, bool bItemStackWasSplit = false);
 };

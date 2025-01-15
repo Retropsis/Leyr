@@ -86,44 +86,6 @@ void UDamageGameplayAbility::ForEachHitTryCausingDamage(TArray<FHitResult> HitRe
 	}
 }
 
-void UDamageGameplayAbility::MakeAndApplyExecuteEffectToTarget(const FGameplayTag& TagToApply, UAbilitySystemComponent* TargetASC, int32 Level)
-{
-	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-	FGameplayEffectContextHandle EffectContext = GetAbilitySystemComponentFromActorInfo()->MakeEffectContext();
-	EffectContext.AddSourceObject(this);
-
-	FString TagName = FString::Printf(TEXT("%s"), *TagToApply.ToString());
-	UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(TagName));
-
-	Effect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
-	Effect->DurationMagnitude = FGameplayEffectModifierMagnitude{ 1.25f };
-	
-	UTargetTagsGameplayEffectComponent& AssetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
-	FInheritedTagContainer InheritedTagContainer;
-	InheritedTagContainer.Added.AddTag(TagToApply);
-	AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
-	
-	Effect->StackingType = EGameplayEffectStackingType::AggregateByTarget;
-	Effect->StackLimitCount = 1;
-
-	// const int32 Index = Effect->Modifiers.Num();
-	// Effect->Modifiers.Add(FGameplayModifierInfo());
-	// FGameplayModifierInfo& ModifierInfo = Effect->Modifiers[Index];
-	//
-	// ModifierInfo.ModifierMagnitude = FScalableFloat(StatusEffectDamage);
-	// ModifierInfo.ModifierOp = EGameplayModOp::Additive;
-	// ModifierInfo.Attribute = UBaseAttributeSet::GetIncomingDamageAttribute();
-
-	if (FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec(Effect, EffectContext, Level))
-	{
-		// FBaseGameplayEffectContext* BaseContext = static_cast<FBaseGameplayEffectContext*>(MutableSpec->GetContext().Get());
-		// TSharedPtr<FGameplayTag> StatusEffectDamageType = MakeShareable(new FGameplayTag(DamageType));
-		// BaseContext->SetDamageType(StatusEffectDamageType);
-
-		GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*MutableSpec, TargetASC);
-	}
-}
-
 bool UDamageGameplayAbility::IsHostile() const
 {
 	return ULeyrAbilitySystemLibrary::IsHostile(GetAvatarActorFromActorInfo(), HitActor);

@@ -99,7 +99,13 @@ public:
 	AContainer* GetContainer();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UInventoryComponent* GetInventoryComponentByType(EContainerType Type);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void CloseContainer();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool UseItem(int32 ItemID, int32 Amount);
 	
 	/*
 	 * Combat

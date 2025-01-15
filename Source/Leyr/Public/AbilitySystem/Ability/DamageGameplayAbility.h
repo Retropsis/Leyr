@@ -31,8 +31,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ForEachHitTryCausingDamage(TArray<FHitResult> HitResults);
 
-	void MakeAndApplyExecuteEffectToTarget(const FGameplayTag& TagToApply, UAbilitySystemComponent* TargetASC, int32 Level = 1);
-
 	UFUNCTION(BlueprintPure)
 	bool IsHostile() const;
 

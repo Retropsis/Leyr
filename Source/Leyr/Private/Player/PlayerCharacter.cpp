@@ -985,6 +985,23 @@ void APlayerCharacter::CloseContainer_Implementation()
 	ServerCloseContainer();
 }
 
+UInventoryComponent* APlayerCharacter::GetInventoryComponentByType_Implementation(EContainerType Type)
+{
+	switch (Type) {
+	case EContainerType::Inventory: return PlayerInventory;
+	case EContainerType::Hotbar: return HotbarComponent;
+	case EContainerType::Container: return InteractingContainer ? InteractingContainer->Container : nullptr;
+	case EContainerType::Equipment:
+		break;
+	}
+	return nullptr;
+}
+
+bool APlayerCharacter::UseItem_Implementation(int32 ItemID, int32 Amount)
+{
+	return PlayerInventory->UseItem(ItemID, Amount);
+}
+
 void APlayerCharacter::ServerCloseContainer_Implementation()
 {
 	InteractingContainer->ServerStopInteracting(this);

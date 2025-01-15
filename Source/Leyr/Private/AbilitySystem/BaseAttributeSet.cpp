@@ -100,6 +100,10 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	{
 		HandleIncomingDamage(Props);
 	}
+	if (Data.EvaluatedData.Attribute == GetIncomingHealingAttribute())
+	{
+		HandleIncomingHealing(Props);
+	}
 	if (Data.EvaluatedData.Attribute == GetIncomingXPAttribute())
 	{
 		HandleIncomingXP(Props);
@@ -122,7 +126,7 @@ void UBaseAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute,
 	}
 }
 
-void UBaseAttributeSet::ShowFloatingText(const FEffectProperties& Props, float Damage, bool bBlockedHit, bool bCriticalHit) const
+void UBaseAttributeSet::ShowFloatingText(const FEffectProperties& Props, FUIMessageData& MessageData) const
 {
 	if (Props.SourceCharacter != Props.TargetCharacter)
 	{
@@ -130,7 +134,8 @@ void UBaseAttributeSet::ShowFloatingText(const FEffectProperties& Props, float D
 		{
 			if(APlayerCharacterController* PC = Cast<APlayerCharacterController>(Props.SourceCharacter->Controller))
 			{
-				const FUIMessageData MessageData{ EMessageType::DamageToEnemy, Damage, Props.TargetAvatarActor, bBlockedHit, bCriticalHit };
+				MessageData.MessageType = EMessageType::DamageToEnemy;
+				MessageData.TargetActor = Props.TargetAvatarActor;
 				PC->ClientShowDamageNumber(MessageData);
 				return;
 			}
@@ -138,7 +143,17 @@ void UBaseAttributeSet::ShowFloatingText(const FEffectProperties& Props, float D
 		if(!IsValid(Props.TargetCharacter)) return;
 		if(APlayerCharacterController* PC = Cast<APlayerCharacterController>(Props.TargetCharacter->Controller))
 		{
-			const FUIMessageData MessageData{ EMessageType::DamageToPlayer, Damage, Props.TargetAvatarActor, bBlockedHit, bCriticalHit };
+			MessageData.MessageType = EMessageType::DamageToPlayer;
+			MessageData.TargetActor = Props.TargetAvatarActor;
+			PC->ClientShowDamageNumber(MessageData);
+		}
+	}
+	else if(IsValid(Props.TargetCharacter))
+	{
+		if(APlayerCharacterController* PC = Cast<APlayerCharacterController>(Props.TargetCharacter->Controller))
+		{
+			MessageData.MessageType = EMessageType::HealingToPlayer;
+			MessageData.TargetActor = Props.TargetAvatarActor;
 			PC->ClientShowDamageNumber(MessageData);
 		}
 	}
@@ -208,11 +223,26 @@ void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 		const bool bBlockedHit = ULeyrAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
 		const bool bCriticalHit = ULeyrAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
 		const bool bExecuteHit = ULeyrAbilitySystemLibrary::IsExecuteHit(Props.EffectContextHandle);
-		ShowFloatingText(Props, LocalIncomingDamage, bBlockedHit, bCriticalHit);
+		FUIMessageData MessageData{ EMessageType::DamageToEnemy, LocalIncomingDamage, Props.TargetAvatarActor, bBlockedHit, bCriticalHit };
+		ShowFloatingText(Props, MessageData);
 		if (ULeyrAbilitySystemLibrary::IsSuccessfulStatusEffect(Props.EffectContextHandle))
 		{
 			HandleStatusEffect(Props);
 		}
+	}
+}
+
+void UBaseAttributeSet::HandleIncomingHealing(const FEffectProperties& Props)
+{
+	float LocalIncomingHealing = Props.TargetAvatarActor->Implements<UAbilityActorInterface>() ? 1.f :  GetIncomingHealing();
+	SetIncomingHealing(0.f);
+	
+	if (LocalIncomingHealing > 0.f)
+	{		
+		const float NewHealth = GetHealth() + LocalIncomingHealing;
+		SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+		FUIMessageData MessageData{ EMessageType::HealingToPlayer, LocalIncomingHealing, Props.TargetAvatarActor, false, false };
+		ShowFloatingText(Props, MessageData);
 	}
 }
 

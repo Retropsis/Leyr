@@ -21,11 +21,22 @@ class LEYR_API UInventoryWidgetController : public UWidgetController
 	GENERATED_BODY()
 
 public:
+	virtual void BindCallbacksToDependencies() override;
+	
 	UFUNCTION(BlueprintCallable)
 	void EquipButtonPressed(FInventoryItemData ItemData, const FGameplayTag& InputTag);
+	
+	void ClearEquipButtonByItemData(const FInventoryItemData& ItemData);
+	void ClearEquipButtonByInputTag(const FGameplayTag InputTag);
+
+	UFUNCTION()
+	void HandleItemUpdated(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData Item);
 
 	UPROPERTY(BlueprintAssignable)
 	FOnInputAssignedSignature OnInputAssigned;
+
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UInventoryComponent> InventoryComponent;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")

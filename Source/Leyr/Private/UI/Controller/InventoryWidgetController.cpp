@@ -5,6 +5,11 @@
 #include "Game/BaseGameplayTags.h"
 #include "Inventory/InventoryComponent.h"
 
+void UInventoryWidgetController::BindCallbacksToDependencies()
+{
+	InventoryComponent->OnItemUpdated.AddDynamic(this, &UInventoryWidgetController::HandleItemUpdated);
+}
+
 void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData, const FGameplayTag& InputTag)
 {
 	if(ItemData.ID == 0) return;
@@ -19,7 +24,7 @@ void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData,
 		EquippedItemAbilities.Remove(InputTag);
 		OnInputAssigned.Broadcast(ItemToRemove->ID, FBaseGameplayTags::Get().Abilities_None);
 		
-		if(ItemToRemove->ID == ItemData.ID) return;
+		if(ItemToRemove->ID == ItemData.ID) return; // We required same input for same item so we cleared and leave
 	}
 	// Replace
 	for (TTuple<FGameplayTag, FInventoryItemData> EquippedAbility : EquippedItemAbilities)
@@ -27,6 +32,7 @@ void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData,
 		if(EquippedAbility.Value.ID == ItemData.ID)
 		{
 			ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(this, AbilitySystemComponent, ItemData, InputTag, EquippedAbility.Key);
+			ULeyrAbilitySystemLibrary::AssignMonkAbilities(this, AbilitySystemComponent, EquippedAbility.Key);
 			EquippedItemAbilities.Remove(EquippedAbility.Key);
 			EquippedItemAbilities.Add(InputTag, ItemData);
 			OnInputAssigned.Broadcast(ItemData.ID, InputTag);
@@ -34,8 +40,41 @@ void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData,
 		}
 	}
 	// New Assignment
-	ULeyrAbilitySystemLibrary::GiveItemAbilities(this, AbilitySystemComponent, ItemData, InputTag);
 	ULeyrAbilitySystemLibrary::ClearInputFromMonkAbilities(this, AbilitySystemComponent, InputTag);
+	ULeyrAbilitySystemLibrary::GiveItemAbilities(this, AbilitySystemComponent, ItemData, InputTag);
 	EquippedItemAbilities.Add(InputTag, ItemData);
 	OnInputAssigned.Broadcast(ItemData.ID, InputTag);
+}
+
+void UInventoryWidgetController::HandleItemUpdated(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData Item)
+{
+	if (Item.Quantity == 0)
+	{
+		ClearEquipButtonByItemData(Item);
+	}
+}
+
+void UInventoryWidgetController::ClearEquipButtonByItemData(const FInventoryItemData& ItemData)
+{
+	for (TTuple<FGameplayTag, FInventoryItemData> EquippedAbility : EquippedItemAbilities)
+	{
+		if(EquippedAbility.Value.ID == ItemData.ID)
+		{
+			ULeyrAbilitySystemLibrary::RemoveItemAbilities(this, AbilitySystemComponent, ItemData, EquippedAbility.Key);
+			ULeyrAbilitySystemLibrary::AssignMonkAbilities(this, AbilitySystemComponent, EquippedAbility.Key);
+			EquippedItemAbilities.Remove(EquippedAbility.Key);
+			OnInputAssigned.Broadcast(ItemData.ID, FBaseGameplayTags::Get().Abilities_None);
+		}
+	}
+}
+
+void UInventoryWidgetController::ClearEquipButtonByInputTag(const FGameplayTag InputTag)
+{
+	if(FInventoryItemData* ItemToRemove = EquippedItemAbilities.Find(InputTag))
+	{
+		ULeyrAbilitySystemLibrary::RemoveItemAbilities(this, AbilitySystemComponent, *ItemToRemove, InputTag);
+		ULeyrAbilitySystemLibrary::AssignMonkAbilities(this, AbilitySystemComponent, InputTag);
+		EquippedItemAbilities.Remove(InputTag);
+		OnInputAssigned.Broadcast(ItemToRemove->ID, FBaseGameplayTags::Get().Abilities_None);
+	}
 }

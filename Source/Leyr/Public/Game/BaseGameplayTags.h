@@ -280,6 +280,12 @@ FGameplayTag Cooldown_Weapon_Bow_Shot;
  
 FGameplayTag Cooldown_Alteration_Berserk_1;
  
+FGameplayTag Cooldown_Item_Instant;
+FGameplayTag Cooldown_Item_Short;
+FGameplayTag Cooldown_Item_Average;
+FGameplayTag Cooldown_Item_Long;
+FGameplayTag Cooldown_Item_VeryLong;
+ 
 /*
  * Side Effects
  */

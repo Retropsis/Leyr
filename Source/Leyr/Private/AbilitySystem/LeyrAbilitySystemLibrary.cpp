@@ -10,6 +10,7 @@
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "AbilitySystem/Data/EncounterInfo.h"
 #include "AbilitySystem/Data/ItemAbilityInfo.h"
+#include "Data/ItemData.h"
 #include "Engine/OverlapResult.h"
 #include "Game/BaseGameplayTags.h"
 #include "Game/LeyrGameMode.h"
@@ -243,8 +244,8 @@ void ULeyrAbilitySystemLibrary::AssignMonkAbilities(const UObject* WorldContextO
 				ASC->MarkAbilitySpecDirty(*AbilitySpec);
 				
 				// TODO: Allows ASC to broadcast the removed ability
-				// const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-				// BaseASC->ClientEquipToolAbility(GameplayTags.Abilities_None, GameplayTags.Abilities_Status_Unlocked, Ability.Value, FGameplayTag());
+				const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+				BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
 			}
 		}
 	}
@@ -265,8 +266,8 @@ void ULeyrAbilitySystemLibrary::ClearInputFromMonkAbilities(const UObject* World
 				ASC->MarkAbilitySpecDirty(*AbilitySpec);
 				
 				// TODO: Allows ASC to broadcast the removed ability
-				// const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-				// BaseASC->ClientEquipToolAbility(GameplayTags.Abilities_None, GameplayTags.Abilities_Status_Unlocked, Ability.Value, FGameplayTag());
+				const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+				BaseASC->ClientEquipAbility(GameplayTags.Abilities_None, GameplayTags.Abilities_None, InputTag, FGameplayTag());
 			}
 		}
 	}
@@ -281,15 +282,22 @@ void ULeyrAbilitySystemLibrary::GiveItemAbilities(const UObject* WorldContextObj
 	{
 		const FBaseItemAbilityInfo AbilityInfo = ItemAbilityInfo->FindItemAbilityInfoForTag(AbilityTag);
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityInfo.Ability, 1);
+		FGameplayTagContainer PreviousTags = AbilitySpec.DynamicAbilityTags.Filter(FGameplayTag::RequestGameplayTag("Input").GetSingleTagContainer());
+		AbilitySpec.DynamicAbilityTags.RemoveTags(PreviousTags);
 		AbilitySpec.DynamicAbilityTags.AddTag(InputTag);
+		AbilitySpec.SourceObject = ItemData.Asset.Get();
 		ASC->GiveAbility(AbilitySpec);
 		ASC->MarkAbilitySpecDirty(AbilitySpec);
 
 		// TODO: Allows ASC to broadcast the new equipped ability
-		// if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
-		// {
-		// 	BaseASC->ClientEquipItemAbility(Ability.Key, FBaseGameplayTags::Get().Abilities_Status_Equipped, Ability.Value, FGameplayTag());
-		// }
+		if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
+		{
+			for (FGameplayTag PreviousTag : PreviousTags)
+			{
+				BaseASC->ClientEquipAbility(AbilityTag, FBaseGameplayTags::Get().Abilities_None, PreviousTag, FGameplayTag());
+			}
+			BaseASC->ClientEquipAbility(AbilityTag, FBaseGameplayTags::Get().Abilities_Status_Equipped, InputTag, FGameplayTag());
+		}
 	}
 }
 
@@ -309,8 +317,8 @@ void ULeyrAbilitySystemLibrary::RemoveItemAbilities(const UObject* WorldContextO
 				ASC->MarkAbilitySpecDirty(*AbilitySpec);
 				
 				// TODO: Allows ASC to broadcast the removed ability
-				// const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-				// BaseASC->ClientEquipToolAbility(GameplayTags.Abilities_None, GameplayTags.Abilities_Status_Unlocked, Ability.Value, FGameplayTag());
+				const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+				BaseASC->ClientEquipAbility(GameplayTags.Abilities_None, GameplayTags.Abilities_None, PreviousInputTag, FGameplayTag());
 			}
 		}
 	}
@@ -331,8 +339,8 @@ void ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(const UObject* WorldConte
 				AbilitySpec->DynamicAbilityTags.AddTag(InputTag);
 				
 				// TODO: Allows ASC to broadcast the removed ability
-				// const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-				// BaseASC->ClientEquipToolAbility(GameplayTags.Abilities_None, GameplayTags.Abilities_Status_Unlocked, Ability.Value, FGameplayTag());
+				const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+				BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
 			}
 		}
 	}
