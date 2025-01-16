@@ -21,6 +21,28 @@ void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData,
 	AssignInputTag(ItemData, InputTag);
 }
 
+void UInventoryWidgetController::LootButtonPressed(int32 SourceSlotIndex)
+{
+	if(UInventoryComponent* ContainerComponent = ULeyrAbilitySystemLibrary::GetContainerComponent(this))
+	{
+		ContainerComponent->TransferItemToEmptySlot(InventoryComponent, SourceSlotIndex);
+	}
+}
+
+void UInventoryWidgetController::LootAllButtonPressed()
+{
+	if(UInventoryComponent* ContainerComponent = ULeyrAbilitySystemLibrary::GetContainerComponent(this))
+	{
+		for (int i = 0; i < ContainerComponent->Items.Num(); ++i)
+		{
+			if(ContainerComponent->Items[i].ID != 0)
+			{
+				ContainerComponent->TransferItemToEmptySlot(InventoryComponent, i);
+			}
+		}
+	}
+}
+
 void UInventoryWidgetController::ClearInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag)
 {
 	ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputTag, true);

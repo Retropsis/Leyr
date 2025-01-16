@@ -7,6 +7,7 @@
 #include "AI/BaseCharacter.h"
 #include "Interaction/InventoryInterface.h"
 #include "Interaction/PlayerInterface.h"
+#include "Inventory/Container/Container.h"
 #include "PlayerCharacter.generated.h"
 
 enum class ECharacterName : uint8;
@@ -76,6 +77,7 @@ public:
 	virtual UInventoryComponent* GetInventoryComponent_Implementation() override { return PlayerInventory; }
 	/** end Inventory Interface */
 	virtual UInventoryComponent* GetPlayerInventory() { return PlayerInventory; }
+	virtual UInventoryComponent* GetInteractingContainer() { return InteractingContainer->Container; }
 	
 	UFUNCTION(Server, Reliable)
 	void ServerInteract();

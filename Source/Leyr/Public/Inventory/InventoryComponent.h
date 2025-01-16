@@ -85,6 +85,7 @@ public:
 	void SetInventorySize(int32 Size);
 
 	virtual void TransferItem(UInventoryComponent* TargetInventory, int32 SourceSlotIndex, int32 TargetSlotIndex);
+	virtual void TransferItemToEmptySlot(UInventoryComponent* TargetInventory, int32 SourceSlotIndex);
 	virtual bool UseItem(int32 ItemID, int32 Amount);
 	virtual bool UpdateItemInputTag(FInventoryItemData ItemData, FGameplayTag InputTag) { return false; }
 	

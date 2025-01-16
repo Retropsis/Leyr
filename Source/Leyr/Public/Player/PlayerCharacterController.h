@@ -32,6 +32,7 @@ public:
 	virtual void PlayerTick(float DeltaTime) override;
 	
 	UInventoryWidgetController* GetInventoryWidgetController(const FWidgetControllerParams& WCParams);
+	APlayerCharacter* GetPlayerCharacter() { return PlayerCharacter; }
 
 	UFUNCTION(Client, Reliable)
 	void ClientShowDamageNumber(const FUIMessageData& MessageData);

@@ -17,6 +17,7 @@
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/PlayerCharacter.h"
 #include "Player/PlayerCharacterController.h"
 #include "Player/PlayerCharacterState.h"
 #include "UI/PlayerHUD.h"
@@ -628,4 +629,13 @@ int32 ULeyrAbilitySystemLibrary::GetXPRewardForClassAndLevel(const UObject* Worl
 	const float XPReward = Info.XPReward.GetValueAtLevel(CharacterLevel);
 
 	return static_cast<int32>(XPReward);
+}
+
+UInventoryComponent* ULeyrAbilitySystemLibrary::GetContainerComponent(const UObject* WorldContextObject)
+{
+	if (APlayerCharacterController* PCC  = Cast<APlayerCharacterController>(WorldContextObject->GetWorld()->GetFirstPlayerController()))
+	{
+		return PCC->GetPlayerCharacter() ? PCC->GetPlayerCharacter()->GetInteractingContainer() : nullptr;
+	}
+	return nullptr;
 }

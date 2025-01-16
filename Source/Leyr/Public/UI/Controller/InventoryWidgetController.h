@@ -29,6 +29,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void EquipButtonPressed(FInventoryItemData ItemData, const FGameplayTag& InputTag);
 	
+	UFUNCTION(BlueprintCallable)
+	void LootButtonPressed(int32 SourceSlotIndex);
+	
+	UFUNCTION(BlueprintCallable)
+	void LootAllButtonPressed();
+	
 	void ClearEquipButtonByItemData(const FInventoryItemData& ItemData);
 	bool ClearEquipButtonByInputTag(const FGameplayTag InputTag, const int32 ItemID);
 

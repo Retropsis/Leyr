@@ -7,6 +7,8 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "LeyrAbilitySystemLibrary.generated.h"
 
+class UInventoryComponent;
+class UContainerComponent;
 enum class EContainerType : uint8;
 class UItemAbilityInfo;
 struct FInventoryItemData;
@@ -188,4 +190,10 @@ public:
 	static void SetAirborneForce(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const FVector& InForce);
 	
 	static int32 GetXPRewardForClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass, int32 CharacterLevel);
+
+	/*
+	 * Inventory
+	*/
+	UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary|Inventory", meta=(WorldContext="WorldContextObject"))
+	static UInventoryComponent* GetContainerComponent(const UObject* WorldContextObject);
 };

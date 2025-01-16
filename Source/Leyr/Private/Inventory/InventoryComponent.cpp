@@ -94,6 +94,19 @@ void UInventoryComponent::TransferItem(UInventoryComponent* TargetInventory, int
 	}
 }
 
+void UInventoryComponent::TransferItemToEmptySlot(UInventoryComponent* TargetInventory, int32 SourceSlotIndex)
+{
+	if(TargetInventory == this) return;
+	
+	int32 EmptySlotIndex;
+	if(TargetInventory && TargetInventory->FindEmptySlot(EmptySlotIndex))
+	{
+		FInventoryItemData ItemData = GetItemAtIndex(SourceSlotIndex);
+		TargetInventory->AddItem(ItemData);
+		RemoveItemAtIndex(SourceSlotIndex);
+	}
+}
+
 bool UInventoryComponent::IsSlotEmpty(int32 SlotIndex)
 {
 	checkf(Items.IsValidIndex(SlotIndex), TEXT("Attempting to reach out of bounds index in %s"), *GetNameSafe(this));
