@@ -1,8 +1,10 @@
 // @ Retropsis 2024-2025.
 
 #include "World/Item.h"
+#include "PaperFlipbookComponent.h"
 #include "Components/SphereComponent.h"
 #include "Interaction/InventoryInterface.h"
+#include "Kismet/GameplayStatics.h"
 
 AItem::AItem()
 {
@@ -12,6 +14,8 @@ AItem::AItem()
 	Sphere = CreateDefaultSubobject<USphereComponent>("Sphere");
 	Sphere->SetupAttachment(GetRootComponent());
 	Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	GetRenderComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AItem::BeginPlay()
@@ -42,6 +46,7 @@ void AItem::Interact_Implementation(AActor* InteractingActor)
 	if (UInventoryComponent* InventoryComponent = IInventoryInterface::Execute_GetInventoryComponent(InteractingActor))
 	{
 		InventoryComponent->ServerAddItem(ItemData);
+		UGameplayStatics::PlaySoundAtLocation(this, PickupSound, GetActorLocation());
 		Destroy();
 	}
 }

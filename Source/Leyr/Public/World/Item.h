@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "PaperFlipbookActor.h"
 #include "GameFramework/Actor.h"
-#include "PaperSpriteActor.h"
 #include "Interaction/InteractionInterface.h"
 #include "Inventory/InventoryComponent.h"
 #include "Item.generated.h"
@@ -15,7 +15,7 @@ class UPaperSprite;
 class USphereComponent;
 
 UCLASS()
-class LEYR_API AItem : public APaperSpriteActor, public IInteractionInterface
+class LEYR_API AItem : public APaperFlipbookActor, public IInteractionInterface
 {
 	GENERATED_BODY()
 	
@@ -27,8 +27,16 @@ public:
 	
 	virtual void Interact_Implementation(AActor* InteractingActor) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FInventoryItemData ItemData;
+	
+	int32 ID;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TArray<FGameplayTag> Abilities;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TObjectPtr<USoundBase> PickupSound = nullptr;
 
 	UFUNCTION()
 	TArray<FGameplayTag> GetAbilities() { return Abilities; }
@@ -38,9 +46,6 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<USphereComponent> Sphere;
-
-	UPROPERTY(EditDefaultsOnly)
-	TArray<FGameplayTag> Abilities;
 
 private:
 	UPROPERTY() TObjectPtr<AActor> OverlappingActor;

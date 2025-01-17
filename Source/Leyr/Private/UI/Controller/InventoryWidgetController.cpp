@@ -23,6 +23,7 @@ void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData,
 
 void UInventoryWidgetController::LootButtonPressed(int32 SourceSlotIndex)
 {
+	if(!bContainerIsOpen) return;
 	if(UInventoryComponent* ContainerComponent = ULeyrAbilitySystemLibrary::GetContainerComponent(this))
 	{
 		ContainerComponent->TransferItemToEmptySlot(InventoryComponent, SourceSlotIndex);
@@ -31,6 +32,7 @@ void UInventoryWidgetController::LootButtonPressed(int32 SourceSlotIndex)
 
 void UInventoryWidgetController::LootAllButtonPressed()
 {
+	if(!bContainerIsOpen) return;
 	if(UInventoryComponent* ContainerComponent = ULeyrAbilitySystemLibrary::GetContainerComponent(this))
 	{
 		for (int i = 0; i < ContainerComponent->Items.Num(); ++i)
@@ -46,7 +48,6 @@ void UInventoryWidgetController::LootAllButtonPressed()
 void UInventoryWidgetController::ClearInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag)
 {
 	ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputTag, true);
-	// ULeyrAbilitySystemLibrary::RemoveItemAbilities(this, AbilitySystemComponent, ItemData, InputTag);
 	ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputTag, false);
 	EquippedItemAbilities.Remove(InputTag);
 	OnInputAssigned.Broadcast(ItemData.ID, FBaseGameplayTags::Get().Abilities_None);
@@ -57,7 +58,6 @@ void UInventoryWidgetController::AssignInputTag(FInventoryItemData ItemData, con
 {
 	ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputTag, true);
 	ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputTag, false);
-	// ULeyrAbilitySystemLibrary::GiveItemAbilities(this, AbilitySystemComponent, ItemData, InputTag);
 	EquippedItemAbilities.Add(InputTag, ItemData);
 	OnInputAssigned.Broadcast(ItemData.ID, InputTag);
 	InventoryComponent->UpdateItemInputTag(ItemData, InputTag);

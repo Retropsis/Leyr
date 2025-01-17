@@ -35,6 +35,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void LootAllButtonPressed();
 	
+	UFUNCTION(BlueprintCallable)
+	void SetContainerOpen(bool bIsOpen) { bContainerIsOpen = bIsOpen; }
+	
 	void ClearEquipButtonByItemData(const FInventoryItemData& ItemData);
 	bool ClearEquipButtonByInputTag(const FGameplayTag InputTag, const int32 ItemID);
 
@@ -53,4 +56,5 @@ protected:
 
 private:
 	TMap<FGameplayTag, FInventoryItemData> EquippedItemAbilities;
+	bool bContainerIsOpen = false;
 };

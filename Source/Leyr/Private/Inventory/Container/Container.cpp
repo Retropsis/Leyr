@@ -23,7 +23,11 @@ AContainer::AContainer()
 void AContainer::BeginPlay()
 {
 	Super::BeginPlay();
-	if(HasAuthority()) Container->SetSlotCount(SlotCount);
+	if(HasAuthority())
+	{
+		Container->SetSlotCount(SlotCount);
+		BuildContainerLoot();
+	}
 }
 
 void AContainer::Interact_Implementation(AActor* InteractingActor)

@@ -27,6 +27,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ToggleContainerLid(bool bOpen);
 	
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void BuildContainerLoot();
+	
 	UFUNCTION(Server, Reliable)
 	void ServerStopInteracting(AActor* InteractingActor);
 
@@ -55,6 +58,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category="Container")
 	TObjectPtr<UBoxComponent> OverlapBox;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<USoundBase> OpenLidSound = nullptr;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<USoundBase> CloseLidSound = nullptr;
 
 private:
 	UPROPERTY()

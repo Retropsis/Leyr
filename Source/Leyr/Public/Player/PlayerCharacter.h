@@ -77,7 +77,7 @@ public:
 	virtual UInventoryComponent* GetInventoryComponent_Implementation() override { return PlayerInventory; }
 	/** end Inventory Interface */
 	virtual UInventoryComponent* GetPlayerInventory() { return PlayerInventory; }
-	virtual UInventoryComponent* GetInteractingContainer() { return InteractingContainer->Container; }
+	virtual UInventoryComponent* GetInteractingContainer() { return InteractingContainer ? InteractingContainer->Container : nullptr; }
 	
 	UFUNCTION(Server, Reliable)
 	void ServerInteract();
