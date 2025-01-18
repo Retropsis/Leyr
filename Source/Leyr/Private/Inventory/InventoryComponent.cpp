@@ -175,11 +175,11 @@ bool UInventoryComponent::FindEmptySlot(int32& EmptySlotIndex)
 /*
  * Custom Functions
  */
-bool UInventoryComponent::UseItem(int32 ItemID, int32 Amount)
+bool UInventoryComponent::UseItem(UItemData* Asset, int32 Amount)
 {
 	for (int i = 0; i < Items.Num(); ++i)
 	{
-		if (Items[i].ID == ItemID && Items[i].Quantity >= Amount)
+		if (Items[i].Asset == Asset && Items[i].Quantity >= Amount)
 		{
 			Items[i].Quantity -= Amount;
 			if (Items[i].Quantity > 0)

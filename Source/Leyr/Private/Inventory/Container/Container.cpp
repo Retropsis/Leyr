@@ -2,6 +2,7 @@
 
 #include "Inventory/Container/Container.h"
 #include "Components/BoxComponent.h"
+#include "Data/ItemDataRow.h"
 #include "Interaction/PlayerInterface.h"
 #include "Inventory/ContainerComponent.h"
 #include "Leyr/Leyr.h"
@@ -18,6 +19,11 @@ AContainer::AContainer()
 	OverlapBox->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
 
 	Container = CreateDefaultSubobject<UContainerComponent>("ContainerComponent");
+}
+
+void AContainer::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
 }
 
 void AContainer::BeginPlay()

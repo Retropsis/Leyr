@@ -3,6 +3,7 @@
 #include "World/Item.h"
 #include "PaperFlipbookComponent.h"
 #include "Components/SphereComponent.h"
+#include "Data/ItemDataRow.h"
 #include "Interaction/InventoryInterface.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -16,6 +17,26 @@ AItem::AItem()
 	Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	GetRenderComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void AItem::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	const FName ChangedPropertyName = PropertyChangedEvent.Property ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+	if(ChangedPropertyName == GET_MEMBER_NAME_CHECKED(FDataTableRowHandle, RowName))
+	{
+		if(ItemDataTable)
+		{
+			if(const FItemDataRow* ItemDataRow = ItemDataTable->FindRow<FItemDataRow>(ItemRowHandle.RowName, ItemRowHandle.RowName.ToString()))
+			{
+				ItemData = ItemDataRow->ItemData;
+				PickupSound = ItemDataRow->PickupSound;
+				GetRenderComponent()->SetFlipbook(ItemDataRow->PickupFlipbook);
+				SetActorLabel()
+			}
+		}
+	}
 }
 
 void AItem::BeginPlay()

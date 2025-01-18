@@ -56,7 +56,7 @@ bool UBaseGameplayAbility::CommitInventoryCost()
 	FGameplayAbilitySpec* AbilitySpec = GetCurrentAbilitySpec();
 	if(UItemData* ItemData = Cast<UItemData>(AbilitySpec->SourceObject.Get()))
 	{
-		return IPlayerInterface::Execute_UseItem(GetAvatarActorFromActorInfo(), ItemData->ID, 1);
+		return IPlayerInterface::Execute_UseItem(GetAvatarActorFromActorInfo(), ItemData, 1);
 	}
 	return false;
 }

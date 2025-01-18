@@ -20,6 +20,10 @@ class LEYR_API AContainer : public AActor, public IInteractionInterface
 public:	
 	AContainer();
 
+	#if WITH_EDITOR
+		virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	#endif
+
 	// TODO: This call is Server in the course
 	virtual void Interact_Implementation(AActor* InteractingActor) override;
 	bool IsContainerAccessed() const { return InteractingActors.Num() > 0; }

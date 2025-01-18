@@ -21,16 +21,24 @@ class LEYR_API AItem : public APaperFlipbookActor, public IInteractionInterface
 	
 public:	
 	AItem();
+	
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
 
 	UFUNCTION()
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 	virtual void Interact_Implementation(AActor* InteractingActor) override;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FInventoryItemData ItemData;
 	
-	int32 ID;
+	UPROPERTY(EditDefaultsOnly, Category="Container|Initialization")
+	TObjectPtr<UDataTable> ItemDataTable;
+	
+	UPROPERTY(EditInstanceOnly, Category="Container|Initialization")
+	FDataTableRowHandle ItemRowHandle;
+
+	UPROPERTY(BlueprintReadWrite)
+	FInventoryItemData ItemData;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<FGameplayTag> Abilities;

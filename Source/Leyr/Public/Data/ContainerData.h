@@ -26,14 +26,11 @@ struct FContainerItem
 };
 
 UCLASS(Blueprintable, BlueprintType)
-class LEYR_API UContainerData : public UDataAsset
+class LEYR_API UContainerArtData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TArray<FContainerItem> Items;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TObjectPtr<UPaperFlipbook> ContainerFlipbook;
 
@@ -42,4 +39,17 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TObjectPtr<USoundBase> CloseLidSound = nullptr;
+};
+
+UCLASS(Blueprintable, BlueprintType)
+class LEYR_API UContainerData : public UDataAsset
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSoftObjectPtr<UContainerArtData> ContainerArt = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TArray<FContainerItem> Items;
 };

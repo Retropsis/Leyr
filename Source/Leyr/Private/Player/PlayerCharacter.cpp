@@ -997,9 +997,9 @@ UInventoryComponent* APlayerCharacter::GetInventoryComponentByType_Implementatio
 	return nullptr;
 }
 
-bool APlayerCharacter::UseItem_Implementation(int32 ItemID, int32 Amount)
+bool APlayerCharacter::UseItem_Implementation(UItemData* Asset, int32 Amount)
 {
-	return PlayerInventory->UseItem(ItemID, Amount);
+	return PlayerInventory->UseItem(Asset, Amount);
 }
 
 void APlayerCharacter::ServerCloseContainer_Implementation()
