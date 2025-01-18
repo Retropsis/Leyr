@@ -21,8 +21,6 @@ struct FContainerItem
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	int32 Quantity = 1;
-	
-	FInventoryItemData ItemData = FInventoryItemData();
 };
 
 UCLASS(Blueprintable, BlueprintType)
@@ -47,6 +45,9 @@ class LEYR_API UContainerData : public UDataAsset
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FName Name = FName();
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSoftObjectPtr<UContainerArtData> ContainerArt = nullptr;
 	

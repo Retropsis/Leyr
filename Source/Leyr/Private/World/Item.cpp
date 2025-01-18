@@ -33,7 +33,7 @@ void AItem::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 				ItemData = ItemDataRow->ItemData;
 				PickupSound = ItemDataRow->PickupSound;
 				GetRenderComponent()->SetFlipbook(ItemDataRow->PickupFlipbook);
-				SetActorLabel()
+				SetActorLabel(FString::Printf(TEXT("BP_%s"), *ItemData.Name.ToString()));
 			}
 		}
 	}

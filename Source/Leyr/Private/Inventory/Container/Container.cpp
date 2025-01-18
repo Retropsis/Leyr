@@ -1,7 +1,10 @@
 // @ Retropsis 2024-2025.
 
 #include "Inventory/Container/Container.h"
+
+#include "PaperFlipbookComponent.h"
 #include "Components/BoxComponent.h"
+#include "Data/ContainerData.h"
 #include "Data/ItemDataRow.h"
 #include "Interaction/PlayerInterface.h"
 #include "Inventory/ContainerComponent.h"
@@ -24,6 +27,22 @@ AContainer::AContainer()
 void AContainer::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
+	
+	const FName ChangedPropertyName = PropertyChangedEvent.Property ? PropertyChangedEvent.Property->GetFName() : NAME_None;
+	if(ChangedPropertyName == GET_MEMBER_NAME_CHECKED(AContainer, ContainerData))
+	{
+		if(ContainerData)
+		{
+			if (const UContainerArtData* Data = ContainerData->ContainerArt.LoadSynchronous())
+			{
+				OpenLidSound = Data->OpenLidSound;
+                CloseLidSound = Data->CloseLidSound;
+                GetRenderComponent()->SetFlipbook(Data->ContainerFlipbook);
+				GetRenderComponent()->SetPlayRate(0.f);
+			}
+			SetActorLabel(FString::Printf(TEXT("BP_%s"), *ContainerData->Name.ToString()));
+		}
+	}
 }
 
 void AContainer::BeginPlay()
@@ -33,6 +52,24 @@ void AContainer::BeginPlay()
 	{
 		Container->SetSlotCount(SlotCount);
 		BuildContainerLoot();
+	}
+}
+
+void AContainer::BuildContainerLoot() const
+{
+	checkf(ContainerData, TEXT("Please add a DataAsset to this container: %s"), *GetName());
+	
+	for (FContainerItem ContainerItem : ContainerData->Items)
+	{
+		if(ItemDataTable)
+		{
+			if(const FItemDataRow* ItemDataRow = ItemDataTable->FindRow<FItemDataRow>(ContainerItem.Item.RowName, ContainerItem.Item.RowName.ToString()))
+			{
+				FInventoryItemData ItemToAdd = ItemDataRow->ItemData;
+				ItemToAdd.Quantity = ContainerItem.Quantity;
+				Container->ServerAddItem(ItemToAdd);
+			}
+		}
 	}
 }
 

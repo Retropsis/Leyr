@@ -3,17 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PaperFlipbookActor.h"
+#include "Data/ContainerData.h"
 #include "GameFramework/Actor.h"
 #include "Interaction/InteractionInterface.h"
 #include "Inventory/ContainerComponent.h"
 #include "Inventory/Data/InventoryData.h"
 #include "Container.generated.h"
 
+class UContainerData;
 class UContainerComponent;
 class UBoxComponent;
 
 UCLASS()
-class LEYR_API AContainer : public AActor, public IInteractionInterface
+class LEYR_API AContainer : public APaperFlipbookActor, public IInteractionInterface
 {
 	GENERATED_BODY()
 	
@@ -31,8 +34,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ToggleContainerLid(bool bOpen);
 	
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void BuildContainerLoot();
+	void BuildContainerLoot() const;
 	
 	UFUNCTION(Server, Reliable)
 	void ServerStopInteracting(AActor* InteractingActor);
@@ -53,6 +55,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Container")
 	TObjectPtr<UContainerComponent> Container;
+
+	UPROPERTY(EditInstanceOnly, Category="Container|Initialization")
+	UContainerData* ContainerData = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Container|Initialization")
+	TObjectPtr<UDataTable> ItemDataTable;
 	
 protected:
 	virtual void BeginPlay() override;

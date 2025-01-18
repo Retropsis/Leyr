@@ -21,6 +21,9 @@ public:
 	int32 ID = 0;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FName Name = FName();
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	int32 Quantity = 0;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -28,6 +31,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSoftObjectPtr<UItemData> Asset = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TArray<FGameplayTag> Abilities;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float Health = 0.f;
