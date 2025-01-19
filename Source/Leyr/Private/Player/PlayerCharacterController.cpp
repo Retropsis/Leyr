@@ -8,6 +8,7 @@
 #include "GameplayTagContainer.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "Player/Input/BaseInputComponent.h"
+#include "UI/Controller/EquipmentWidgetController.h"
 #include "UI/Controller/InventoryWidgetController.h"
 #include "UI/Widget/DamageTextComponent.h"
 
@@ -146,6 +147,19 @@ UInventoryWidgetController* APlayerCharacterController::GetInventoryWidgetContro
 		InventoryWidgetController->BindCallbacksToDependencies();
 	}
 	return InventoryWidgetController;
+}
+
+UEquipmentWidgetController* APlayerCharacterController::GetEquipmentWidgetController(const FWidgetControllerParams& WCParams)
+{
+	if (EquipmentWidgetController == nullptr)
+	{
+		EquipmentWidgetController = NewObject<UEquipmentWidgetController>(this, EquipmentWidgetControllerClass);
+		EquipmentWidgetController->SetWidgetControllerParams(WCParams);
+		// PlayerCharacter = Cast<APlayerCharacter>(GetCharacter());
+		// if(PlayerCharacter) EquipmentWidgetController->EquipmentComponent = PlayerCharacter->GetPlayerEquipment();
+		EquipmentWidgetController->BindCallbacksToDependencies();
+	}
+	return EquipmentWidgetController;
 }
 
 void APlayerCharacterController::HotbarButtonPressed(int32 Index)

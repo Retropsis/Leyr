@@ -74,6 +74,20 @@ UInventoryWidgetController* ULeyrAbilitySystemLibrary::GetInventoryWidgetControl
 	return nullptr;
 }
 
+UEquipmentWidgetController* ULeyrAbilitySystemLibrary::GetEquipmentWidgetController(const UObject* WorldContextObject)
+{
+	FWidgetControllerParams WCParams;
+	APlayerHUD* PlayerHUD = nullptr;
+	if (MakeWidgetControllerParams(WorldContextObject, WCParams, PlayerHUD))
+	{
+		if(APlayerCharacterController* PC = Cast<APlayerCharacterController>(WCParams.PlayerController))
+		{
+			return PC->GetEquipmentWidgetController(WCParams);
+		}
+	}
+	return nullptr;
+}
+
 bool ULeyrAbilitySystemLibrary::MakeWidgetControllerParams(const UObject* WorldContextObject, FWidgetControllerParams& OutWCParams, APlayerHUD*& OutPlayerHUD)
 {
 	if (const APlayerController* PC  = WorldContextObject->GetWorld()->GetFirstPlayerController())
@@ -638,4 +652,20 @@ UInventoryComponent* ULeyrAbilitySystemLibrary::GetContainerComponent(const UObj
 		return PCC->GetPlayerCharacter() ? PCC->GetPlayerCharacter()->GetInteractingContainer() : nullptr;
 	}
 	return nullptr;
+}
+
+FInventoryItemData ULeyrAbilitySystemLibrary::FindItemDataByID(const UObject* WorldContextObject, int32 ItemID)
+{
+	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (LeyrGameMode == nullptr) return FInventoryItemData();
+	
+	return LeyrGameMode->FindItemDataByID(ItemID);
+}
+
+FInventoryItemData ULeyrAbilitySystemLibrary::FindItemDataByRowName(const UObject* WorldContextObject, FName RowName)
+{
+	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (LeyrGameMode == nullptr) return FInventoryItemData();
+	
+	return LeyrGameMode->FindItemDataByRowName(RowName);
 }

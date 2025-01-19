@@ -1,11 +1,10 @@
 // @ Retropsis 2024-2025.
 
 #include "Inventory/Container/Container.h"
-
 #include "PaperFlipbookComponent.h"
+#include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "Components/BoxComponent.h"
 #include "Data/ContainerData.h"
-#include "Data/ItemDataRow.h"
 #include "Interaction/PlayerInterface.h"
 #include "Inventory/ContainerComponent.h"
 #include "Leyr/Leyr.h"
@@ -61,15 +60,11 @@ void AContainer::BuildContainerLoot() const
 	
 	for (FContainerItem ContainerItem : ContainerData->Items)
 	{
-		if(ItemDataTable)
-		{
-			if(const FItemDataRow* ItemDataRow = ItemDataTable->FindRow<FItemDataRow>(ContainerItem.Item.RowName, ContainerItem.Item.RowName.ToString()))
-			{
-				FInventoryItemData ItemToAdd = ItemDataRow->ItemData;
-				ItemToAdd.Quantity = ContainerItem.Quantity;
-				Container->ServerAddItem(ItemToAdd);
-			}
-		}
+		if(ContainerItem.Item.RowName.IsNone()) continue;
+		
+		FInventoryItemData ItemToAdd = ULeyrAbilitySystemLibrary::FindItemDataByRowName(this, ContainerItem.Item.RowName);
+		ItemToAdd.Quantity = ContainerItem.Quantity;
+		Container->ServerAddItem(ItemToAdd);
 	}
 }
 

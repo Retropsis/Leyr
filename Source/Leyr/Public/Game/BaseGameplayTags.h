@@ -357,6 +357,24 @@ FGameplayTag Montage_Window_Combo;
 FGameplayTag Montage_Window_Execute;
  
  /*
+  * Equipment Tags
+  */
+ FGameplayTag Equipment_ActionSlot;
+ FGameplayTag Equipment_ActionSlot_1;
+ FGameplayTag Equipment_ActionSlot_2;
+ FGameplayTag Equipment_ActionSlot_3;
+ FGameplayTag Equipment_Headgear;
+ FGameplayTag Equipment_UpperBody;
+ FGameplayTag Equipment_LowerBody;
+ FGameplayTag Equipment_Footwear;
+ FGameplayTag Equipment_Wrist;
+ FGameplayTag Equipment_Waist;
+ FGameplayTag Equipment_Ammunition;
+
+ TMap<FGameplayTag, FGameplayTag> EquipmentSlotToInputTags;
+ TMap<FGameplayTag, FGameplayTag> InputTagsToEquipmentSlots;
+ 
+ /*
   * Input Tags
   */
 FGameplayTag InputTag;

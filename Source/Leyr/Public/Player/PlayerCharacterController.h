@@ -9,6 +9,7 @@
 #include "UI/Data/UIData.h"
 #include "PlayerCharacterController.generated.h"
 
+class UEquipmentWidgetController;
 struct FWidgetControllerParams;
 class UInventoryWidgetController;
 class UWidget;
@@ -32,6 +33,7 @@ public:
 	virtual void PlayerTick(float DeltaTime) override;
 	
 	UInventoryWidgetController* GetInventoryWidgetController(const FWidgetControllerParams& WCParams);
+	UEquipmentWidgetController* GetEquipmentWidgetController(const FWidgetControllerParams& WCParams);
 	APlayerCharacter* GetPlayerCharacter() { return PlayerCharacter; }
 
 	UFUNCTION(Client, Reliable)
@@ -106,6 +108,12 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UInventoryWidgetController> InventoryWidgetControllerClass;
+	
+	UPROPERTY()
+	TObjectPtr<UEquipmentWidgetController> EquipmentWidgetController;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UEquipmentWidgetController> EquipmentWidgetControllerClass;
 	
 	/*
 	 * Hotbar

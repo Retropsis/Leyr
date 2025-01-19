@@ -50,7 +50,7 @@ void UInventoryWidgetController::ClearInputTag(FInventoryItemData ItemData, cons
 	ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputTag, true);
 	ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputTag, false);
 	EquippedItemAbilities.Remove(InputTag);
-	OnInputAssigned.Broadcast(ItemData.ID, FBaseGameplayTags::Get().Abilities_None);
+	OnInputRemoved.Broadcast(InputTag);
 	InventoryComponent->UpdateItemInputTag(ItemData, FBaseGameplayTags::Get().Abilities_None);
 }
 
@@ -59,7 +59,7 @@ void UInventoryWidgetController::AssignInputTag(FInventoryItemData ItemData, con
 	ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputTag, true);
 	ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputTag, false);
 	EquippedItemAbilities.Add(InputTag, ItemData);
-	OnInputAssigned.Broadcast(ItemData.ID, InputTag);
+	OnInputAssigned.Broadcast(ItemData, InputTag);
 	InventoryComponent->UpdateItemInputTag(ItemData, InputTag);
 }
 
@@ -73,7 +73,8 @@ bool UInventoryWidgetController::ReplaceInputTag(FInventoryItemData ItemData, co
 			ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, EquippedAbility.Key, false);
 			EquippedItemAbilities.Remove(EquippedAbility.Key);
 			EquippedItemAbilities.Add(InputTag, ItemData);
-			OnInputAssigned.Broadcast(ItemData.ID, InputTag);
+			OnInputRemoved.Broadcast(EquippedAbility.Key);
+			OnInputAssigned.Broadcast(ItemData, InputTag);
 			InventoryComponent->UpdateItemInputTag(ItemData, InputTag);
 			return true;
 		}

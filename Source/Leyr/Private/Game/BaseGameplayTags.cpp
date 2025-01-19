@@ -394,6 +394,21 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Montage_Window_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Window.Execute"), FString("Montage Window Execute"));
 	
 	/*
+	 * Equipment Tags
+	 */
+	GameplayTags.Equipment_ActionSlot = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.ActionSlot"), FString("Equipment ActionSlot"));
+	GameplayTags.Equipment_ActionSlot_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.ActionSlot.1"), FString("Equipment ActionSlot 1"));
+	GameplayTags.Equipment_ActionSlot_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.ActionSlot.2"), FString("Equipment ActionSlot 2"));
+	GameplayTags.Equipment_ActionSlot_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.ActionSlot.3"), FString("Equipment ActionSlot 3"));
+	GameplayTags.Equipment_Headgear = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.Headgear"), FString("Equipment ActionSlot"));
+	GameplayTags.Equipment_UpperBody = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.UpperBody"), FString("Equipment UpperBody"));
+	GameplayTags.Equipment_LowerBody = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.LowerBody"), FString("Equipment LowerBody"));
+	GameplayTags.Equipment_Footwear = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.Footwear"), FString("Equipment Footwear"));
+	GameplayTags.Equipment_Wrist = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.Wrist"), FString("Equipment Wrist"));
+	GameplayTags.Equipment_Waist = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.Waist"), FString("Equipment Waist"));
+	GameplayTags.Equipment_Ammunition = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.Ammunition"), FString("Equipment Ammunition"));
+	
+	/*
 	 * Input Tags
 	 */
 	GameplayTags.InputTag = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag"), FString("Input Parent Tag"));
@@ -419,6 +434,13 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.InputTag_Passive_5 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Passive.5"), FString("Passive 5"));	
 	GameplayTags.InputTag_Throw_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Throw.1"), FString("Throw 1"));
 	GameplayTags.InputTag_Throw_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Throw.2"), FString("Throw 2"));
+
+	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_1, GameplayTags.InputTag_LMB);
+	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_2, GameplayTags.InputTag_RMB);
+	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_3, GameplayTags.InputTag_1);
+	GameplayTags.InputTagsToEquipmentSlots.Add(GameplayTags.InputTag_LMB, GameplayTags.Equipment_ActionSlot_1);
+	GameplayTags.InputTagsToEquipmentSlots.Add(GameplayTags.InputTag_RMB, GameplayTags.Equipment_ActionSlot_2);
+	GameplayTags.InputTagsToEquipmentSlots.Add(GameplayTags.InputTag_1, GameplayTags.Equipment_ActionSlot_3);
 
 	/*
 	* Player Tags

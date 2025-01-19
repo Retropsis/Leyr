@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "Inventory/InventoryComponent.h"
 #include "LeyrGameMode.generated.h"
 
 class UMapInfo;
@@ -37,4 +38,10 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Map Info")
 	TObjectPtr<UMapInfo> MapInfo;
+
+	UPROPERTY(EditDefaultsOnly, Category="DataTable|Items")
+	TObjectPtr<UDataTable> ItemDataTable;
+
+	FInventoryItemData FindItemDataByID(int32 ItemID) const;
+	FInventoryItemData FindItemDataByRowName(FName RowName) const;
 };

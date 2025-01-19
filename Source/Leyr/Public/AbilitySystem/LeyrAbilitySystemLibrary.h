@@ -7,6 +7,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "LeyrAbilitySystemLibrary.generated.h"
 
+class UEquipmentWidgetController;
 class UInventoryComponent;
 class UContainerComponent;
 enum class EContainerType : uint8;
@@ -53,6 +54,9 @@ public:
 	
 	UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary", meta=(WorldContext="WorldContextObject"))
 	static  UInventoryWidgetController* GetInventoryWidgetController(const UObject* WorldContextObject);
+	
+	UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary", meta=(WorldContext="WorldContextObject"))
+	static  UEquipmentWidgetController* GetEquipmentWidgetController(const UObject* WorldContextObject);
 	
 	UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary", meta=(WorldContext="WorldContextObject"))
 	static  bool MakeWidgetControllerParams(const UObject* WorldContextObject, FWidgetControllerParams& OutWCParams, APlayerHUD*& OutPlayerHUD);
@@ -196,4 +200,10 @@ public:
 	*/
 	UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary|Inventory", meta=(WorldContext="WorldContextObject"))
 	static UInventoryComponent* GetContainerComponent(const UObject* WorldContextObject);
+	
+	UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary|Inventory", meta=(WorldContext="WorldContextObject"))
+	static FInventoryItemData FindItemDataByID(const UObject* WorldContextObject, int32 ItemID);
+	
+	UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary|Inventory", meta=(WorldContext="WorldContextObject"))
+	static FInventoryItemData FindItemDataByRowName(const UObject* WorldContextObject, FName RowName);
 };

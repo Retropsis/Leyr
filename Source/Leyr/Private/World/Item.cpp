@@ -2,6 +2,7 @@
 
 #include "World/Item.h"
 #include "PaperFlipbookComponent.h"
+#include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "Components/SphereComponent.h"
 #include "Data/ItemDataRow.h"
 #include "Interaction/InventoryInterface.h"
@@ -44,6 +45,10 @@ void AItem::BeginPlay()
 	Super::BeginPlay();
 	if(HasAuthority())
 	{
+		if(!ItemRowHandle.RowName.IsNone())
+		{
+			ItemData = ULeyrAbilitySystemLibrary::FindItemDataByRowName(this, ItemRowHandle.RowName);
+		}
 		Sphere->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnBeginOverlap);
 		Sphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	

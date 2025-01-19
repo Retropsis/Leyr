@@ -8,7 +8,8 @@
 #include "UI/Controller/WidgetController.h"
 #include "InventoryWidgetController.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInputAssignedSignature, int32, ItemID, FGameplayTag, InputTag);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInputAssignedSignature, FInventoryItemData, ItemData, FGameplayTag, InputTag);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInputRemovedSignature, FGameplayTag, InputTag);
 
 class UItemAbilityInfo;
 struct FGameplayTag;
@@ -46,6 +47,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnInputAssignedSignature OnInputAssigned;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnInputRemovedSignature OnInputRemoved;
 
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
 	TObjectPtr<UInventoryComponent> InventoryComponent;

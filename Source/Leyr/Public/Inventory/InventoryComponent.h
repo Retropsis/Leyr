@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
+#include "Data/ItemData.h"
 #include "InventoryComponent.generated.h"
 
 struct FGameplayTag;
@@ -52,6 +53,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FGameplayTag InputTag = FGameplayTag();
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FGameplayTag EquipmentSlot = FGameplayTag();
 };
 
 UENUM(BlueprintType)
