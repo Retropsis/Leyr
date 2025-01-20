@@ -44,14 +44,11 @@ void UEquipmentWidgetController::Equip(const FInventoryItemData& ItemData)
 	{
 		if (Slot.MatchesTagExact(EquippedItem.Key))
 		{
-			if (EquippedItems.Contains(Slot))
+			if (EquippedItems.Contains(Slot) && ItemData.Asset == EquippedItem.Value.Asset)
 			{
-				if (ItemData.Asset == EquippedItem.Value.Asset)
-				{
-					EquippedItems.Remove(Slot);
-					OnItemUnequipped.Broadcast(Slot);
-					return;
-				}
+				EquippedItems.Remove(Slot);
+				OnItemUnequipped.Broadcast(Slot);
+				return;
 			}
 		}
 	}
