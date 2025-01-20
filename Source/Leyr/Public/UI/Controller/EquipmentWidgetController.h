@@ -31,7 +31,10 @@ public:
 	FOnItemUnequipped OnItemUnequipped;
 
 	UFUNCTION(BlueprintCallable)
-	void Equip(const FInventoryItemData& ItemData, FGameplayTag InputTag);
+	void Assign(const FInventoryItemData& ItemData, FGameplayTag InputTag);
+	
+	UFUNCTION(BlueprintCallable)
+	void Equip(const FInventoryItemData& ItemData);
 	
 	UFUNCTION(BlueprintCallable)
 	void Unequip(FGameplayTag InputTag);

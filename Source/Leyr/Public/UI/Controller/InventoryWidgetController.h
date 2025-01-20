@@ -10,6 +10,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInputAssignedSignature, FInventoryItemData, ItemData, FGameplayTag, InputTag);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInputRemovedSignature, FGameplayTag, InputTag);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEquipmentAssignedSignature, FInventoryItemData, ItemData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEquipmentRemovedSignature, FInventoryItemData, ItemData);
 
 class UItemAbilityInfo;
 struct FGameplayTag;
@@ -28,7 +30,10 @@ public:
 	void AssignInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag);
 
 	UFUNCTION(BlueprintCallable)
-	void EquipButtonPressed(FInventoryItemData ItemData, const FGameplayTag& InputTag);
+	void AssignButtonPressed(FInventoryItemData ItemData, const FGameplayTag& InputTag);
+	
+	UFUNCTION(BlueprintCallable)
+	void EquipButtonPressed(FInventoryItemData ItemData);
 	
 	UFUNCTION(BlueprintCallable)
 	void LootButtonPressed(int32 SourceSlotIndex);
@@ -50,6 +55,12 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnInputRemovedSignature OnInputRemoved;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnEquipmentAssignedSignature OnEquipmentAssigned;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnEquipmentRemovedSignature OnEquipmentRemoved;
 
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
 	TObjectPtr<UInventoryComponent> InventoryComponent;

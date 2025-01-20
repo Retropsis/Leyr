@@ -16,7 +16,7 @@ void UEquipmentWidgetController::BindCallbacksToDependencies()
 	Super::BindCallbacksToDependencies();
 }
 
-void UEquipmentWidgetController::Equip(const FInventoryItemData& ItemData, const FGameplayTag InputTag)
+void UEquipmentWidgetController::Assign(const FInventoryItemData& ItemData, const FGameplayTag InputTag)
 {
 	const FInventoryItemData Item = ULeyrAbilitySystemLibrary::FindItemDataByRowName(this, ItemData.Name);
 	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
@@ -24,13 +24,35 @@ void UEquipmentWidgetController::Equip(const FInventoryItemData& ItemData, const
 
 	if(Slot.MatchesTagExact(GameplayTags.Equipment_ActionSlot))
 	{
-		// Slot = GameplayTags.EquipmentSlotToInputTags.Contains(InputTag) ? GameplayTags.EquipmentSlotToInputTags[InputTag] : FGameplayTag();
-		// if(InputTag.MatchesTagExact(GameplayTags.InputTag_LMB)) Slot = GameplayTags.Equipment_ActionSlot_1;
-		// if(InputTag.MatchesTagExact(GameplayTags.InputTag_RMB)) Slot = GameplayTags.Equipment_ActionSlot_2;
-		// if(InputTag.MatchesTagExact(GameplayTags.InputTag_1)) Slot = GameplayTags.Equipment_ActionSlot_3;
 		for (TTuple<FGameplayTag, FGameplayTag> Pair : GameplayTags.InputTagsToEquipmentSlots)
 		{
 			if(Pair.Key.MatchesTagExact(InputTag)) Slot = Pair.Value;
+		}
+	}
+	
+	EquippedItems.Add(Slot, Item);
+	OnItemEquipped.Broadcast(Slot, Item);
+}
+
+void UEquipmentWidgetController::Equip(const FInventoryItemData& ItemData)
+{
+	const FInventoryItemData Item = ULeyrAbilitySystemLibrary::FindItemDataByRowName(this, ItemData.Name);
+	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+	FGameplayTag Slot = Item.EquipmentSlot;
+	
+	for (TTuple<FGameplayTag, FInventoryItemData> EquippedItem : EquippedItems)
+	{
+		if (Slot.MatchesTagExact(EquippedItem.Key))
+		{
+			if (EquippedItems.Contains(Slot))
+			{
+				if (ItemData.Asset == EquippedItem.Value.Asset)
+				{
+					EquippedItems.Remove(Slot);
+					OnItemUnequipped.Broadcast(Slot);
+					return;
+				}
+			}
 		}
 	}
 	EquippedItems.Add(Slot, Item);
@@ -41,7 +63,6 @@ void UEquipmentWidgetController::Unequip(const FGameplayTag InputTag)
 {
 	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
 	FGameplayTag Slot = FGameplayTag();
-	// FGameplayTag Slot = GameplayTags.InputTagsToEquipmentSlots.Contains(InputTag) ? GameplayTags.InputTagsToEquipmentSlots[InputTag] : FGameplayTag();
 	for (TTuple<FGameplayTag, FGameplayTag> Pair : GameplayTags.InputTagsToEquipmentSlots)
 	{
 		if(Pair.Key.MatchesTagExact(InputTag)) Slot = Pair.Value;

@@ -11,14 +11,23 @@ void UInventoryWidgetController::BindCallbacksToDependencies()
 	InventoryComponent->OnItemUpdated.AddDynamic(this, &UInventoryWidgetController::HandleItemUpdated);
 }
 
-void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData, const FGameplayTag& InputTag)
+void UInventoryWidgetController::AssignButtonPressed(FInventoryItemData ItemData, const FGameplayTag& InputTag)
 {
 	if(ItemData.ID == 0) return;
-	
-	//TODO: Need to be unique ID in case there are same items, might need a ref of the inventory slot
-	if (ClearEquipButtonByInputTag(InputTag, ItemData.ID)) return; 
-	if (ReplaceInputTag(ItemData, InputTag)) return;
-	AssignInputTag(ItemData, InputTag);
+	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+
+	if(ItemData.EquipmentSlot.MatchesTagExact(GameplayTags.Equipment_ActionSlot))
+	{
+		//TODO: Need to be unique ID in case there are same items, might need a ref of the inventory slot
+        if (ClearEquipButtonByInputTag(InputTag, ItemData.ID)) return; 
+        if (ReplaceInputTag(ItemData, InputTag)) return;
+        AssignInputTag(ItemData, InputTag);
+	}
+}
+
+void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData)
+{
+	OnEquipmentAssigned.Broadcast(ItemData);
 }
 
 void UInventoryWidgetController::LootButtonPressed(int32 SourceSlotIndex)
