@@ -52,7 +52,7 @@ bool UPlayerInventoryComponent::UpdateItemInputTag(FInventoryItemData ItemData, 
 	{
 		if(Items[i].ID == ItemData.ID)
 		{
-			Items[i].InputTag = InputTag;
+			// Items[i].InputTag = InputTag;
 			return true;
 		}
 	}

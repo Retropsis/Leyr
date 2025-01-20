@@ -41,9 +41,6 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float MaxHealth = 0.f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TSubclassOf<AItem> ItemClass;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	int32 Ammunition = 0;
@@ -51,10 +48,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	int32 MaxAmmunition = 0;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FGameplayTag InputTag = FGameplayTag();
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Equipment"))
 	FGameplayTag EquipmentSlot = FGameplayTag();
 };
 

@@ -277,7 +277,7 @@ void ULeyrAbilitySystemLibrary::GiveItemAbilities(const UObject* WorldContextObj
 	UAbilityInfo* AbilityInfo = GetAbilityInfo(WorldContextObject);
 	if(AbilityInfo == nullptr || ItemData.ID == 0) return;
 	
-	for (FGameplayTag AbilityTag : ItemData.ItemClass.GetDefaultObject()->GetAbilities())
+	for (FGameplayTag AbilityTag : ItemData.Abilities)
 	{
 		const FBaseAbilityInfo BaseAbilityInfo = AbilityInfo->FindAbilityInfoForTag(AbilityTag);
 		const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
@@ -304,7 +304,7 @@ void ULeyrAbilitySystemLibrary::RemoveItemAbilities(const UObject* WorldContextO
 {
 	if(ItemData.ID == 0) return;
 	
-	for (FGameplayTag AbilityTag : ItemData.ItemClass.GetDefaultObject()->GetAbilities())
+	for (FGameplayTag AbilityTag : ItemData.Abilities)
 	{
 		if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
 		{
@@ -329,7 +329,7 @@ void ULeyrAbilitySystemLibrary::UpdateItemAbilities(const UObject* WorldContextO
 	const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
 	if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
 	{
-		for (FGameplayTag AbilityTag : ItemData.ItemClass.GetDefaultObject()->GetAbilities())
+		for (FGameplayTag AbilityTag : ItemData.Abilities)
         {
 			if(bShouldClear)
 			{
@@ -368,7 +368,7 @@ void ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(const UObject* WorldConte
 	
 	if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
 	{
-		for (FGameplayTag AbilityTag : ItemData.ItemClass.GetDefaultObject()->GetAbilities())
+		for (FGameplayTag AbilityTag : ItemData.Abilities)
 		{
 			if(FGameplayAbilitySpec* AbilitySpec = BaseASC->GetSpecFromAbilityTag(AbilityTag))
 			{

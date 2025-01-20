@@ -49,9 +49,6 @@ public:
 	EItemType ItemType = EItemType::Misc;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
-	TSoftClassPtr<AItem> ItemClass;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	float Health = 0.f;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
