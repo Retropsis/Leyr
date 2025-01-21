@@ -1,8 +1,12 @@
 // @ Retropsis 2024-2025.
 
 #include "UI/Controller/InventoryWidgetController.h"
+
+#include "AbilitySystemComponent.h"
+#include "GameplayEffect.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "Game/BaseGameplayTags.h"
+#include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "Inventory/InventoryComponent.h"
 
 void UInventoryWidgetController::BindCallbacksToDependencies()
@@ -27,7 +31,66 @@ void UInventoryWidgetController::AssignButtonPressed(FInventoryItemData ItemData
 
 void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData)
 {
-	OnEquipmentAssigned.Broadcast(ItemData);
+	// OnEquipmentAssigned.Broadcast(ItemData);
+	Equip(ItemData);
+}
+
+void UInventoryWidgetController::Assign(const FInventoryItemData& ItemData, FGameplayTag InputTag)
+{
+	const FInventoryItemData Item = ULeyrAbilitySystemLibrary::FindItemDataByRowName(this, ItemData.Name);
+	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+	FGameplayTag Slot = Item.EquipmentSlot;
+
+	if(Slot.MatchesTagExact(GameplayTags.Equipment_ActionSlot))
+	{
+		for (TTuple<FGameplayTag, FGameplayTag> Pair : GameplayTags.InputTagsToEquipmentSlots)
+		{
+			if(Pair.Key.MatchesTagExact(InputTag)) Slot = Pair.Value;
+		}
+	}
+	
+	EquippedItems.Add(Slot, Item);
+	OnItemEquipped.Broadcast(Slot, Item);
+}
+
+void UInventoryWidgetController::Equip(const FInventoryItemData& ItemData)
+{
+	const FInventoryItemData Item = ULeyrAbilitySystemLibrary::FindItemDataByRowName(this, ItemData.Name); // Why do I do this ????
+	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+	FGameplayTag Slot = Item.EquipmentSlot;
+	
+	for (TTuple<FGameplayTag, FInventoryItemData> EquippedItem : EquippedItems)
+	{
+		if (Slot.MatchesTagExact(EquippedItem.Key))
+		{
+			if (EquippedItems.Contains(Slot) && ItemData.Asset == EquippedItem.Value.Asset)
+			{
+				EquippedItems.Remove(Slot);
+				OnItemUnequipped.Broadcast(Slot);
+				return;
+			}
+		}
+	}
+	EquippedItems.Add(Slot, Item);
+	OnItemEquipped.Broadcast(Slot, Item);
+
+	TArray<TSubclassOf<UGameplayEffect>> Effects = ItemData.Asset.LoadSynchronous()->Effects;
+	for (TSubclassOf<UGameplayEffect> Effect : Effects)
+	{
+		MakeAndApplyExecuteEffectToSelf(Effect.GetDefaultObject(), ItemData.Asset.Get());
+	}
+}
+
+void UInventoryWidgetController::Unequip(FGameplayTag InputTag)
+{
+	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+	FGameplayTag Slot = FGameplayTag();
+	for (TTuple<FGameplayTag, FGameplayTag> Pair : GameplayTags.InputTagsToEquipmentSlots)
+	{
+		if(Pair.Key.MatchesTagExact(InputTag)) Slot = Pair.Value;
+	}
+	EquippedItems.Remove(Slot);
+	OnItemUnequipped.Broadcast(Slot);
 }
 
 void UInventoryWidgetController::LootButtonPressed(int32 SourceSlotIndex)
@@ -60,7 +123,8 @@ void UInventoryWidgetController::ClearInputTag(FInventoryItemData ItemData, cons
 	ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputTag, false);
 	EquippedItemAbilities.Remove(InputTag);
 	OnInputRemoved.Broadcast(InputTag);
-	InventoryComponent->UpdateItemInputTag(ItemData, FBaseGameplayTags::Get().Abilities_None);
+	Unequip(InputTag);
+	InventoryComponent->UpdateItemInputTag(ItemData, FBaseGameplayTags::Get().InputTag_None);
 }
 
 void UInventoryWidgetController::AssignInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag)
@@ -69,7 +133,21 @@ void UInventoryWidgetController::AssignInputTag(FInventoryItemData ItemData, con
 	ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputTag, false);
 	EquippedItemAbilities.Add(InputTag, ItemData);
 	OnInputAssigned.Broadcast(ItemData, InputTag);
+	Assign(ItemData, InputTag);
 	InventoryComponent->UpdateItemInputTag(ItemData, InputTag);
+}
+
+void UInventoryWidgetController::MakeAndApplyExecuteEffectToSelf(UGameplayEffect* EffectToApply, const UObject* SourceObject, const FGameplayTag& TagToApply, const int32 Level) const
+{
+	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+	EffectContext.AddSourceObject(SourceObject);
+	
+	UTargetTagsGameplayEffectComponent& AssetTagsComponent = EffectToApply->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
+	FInheritedTagContainer InheritedTagContainer;
+	InheritedTagContainer.Added.AddTag(TagToApply);
+	AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
+
+	AbilitySystemComponent->ApplyGameplayEffectToSelf(EffectToApply, Level, EffectContext);
 }
 
 bool UInventoryWidgetController::ReplaceInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag)
@@ -80,10 +158,14 @@ bool UInventoryWidgetController::ReplaceInputTag(FInventoryItemData ItemData, co
 		{
 			ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(this, AbilitySystemComponent, ItemData, InputTag, EquippedAbility.Key);
 			ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, EquippedAbility.Key, false);
+			
 			EquippedItemAbilities.Remove(EquippedAbility.Key);
 			EquippedItemAbilities.Add(InputTag, ItemData);
 			OnInputRemoved.Broadcast(EquippedAbility.Key);
 			OnInputAssigned.Broadcast(ItemData, InputTag);
+			
+			Assign(ItemData, InputTag);
+			Unequip(EquippedAbility.Key);
 			InventoryComponent->UpdateItemInputTag(ItemData, InputTag);
 			return true;
 		}

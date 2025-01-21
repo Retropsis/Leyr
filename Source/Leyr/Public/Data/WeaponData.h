@@ -17,9 +17,6 @@ class LEYR_API UWeaponData : public UItemData
 public:
 	UWeaponData();
 	
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
-	// TSoftClassPtr<AItem> ItemClass;
-	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item|Weapon")
 	float BaseDamage = 0.f;
 

@@ -56,9 +56,6 @@ public:
 	static  UInventoryWidgetController* GetInventoryWidgetController(const UObject* WorldContextObject);
 	
 	UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary", meta=(WorldContext="WorldContextObject"))
-	static  UEquipmentWidgetController* GetEquipmentWidgetController(const UObject* WorldContextObject);
-	
-	UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary", meta=(WorldContext="WorldContextObject"))
 	static  bool MakeWidgetControllerParams(const UObject* WorldContextObject, FWidgetControllerParams& OutWCParams, APlayerHUD*& OutPlayerHUD);
 
 	/*

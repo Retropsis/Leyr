@@ -74,20 +74,6 @@ UInventoryWidgetController* ULeyrAbilitySystemLibrary::GetInventoryWidgetControl
 	return nullptr;
 }
 
-UEquipmentWidgetController* ULeyrAbilitySystemLibrary::GetEquipmentWidgetController(const UObject* WorldContextObject)
-{
-	FWidgetControllerParams WCParams;
-	APlayerHUD* PlayerHUD = nullptr;
-	if (MakeWidgetControllerParams(WorldContextObject, WCParams, PlayerHUD))
-	{
-		if(APlayerCharacterController* PC = Cast<APlayerCharacterController>(WCParams.PlayerController))
-		{
-			return PC->GetEquipmentWidgetController(WCParams);
-		}
-	}
-	return nullptr;
-}
-
 bool ULeyrAbilitySystemLibrary::MakeWidgetControllerParams(const UObject* WorldContextObject, FWidgetControllerParams& OutWCParams, APlayerHUD*& OutPlayerHUD)
 {
 	if (const APlayerController* PC  = WorldContextObject->GetWorld()->GetFirstPlayerController())

@@ -10,8 +10,8 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInputAssignedSignature, FInventoryItemData, ItemData, FGameplayTag, InputTag);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInputRemovedSignature, FGameplayTag, InputTag);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEquipmentAssignedSignature, FInventoryItemData, ItemData);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEquipmentRemovedSignature, FInventoryItemData, ItemData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemEquippedSignature, FGameplayTag, SlotTag, FInventoryItemData, ItemData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemUnequippedSignature, FGameplayTag, SlotTag);
 
 class UItemAbilityInfo;
 struct FGameplayTag;
@@ -28,12 +28,22 @@ public:
 	void ClearInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag);
 	bool ReplaceInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag);
 	void AssignInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag);
+	void MakeAndApplyExecuteEffectToSelf(UGameplayEffect* EffectToApply, const UObject* SourceObject, const FGameplayTag& TagToApply = FGameplayTag(), int32 Level = 1) const;
 
 	UFUNCTION(BlueprintCallable)
 	void AssignButtonPressed(FInventoryItemData ItemData, const FGameplayTag& InputTag);
 	
 	UFUNCTION(BlueprintCallable)
 	void EquipButtonPressed(FInventoryItemData ItemData);
+	
+	UFUNCTION(BlueprintCallable)
+	void Assign(const FInventoryItemData& ItemData, FGameplayTag InputTag);
+	
+	UFUNCTION(BlueprintCallable)
+	void Equip(const FInventoryItemData& ItemData);
+	
+	UFUNCTION(BlueprintCallable)
+	void Unequip(FGameplayTag InputTag);
 	
 	UFUNCTION(BlueprintCallable)
 	void LootButtonPressed(int32 SourceSlotIndex);
@@ -57,19 +67,16 @@ public:
 	FOnInputRemovedSignature OnInputRemoved;
 
 	UPROPERTY(BlueprintAssignable)
-	FOnEquipmentAssignedSignature OnEquipmentAssigned;
+	FOnItemEquippedSignature OnItemEquipped;
 	
 	UPROPERTY(BlueprintAssignable)
-	FOnEquipmentRemovedSignature OnEquipmentRemoved;
+	FOnItemUnequippedSignature OnItemUnequipped;
 
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
 	TObjectPtr<UInventoryComponent> InventoryComponent;
 
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
-	TObjectPtr<UItemAbilityInfo> ItemAbilityInfo;
-
 private:
 	TMap<FGameplayTag, FInventoryItemData> EquippedItemAbilities;
+	TMap<FGameplayTag, FInventoryItemData> EquippedItems;
 	bool bContainerIsOpen = false;
 };

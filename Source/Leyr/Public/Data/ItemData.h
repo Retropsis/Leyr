@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "ItemData.generated.h"
 
+class UGameplayEffect;
 class AItem;
 
 UENUM(BlueprintType)
@@ -47,6 +48,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	EItemType ItemType = EItemType::Misc;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
+	TArray<TSubclassOf<UGameplayEffect>> Effects;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	float Health = 0.f;
