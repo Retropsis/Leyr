@@ -99,6 +99,22 @@ public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Luck, Category="Attributes|Primary")
 	FGameplayAttributeData Luck;
 	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, Luck);
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_PhysicalAttackBase, Category="Attributes|Primary")
+	FGameplayAttributeData PhysicalAttackBase;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, PhysicalAttackBase);
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_MagicalAttackBase, Category="Attributes|Primary")
+	FGameplayAttributeData MagicalAttackBase;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, MagicalAttackBase);
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_PhysicalDefenseBase, Category = "Attributes|Primary")
+	FGameplayAttributeData PhysicalDefenseBase;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, PhysicalDefenseBase);
+	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MagicalDefenseBase, Category = "Attributes|Primary")
+	FGameplayAttributeData MagicalDefenseBase;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet,  MagicalDefenseBase);
 
 	/*
 	 * Secondary Attributes
@@ -255,6 +271,18 @@ public:
 
 	UFUNCTION()
 	void OnRep_Luck(const FGameplayAttributeData& OldLuck) const;
+	
+	UFUNCTION()
+	void OnRep_PhysicalAttackBase(const FGameplayAttributeData& OldPhysicalAttackBase) const;
+	
+	UFUNCTION()
+	void OnRep_MagicalAttackBase(const FGameplayAttributeData& OldMagicalAttackBase) const;
+	
+	UFUNCTION()
+	void OnRep_PhysicalDefenseBase(const FGameplayAttributeData& OldPhysicalDefenseBase) const;
+
+	UFUNCTION()
+	void OnRep_MagicalDefenseBase(const FGameplayAttributeData& OldMagicalDefenseBase) const;
 
 	/* Secondary Attributes Rep Notifies */
 	UFUNCTION()

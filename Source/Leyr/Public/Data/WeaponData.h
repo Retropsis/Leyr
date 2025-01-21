@@ -16,16 +16,4 @@ class LEYR_API UWeaponData : public UItemData
 
 public:
 	UWeaponData();
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item|Weapon")
-	float BaseDamage = 0.f;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item|Weapon")
-	bool bUseAmmunition = false;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item|Weapon")
-	int32 Ammunition = 0;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item|Weapon")
-	int32 MaxAmmunition = 0;
 };

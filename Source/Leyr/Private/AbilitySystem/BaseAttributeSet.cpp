@@ -30,6 +30,11 @@ void UBaseAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, Spirit, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, Luck, COND_None, REPNOTIFY_Always);
 	
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, PhysicalAttackBase, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, MagicalAttackBase, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, PhysicalDefenseBase, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, MagicalDefenseBase, COND_None, REPNOTIFY_Always);
+	
 	// Secondary Attributes
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, PhysicalAttack, COND_None, REPNOTIFY_Always);
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, MagicalAttack, COND_None, REPNOTIFY_Always);
@@ -400,6 +405,26 @@ void UBaseAttributeSet::OnRep_Spirit(const FGameplayAttributeData& OldSpirit) co
 void UBaseAttributeSet::OnRep_Luck(const FGameplayAttributeData& OldLuck) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, Luck, OldLuck);
+}
+
+void UBaseAttributeSet::OnRep_PhysicalAttackBase(const FGameplayAttributeData& OldPhysicalAttackBase) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, PhysicalAttackBase, OldPhysicalAttackBase);
+}
+
+void UBaseAttributeSet::OnRep_MagicalAttackBase(const FGameplayAttributeData& OldMagicalAttackBase) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, MagicalAttackBase, OldMagicalAttackBase);
+}
+
+void UBaseAttributeSet::OnRep_PhysicalDefenseBase(const FGameplayAttributeData& OldPhysicalDefenseBase) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, PhysicalDefenseBase, OldPhysicalDefenseBase);
+}
+
+void UBaseAttributeSet::OnRep_MagicalDefenseBase(const FGameplayAttributeData& OldMagicalDefenseBase) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, MagicalDefenseBase, OldMagicalDefenseBase);
 }
 
 /* Secondary Attributes Rep Notifies */

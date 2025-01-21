@@ -31,7 +31,4 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Armor")
 	EArmorType ArmorType = EArmorType::Head;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Armor")
-	float BaseArmor = 0.f;
 };

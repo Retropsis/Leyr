@@ -185,6 +185,17 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		Damage += DamageTypeValue;
 	}
 	
+	float SourcePhysicalAttack = 0.f;
+	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().PhysicalAttackDef, EvaluationParameters, SourcePhysicalAttack);
+	SourcePhysicalAttack = FMath::Max<float>(SourcePhysicalAttack, 0.f);
+	
+	const float EffectivePhysicalAttack = 1.f + FMath::Clamp(SourcePhysicalAttack, 0.f, 100.f) / 100.f;
+	// const float EffectivePhysicalAttack = SourcePhysicalAttack *= ( 100 - SourceArmorPenetration * ArmorPenetrationCoefficient ) / 100.f;
+	// const FRealCurve* EffectivePhysicalAttackCurve = CharacterClassInfo->DamageCalculationCoefficients->FindCurve(FName("EffectivePhysicalAttack"), FString());
+	// const float EffectivePhysicalAttackCoefficient = EffectivePhysicalAttackCurve->Eval(TargetCharacterLevel);
+	GEngine->AddOnScreenDebugMessage(445577, 5.f, FColor::Cyan, FString::Printf(TEXT("EffectivePAtk: [%f]"), EffectivePhysicalAttack));
+	Damage += Damage * EffectivePhysicalAttack;
+	
 	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
 	
 	// Capture BlockChance on Target, and determine if there was a successful Block
@@ -211,9 +222,9 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	// ArmorPenetration ignores a percentage of the Target's Armor.	
 	const float EffectivePhysicalDefense = TargetPhysicalDefense *= ( 100 - SourceArmorPenetration * ArmorPenetrationCoefficient ) / 100.f;
-
 	const FRealCurve* EffectivePhysicalDefenseCurve = CharacterClassInfo->DamageCalculationCoefficients->FindCurve(FName("EffectivePhysicalDefense"), FString());
 	const float EffectivePhysicalDefenseCoefficient = EffectivePhysicalDefenseCurve->Eval(TargetCharacterLevel);
+	
 	// Armor ignores a percentage of incoming Damage.
 	Damage *= ( 100 - EffectivePhysicalDefense * EffectivePhysicalDefenseCoefficient ) / 100.f;	float SourceCriticalHitChance = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().CriticalHitChanceDef, EvaluationParameters, SourceCriticalHitChance);

@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "ItemData.generated.h"
 
+struct FGameplayModifierInfo;
 class UGameplayEffect;
 class AItem;
 
@@ -53,10 +54,7 @@ public:
 	TArray<TSubclassOf<UGameplayEffect>> Effects;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
-	float Health = 0.f;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
-	float MaxHealth = 0.f;
+	TArray<FGameplayModifierInfo> Modifiers;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	float Weight = 0.f;

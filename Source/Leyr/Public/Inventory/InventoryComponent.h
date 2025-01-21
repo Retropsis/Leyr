@@ -35,18 +35,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<FGameplayTag> Abilities;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float Health = 0.f;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	float MaxHealth = 0.f;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	int32 Ammunition = 0;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	int32 MaxAmmunition = 0;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Equipment"))
 	FGameplayTag EquipmentSlot = FGameplayTag();

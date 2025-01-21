@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ActiveGameplayEffectHandle.h"
 #include "GameplayTagContainer.h"
 #include "Inventory/InventoryComponent.h"
 #include "UI/Controller/WidgetController.h"
@@ -27,8 +28,10 @@ public:
 	virtual void BindCallbacksToDependencies() override;
 	void ClearInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag);
 	bool ReplaceInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag);
-	void AssignInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag);
-	void MakeAndApplyExecuteEffectToSelf(UGameplayEffect* EffectToApply, const UObject* SourceObject, const FGameplayTag& TagToApply = FGameplayTag(), int32 Level = 1) const;
+	void AssignInputTag(const FInventoryItemData& ItemData, const FGameplayTag& InputTag);
+	void ApplyExecuteEffectToSelf(UGameplayEffect* EffectToApply, const UObject* SourceObject, const FGameplayTag& EquipmentSlot, int32 Level = 1);
+	void MakeAndApplyEffectToSelf(const UObject* SourceObject, const FGameplayTag& EquipmentSlot, TArray<FGameplayModifierInfo> Modifiers, int32 Level = 1);
+	void RemoveActiveGameplayEffect(FGameplayTag EquipmentSlot);
 
 	UFUNCTION(BlueprintCallable)
 	void AssignButtonPressed(FInventoryItemData ItemData, const FGameplayTag& InputTag);
@@ -78,5 +81,6 @@ public:
 private:
 	TMap<FGameplayTag, FInventoryItemData> EquippedItemAbilities;
 	TMap<FGameplayTag, FInventoryItemData> EquippedItems;
+	TMap<FGameplayTag, FActiveGameplayEffectHandle> EquippedEffects;
 	bool bContainerIsOpen = false;
 };
