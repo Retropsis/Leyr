@@ -7,6 +7,7 @@
 #include "Leyr/Leyr.h"
 #include "BaseGameplayAbility.generated.h"
 
+class UItemData;
 /**
  * 
  */
@@ -25,7 +26,7 @@ public:
 	UObject* GetSourceObjectFromAbilitySpec();
 	
 	UFUNCTION(BlueprintCallable)
-	bool CommitInventoryCost();
+	bool CommitInventoryCost(bool bIsSelfCost = true);
 	
 	virtual FString GetDescription(int32 Level);
 	virtual FString GetNextLevelDescription(int32 Level);

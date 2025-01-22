@@ -659,3 +659,10 @@ FInventoryItemData ULeyrAbilitySystemLibrary::FindItemDataByRowName(const UObjec
 	
 	return LeyrGameMode->FindItemDataByRowName(RowName);
 }
+
+UInventoryCostData* ULeyrAbilitySystemLibrary::GetInventoryCostData(const UObject* WorldContextObject)
+{
+	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (LeyrGameMode == nullptr) return nullptr;
+	return LeyrGameMode->InventoryCostInfo;
+}

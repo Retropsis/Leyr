@@ -375,6 +375,16 @@ FGameplayTag Montage_Window_Execute;
  TMap<FGameplayTag, FGameplayTag> InputTagsToEquipmentSlots;
  
  /*
+  * Inventory Cost Tags
+  */
+ FGameplayTag Cost;
+ FGameplayTag Cost_None;
+ FGameplayTag Cost_Arrow;
+ FGameplayTag Cost_Bolt;
+ FGameplayTag Cost_Bone;
+ FGameplayTag Cost_Feather;
+ 
+ /*
   * Input Tags
   */
 FGameplayTag InputTag;

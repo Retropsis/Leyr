@@ -409,6 +409,16 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Equipment_Ammunition = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.Ammunition"), FString("Equipment Ammunition"));
 	
 	/*
+	 * Inventory Cost Tags
+	 */
+	GameplayTags.Cost = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cost"), FString("Cost"));
+	GameplayTags.Cost_None = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cost.None"), FString("Cost None"));
+	GameplayTags.Cost_Arrow = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cost.Arrow"), FString("Cost Arrow"));
+	GameplayTags.Cost_Bolt = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cost.Bolt"), FString("Cost Bolt"));
+	GameplayTags.Cost_Bone = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cost.Bone"), FString("Cost Bone"));
+	GameplayTags.Cost_Feather = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cost.Feather"), FString("Cost Feather"));
+	
+	/*
 	 * Input Tags
 	 */
 	GameplayTags.InputTag = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag"), FString("Input Parent Tag"));

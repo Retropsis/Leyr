@@ -2,6 +2,8 @@
 
 #include "AbilitySystem/Ability/BaseGameplayAbility.h"
 #include "AbilitySystem/BaseAttributeSet.h"
+#include "AbilitySystem/LeyrAbilitySystemLibrary.h"
+#include "Data/InventoryCostData.h"
 #include "Data/ItemData.h"
 #include "Game/BaseGameplayTags.h"
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
@@ -51,14 +53,29 @@ UObject* UBaseGameplayAbility::GetSourceObjectFromAbilitySpec()
 	return AbilitySpec->SourceObject.Get();
 }
 
-bool UBaseGameplayAbility::CommitInventoryCost()
+bool UBaseGameplayAbility::CommitInventoryCost(bool bIsSelfCost)
 {
+	const UInventoryCostData* InventoryCostData = ULeyrAbilitySystemLibrary::GetInventoryCostData(this);
 	FGameplayAbilitySpec* AbilitySpec = GetCurrentAbilitySpec();
-	if(UItemData* ItemData = Cast<UItemData>(AbilitySpec->SourceObject.Get()))
+	UItemData* ItemData = Cast<UItemData>(AbilitySpec->SourceObject.Get());
+
+	if(bIsSelfCost) return IPlayerInterface::Execute_UseItem(GetAvatarActorFromActorInfo(), ItemData, 1);
+	
+	bool bHasFoundCompatibleItem = false;
+	
+	if(InventoryCostData && ItemData)
 	{
-		return IPlayerInterface::Execute_UseItem(GetAvatarActorFromActorInfo(), ItemData, 1);
+		FInventoryCost InventoryCost = InventoryCostData->FindCostInfoForTag(ItemData->CostTag);
+		for (UItemData* CompatibleItem : InventoryCost.CompatibleItems)
+		{
+			if(IPlayerInterface::Execute_UseItem(GetAvatarActorFromActorInfo(), CompatibleItem, 1))
+			{
+				bHasFoundCompatibleItem = true;
+				break;
+			}
+		}
 	}
-	return false;
+	return bHasFoundCompatibleItem;
 }
 
 FString UBaseGameplayAbility::GetDescription(int32 Level)

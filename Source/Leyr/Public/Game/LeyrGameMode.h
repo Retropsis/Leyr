@@ -7,6 +7,7 @@
 #include "Inventory/InventoryComponent.h"
 #include "LeyrGameMode.generated.h"
 
+class UInventoryCostData;
 class UMapInfo;
 class UBehaviourInfo;
 class UEncounterInfo;
@@ -38,6 +39,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Map Info")
 	TObjectPtr<UMapInfo> MapInfo;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Inventory Cost Info")
+	TObjectPtr<UInventoryCostData> InventoryCostInfo;
 
 	UPROPERTY(EditDefaultsOnly, Category="DataTable|Items")
 	TObjectPtr<UDataTable> ItemDataTable;

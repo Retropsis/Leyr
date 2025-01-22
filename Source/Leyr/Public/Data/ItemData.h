@@ -37,10 +37,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	TObjectPtr<UTexture2D> Icon = nullptr;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	TObjectPtr<UPaperFlipbook> PickupFlipbook = nullptr;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	TObjectPtr<USoundBase> PickupSound = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
@@ -66,6 +66,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	TArray<FGameplayModifierInfo> Modifiers;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item", meta=(Categories="Cost"))
+	FGameplayTag CostTag = FGameplayTag();
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	float Weight = 0.f;

@@ -7,6 +7,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "LeyrAbilitySystemLibrary.generated.h"
 
+class UInventoryCostData;
 class UEquipmentWidgetController;
 class UInventoryComponent;
 class UContainerComponent;
@@ -203,4 +204,7 @@ public:
 	
 	UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary|Inventory", meta=(WorldContext="WorldContextObject"))
 	static FInventoryItemData FindItemDataByRowName(const UObject* WorldContextObject, FName RowName);
+	
+	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|Inventory", meta=(WorldContext="WorldContextObject"))
+	static UInventoryCostData* GetInventoryCostData(const UObject* WorldContextObject);
 };
