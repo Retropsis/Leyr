@@ -3,10 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
 #include "ItemData.generated.h"
 
 struct FGameplayModifierInfo;
+class UPaperFlipbook;
 class UGameplayEffect;
 class AItem;
 
@@ -34,6 +36,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	TObjectPtr<UTexture2D> Icon = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UPaperFlipbook> PickupFlipbook = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<USoundBase> PickupSound = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	FText Name = FText();
@@ -49,6 +57,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	EItemType ItemType = EItemType::Misc;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Item", meta=(Categories="Abilities"))
+	TArray<FGameplayTag> Abilities;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	TArray<TSubclassOf<UGameplayEffect>> Effects;

@@ -8,7 +8,6 @@
 #include "Data/ItemData.h"
 #include "InventoryComponent.generated.h"
 
-struct FGameplayTag;
 class UItemData;
 class AItem;
 
@@ -32,9 +31,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSoftObjectPtr<UItemData> Asset = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TArray<FGameplayTag> Abilities;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Equipment"))
 	FGameplayTag EquipmentSlot = FGameplayTag();

@@ -241,7 +241,7 @@ void ULeyrAbilitySystemLibrary::UpdateMonkAbilities(const UObject* WorldContextO
 		{
 			if(FGameplayAbilitySpec* AbilitySpec = BaseASC->GetSpecFromAbilityTag(AbilityTag))
 			{				
-				const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+				const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 				if(bShouldClear)
 				{
 					AbilitySpec->DynamicAbilityTags.RemoveTag(InputTag);
@@ -261,12 +261,13 @@ void ULeyrAbilitySystemLibrary::UpdateMonkAbilities(const UObject* WorldContextO
 void ULeyrAbilitySystemLibrary::GiveItemAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag InputTag)
 {
 	UAbilityInfo* AbilityInfo = GetAbilityInfo(WorldContextObject);
-	if(AbilityInfo == nullptr || ItemData.ID == 0) return;
+	UItemData* Asset = ItemData.Asset.LoadSynchronous();
+	if(AbilityInfo == nullptr || Asset == nullptr) return;
 	
-	for (FGameplayTag AbilityTag : ItemData.Abilities)
+	for (FGameplayTag AbilityTag : Asset->Abilities)
 	{
 		const FBaseAbilityInfo BaseAbilityInfo = AbilityInfo->FindAbilityInfoForTag(AbilityTag);
-		const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+		const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(BaseAbilityInfo.Ability, 1);
 		FGameplayTagContainer PreviousTags = AbilitySpec.DynamicAbilityTags.Filter(GameplayTags.InputTag.GetSingleTagContainer());
 		AbilitySpec.DynamicAbilityTags.RemoveTags(PreviousTags);
@@ -288,9 +289,10 @@ void ULeyrAbilitySystemLibrary::GiveItemAbilities(const UObject* WorldContextObj
 
 void ULeyrAbilitySystemLibrary::RemoveItemAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag PreviousInputTag)
 {
-	if(ItemData.ID == 0) return;
+	UItemData* Asset = ItemData.Asset.LoadSynchronous();
+	if(Asset == nullptr) return;
 	
-	for (FGameplayTag AbilityTag : ItemData.Abilities)
+	for (FGameplayTag AbilityTag : Asset->Abilities)
 	{
 		if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
 		{
@@ -300,7 +302,7 @@ void ULeyrAbilitySystemLibrary::RemoveItemAbilities(const UObject* WorldContextO
 				ASC->ClearAbility(AbilitySpec->Handle);
 				ASC->MarkAbilitySpecDirty(*AbilitySpec);
 				
-				const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+				const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 				BaseASC->ClientEquipAbility(GameplayTags.Abilities_None, GameplayTags.Abilities_None, PreviousInputTag, FGameplayTag());
 			}
 		}
@@ -310,12 +312,13 @@ void ULeyrAbilitySystemLibrary::RemoveItemAbilities(const UObject* WorldContextO
 void ULeyrAbilitySystemLibrary::UpdateItemAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag InputTag, bool bShouldClear)
 {
 	UAbilityInfo* AbilityInfo = GetAbilityInfo(WorldContextObject);
-	if(AbilityInfo == nullptr || ItemData.ID == 0) return;
+	UItemData* Asset = ItemData.Asset.LoadSynchronous();
+	if(AbilityInfo == nullptr || Asset == nullptr) return;
 	
-	const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 	if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
 	{
-		for (FGameplayTag AbilityTag : ItemData.Abilities)
+		for (FGameplayTag AbilityTag : Asset->Abilities)
         {
 			if(bShouldClear)
 			{
@@ -350,18 +353,19 @@ void ULeyrAbilitySystemLibrary::UpdateItemAbilities(const UObject* WorldContextO
 
 void ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag InputTag, FGameplayTag TagToRemove)
 {
-	if(ItemData.ID == 0) return;
+	UItemData* Asset = ItemData.Asset.LoadSynchronous();
+	if(Asset == nullptr) return;
 	
 	if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
 	{
-		for (FGameplayTag AbilityTag : ItemData.Abilities)
+		for (FGameplayTag AbilityTag : Asset->Abilities)
 		{
 			if(FGameplayAbilitySpec* AbilitySpec = BaseASC->GetSpecFromAbilityTag(AbilityTag))
 			{
 				AbilitySpec->DynamicAbilityTags.RemoveTag(TagToRemove);
 				AbilitySpec->DynamicAbilityTags.AddTag(InputTag);
 						
-				const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+				const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 				BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
 			}
 		}

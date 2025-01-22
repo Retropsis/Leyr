@@ -31,9 +31,12 @@ void AItem::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 		{
 			if(const FItemDataRow* ItemDataRow = ItemDataTable->FindRow<FItemDataRow>(ItemRowHandle.RowName, ItemRowHandle.RowName.ToString()))
 			{
+				if(const UItemData* Asset = ItemDataRow->ItemData.Asset.LoadSynchronous())
+				{
+					PickupSound = Asset->PickupSound;
+					GetRenderComponent()->SetFlipbook(Asset->PickupFlipbook);
+				}
 				ItemData = ItemDataRow->ItemData;
-				PickupSound = ItemDataRow->PickupSound;
-				GetRenderComponent()->SetFlipbook(ItemDataRow->PickupFlipbook);
 				SetActorLabel(FString::Printf(TEXT("BP_%s"), *ItemData.Name.ToString()));
 			}
 		}
