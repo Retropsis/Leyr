@@ -127,7 +127,7 @@ void UInventoryWidgetController::LootAllButtonPressed()
 	}
 }
 
-void UInventoryWidgetController::ClearInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag)
+void UInventoryWidgetController::ClearInputTag(const FInventoryItemData& ItemData, const FGameplayTag& InputTag)
 {
 	ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputTag, true);
 	ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputTag, false);
@@ -226,7 +226,8 @@ bool UInventoryWidgetController::ReplaceInputTag(FInventoryItemData ItemData, co
 
 void UInventoryWidgetController::HandleItemUpdated(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData Item)
 {
-	if (Item.Quantity == 0)
+	const UItemData* Asset =  Item.Asset.LoadSynchronous();
+	if (Item.Quantity == 0 && Asset && Asset->bRemoveStackIfEmpty)
 	{
 		ClearEquipButtonByItemData(Item);
 	}

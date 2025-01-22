@@ -181,7 +181,7 @@ bool UInventoryComponent::UseItem(UItemData* Asset, int32 Amount)
 		if (Items[i].Asset == Asset && Items[i].Quantity >= Amount)
 		{
 			Items[i].Quantity -= Amount;
-			if (Items[i].Quantity > 0)
+			if (Items[i].Quantity > 0 || !Asset->bRemoveStackIfEmpty)
 			{
 				UpdateInventorySlotUI(i, Items[i]);
 			}

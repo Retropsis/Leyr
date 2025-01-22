@@ -53,6 +53,9 @@ public:
 	bool bIsStackable = false;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
+	bool bRemoveStackIfEmpty = false;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	int32 StackSize = 0;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")

@@ -1002,7 +1002,7 @@ UInventoryComponent* APlayerCharacter::GetInventoryComponentByType_Implementatio
 
 bool APlayerCharacter::UseItem_Implementation(UItemData* Asset, int32 Amount, bool bIsSelfCost)
 {
-	if(bIsSelfCost) PlayerInventory->UseItem(Asset, Amount);
+	if(bIsSelfCost) return PlayerInventory->UseItem(Asset, Amount);
 	
 	const UInventoryCostData* InventoryCostData = ULeyrAbilitySystemLibrary::GetInventoryCostData(this);
 	bool bHasFoundCompatibleItem = false;

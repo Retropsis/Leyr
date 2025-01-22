@@ -26,7 +26,7 @@ class LEYR_API UInventoryWidgetController : public UWidgetController
 
 public:
 	virtual void BindCallbacksToDependencies() override;
-	void ClearInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag);
+	void ClearInputTag(const FInventoryItemData& ItemData, const FGameplayTag& InputTag);
 	bool ReplaceInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag);
 	void AssignInputTag(const FInventoryItemData& ItemData, const FGameplayTag& InputTag);
 	void ApplyExecuteEffectToSelf(UGameplayEffect* EffectToApply, const UObject* SourceObject, const FGameplayTag& EquipmentSlot, int32 Level = 1);
