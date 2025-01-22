@@ -55,27 +55,12 @@ UObject* UBaseGameplayAbility::GetSourceObjectFromAbilitySpec()
 
 bool UBaseGameplayAbility::CommitInventoryCost(bool bIsSelfCost)
 {
-	const UInventoryCostData* InventoryCostData = ULeyrAbilitySystemLibrary::GetInventoryCostData(this);
-	FGameplayAbilitySpec* AbilitySpec = GetCurrentAbilitySpec();
-	UItemData* ItemData = Cast<UItemData>(AbilitySpec->SourceObject.Get());
-
-	if(bIsSelfCost) return IPlayerInterface::Execute_UseItem(GetAvatarActorFromActorInfo(), ItemData, 1);
-	
-	bool bHasFoundCompatibleItem = false;
-	
-	if(InventoryCostData && ItemData)
+	const FGameplayAbilitySpec* AbilitySpec = GetCurrentAbilitySpec();
+	if(UItemData* ItemData = Cast<UItemData>(AbilitySpec->SourceObject.Get()))
 	{
-		FInventoryCost InventoryCost = InventoryCostData->FindCostInfoForTag(ItemData->CostTag);
-		for (UItemData* CompatibleItem : InventoryCost.CompatibleItems)
-		{
-			if(IPlayerInterface::Execute_UseItem(GetAvatarActorFromActorInfo(), CompatibleItem, 1))
-			{
-				bHasFoundCompatibleItem = true;
-				break;
-			}
-		}
+		return IPlayerInterface::Execute_UseItem(GetAvatarActorFromActorInfo(), ItemData, 1, bIsSelfCost);
 	}
-	return bHasFoundCompatibleItem;
+	return false;
 }
 
 FString UBaseGameplayAbility::GetDescription(int32 Level)

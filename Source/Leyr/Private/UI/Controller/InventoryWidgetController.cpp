@@ -232,6 +232,18 @@ void UInventoryWidgetController::HandleItemUpdated(EContainerType ContainerType,
 	}
 }
 
+UItemData* UInventoryWidgetController::HasCompatibleItemCostInAmmunitionSlot(const FGameplayTag CostTag)
+{
+	if (const FInventoryItemData* ItemData = EquippedItems.Find(FBaseGameplayTags::Get().Equipment_Ammunition))
+	{
+		if(UItemData* Asset = ItemData->Asset.LoadSynchronous())
+		{
+			return Asset->CostTag.MatchesTagExact(CostTag) ? Asset : nullptr;
+		}
+	}
+	return nullptr;
+}
+
 void UInventoryWidgetController::ClearEquipButtonByItemData(const FInventoryItemData& ItemData)
 {
 	for (TTuple<FGameplayTag, FInventoryItemData> EquippedAbility : EquippedItemAbilities)

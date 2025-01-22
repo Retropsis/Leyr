@@ -98,7 +98,7 @@ public:
 	virtual void SetContainer_Implementation(AContainer* Container) override;
 	virtual void CloseContainer_Implementation() override;
 	virtual UInventoryComponent* GetInventoryComponentByType_Implementation(EContainerType Type) override;
-	virtual bool UseItem_Implementation(UItemData* Asset, int32 Amount = 1) override;
+	virtual bool UseItem_Implementation(UItemData* Asset, int32 Amount, bool bIsSelfCost) override;
 	
 	virtual void AddToXP_Implementation(int32 InXP) override;
 	virtual void LevelUp_Implementation() override;
@@ -228,6 +228,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UHotbarComponent> HotbarComponent;
 
+	UPROPERTY()
 	TObjectPtr<AContainer> InteractingContainer;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))

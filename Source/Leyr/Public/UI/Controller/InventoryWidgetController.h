@@ -63,6 +63,8 @@ public:
 	UFUNCTION()
 	void HandleItemUpdated(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData Item);
 
+	UItemData* HasCompatibleItemCostInAmmunitionSlot(const FGameplayTag CostTag);
+
 	UPROPERTY(BlueprintAssignable)
 	FOnInputAssignedSignature OnInputAssigned;
 	

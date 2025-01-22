@@ -26,8 +26,11 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "NiagaraComponent.h"
 #include "PaperFlipbookComponent.h"
+#include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AbilitySystem/Data/CharacterInfo.h"
+#include "Data/InventoryCostData.h"
 #include "Interaction/ElevatorInterface.h"
+#include "UI/Controller/InventoryWidgetController.h"
 #include "World/Map/ParallaxController.h"
 
 APlayerCharacter::APlayerCharacter()
@@ -997,9 +1000,37 @@ UInventoryComponent* APlayerCharacter::GetInventoryComponentByType_Implementatio
 	return nullptr;
 }
 
-bool APlayerCharacter::UseItem_Implementation(UItemData* Asset, int32 Amount)
+bool APlayerCharacter::UseItem_Implementation(UItemData* Asset, int32 Amount, bool bIsSelfCost)
 {
-	return PlayerInventory->UseItem(Asset, Amount);
+	if(bIsSelfCost) PlayerInventory->UseItem(Asset, Amount);
+	
+	const UInventoryCostData* InventoryCostData = ULeyrAbilitySystemLibrary::GetInventoryCostData(this);
+	bool bHasFoundCompatibleItem = false;
+	
+	if(APlayerCharacterController* PlayerCharacterController = Cast<APlayerCharacterController>(Controller))
+	{
+		if(UInventoryWidgetController* IC =PlayerCharacterController->GetInventoryWidgetController())
+		{
+			if(UItemData* PreferredAsset = IC->HasCompatibleItemCostInAmmunitionSlot(Asset->CostTag))
+			{		
+				bHasFoundCompatibleItem = PlayerInventory->UseItem(PreferredAsset, Amount);
+			}
+		}
+	}
+	
+	if(InventoryCostData && Asset && !bHasFoundCompatibleItem)
+	{		
+		FInventoryCost InventoryCost = InventoryCostData->FindCostInfoForTag(Asset->CostTag);
+		for (UItemData* CompatibleItem : InventoryCost.CompatibleItems)
+		{
+			if(PlayerInventory->UseItem(CompatibleItem, Amount))
+			{
+				bHasFoundCompatibleItem = true;
+				break;
+			}
+		}
+	}
+	return bHasFoundCompatibleItem;
 }
 
 void APlayerCharacter::ServerCloseContainer_Implementation()
