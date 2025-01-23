@@ -448,9 +448,9 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_1, GameplayTags.InputTag_LMB);
 	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_2, GameplayTags.InputTag_RMB);
 	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_3, GameplayTags.InputTag_1);
-	GameplayTags.InputTagsToEquipmentSlots.Add(GameplayTags.InputTag_LMB, GameplayTags.Equipment_ActionSlot_1);
-	GameplayTags.InputTagsToEquipmentSlots.Add(GameplayTags.InputTag_RMB, GameplayTags.Equipment_ActionSlot_2);
-	GameplayTags.InputTagsToEquipmentSlots.Add(GameplayTags.InputTag_1, GameplayTags.Equipment_ActionSlot_3);
+	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.InputTag_LMB, GameplayTags.Equipment_ActionSlot_1);
+	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.InputTag_RMB, GameplayTags.Equipment_ActionSlot_2);
+	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.InputTag_1, GameplayTags.Equipment_ActionSlot_3);
 
 	/*
 	* Player Tags

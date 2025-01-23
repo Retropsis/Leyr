@@ -26,9 +26,14 @@ class LEYR_API UInventoryWidgetController : public UWidgetController
 
 public:
 	virtual void BindCallbacksToDependencies() override;
+	
 	void ClearInputTag(const FInventoryItemData& ItemData, const FGameplayTag& InputTag);
 	bool ReplaceInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag);
 	void AssignInputTag(const FInventoryItemData& ItemData, const FGameplayTag& InputTag);
+	void ClearEquipButtonByItemData(const FInventoryItemData& ItemData);
+	bool ClearEquipButtonByInputTag(const FGameplayTag InputTag, const int32 ItemID);
+	UItemData* HasCompatibleItemCostInAmmunitionSlot(const FGameplayTag CostTag);
+	
 	void ApplyExecuteEffectToSelf(UGameplayEffect* EffectToApply, const UObject* SourceObject, const FGameplayTag& EquipmentSlot, int32 Level = 1);
 	void MakeAndApplyEffectToSelf(const UObject* SourceObject, const FGameplayTag& EquipmentSlot, TArray<FGameplayModifierInfo> Modifiers, int32 Level = 1);
 	void RemoveActiveGameplayEffect(FGameplayTag EquipmentSlot);
@@ -56,14 +61,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void SetContainerOpen(bool bIsOpen) { bContainerIsOpen = bIsOpen; }
-	
-	void ClearEquipButtonByItemData(const FInventoryItemData& ItemData);
-	bool ClearEquipButtonByInputTag(const FGameplayTag InputTag, const int32 ItemID);
 
 	UFUNCTION()
 	void HandleItemUpdated(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData Item);
-
-	UItemData* HasCompatibleItemCostInAmmunitionSlot(const FGameplayTag CostTag);
 
 	UPROPERTY(BlueprintAssignable)
 	FOnInputAssignedSignature OnInputAssigned;
@@ -76,6 +76,9 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnItemUnequippedSignature OnItemUnequipped;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnItemUpdated HandleOnItemUpdated;
 
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
 	TObjectPtr<UInventoryComponent> InventoryComponent;

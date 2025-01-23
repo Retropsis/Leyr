@@ -372,7 +372,6 @@ FGameplayTag Montage_Window_Execute;
  FGameplayTag Equipment_Ammunition;
 
  TMap<FGameplayTag, FGameplayTag> EquipmentSlotToInputTags;
- TMap<FGameplayTag, FGameplayTag> InputTagsToEquipmentSlots;
  
  /*
   * Inventory Cost Tags
