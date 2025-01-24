@@ -14,6 +14,15 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInputRemovedSignature, FGameplayT
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemEquippedSignature, FGameplayTag, SlotTag, FInventoryItemData, ItemData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemUnequippedSignature, FGameplayTag, SlotTag);
 
+USTRUCT()
+struct FEquippedItem
+{
+	GENERATED_BODY()
+
+	FInventoryItemData ItemData = FInventoryItemData();
+	FActiveGameplayEffectHandle ActiveEffect = FActiveGameplayEffectHandle();	
+};
+
 class UItemAbilityInfo;
 struct FGameplayTag;
 /**
@@ -26,20 +35,22 @@ class LEYR_API UInventoryWidgetController : public UWidgetController
 
 public:
 	virtual void BindCallbacksToDependencies() override;
-	
-	void ClearInputTag(const FInventoryItemData& ItemData, const FGameplayTag& InputTag);
-	bool ReplaceInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag);
-	void AssignInputTag(const FInventoryItemData& ItemData, const FGameplayTag& InputTag);
+	void Clear(FGameplayTag InputToClear, FGameplayTag SlotToUnequip);
+	void Assign(FGameplayTag InputToAssign, FGameplayTag SlotToEquip, FEquippedItem& ItemToEquip);
+
+	bool ReplaceInputTag(FInventoryItemData ItemData, const FGameplayTag InputTag);
+	void AssignInputTag(const FInventoryItemData& ItemData, const FGameplayTag InputTag);
 	void ClearEquipButtonByItemData(const FInventoryItemData& ItemData);
-	bool ClearEquipButtonByInputTag(const FGameplayTag InputTag, const int32 ItemID);
+	bool ClearEquipButtonByInputTag(const FGameplayTag InputTag, const UItemData* Asset);
+	void ClearInputTag(const FEquippedItem* EquippedItem, const FGameplayTag InputTag);
 	UItemData* HasCompatibleItemCostInAmmunitionSlot(const FGameplayTag CostTag);
 	
-	void ApplyExecuteEffectToSelf(UGameplayEffect* EffectToApply, const UObject* SourceObject, const FGameplayTag& EquipmentSlot, int32 Level = 1);
-	void MakeAndApplyEffectToSelf(const UObject* SourceObject, const FGameplayTag& EquipmentSlot, TArray<FGameplayModifierInfo> Modifiers, int32 Level = 1);
+	FActiveGameplayEffectHandle ApplyExecuteEffectToSelf(UGameplayEffect* EffectToApply, const UObject* SourceObject, const FGameplayTag EquipmentSlot, int32 Level = 1);
+	FActiveGameplayEffectHandle MakeAndApplyEffectToSelf(const UObject* SourceObject, const FGameplayTag& EquipmentSlot, TArray<FGameplayModifierInfo> Modifiers, int32 Level = 1);
 	void RemoveActiveGameplayEffect(FGameplayTag EquipmentSlot);
 
 	UFUNCTION(BlueprintCallable)
-	void AssignButtonPressed(FInventoryItemData ItemData, const FGameplayTag& InputTag);
+	void AssignButtonPressed(FInventoryItemData ItemData, const FGameplayTag InputTag);
 	
 	UFUNCTION(BlueprintCallable)
 	void EquipButtonPressed(FInventoryItemData ItemData);
@@ -84,8 +95,6 @@ public:
 	TObjectPtr<UInventoryComponent> InventoryComponent;
 
 private:
-	TMap<FGameplayTag, FInventoryItemData> EquippedItemAbilities;
-	TMap<FGameplayTag, FInventoryItemData> EquippedItems;
-	TMap<FGameplayTag, FActiveGameplayEffectHandle> EquippedEffects;
+	TMap<FGameplayTag, FEquippedItem> EquippedItems;
 	bool bContainerIsOpen = false;
 };

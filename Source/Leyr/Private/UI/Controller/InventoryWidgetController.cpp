@@ -17,17 +17,160 @@ void UInventoryWidgetController::BindCallbacksToDependencies()
 /*
  * Assigning
  */
-void UInventoryWidgetController::AssignButtonPressed(FInventoryItemData ItemData, const FGameplayTag& InputTag)
+void UInventoryWidgetController::AssignButtonPressed(const FInventoryItemData ItemData, const FGameplayTag InputTag)
 {
-	if(ItemData.ID == 0) return;
+	if(ItemData.Asset.Get() == nullptr) return;
+	
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 
 	if(ItemData.EquipmentSlot.MatchesTagExact(GameplayTags.Equipment_ActionSlot))
 	{
-        if (ClearEquipButtonByInputTag(InputTag, ItemData.ID)) return; 
-        if (ReplaceInputTag(ItemData, InputTag)) return;
-        AssignInputTag(ItemData, InputTag);
+		FGameplayTag InputToAssign = InputTag;
+		FGameplayTag SlotToEquip = GameplayTags.EquipmentSlotToInputTags[InputTag];
+		FEquippedItem ItemToEquip = FEquippedItem{ ItemData };
+		
+		FGameplayTag InputToClear = FGameplayTag();
+		FGameplayTag SlotToUnequip = FGameplayTag();
+		FEquippedItem ItemToClearFromInput = FEquippedItem();
+		bool bShouldClear = false;
+
+		// INPUT/SLOT ALREADY ASSIGNED
+		if(const FEquippedItem* EquippedItem = EquippedItems.Find(SlotToEquip))
+		{
+			ItemToClearFromInput = *EquippedItem;
+			InputToClear = InputToAssign;
+			// SlotToUnequip = GameplayTags.EquipmentSlotToInputTags[InputToClear];
+			bShouldClear = true;
+		}
+
+		// ITEM ALREADY ASSIGNED
+		for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
+		{
+			if (EquippedItem.Value.ItemData.Asset.Get() == ItemData.Asset.Get())
+			{
+				SlotToUnequip = EquippedItem.Key;
+				// InputToClear = GameplayTags.EquipmentSlotToInputTags[SlotToUnequip];
+				InputToClear = InputToAssign;
+				bShouldClear = true;
+				break;
+			}
+		}
+
+		// 1. Clear
+		if(bShouldClear)
+		{
+			Clear(InputToClear, SlotToUnequip);
+		}
+		
+		if (ItemToClearFromInput.ItemData.Asset.Get() == ItemToEquip.ItemData.Asset.Get() && InputToAssign.MatchesTagExact(InputToClear)) // Clear
+		{
+			GEngine->AddOnScreenDebugMessage(48950, 5.f, FColor::Green, FString::Printf(TEXT("Clear")));
+			ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputToAssign, true);
+			ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputToAssign, false);
+			return;
+		}
+		if (ItemToClearFromInput.ItemData.Asset.Get() == nullptr && !InputToClear.IsValid()) // Assign new input to new item
+		{
+			GEngine->AddOnScreenDebugMessage(48954, 5.f, FColor::Green, FString::Printf(TEXT("Assign")));
+			ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputToAssign, true);
+			ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputToAssign, false);
+		}
+		else if (ItemToClearFromInput.ItemData.Asset.Get() == nullptr && SlotToUnequip.IsValid()) // Keep Item, Change Input
+		{
+			GEngine->AddOnScreenDebugMessage(48951, 5.f, FColor::Green, FString::Printf(TEXT("Keep Item, Change Input")));
+			ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputToAssign, true);
+			ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(this, AbilitySystemComponent, ItemData, InputToAssign, GameplayTags.EquipmentSlotToInputTags[SlotToUnequip]);
+			ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, GameplayTags.EquipmentSlotToInputTags[SlotToUnequip], false);
+		}
+		else if (ItemToClearFromInput.ItemData.Asset.Get() != ItemToEquip.ItemData.Asset.Get() && SlotToUnequip.IsValid()) // Steal already assigned input to replace its own input
+		{
+			GEngine->AddOnScreenDebugMessage(48952, 5.f, FColor::Green, FString::Printf(TEXT("Steal")));
+			ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemToClearFromInput.ItemData, InputToAssign, true);
+			ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, GameplayTags.EquipmentSlotToInputTags[SlotToUnequip], false);
+			ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(this, AbilitySystemComponent, ItemData, InputToAssign, GameplayTags.EquipmentSlotToInputTags[SlotToUnequip]);
+		}
+		else	if (ItemToClearFromInput.ItemData.Asset.Get() != ItemToEquip.ItemData.Asset.Get() && InputToAssign.MatchesTagExact(InputToClear)) // Keep Input, Change Item Ability
+		{
+			GEngine->AddOnScreenDebugMessage(48953, 5.f, FColor::Green, FString::Printf(TEXT("Keep Input, Change Item Ability")));
+			ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemToClearFromInput.ItemData, InputToAssign, true);
+			ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputToAssign, false);
+		}
+		
+		// 2. Assign
+		Assign(InputToAssign, SlotToEquip, ItemToEquip);
 	}
+}
+
+void UInventoryWidgetController::Assign(const FGameplayTag InputToAssign, const FGameplayTag SlotToEquip, FEquippedItem& ItemToEquip)
+{
+	// GEngine->AddOnScreenDebugMessage(48943, 5.f, FColor::White, FString::Printf(TEXT("Assign: [%s] - [%s]"), *InputToAssign.ToString(), *SlotToEquip.ToString()));
+	OnInputAssigned.Broadcast(ItemToEquip.ItemData, InputToAssign);
+	OnItemEquipped.Broadcast(SlotToEquip, ItemToEquip.ItemData);
+	// const UItemData* Asset = ItemToEquip.ItemData.Asset.LoadSynchronous();
+	// ItemToEquip.ActiveEffect = MakeAndApplyEffectToSelf(Asset, SlotToEquip, Asset->Modifiers);
+	EquippedItems.Add(SlotToEquip, ItemToEquip);
+}
+
+void UInventoryWidgetController::Clear(const FGameplayTag InputToClear, const FGameplayTag SlotToUnequip)
+{
+	GEngine->AddOnScreenDebugMessage(48944, 5.f, FColor::White, FString::Printf(TEXT("Remove: [%s] - [%s]"), *InputToClear.ToString(), *SlotToUnequip.ToString()));
+	OnInputRemoved.Broadcast(InputToClear);
+	OnItemUnequipped.Broadcast(SlotToUnequip);
+	// RemoveActiveGameplayEffect(SlotToUnequip);
+	EquippedItems.Remove(SlotToUnequip);
+}
+
+bool UInventoryWidgetController::ClearEquipButtonByInputTag(const FGameplayTag InputTag, const UItemData* Asset)
+{
+	if(const FEquippedItem* EquippedItem = EquippedItems.Find(InputTag))
+	{
+		ClearInputTag(EquippedItem, InputTag);
+		return Asset == EquippedItem->ItemData.Asset;
+	}
+	return false;
+}
+
+void UInventoryWidgetController::ClearInputTag(const FEquippedItem* EquippedItem, const FGameplayTag InputTag)
+{
+	ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, EquippedItem->ItemData, InputTag, true);
+	ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputTag, false);
+	EquippedItems.Remove(InputTag);
+	OnInputRemoved.Broadcast(InputTag);
+	Unequip(InputTag);
+	InventoryComponent->UpdateItemInputTag(EquippedItem->ItemData, FBaseGameplayTags::Get().InputTag_None);
+}
+
+bool UInventoryWidgetController::ReplaceInputTag(FInventoryItemData ItemData, const FGameplayTag InputTag)
+{
+	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
+	{
+		if (EquippedItem.Value.ItemData.Asset == ItemData.Asset)
+		{
+			ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(this, AbilitySystemComponent, ItemData, InputTag, EquippedItem.Key);
+			ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, EquippedItem.Key, false);
+			
+			EquippedItems.Remove(EquippedItem.Key);
+			EquippedItems.Add(InputTag, FEquippedItem{ ItemData });
+			OnInputRemoved.Broadcast(EquippedItem.Key);
+			OnInputAssigned.Broadcast(ItemData, InputTag);
+			
+			Assign(ItemData, InputTag);
+			Unequip(EquippedItem.Key);
+			InventoryComponent->UpdateItemInputTag(ItemData, InputTag);
+			return true;
+		}
+	}
+	return false;
+}
+
+void UInventoryWidgetController::AssignInputTag(const FInventoryItemData& ItemData, const FGameplayTag InputTag)
+{
+	ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputTag, true);
+	ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputTag, false);
+	EquippedItems.Add(InputTag, FEquippedItem{ ItemData });
+	OnInputAssigned.Broadcast(ItemData, InputTag);
+	Assign(ItemData, InputTag);
+	InventoryComponent->UpdateItemInputTag(ItemData, InputTag);
 }
 
 void UInventoryWidgetController::Assign(const FInventoryItemData& ItemData, FGameplayTag InputTag)
@@ -44,7 +187,7 @@ void UInventoryWidgetController::Assign(const FInventoryItemData& ItemData, FGam
 		}
 	}
 	
-	EquippedItems.Add(Slot, Item);
+	EquippedItems.Add(Slot, FEquippedItem{ Item });
 	OnItemEquipped.Broadcast(Slot, Item);
 	
 	UItemData* ItemDataAsset = ItemData.Asset.LoadSynchronous();
@@ -55,69 +198,16 @@ void UInventoryWidgetController::Assign(const FInventoryItemData& ItemData, FGam
 	MakeAndApplyEffectToSelf(ItemData.Asset.Get(), Slot, ItemDataAsset->Modifiers);
 }
 
-void UInventoryWidgetController::ClearInputTag(const FInventoryItemData& ItemData, const FGameplayTag& InputTag)
-{
-	ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputTag, true);
-	ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputTag, false);
-	EquippedItemAbilities.Remove(InputTag);
-	OnInputRemoved.Broadcast(InputTag);
-	Unequip(InputTag);
-	InventoryComponent->UpdateItemInputTag(ItemData, FBaseGameplayTags::Get().InputTag_None);
-}
-
-void UInventoryWidgetController::AssignInputTag(const FInventoryItemData& ItemData, const FGameplayTag& InputTag)
-{
-	ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputTag, true);
-	ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputTag, false);
-	EquippedItemAbilities.Add(InputTag, ItemData);
-	OnInputAssigned.Broadcast(ItemData, InputTag);
-	Assign(ItemData, InputTag);
-	InventoryComponent->UpdateItemInputTag(ItemData, InputTag);
-}
-
-bool UInventoryWidgetController::ReplaceInputTag(FInventoryItemData ItemData, const FGameplayTag& InputTag)
-{
-	for (TTuple<FGameplayTag, FInventoryItemData> EquippedAbility : EquippedItemAbilities)
-	{
-		if(EquippedAbility.Value.ID == ItemData.ID)
-		{
-			ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(this, AbilitySystemComponent, ItemData, InputTag, EquippedAbility.Key);
-			ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, EquippedAbility.Key, false);
-			
-			EquippedItemAbilities.Remove(EquippedAbility.Key);
-			EquippedItemAbilities.Add(InputTag, ItemData);
-			OnInputRemoved.Broadcast(EquippedAbility.Key);
-			OnInputAssigned.Broadcast(ItemData, InputTag);
-			
-			Assign(ItemData, InputTag);
-			Unequip(EquippedAbility.Key);
-			InventoryComponent->UpdateItemInputTag(ItemData, InputTag);
-			return true;
-		}
-	}
-	return false;
-}
-
 void UInventoryWidgetController::ClearEquipButtonByItemData(const FInventoryItemData& ItemData)
 {
-	for (TTuple<FGameplayTag, FInventoryItemData> EquippedAbility : EquippedItemAbilities)
+	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
 	{
-		if(EquippedAbility.Value.ID == ItemData.ID)
+		if(EquippedItem.Value.ItemData.Asset == ItemData.Asset)
 		{
-			ClearInputTag(ItemData, EquippedAbility.Key);
+			ClearInputTag(&EquippedItem.Value, EquippedItem.Key);
 			return;
 		}
 	}
-}
-
-bool UInventoryWidgetController::ClearEquipButtonByInputTag(const FGameplayTag InputTag, const int32 ItemID)
-{
-	if(const FInventoryItemData* ItemToRemove = EquippedItemAbilities.Find(InputTag))
-	{
-		ClearInputTag(*ItemToRemove, InputTag);
-		return ItemID == ItemToRemove->ID;
-	}
-	return false;
 }
 
 /*
@@ -134,11 +224,11 @@ void UInventoryWidgetController::Equip(const FInventoryItemData& ItemData)
 	const FInventoryItemData Item = ULeyrAbilitySystemLibrary::FindItemDataByRowName(this, ItemData.Name); // Why do I do this ????
 	FGameplayTag Slot = Item.EquipmentSlot;
 	
-	for (TTuple<FGameplayTag, FInventoryItemData> EquippedItem : EquippedItems)
+	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
 	{
 		if (Slot.MatchesTagExact(EquippedItem.Key))
 		{
-			if (EquippedItems.Contains(Slot) && ItemData.Asset == EquippedItem.Value.Asset)
+			if (EquippedItems.Contains(Slot) && ItemData.Asset == EquippedItem.Value.ItemData.Asset)
 			{
 				EquippedItems.Remove(Slot);
 				OnItemUnequipped.Broadcast(Slot);	
@@ -147,7 +237,7 @@ void UInventoryWidgetController::Equip(const FInventoryItemData& ItemData)
 			}
 		}
 	}
-	EquippedItems.Add(Slot, Item);
+	EquippedItems.Add(Slot, FEquippedItem{ Item });
 	OnItemEquipped.Broadcast(Slot, Item);
 
 	UItemData* ItemDataAsset = ItemData.Asset.LoadSynchronous();
@@ -186,9 +276,9 @@ void UInventoryWidgetController::HandleItemUpdated(EContainerType ContainerType,
 
 UItemData* UInventoryWidgetController::HasCompatibleItemCostInAmmunitionSlot(const FGameplayTag CostTag)
 {
-	if (const FInventoryItemData* ItemData = EquippedItems.Find(FBaseGameplayTags::Get().Equipment_Ammunition))
+	if (const FEquippedItem* EquippedItem = EquippedItems.Find(FBaseGameplayTags::Get().Equipment_Ammunition))
 	{
-		if(UItemData* Asset = ItemData->Asset.LoadSynchronous())
+		if(UItemData* Asset = EquippedItem->ItemData.Asset.LoadSynchronous())
 		{
 			return Asset->CostTag.MatchesTagExact(CostTag) ? Asset : nullptr;
 		}
@@ -226,7 +316,7 @@ void UInventoryWidgetController::LootAllButtonPressed()
 /*
  * Gameplay Effects
  */
-void UInventoryWidgetController::ApplyExecuteEffectToSelf(UGameplayEffect* EffectToApply, const UObject* SourceObject, const FGameplayTag& EquipmentSlot, const int32 Level)
+FActiveGameplayEffectHandle UInventoryWidgetController::ApplyExecuteEffectToSelf(UGameplayEffect* EffectToApply, const UObject* SourceObject, const FGameplayTag EquipmentSlot, const int32 Level)
 {
 	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
 	EffectContext.AddSourceObject(SourceObject);
@@ -236,11 +326,10 @@ void UInventoryWidgetController::ApplyExecuteEffectToSelf(UGameplayEffect* Effec
 	InheritedTagContainer.Added.AddTag(EquipmentSlot);
 	AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
 
-	const FActiveGameplayEffectHandle ActiveEffectHandle = AbilitySystemComponent->ApplyGameplayEffectToSelf(EffectToApply, Level, EffectContext);
-	EquippedEffects.Add(EquipmentSlot, ActiveEffectHandle);
+	return AbilitySystemComponent->ApplyGameplayEffectToSelf(EffectToApply, Level, EffectContext);
 }
 
-void UInventoryWidgetController::MakeAndApplyEffectToSelf(const UObject* SourceObject, const FGameplayTag& EquipmentSlot, TArray<FGameplayModifierInfo> Modifiers, const int32 Level)
+FActiveGameplayEffectHandle UInventoryWidgetController::MakeAndApplyEffectToSelf(const UObject* SourceObject, const FGameplayTag& EquipmentSlot, TArray<FGameplayModifierInfo> Modifiers, const int32 Level)
 {
 	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
 	EffectContext.AddSourceObject(SourceObject);
@@ -255,24 +344,30 @@ void UInventoryWidgetController::MakeAndApplyEffectToSelf(const UObject* SourceO
 	InheritedTagContainer.Added.AddTag(EquipmentSlot);
 	AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
 
-	for (FGameplayModifierInfo Modifier : Modifiers)
+	for (int i = 0; i < Modifiers.Num(); ++i)
 	{
-		Effect->Modifiers.Add(Modifier);
+		Effect->Modifiers.Add(Modifiers[i]);
 	}
 
 	if (const FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec(Effect, EffectContext, Level))
 	{
-		const FActiveGameplayEffectHandle ActiveEffectHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*MutableSpec, AbilitySystemComponent);
-		EquippedEffects.Add(EquipmentSlot, ActiveEffectHandle);
+		return AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*MutableSpec, AbilitySystemComponent);
 	}
+	return FActiveGameplayEffectHandle();
 }
 
 void UInventoryWidgetController::RemoveActiveGameplayEffect(FGameplayTag EquipmentSlot)
 {
-	if(EquippedEffects.IsEmpty()) return;
-	
-	const FActiveGameplayEffectHandle* HandleToRemove = EquippedEffects.Find(EquipmentSlot);
-	AbilitySystemComponent->RemoveActiveGameplayEffect(*HandleToRemove);
+	if(EquippedItems.IsEmpty()) return;
+
+	if (FEquippedItem* ItemToRemove = EquippedItems.Find(EquipmentSlot))
+	{
+		if(ItemToRemove->ActiveEffect.IsValid())
+		{
+			AbilitySystemComponent->RemoveActiveGameplayEffect(ItemToRemove->ActiveEffect);
+		}
+		
+	}
 	// FGameplayEffectQuery Query;
 	// Query.EffectTagQuery.
 	// AbilitySystemComponent->RemoveActiveEffects()

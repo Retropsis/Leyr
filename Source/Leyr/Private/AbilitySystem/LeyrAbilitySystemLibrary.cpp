@@ -366,7 +366,7 @@ void ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(const UObject* WorldConte
 				AbilitySpec->DynamicAbilityTags.AddTag(InputTag);
 						
 				const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-				BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
+				BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, TagToRemove);
 			}
 		}
 	}
