@@ -39,7 +39,6 @@ void UInventoryWidgetController::AssignButtonPressed(const FInventoryItemData It
 		{
 			ItemToClearFromInput = *EquippedItem;
 			InputToClear = InputToAssign;
-			// SlotToUnequip = GameplayTags.EquipmentSlotToInputTags[InputToClear];
 			bShouldClear = true;
 		}
 
@@ -49,7 +48,6 @@ void UInventoryWidgetController::AssignButtonPressed(const FInventoryItemData It
 			if (EquippedItem.Value.ItemData.Asset.Get() == ItemData.Asset.Get())
 			{
 				SlotToUnequip = EquippedItem.Key;
-				// InputToClear = GameplayTags.EquipmentSlotToInputTags[SlotToUnequip];
 				InputToClear = InputToAssign;
 				bShouldClear = true;
 				break;
@@ -120,96 +118,6 @@ void UInventoryWidgetController::Clear(const FGameplayTag InputToClear, const FG
 	EquippedItems.Remove(SlotToUnequip);
 }
 
-bool UInventoryWidgetController::ClearEquipButtonByInputTag(const FGameplayTag InputTag, const UItemData* Asset)
-{
-	if(const FEquippedItem* EquippedItem = EquippedItems.Find(InputTag))
-	{
-		ClearInputTag(EquippedItem, InputTag);
-		return Asset == EquippedItem->ItemData.Asset;
-	}
-	return false;
-}
-
-void UInventoryWidgetController::ClearInputTag(const FEquippedItem* EquippedItem, const FGameplayTag InputTag)
-{
-	ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, EquippedItem->ItemData, InputTag, true);
-	ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputTag, false);
-	EquippedItems.Remove(InputTag);
-	OnInputRemoved.Broadcast(InputTag);
-	Unequip(InputTag);
-	InventoryComponent->UpdateItemInputTag(EquippedItem->ItemData, FBaseGameplayTags::Get().InputTag_None);
-}
-
-bool UInventoryWidgetController::ReplaceInputTag(FInventoryItemData ItemData, const FGameplayTag InputTag)
-{
-	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
-	{
-		if (EquippedItem.Value.ItemData.Asset == ItemData.Asset)
-		{
-			ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(this, AbilitySystemComponent, ItemData, InputTag, EquippedItem.Key);
-			ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, EquippedItem.Key, false);
-			
-			EquippedItems.Remove(EquippedItem.Key);
-			EquippedItems.Add(InputTag, FEquippedItem{ ItemData });
-			OnInputRemoved.Broadcast(EquippedItem.Key);
-			OnInputAssigned.Broadcast(ItemData, InputTag);
-			
-			Assign(ItemData, InputTag);
-			Unequip(EquippedItem.Key);
-			InventoryComponent->UpdateItemInputTag(ItemData, InputTag);
-			return true;
-		}
-	}
-	return false;
-}
-
-void UInventoryWidgetController::AssignInputTag(const FInventoryItemData& ItemData, const FGameplayTag InputTag)
-{
-	ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputTag, true);
-	ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputTag, false);
-	EquippedItems.Add(InputTag, FEquippedItem{ ItemData });
-	OnInputAssigned.Broadcast(ItemData, InputTag);
-	Assign(ItemData, InputTag);
-	InventoryComponent->UpdateItemInputTag(ItemData, InputTag);
-}
-
-void UInventoryWidgetController::Assign(const FInventoryItemData& ItemData, FGameplayTag InputTag)
-{
-	const FInventoryItemData Item = ULeyrAbilitySystemLibrary::FindItemDataByRowName(this, ItemData.Name);
-	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-	FGameplayTag Slot = Item.EquipmentSlot;
-
-	if(Slot.MatchesTagExact(GameplayTags.Equipment_ActionSlot))
-	{
-		if(GameplayTags.EquipmentSlotToInputTags.Contains(InputTag))
-		{
-			Slot = GameplayTags.EquipmentSlotToInputTags[InputTag];
-		}
-	}
-	
-	EquippedItems.Add(Slot, FEquippedItem{ Item });
-	OnItemEquipped.Broadcast(Slot, Item);
-	
-	UItemData* ItemDataAsset = ItemData.Asset.LoadSynchronous();
-	for (TSubclassOf<UGameplayEffect> Effect : ItemDataAsset->Effects)
-	{
-		ApplyExecuteEffectToSelf(Effect.GetDefaultObject(), ItemData.Asset.Get(), Slot);
-	}
-	MakeAndApplyEffectToSelf(ItemData.Asset.Get(), Slot, ItemDataAsset->Modifiers);
-}
-
-void UInventoryWidgetController::ClearEquipButtonByItemData(const FInventoryItemData& ItemData)
-{
-	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
-	{
-		if(EquippedItem.Value.ItemData.Asset == ItemData.Asset)
-		{
-			ClearInputTag(&EquippedItem.Value, EquippedItem.Key);
-			return;
-		}
-	}
-}
-
 /*
  * Equipping
  */
@@ -232,7 +140,7 @@ void UInventoryWidgetController::Equip(const FInventoryItemData& ItemData)
 			{
 				EquippedItems.Remove(Slot);
 				OnItemUnequipped.Broadcast(Slot);	
-				RemoveActiveGameplayEffect(Slot);
+				// RemoveActiveGameplayEffect(Slot);
 				return;
 			}
 		}
@@ -240,27 +148,12 @@ void UInventoryWidgetController::Equip(const FInventoryItemData& ItemData)
 	EquippedItems.Add(Slot, FEquippedItem{ Item });
 	OnItemEquipped.Broadcast(Slot, Item);
 
-	UItemData* ItemDataAsset = ItemData.Asset.LoadSynchronous();
-	for (TSubclassOf<UGameplayEffect> Effect : ItemDataAsset->Effects)
-	{
-		ApplyExecuteEffectToSelf(Effect.GetDefaultObject(), ItemData.Asset.Get(), Slot);
-	}
-	MakeAndApplyEffectToSelf(ItemData.Asset.Get(), Slot, ItemDataAsset->Modifiers);
-}
-
-void UInventoryWidgetController::Unequip(FGameplayTag InputTag)
-{
-	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-	FGameplayTag Slot = FGameplayTag();
-	
-	if(GameplayTags.EquipmentSlotToInputTags.Contains(InputTag))
-	{
-		Slot = GameplayTags.EquipmentSlotToInputTags[InputTag];
-	}
-	EquippedItems.Remove(Slot);
-	OnItemUnequipped.Broadcast(Slot);
-	GEngine->AddOnScreenDebugMessage(9789444, 5.f, FColor::Magenta, "UInventoryWidgetController::Unequip");
-	RemoveActiveGameplayEffect(Slot);
+	// UItemData* ItemDataAsset = ItemData.Asset.LoadSynchronous();
+	// for (TSubclassOf<UGameplayEffect> Effect : ItemDataAsset->Effects)
+	// {
+	// 	ApplyExecuteEffectToSelf(Effect.GetDefaultObject(), ItemData.Asset.Get(), Slot);
+	// }
+	// MakeAndApplyEffectToSelf(ItemData.Asset.Get(), Slot, ItemDataAsset->Modifiers);
 }
 
 void UInventoryWidgetController::HandleItemUpdated(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData Item)
@@ -270,7 +163,14 @@ void UInventoryWidgetController::HandleItemUpdated(EContainerType ContainerType,
 	const UItemData* Asset =  Item.Asset.LoadSynchronous();
 	if (Item.Quantity == 0 && Asset && Asset->bRemoveStackIfEmpty)
 	{
-		ClearEquipButtonByItemData(Item);
+		for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
+		{
+			if(EquippedItem.Value.ItemData.Asset.Get() == Item.Asset.Get())
+			{
+				Clear(FBaseGameplayTags::Get().EquipmentSlotToInputTags[EquippedItem.Key], EquippedItem.Key);
+				return;
+			}
+		}
 	}
 }
 

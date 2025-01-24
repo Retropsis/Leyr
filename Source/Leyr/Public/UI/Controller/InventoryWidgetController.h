@@ -37,12 +37,6 @@ public:
 	virtual void BindCallbacksToDependencies() override;
 	void Clear(FGameplayTag InputToClear, FGameplayTag SlotToUnequip);
 	void Assign(FGameplayTag InputToAssign, FGameplayTag SlotToEquip, FEquippedItem& ItemToEquip);
-
-	bool ReplaceInputTag(FInventoryItemData ItemData, const FGameplayTag InputTag);
-	void AssignInputTag(const FInventoryItemData& ItemData, const FGameplayTag InputTag);
-	void ClearEquipButtonByItemData(const FInventoryItemData& ItemData);
-	bool ClearEquipButtonByInputTag(const FGameplayTag InputTag, const UItemData* Asset);
-	void ClearInputTag(const FEquippedItem* EquippedItem, const FGameplayTag InputTag);
 	UItemData* HasCompatibleItemCostInAmmunitionSlot(const FGameplayTag CostTag);
 	
 	FActiveGameplayEffectHandle ApplyExecuteEffectToSelf(UGameplayEffect* EffectToApply, const UObject* SourceObject, const FGameplayTag EquipmentSlot, int32 Level = 1);
@@ -56,13 +50,7 @@ public:
 	void EquipButtonPressed(FInventoryItemData ItemData);
 	
 	UFUNCTION(BlueprintCallable)
-	void Assign(const FInventoryItemData& ItemData, FGameplayTag InputTag);
-	
-	UFUNCTION(BlueprintCallable)
 	void Equip(const FInventoryItemData& ItemData);
-	
-	UFUNCTION(BlueprintCallable)
-	void Unequip(FGameplayTag InputTag);
 	
 	UFUNCTION(BlueprintCallable)
 	void LootButtonPressed(int32 SourceSlotIndex);
