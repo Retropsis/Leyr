@@ -1,6 +1,7 @@
 // @ Retropsis 2024-2025.
 
 #include "UI/Controller/InventoryWidgetController.h"
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayEffect.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
@@ -12,6 +13,10 @@ void UInventoryWidgetController::BindCallbacksToDependencies()
 {
 	checkf(InventoryComponent, TEXT("InventoryComponent is NULL, please check [%s]"), *GetName());
 	InventoryComponent->OnItemUpdated.AddDynamic(this, &UInventoryWidgetController::HandleItemUpdated);
+
+	FGameplayEffectSpecHandle EquipmentSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(EquipmentEffectClass, 1.f, AbilitySystemComponent->MakeEffectContext());
+	
+	ActiveEquipmentEffectHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*EquipmentSpecHandle.Data.Get(), AbilitySystemComponent);
 }
 
 /*
@@ -39,6 +44,7 @@ void UInventoryWidgetController::AssignButtonPressed(const FInventoryItemData It
 		{
 			ItemToClearFromInput = *EquippedItem;
 			InputToClear = InputToAssign;
+			// SlotToUnequip = EquippedItem.Key;
 			bShouldClear = true;
 		}
 
@@ -83,9 +89,9 @@ void UInventoryWidgetController::AssignButtonPressed(const FInventoryItemData It
 		else if (ItemToClearFromInput.ItemData.Asset.Get() != ItemToEquip.ItemData.Asset.Get() && SlotToUnequip.IsValid()) // Steal already assigned input to replace its own input
 		{
 			GEngine->AddOnScreenDebugMessage(48952, 5.f, FColor::Green, FString::Printf(TEXT("Steal")));
-			ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemToClearFromInput.ItemData, InputToAssign, true);
-			ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, GameplayTags.EquipmentSlotToInputTags[SlotToUnequip], false);
+			ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemToClearFromInput.ItemData, GameplayTags.EquipmentSlotToInputTags[SlotToUnequip], true);
 			ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(this, AbilitySystemComponent, ItemData, InputToAssign, GameplayTags.EquipmentSlotToInputTags[SlotToUnequip]);
+			ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, GameplayTags.EquipmentSlotToInputTags[SlotToUnequip], false);
 		}
 		else	if (ItemToClearFromInput.ItemData.Asset.Get() != ItemToEquip.ItemData.Asset.Get() && InputToAssign.MatchesTagExact(InputToClear)) // Keep Input, Change Item Ability
 		{
@@ -106,7 +112,21 @@ void UInventoryWidgetController::Assign(const FGameplayTag InputToAssign, const 
 	OnItemEquipped.Broadcast(SlotToEquip, ItemToEquip.ItemData);
 	// const UItemData* Asset = ItemToEquip.ItemData.Asset.LoadSynchronous();
 	// ItemToEquip.ActiveEffect = MakeAndApplyEffectToSelf(Asset, SlotToEquip, Asset->Modifiers);
+
+	// for (TSubclassOf<UGameplayEffect> Effect : Asset->Effects)
+	// {
+	// 	FGameplayEffectContextHandle ContextHandle = AbilitySystemComponent->MakeEffectContext();
+	// 	FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(Effect, 1.f, ContextHandle);
+	// 	const_cast<UGameplayEffect*>(SpecHandle.Data.Get()->Def.Get())->Modifiers = Asset->Modifiers;
+	// 	ItemToEquip.ActiveEffect = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+	// }
+
+	if(const UItemData* Asset = ItemToEquip.ItemData.Asset.LoadSynchronous())
+	{
+		ItemToEquip.Modifiers = Asset->Modifiers;
+	}
 	EquippedItems.Add(SlotToEquip, ItemToEquip);
+	UpdateEquipmentEffect();
 }
 
 void UInventoryWidgetController::Clear(const FGameplayTag InputToClear, const FGameplayTag SlotToUnequip)
@@ -116,6 +136,7 @@ void UInventoryWidgetController::Clear(const FGameplayTag InputToClear, const FG
 	OnItemUnequipped.Broadcast(SlotToUnequip);
 	// RemoveActiveGameplayEffect(SlotToUnequip);
 	EquippedItems.Remove(SlotToUnequip);
+	UpdateEquipmentEffect();
 }
 
 /*
@@ -129,31 +150,45 @@ void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData)
 
 void UInventoryWidgetController::Equip(const FInventoryItemData& ItemData)
 {
-	const FInventoryItemData Item = ULeyrAbilitySystemLibrary::FindItemDataByRowName(this, ItemData.Name); // Why do I do this ????
-	FGameplayTag Slot = Item.EquipmentSlot;
+	UItemData* Asset = ItemData.Asset.LoadSynchronous();
+	FGameplayTag Slot = ItemData.EquipmentSlot;
+	
+	if(Asset == nullptr || Slot.MatchesTagExact(FBaseGameplayTags::Get().Equipment_ActionSlot)) return;
 	
 	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
 	{
 		if (Slot.MatchesTagExact(EquippedItem.Key))
 		{
-			if (EquippedItems.Contains(Slot) && ItemData.Asset == EquippedItem.Value.ItemData.Asset)
+			if (EquippedItems.Contains(Slot) && ItemData.Asset.Get() == EquippedItem.Value.ItemData.Asset.Get())
 			{
-				EquippedItems.Remove(Slot);
+				RemoveActiveGameplayEffect(Slot);
 				OnItemUnequipped.Broadcast(Slot);	
-				// RemoveActiveGameplayEffect(Slot);
+				EquippedItems.Remove(Slot);
+				UpdateEquipmentEffect();
 				return;
 			}
 		}
 	}
-	EquippedItems.Add(Slot, FEquippedItem{ Item });
-	OnItemEquipped.Broadcast(Slot, Item);
-
-	// UItemData* ItemDataAsset = ItemData.Asset.LoadSynchronous();
-	// for (TSubclassOf<UGameplayEffect> Effect : ItemDataAsset->Effects)
+	
+	FEquippedItem ItemToEquip{ItemData };
+	// for (const TSubclassOf<UGameplayEffect> Effect : Asset->Effects)
+	// {
+	// 	const FGameplayEffectContextHandle ContextHandle = AbilitySystemComponent->MakeEffectContext();
+	// 	FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(Effect, 1.f, ContextHandle);
+	// 	const_cast<UGameplayEffect*>(SpecHandle.Data.Get()->Def.Get())->Modifiers = Asset->Modifiers;
+	// 	ItemToEquip.ActiveEffect = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+	// }
+	
+	// for (TSubclassOf<UGameplayEffect> Effect : Asset->Effects)
 	// {
 	// 	ApplyExecuteEffectToSelf(Effect.GetDefaultObject(), ItemData.Asset.Get(), Slot);
 	// }
-	// MakeAndApplyEffectToSelf(ItemData.Asset.Get(), Slot, ItemDataAsset->Modifiers);
+	// MakeAndApplyEffectToSelf(ItemData.Asset.Get(), Slot, Asset->Modifiers);
+	
+	OnItemEquipped.Broadcast(Slot, ItemData);
+	ItemToEquip.Modifiers = Asset->Modifiers;
+	EquippedItems.Add(Slot, ItemToEquip);
+	UpdateEquipmentEffect();
 }
 
 void UInventoryWidgetController::HandleItemUpdated(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData Item)
@@ -230,12 +265,12 @@ FActiveGameplayEffectHandle UInventoryWidgetController::ApplyExecuteEffectToSelf
 }
 
 FActiveGameplayEffectHandle UInventoryWidgetController::MakeAndApplyEffectToSelf(const UObject* SourceObject, const FGameplayTag& EquipmentSlot, TArray<FGameplayModifierInfo> Modifiers, const int32 Level)
-{
+{	
 	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
 	EffectContext.AddSourceObject(SourceObject);
 
-	FString TagName = FString::Printf(TEXT("%s"), *EquipmentSlot.ToString());
-	UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(TagName));
+	FString SourceObjectName = FString::Printf(TEXT("%s_AddedEffects"), *SourceObject->GetName());
+	UGameplayEffect* Effect = NewObject<UGameplayEffect>(this, FName(SourceObjectName));
 
 	Effect->DurationPolicy = EGameplayEffectDurationType::Infinite;
 	
@@ -249,7 +284,7 @@ FActiveGameplayEffectHandle UInventoryWidgetController::MakeAndApplyEffectToSelf
 		Effect->Modifiers.Add(Modifiers[i]);
 	}
 
-	if (const FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec(Effect, EffectContext, Level))
+	if (FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec(Effect, EffectContext, Level))
 	{
 		return AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*MutableSpec, AbilitySystemComponent);
 	}
@@ -262,13 +297,46 @@ void UInventoryWidgetController::RemoveActiveGameplayEffect(FGameplayTag Equipme
 
 	if (FEquippedItem* ItemToRemove = EquippedItems.Find(EquipmentSlot))
 	{
+		GEngine->AddOnScreenDebugMessage(35777, 5.f, FColor::Magenta, FString::Printf(TEXT("Removing: [%s]"), *ItemToRemove->ActiveEffect.ToString()));
 		if(ItemToRemove->ActiveEffect.IsValid())
 		{
 			AbilitySystemComponent->RemoveActiveGameplayEffect(ItemToRemove->ActiveEffect);
 		}
-		
 	}
 	// FGameplayEffectQuery Query;
 	// Query.EffectTagQuery.
 	// AbilitySystemComponent->RemoveActiveEffects()
+}
+
+void UInventoryWidgetController::UpdateEquipmentEffect()
+{
+	if(ActiveEquipmentEffectHandle.IsValid()) AbilitySystemComponent->RemoveActiveGameplayEffect(ActiveEquipmentEffectHandle);
+	
+	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
+
+	FString SourceObjectName = FString::Printf(TEXT("%s"), *EquipmentEffectClass->GetName());
+	UGameplayEffect* Effect = NewObject<UGameplayEffect>(this, FName(SourceObjectName));
+
+	Effect->DurationPolicy = EGameplayEffectDurationType::Infinite;
+	
+	// UTargetTagsGameplayEffectComponent& AssetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
+	// FInheritedTagContainer InheritedTagContainer;
+	// InheritedTagContainer.Added.AddTag(EquipmentSlot);
+	// AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
+
+	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
+	{
+		// const UItemData* Asset = EquippedItem.Value.ItemData.Asset.LoadSynchronous();
+		// if(Asset == nullptr) continue;
+		for (int i = 0; i < EquippedItem.Value.Modifiers.Num(); ++i)
+		{
+			Effect->Modifiers.Add(EquippedItem.Value.Modifiers[i]);
+		}
+	}
+
+	if (FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec(Effect, EffectContext, 1.f))
+	{
+		ActiveEquipmentEffectHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*MutableSpec, AbilitySystemComponent);
+	}
 }

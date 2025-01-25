@@ -20,7 +20,8 @@ struct FEquippedItem
 	GENERATED_BODY()
 
 	FInventoryItemData ItemData = FInventoryItemData();
-	FActiveGameplayEffectHandle ActiveEffect = FActiveGameplayEffectHandle();	
+	FActiveGameplayEffectHandle ActiveEffect = FActiveGameplayEffectHandle();
+	TArray<FGameplayModifierInfo> Modifiers;
 };
 
 class UItemAbilityInfo;
@@ -43,6 +44,8 @@ public:
 	FActiveGameplayEffectHandle MakeAndApplyEffectToSelf(const UObject* SourceObject, const FGameplayTag& EquipmentSlot, TArray<FGameplayModifierInfo> Modifiers, int32 Level = 1);
 	void RemoveActiveGameplayEffect(FGameplayTag EquipmentSlot);
 
+	void UpdateEquipmentEffect();
+
 	UFUNCTION(BlueprintCallable)
 	void AssignButtonPressed(FInventoryItemData ItemData, const FGameplayTag InputTag);
 	
@@ -63,6 +66,9 @@ public:
 
 	UFUNCTION()
 	void HandleItemUpdated(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData Item);
+	
+	UPROPERTY(EditDefaultsOnly, Category="WidgetController|Equipment")
+	TSubclassOf<UGameplayEffect> EquipmentEffectClass;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnInputAssignedSignature OnInputAssigned;
@@ -84,5 +90,6 @@ public:
 
 private:
 	TMap<FGameplayTag, FEquippedItem> EquippedItems;
+	FActiveGameplayEffectHandle ActiveEquipmentEffectHandle;
 	bool bContainerIsOpen = false;
 };
