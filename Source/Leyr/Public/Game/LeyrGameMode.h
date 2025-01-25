@@ -45,9 +45,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category="Inventory")
 	TObjectPtr<UDataTable> ItemDataTable;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Inventory")
-	TSubclassOf<UGameplayEffect> EquipmentEffectClass;
 
 	FInventoryItemData FindItemDataByID(int32 ItemID) const;
 	FInventoryItemData FindItemDataByRowName(FName RowName) const;

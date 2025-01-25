@@ -230,7 +230,7 @@ UAbilityInfo* ULeyrAbilitySystemLibrary::GetAbilityInfo(const UObject* WorldCont
 	return LeyrGameMode->AbilityInfo;
 }
 
-void ULeyrAbilitySystemLibrary::UpdateMonkAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FGameplayTag InputTag, bool bShouldClear)
+void ULeyrAbilitySystemLibrary::UpdateMonkAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FGameplayTagContainer InputTags, bool bShouldClear)
 {
 	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);
 	if(CharacterClassInfo == nullptr) return;
@@ -244,13 +244,19 @@ void ULeyrAbilitySystemLibrary::UpdateMonkAbilities(const UObject* WorldContextO
 				const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 				if(bShouldClear)
 				{
-					AbilitySpec->DynamicAbilityTags.RemoveTag(InputTag);
-					BaseASC->ClientEquipAbility(GameplayTags.Abilities_None, GameplayTags.Abilities_None, InputTag, FGameplayTag());
+					for (FGameplayTag InputTag : InputTags)
+					{
+						AbilitySpec->DynamicAbilityTags.RemoveTag(InputTag);
+                        BaseASC->ClientEquipAbility(GameplayTags.Abilities_None, GameplayTags.Abilities_None, InputTag, FGameplayTag());
+					}
 				}
 				else
 				{
-					AbilitySpec->DynamicAbilityTags.AddTag(InputTag);
-					BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
+					for (FGameplayTag InputTag : InputTags)
+					{
+						AbilitySpec->DynamicAbilityTags.AddTag(InputTag);
+						BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
+					}
 				}
 				ASC->MarkAbilitySpecDirty(*AbilitySpec);
 			}
@@ -665,11 +671,4 @@ UInventoryCostData* ULeyrAbilitySystemLibrary::GetInventoryCostData(const UObjec
 	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
 	if (LeyrGameMode == nullptr) return nullptr;
 	return LeyrGameMode->InventoryCostInfo;
-}
-
-TSubclassOf<UGameplayEffect> ULeyrAbilitySystemLibrary::GetEquipmentEffectClass(const UObject* WorldContextObject)
-{
-	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
-	if (LeyrGameMode == nullptr) return nullptr;
-	return LeyrGameMode->EquipmentEffectClass;
 }

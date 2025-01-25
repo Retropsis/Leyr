@@ -75,7 +75,7 @@ public:
 	static UAbilityInfo* GetAbilityInfo(const UObject* WorldContextObject);
 	
 	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|CharacterClassDefaults", meta=(WorldContext="WorldContextObject"))
-	static void UpdateMonkAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FGameplayTag InputTag, bool bShouldClear);
+	static void UpdateMonkAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FGameplayTagContainer InputTags, bool bShouldClear);
 	
 	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|CharacterClassDefaults", meta=(WorldContext="WorldContextObject"))
 	static void GiveItemAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag InputTag);
@@ -207,7 +207,4 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|Inventory", meta=(WorldContext="WorldContextObject"))
 	static UInventoryCostData* GetInventoryCostData(const UObject* WorldContextObject);
-	
-	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|Inventory", meta=(WorldContext="WorldContextObject"))
-	static TSubclassOf<UGameplayEffect> GetEquipmentEffectClass(const UObject* WorldContextObject);
 };

@@ -49,10 +49,10 @@ public:
 	void Equip(const FInventoryItemData& ItemData);
 	
 	UFUNCTION(BlueprintCallable)
-	void LootButtonPressed(int32 SourceSlotIndex);
+	void LootButtonPressed(int32 SourceSlotIndex) const;
 	
 	UFUNCTION(BlueprintCallable)
-	void LootAllButtonPressed();
+	void LootAllButtonPressed() const;
 	
 	UFUNCTION(BlueprintCallable)
 	void SetContainerOpen(bool bIsOpen) { bContainerIsOpen = bIsOpen; }
@@ -80,6 +80,7 @@ public:
 
 private:
 	void UpdateEquipmentEffect();
+	void UpdateMonkAbility();
 	
 	TMap<FGameplayTag, FEquippedItem> EquippedItems;
 	FActiveGameplayEffectHandle ActiveEquipmentEffectHandle;

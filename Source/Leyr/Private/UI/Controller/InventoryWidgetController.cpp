@@ -13,6 +13,7 @@ void UInventoryWidgetController::BindCallbacksToDependencies()
 	checkf(InventoryComponent, TEXT("InventoryComponent is NULL, please check [%s]"), *GetName());
 	InventoryComponent->OnItemUpdated.AddDynamic(this, &UInventoryWidgetController::HandleItemUpdated);
 	UpdateEquipmentEffect();
+	UpdateMonkAbility();
 }
 
 /*
@@ -21,84 +22,81 @@ void UInventoryWidgetController::BindCallbacksToDependencies()
 void UInventoryWidgetController::AssignButtonPressed(const FInventoryItemData ItemData, const FGameplayTag InputTag)
 {
 	if(ItemData.Asset.Get() == nullptr) return;
-	
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	if(!ItemData.EquipmentSlot.MatchesTagExact(GameplayTags.Equipment_ActionSlot)) return;
+	
+	FGameplayTag InputToAssign = InputTag;
+	FGameplayTag SlotToEquip = GameplayTags.EquipmentSlotToInputTags[InputTag];
+	FEquippedItem ItemToEquip = FEquippedItem{ ItemData };
+	
+	FGameplayTag InputToClear = FGameplayTag();
+	FGameplayTag SlotToUnequip = FGameplayTag();
+	FEquippedItem ItemToClearFromInput = FEquippedItem();
+	bool bShouldClear = false;
 
-	if(ItemData.EquipmentSlot.MatchesTagExact(GameplayTags.Equipment_ActionSlot))
+	// INPUT/SLOT ALREADY ASSIGNED
+	if(const FEquippedItem* EquippedItem = EquippedItems.Find(SlotToEquip))
 	{
-		FGameplayTag InputToAssign = InputTag;
-		FGameplayTag SlotToEquip = GameplayTags.EquipmentSlotToInputTags[InputTag];
-		FEquippedItem ItemToEquip = FEquippedItem{ ItemData };
-		
-		FGameplayTag InputToClear = FGameplayTag();
-		FGameplayTag SlotToUnequip = FGameplayTag();
-		FEquippedItem ItemToClearFromInput = FEquippedItem();
-		bool bShouldClear = false;
-
-		// INPUT/SLOT ALREADY ASSIGNED
-		if(const FEquippedItem* EquippedItem = EquippedItems.Find(SlotToEquip))
-		{
-			ItemToClearFromInput = *EquippedItem;
-			InputToClear = InputToAssign;
-			// SlotToUnequip = EquippedItem.Key;
-			bShouldClear = true;
-		}
-
-		// ITEM ALREADY ASSIGNED
-		for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
-		{
-			if (EquippedItem.Value.ItemData.Asset.Get() == ItemData.Asset.Get())
-			{
-				SlotToUnequip = EquippedItem.Key;
-				InputToClear = InputToAssign;
-				bShouldClear = true;
-				break;
-			}
-		}
-
-		// 1. Clear
-		if(bShouldClear)
-		{
-			Clear(InputToClear, SlotToUnequip);
-		}
-		
-		if (ItemToClearFromInput.ItemData.Asset.Get() == ItemToEquip.ItemData.Asset.Get() && InputToAssign.MatchesTagExact(InputToClear)) // Clear
-		{
-			GEngine->AddOnScreenDebugMessage(48950, 5.f, FColor::Green, FString::Printf(TEXT("Clear")));
-			ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputToAssign, true);
-			ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputToAssign, false);
-			return;
-		}
-		if (ItemToClearFromInput.ItemData.Asset.Get() == nullptr && !InputToClear.IsValid()) // Assign new input to new item
-		{
-			GEngine->AddOnScreenDebugMessage(48954, 5.f, FColor::Green, FString::Printf(TEXT("Assign")));
-			ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputToAssign, true);
-			ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputToAssign, false);
-		}
-		else if (ItemToClearFromInput.ItemData.Asset.Get() == nullptr && SlotToUnequip.IsValid()) // Keep Item, Change Input
-		{
-			GEngine->AddOnScreenDebugMessage(48951, 5.f, FColor::Green, FString::Printf(TEXT("Keep Item, Change Input")));
-			ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputToAssign, true);
-			ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(this, AbilitySystemComponent, ItemData, InputToAssign, GameplayTags.EquipmentSlotToInputTags[SlotToUnequip]);
-			ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, GameplayTags.EquipmentSlotToInputTags[SlotToUnequip], false);
-		}
-		else if (ItemToClearFromInput.ItemData.Asset.Get() != ItemToEquip.ItemData.Asset.Get() && SlotToUnequip.IsValid()) // Steal already assigned input to replace its own input
-		{
-			GEngine->AddOnScreenDebugMessage(48952, 5.f, FColor::Green, FString::Printf(TEXT("Steal")));
-			ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemToClearFromInput.ItemData, GameplayTags.EquipmentSlotToInputTags[SlotToUnequip], true);
-			ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(this, AbilitySystemComponent, ItemData, InputToAssign, GameplayTags.EquipmentSlotToInputTags[SlotToUnequip]);
-			ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, GameplayTags.EquipmentSlotToInputTags[SlotToUnequip], false);
-		}
-		else	if (ItemToClearFromInput.ItemData.Asset.Get() != ItemToEquip.ItemData.Asset.Get() && InputToAssign.MatchesTagExact(InputToClear)) // Keep Input, Change Item Ability
-		{
-			GEngine->AddOnScreenDebugMessage(48953, 5.f, FColor::Green, FString::Printf(TEXT("Keep Input, Change Item Ability")));
-			ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemToClearFromInput.ItemData, InputToAssign, true);
-			ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputToAssign, false);
-		}
-		
-		// 2. Assign
-		Assign(InputToAssign, SlotToEquip, ItemToEquip);
+		ItemToClearFromInput = *EquippedItem;
+		InputToClear = InputToAssign;
+		// SlotToUnequip = EquippedItem.Key;
+		bShouldClear = true;
 	}
+
+	// ITEM ALREADY ASSIGNED
+	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
+	{
+		if (EquippedItem.Value.ItemData.Asset.Get() == ItemData.Asset.Get())
+		{
+			SlotToUnequip = EquippedItem.Key;
+			InputToClear = InputToAssign;
+			bShouldClear = true;
+			break;
+		}
+	}
+
+	// 1. Clear
+	if(bShouldClear)
+	{
+		Clear(InputToClear, SlotToUnequip);
+	}
+	
+	if (ItemToClearFromInput.ItemData.Asset.Get() == ItemToEquip.ItemData.Asset.Get() && InputToAssign.MatchesTagExact(InputToClear)) // Clear
+	{
+		GEngine->AddOnScreenDebugMessage(48950, 5.f, FColor::Green, FString::Printf(TEXT("Clear")));
+		ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputToAssign, true);
+		ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputToAssign.GetSingleTagContainer(), false);
+		return;
+	}
+	if (ItemToClearFromInput.ItemData.Asset.Get() == nullptr && !InputToClear.IsValid()) // Assign new input to new item
+	{
+		GEngine->AddOnScreenDebugMessage(48954, 5.f, FColor::Green, FString::Printf(TEXT("Assign")));
+		ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputToAssign.GetSingleTagContainer(), true);
+		ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputToAssign, false);
+	}
+	else if (ItemToClearFromInput.ItemData.Asset.Get() == nullptr && SlotToUnequip.IsValid()) // Keep Item, Change Input
+	{
+		GEngine->AddOnScreenDebugMessage(48951, 5.f, FColor::Green, FString::Printf(TEXT("Keep Item, Change Input")));
+		ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, InputToAssign.GetSingleTagContainer(), true);
+		ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(this, AbilitySystemComponent, ItemData, InputToAssign, GameplayTags.EquipmentSlotToInputTags[SlotToUnequip]);
+		ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, GameplayTags.EquipmentSlotToInputTags[SlotToUnequip].GetSingleTagContainer(), false);
+	}
+	else if (ItemToClearFromInput.ItemData.Asset.Get() != ItemToEquip.ItemData.Asset.Get() && SlotToUnequip.IsValid()) // Steal already assigned input to replace its own input
+	{
+		GEngine->AddOnScreenDebugMessage(48952, 5.f, FColor::Green, FString::Printf(TEXT("Steal")));
+		ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemToClearFromInput.ItemData, GameplayTags.EquipmentSlotToInputTags[SlotToUnequip], true);
+		ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(this, AbilitySystemComponent, ItemData, InputToAssign, GameplayTags.EquipmentSlotToInputTags[SlotToUnequip]);
+		ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, GameplayTags.EquipmentSlotToInputTags[SlotToUnequip].GetSingleTagContainer(), false);
+	}
+	else	if (ItemToClearFromInput.ItemData.Asset.Get() != ItemToEquip.ItemData.Asset.Get() && InputToAssign.MatchesTagExact(InputToClear)) // Keep Input, Change Item Ability
+	{
+		GEngine->AddOnScreenDebugMessage(48953, 5.f, FColor::Green, FString::Printf(TEXT("Keep Input, Change Item Ability")));
+		ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemToClearFromInput.ItemData, InputToAssign, true);
+		ULeyrAbilitySystemLibrary::UpdateItemAbilities(this, AbilitySystemComponent, ItemData, InputToAssign, false);
+	}
+	
+	// 2. Assign
+	Assign(InputToAssign, SlotToEquip, ItemToEquip);
 }
 
 void UInventoryWidgetController::Assign(const FGameplayTag InputToAssign, const FGameplayTag SlotToEquip, FEquippedItem& ItemToEquip)
@@ -192,7 +190,7 @@ UItemData* UInventoryWidgetController::HasCompatibleItemCostInAmmunitionSlot(con
 /*
  * Container
 */
-void UInventoryWidgetController::LootButtonPressed(int32 SourceSlotIndex)
+void UInventoryWidgetController::LootButtonPressed(int32 SourceSlotIndex) const
 {
 	if(!bContainerIsOpen) return;
 	if(UInventoryComponent* ContainerComponent = ULeyrAbilitySystemLibrary::GetContainerComponent(this))
@@ -201,7 +199,7 @@ void UInventoryWidgetController::LootButtonPressed(int32 SourceSlotIndex)
 	}
 }
 
-void UInventoryWidgetController::LootAllButtonPressed()
+void UInventoryWidgetController::LootAllButtonPressed() const
 {
 	if(!bContainerIsOpen) return;
 	if(UInventoryComponent* ContainerComponent = ULeyrAbilitySystemLibrary::GetContainerComponent(this))
@@ -245,4 +243,30 @@ void UInventoryWidgetController::UpdateEquipmentEffect()
 	{
 		ActiveEquipmentEffectHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*MutableSpec, AbilitySystemComponent);
 	}
+}
+
+void UInventoryWidgetController::UpdateMonkAbility()
+{
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	FGameplayTagContainer ActionSlots;
+	ActionSlots.AddTag(GameplayTags.Equipment_ActionSlot_1);
+	ActionSlots.AddTag(GameplayTags.Equipment_ActionSlot_2);
+	ActionSlots.AddTag(GameplayTags.Equipment_ActionSlot_3);
+	
+	FGameplayTagQuery ActionSlotQuery;
+	ActionSlotQuery.BuildQuery(
+		FGameplayTagQueryExpression()
+		.AnyTagsMatch()
+		.AddTag(GameplayTags.Equipment_ActionSlot_1)
+		.AddTag(GameplayTags.Equipment_ActionSlot_2)
+		.AddTag(GameplayTags.Equipment_ActionSlot_3)
+ 	);
+	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
+	{
+		if(ActionSlotQuery.Matches(EquippedItem.Key.GetSingleTagContainer()))
+		{
+			ActionSlots.RemoveTag(EquippedItem.Key);
+		}
+	}
+	ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, ActionSlots, false);
 }
