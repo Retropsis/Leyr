@@ -241,6 +241,7 @@ void ULeyrAbilitySystemLibrary::UpdateMonkAbilities(const UObject* WorldContextO
 		{
 			if(FGameplayAbilitySpec* AbilitySpec = BaseASC->GetSpecFromAbilityTag(AbilityTag))
 			{				
+				AbilitySpec->DynamicAbilityTags.Reset();
 				const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 				if(bShouldClear)
 				{

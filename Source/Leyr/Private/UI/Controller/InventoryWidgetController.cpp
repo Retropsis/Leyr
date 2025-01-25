@@ -249,9 +249,9 @@ void UInventoryWidgetController::UpdateMonkAbility()
 {
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 	FGameplayTagContainer ActionSlots;
-	ActionSlots.AddTag(GameplayTags.Equipment_ActionSlot_1);
-	ActionSlots.AddTag(GameplayTags.Equipment_ActionSlot_2);
-	ActionSlots.AddTag(GameplayTags.Equipment_ActionSlot_3);
+	ActionSlots.AddTag(GameplayTags.InputTag_LMB);
+	ActionSlots.AddTag(GameplayTags.InputTag_RMB);
+	ActionSlots.AddTag(GameplayTags.InputTag_1);
 	
 	FGameplayTagQuery ActionSlotQuery;
 	ActionSlotQuery.BuildQuery(
@@ -265,7 +265,7 @@ void UInventoryWidgetController::UpdateMonkAbility()
 	{
 		if(ActionSlotQuery.Matches(EquippedItem.Key.GetSingleTagContainer()))
 		{
-			ActionSlots.RemoveTag(EquippedItem.Key);
+			ActionSlots.RemoveTag(GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key]);
 		}
 	}
 	ULeyrAbilitySystemLibrary::UpdateMonkAbilities(this, AbilitySystemComponent, ActionSlots, false);
