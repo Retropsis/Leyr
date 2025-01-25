@@ -6,17 +6,13 @@
 #include "GameplayEffect.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "Game/BaseGameplayTags.h"
-#include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "Inventory/InventoryComponent.h"
 
 void UInventoryWidgetController::BindCallbacksToDependencies()
 {
 	checkf(InventoryComponent, TEXT("InventoryComponent is NULL, please check [%s]"), *GetName());
 	InventoryComponent->OnItemUpdated.AddDynamic(this, &UInventoryWidgetController::HandleItemUpdated);
-
-	FGameplayEffectSpecHandle EquipmentSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(EquipmentEffectClass, 1.f, AbilitySystemComponent->MakeEffectContext());
-	
-	ActiveEquipmentEffectHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*EquipmentSpecHandle.Data.Get(), AbilitySystemComponent);
+	UpdateEquipmentEffect();
 }
 
 /*
@@ -107,19 +103,8 @@ void UInventoryWidgetController::AssignButtonPressed(const FInventoryItemData It
 
 void UInventoryWidgetController::Assign(const FGameplayTag InputToAssign, const FGameplayTag SlotToEquip, FEquippedItem& ItemToEquip)
 {
-	// GEngine->AddOnScreenDebugMessage(48943, 5.f, FColor::White, FString::Printf(TEXT("Assign: [%s] - [%s]"), *InputToAssign.ToString(), *SlotToEquip.ToString()));
 	OnInputAssigned.Broadcast(ItemToEquip.ItemData, InputToAssign);
 	OnItemEquipped.Broadcast(SlotToEquip, ItemToEquip.ItemData);
-	// const UItemData* Asset = ItemToEquip.ItemData.Asset.LoadSynchronous();
-	// ItemToEquip.ActiveEffect = MakeAndApplyEffectToSelf(Asset, SlotToEquip, Asset->Modifiers);
-
-	// for (TSubclassOf<UGameplayEffect> Effect : Asset->Effects)
-	// {
-	// 	FGameplayEffectContextHandle ContextHandle = AbilitySystemComponent->MakeEffectContext();
-	// 	FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(Effect, 1.f, ContextHandle);
-	// 	const_cast<UGameplayEffect*>(SpecHandle.Data.Get()->Def.Get())->Modifiers = Asset->Modifiers;
-	// 	ItemToEquip.ActiveEffect = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-	// }
 
 	if(const UItemData* Asset = ItemToEquip.ItemData.Asset.LoadSynchronous())
 	{
@@ -134,7 +119,6 @@ void UInventoryWidgetController::Clear(const FGameplayTag InputToClear, const FG
 	GEngine->AddOnScreenDebugMessage(48944, 5.f, FColor::White, FString::Printf(TEXT("Remove: [%s] - [%s]"), *InputToClear.ToString(), *SlotToUnequip.ToString()));
 	OnInputRemoved.Broadcast(InputToClear);
 	OnItemUnequipped.Broadcast(SlotToUnequip);
-	// RemoveActiveGameplayEffect(SlotToUnequip);
 	EquippedItems.Remove(SlotToUnequip);
 	UpdateEquipmentEffect();
 }
@@ -144,7 +128,6 @@ void UInventoryWidgetController::Clear(const FGameplayTag InputToClear, const FG
  */
 void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData)
 {
-	// OnEquipmentAssigned.Broadcast(ItemData);
 	Equip(ItemData);
 }
 
@@ -161,7 +144,6 @@ void UInventoryWidgetController::Equip(const FInventoryItemData& ItemData)
 		{
 			if (EquippedItems.Contains(Slot) && ItemData.Asset.Get() == EquippedItem.Value.ItemData.Asset.Get())
 			{
-				RemoveActiveGameplayEffect(Slot);
 				OnItemUnequipped.Broadcast(Slot);	
 				EquippedItems.Remove(Slot);
 				UpdateEquipmentEffect();
@@ -170,21 +152,7 @@ void UInventoryWidgetController::Equip(const FInventoryItemData& ItemData)
 		}
 	}
 	
-	FEquippedItem ItemToEquip{ItemData };
-	// for (const TSubclassOf<UGameplayEffect> Effect : Asset->Effects)
-	// {
-	// 	const FGameplayEffectContextHandle ContextHandle = AbilitySystemComponent->MakeEffectContext();
-	// 	FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(Effect, 1.f, ContextHandle);
-	// 	const_cast<UGameplayEffect*>(SpecHandle.Data.Get()->Def.Get())->Modifiers = Asset->Modifiers;
-	// 	ItemToEquip.ActiveEffect = AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-	// }
-	
-	// for (TSubclassOf<UGameplayEffect> Effect : Asset->Effects)
-	// {
-	// 	ApplyExecuteEffectToSelf(Effect.GetDefaultObject(), ItemData.Asset.Get(), Slot);
-	// }
-	// MakeAndApplyEffectToSelf(ItemData.Asset.Get(), Slot, Asset->Modifiers);
-	
+	FEquippedItem ItemToEquip{ItemData };	
 	OnItemEquipped.Broadcast(Slot, ItemData);
 	ItemToEquip.Modifiers = Asset->Modifiers;
 	EquippedItems.Add(Slot, ItemToEquip);
@@ -251,63 +219,6 @@ void UInventoryWidgetController::LootAllButtonPressed()
 /*
  * Gameplay Effects
  */
-FActiveGameplayEffectHandle UInventoryWidgetController::ApplyExecuteEffectToSelf(UGameplayEffect* EffectToApply, const UObject* SourceObject, const FGameplayTag EquipmentSlot, const int32 Level)
-{
-	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
-	EffectContext.AddSourceObject(SourceObject);
-	
-	UTargetTagsGameplayEffectComponent& AssetTagsComponent = EffectToApply->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
-	FInheritedTagContainer InheritedTagContainer;
-	InheritedTagContainer.Added.AddTag(EquipmentSlot);
-	AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
-
-	return AbilitySystemComponent->ApplyGameplayEffectToSelf(EffectToApply, Level, EffectContext);
-}
-
-FActiveGameplayEffectHandle UInventoryWidgetController::MakeAndApplyEffectToSelf(const UObject* SourceObject, const FGameplayTag& EquipmentSlot, TArray<FGameplayModifierInfo> Modifiers, const int32 Level)
-{	
-	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
-	EffectContext.AddSourceObject(SourceObject);
-
-	FString SourceObjectName = FString::Printf(TEXT("%s_AddedEffects"), *SourceObject->GetName());
-	UGameplayEffect* Effect = NewObject<UGameplayEffect>(this, FName(SourceObjectName));
-
-	Effect->DurationPolicy = EGameplayEffectDurationType::Infinite;
-	
-	UTargetTagsGameplayEffectComponent& AssetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
-	FInheritedTagContainer InheritedTagContainer;
-	InheritedTagContainer.Added.AddTag(EquipmentSlot);
-	AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
-
-	for (int i = 0; i < Modifiers.Num(); ++i)
-	{
-		Effect->Modifiers.Add(Modifiers[i]);
-	}
-
-	if (FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec(Effect, EffectContext, Level))
-	{
-		return AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*MutableSpec, AbilitySystemComponent);
-	}
-	return FActiveGameplayEffectHandle();
-}
-
-void UInventoryWidgetController::RemoveActiveGameplayEffect(FGameplayTag EquipmentSlot)
-{
-	if(EquippedItems.IsEmpty()) return;
-
-	if (FEquippedItem* ItemToRemove = EquippedItems.Find(EquipmentSlot))
-	{
-		GEngine->AddOnScreenDebugMessage(35777, 5.f, FColor::Magenta, FString::Printf(TEXT("Removing: [%s]"), *ItemToRemove->ActiveEffect.ToString()));
-		if(ItemToRemove->ActiveEffect.IsValid())
-		{
-			AbilitySystemComponent->RemoveActiveGameplayEffect(ItemToRemove->ActiveEffect);
-		}
-	}
-	// FGameplayEffectQuery Query;
-	// Query.EffectTagQuery.
-	// AbilitySystemComponent->RemoveActiveEffects()
-}
-
 void UInventoryWidgetController::UpdateEquipmentEffect()
 {
 	if(ActiveEquipmentEffectHandle.IsValid()) AbilitySystemComponent->RemoveActiveGameplayEffect(ActiveEquipmentEffectHandle);
@@ -315,7 +226,7 @@ void UInventoryWidgetController::UpdateEquipmentEffect()
 	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
 	EffectContext.AddSourceObject(this);
 
-	FString SourceObjectName = FString::Printf(TEXT("%s"), *EquipmentEffectClass->GetName());
+	FString SourceObjectName = FString::Printf(TEXT("GE_EquipmentEffects"));
 	UGameplayEffect* Effect = NewObject<UGameplayEffect>(this, FName(SourceObjectName));
 
 	Effect->DurationPolicy = EGameplayEffectDurationType::Infinite;
@@ -325,14 +236,9 @@ void UInventoryWidgetController::UpdateEquipmentEffect()
 	// InheritedTagContainer.Added.AddTag(EquipmentSlot);
 	// AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
 
-	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
+	for (const TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
 	{
-		// const UItemData* Asset = EquippedItem.Value.ItemData.Asset.LoadSynchronous();
-		// if(Asset == nullptr) continue;
-		for (int i = 0; i < EquippedItem.Value.Modifiers.Num(); ++i)
-		{
-			Effect->Modifiers.Add(EquippedItem.Value.Modifiers[i]);
-		}
+		Effect->Modifiers.Append(EquippedItem.Value.Modifiers);
 	}
 
 	if (FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec(Effect, EffectContext, 1.f))

@@ -40,11 +40,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Map Info")
 	TObjectPtr<UMapInfo> MapInfo;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Inventory Cost Info")
+	UPROPERTY(EditDefaultsOnly, Category="Inventory")
 	TObjectPtr<UInventoryCostData> InventoryCostInfo;
 
-	UPROPERTY(EditDefaultsOnly, Category="DataTable|Items")
+	UPROPERTY(EditDefaultsOnly, Category="Inventory")
 	TObjectPtr<UDataTable> ItemDataTable;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Inventory")
+	TSubclassOf<UGameplayEffect> EquipmentEffectClass;
 
 	FInventoryItemData FindItemDataByID(int32 ItemID) const;
 	FInventoryItemData FindItemDataByRowName(FName RowName) const;

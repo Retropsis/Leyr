@@ -666,3 +666,10 @@ UInventoryCostData* ULeyrAbilitySystemLibrary::GetInventoryCostData(const UObjec
 	if (LeyrGameMode == nullptr) return nullptr;
 	return LeyrGameMode->InventoryCostInfo;
 }
+
+TSubclassOf<UGameplayEffect> ULeyrAbilitySystemLibrary::GetEquipmentEffectClass(const UObject* WorldContextObject)
+{
+	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (LeyrGameMode == nullptr) return nullptr;
+	return LeyrGameMode->EquipmentEffectClass;
+}

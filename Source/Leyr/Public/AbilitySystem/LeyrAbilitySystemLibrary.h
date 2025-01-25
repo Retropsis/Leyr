@@ -207,4 +207,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|Inventory", meta=(WorldContext="WorldContextObject"))
 	static UInventoryCostData* GetInventoryCostData(const UObject* WorldContextObject);
+	
+	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|Inventory", meta=(WorldContext="WorldContextObject"))
+	static TSubclassOf<UGameplayEffect> GetEquipmentEffectClass(const UObject* WorldContextObject);
 };
