@@ -178,6 +178,8 @@ FGameplayTag Abilities_Weapon_Aim;
 FGameplayTag Abilities_Weapon_Bow_Shot;
 FGameplayTag Abilities_Weapon_Spear_Throw;
  
+FGameplayTag Abilities_Weapon;
+FGameplayTag Abilities_Weapon_Monk;
 FGameplayTag Abilities_Weapon_Monk_States;
 FGameplayTag Abilities_Weapon_Monk_Combo;
 FGameplayTag Abilities_Weapon_Monk_Extra;

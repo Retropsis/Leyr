@@ -173,6 +173,15 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_Type_Passive = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Type.Passive"), FString("Abilities Type Passive"));
 
 	/*
+	 * Fighting
+	 */
+	GameplayTags.Abilities_Weapon = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon"), FString("Abilities Weapon"));
+	GameplayTags.Abilities_Weapon_Monk = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Monk"), FString("Abilities Weapon Monk"));
+	GameplayTags.Abilities_Weapon_Monk_States = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Monk.States"), FString("Abilities Weapon Monk States"));
+	GameplayTags.Abilities_Weapon_Monk_Combo = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Monk.Combo"), FString("Abilities Weapon Monk Combo"));
+	GameplayTags.Abilities_Weapon_Monk_Extra = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Monk.Extra"), FString("Abilities Weapon Monk Extra"));
+	
+	/*
 	 * Melee Weapons
 	 */
 	GameplayTags.Abilities_Weapon_Sword_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Sword.1"), FString("Abilities Weapon Sword 1"));
@@ -195,13 +204,6 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_Weapon_Aim = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Aim"), FString("Abilities Weapon Aim"));
 	GameplayTags.Abilities_Weapon_Bow_Shot = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Bow.Shot"), FString("Abilities Weapon Bow Shot"));
 	GameplayTags.Abilities_Weapon_Spear_Throw = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Spear.Throw"), FString("Abilities Weapon Spear Throw"));
-
-	/*
-	 * Fighting
-	 */
-	GameplayTags.Abilities_Weapon_Monk_States = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Monk.States"), FString("Abilities Weapon Monk States"));
-	GameplayTags.Abilities_Weapon_Monk_Combo = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Monk.Combo"), FString("Abilities Weapon Monk Combo"));
-	GameplayTags.Abilities_Weapon_Monk_Extra = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Monk.Extra"), FString("Abilities Weapon Monk Extra"));
 	
 	GameplayTags.Abilities_Throw_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Throw.1"), FString("Abilities Throw 1"));
 	GameplayTags.Abilities_Throw_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Throw.2"), FString("Abilities Throw 2"));

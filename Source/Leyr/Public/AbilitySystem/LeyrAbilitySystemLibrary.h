@@ -75,7 +75,7 @@ public:
 	static UAbilityInfo* GetAbilityInfo(const UObject* WorldContextObject);
 	
 	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|CharacterClassDefaults", meta=(WorldContext="WorldContextObject"))
-	static void UpdateMonkAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FGameplayTagContainer InputTags, bool bShouldClear);
+	static void UpdateMonkAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FGameplayTagContainer InputTags);
 	
 	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|CharacterClassDefaults", meta=(WorldContext="WorldContextObject"))
 	static void GiveItemAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag InputTag);
@@ -85,6 +85,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|CharacterClassDefaults", meta=(WorldContext="WorldContextObject"))
 	static void UpdateItemAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag InputTag, bool bShouldClear);
+	
+	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|CharacterClassDefaults", meta=(WorldContext="WorldContextObject"))
+	static void UpdateAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, UObject* SourceObject, FGameplayTag InputTag, TArray<FGameplayTag> Abilities);
 	
 	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|CharacterClassDefaults", meta=(WorldContext="WorldContextObject"))
 	static void ReplaceAbilityInputTag(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag InputTag, FGameplayTag TagToRemove);

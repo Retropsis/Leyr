@@ -20,6 +20,7 @@ struct FEquippedItem
 	GENERATED_BODY()
 
 	FInventoryItemData ItemData = FInventoryItemData();
+	TArray<FGameplayTag> Abilities;
 	TArray<FGameplayModifierInfo> Modifiers;
 };
 
@@ -81,8 +82,10 @@ public:
 private:
 	void UpdateEquipmentEffect();
 	void UpdateMonkAbility();
+	void UpdateItemAbilities();
 	
 	TMap<FGameplayTag, FEquippedItem> EquippedItems;
+	TMap<FGameplayTag, FEquippedItem> PreviouslyEquippedItems;
 	FActiveGameplayEffectHandle ActiveEquipmentEffectHandle;
 	bool bContainerIsOpen = false;
 };
