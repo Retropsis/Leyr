@@ -307,48 +307,4 @@ void UInventoryWidgetController::UpdateItemAbilities()
 			}
 		}
 	}
-	
-	// TMap<FGameplayTag, TArray<FGameplayTag>> ItemAbilities;
-	// FGameplayTagContainer InputTags;
-	//
-	// for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
-	// {
-	// 	if(EquippedItem.Key.MatchesTag(GameplayTags.Equipment_ActionSlot))
-	// 	{
-	// 		ItemAbilities.Add(GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key], EquippedItem.Value.Abilities);
-	// 		InputTags.AddTag(GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key]);
-	// 	}
-	// }
-	//
-	// // Getting all Weapon AbilitySpecs
-	// FGameplayTagContainer GameplayTagContainer;
-	// GameplayTagContainer.AddTag(GameplayTags.Abilities_Weapon);
-	// TArray<FGameplayAbilitySpec*> MatchingGameplayAbilities;
-	// AbilitySystemComponent->GetActivatableGameplayAbilitySpecsByAllMatchingTags(GameplayTagContainer, MatchingGameplayAbilities);
-	//
-	// for (TTuple<FGameplayTag, TArray<FGameplayTag>> ItemAbility : ItemAbilities)
-	// {
-	// 	ULeyrAbilitySystemLibrary::UpdateAbilities(this, AbilitySystemComponent, ItemAbility.Key, ItemAbility.Value);
-	// }
-	//
-	// if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent))
-	// {
-	// 	for (FGameplayAbilitySpec* AbilitySpec : MatchingGameplayAbilities)
-	// 	{
-	// 		for (TTuple<FGameplayTag, TArray<FGameplayTag>> ItemAbility : ItemAbilities)
-	// 		{
-	// 			if (AbilitySpec->DynamicAbilityTags.HasTagExact(ItemAbility.Key))
-	// 			{
-	// 				AbilitySpec->DynamicAbilityTags.RemoveTag(ItemAbility.Key);
-	// 				if(AbilitySpec->DynamicAbilityTags.IsEmpty())
-	// 				{
-	// 					FGameplayTag AbilityTag = AbilitySpec->Ability.Get()->AbilityTags.First();
-	// 					AbilitySystemComponent->ClearAbility(AbilitySpec->Handle);
-	// 					AbilitySystemComponent->MarkAbilitySpecDirty(*AbilitySpec);
-	// 					// BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_None, ItemAbility.Key, FGameplayTag());
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
 }

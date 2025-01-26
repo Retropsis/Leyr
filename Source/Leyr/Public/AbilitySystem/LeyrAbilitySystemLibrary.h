@@ -78,15 +78,6 @@ public:
 	static void UpdateMonkAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FGameplayTagContainer InputTags);
 	
 	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|CharacterClassDefaults", meta=(WorldContext="WorldContextObject"))
-	static void GiveItemAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag InputTag);
-	
-	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|CharacterClassDefaults", meta=(WorldContext="WorldContextObject"))
-	static void RemoveItemAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag PreviousInputTag);
-	
-	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|CharacterClassDefaults", meta=(WorldContext="WorldContextObject"))
-	static void UpdateItemAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag InputTag, bool bShouldClear);
-	
-	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|CharacterClassDefaults", meta=(WorldContext="WorldContextObject"))
 	static void UpdateAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, UObject* SourceObject, FGameplayTag InputTag, TArray<FGameplayTag> Abilities);
 	
 	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|CharacterClassDefaults", meta=(WorldContext="WorldContextObject"))
