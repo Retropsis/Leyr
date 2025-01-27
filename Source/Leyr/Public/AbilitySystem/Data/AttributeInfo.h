@@ -27,6 +27,9 @@ struct FBaseAttributeInfo
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayAttribute AttributeGetter;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UTexture2D> AttributeIcon = nullptr;
 };
 
 /**

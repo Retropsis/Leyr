@@ -74,6 +74,15 @@ public:
 	FOnItemUnequippedSignature OnItemUnequipped;
 
 	UPROPERTY(BlueprintAssignable)
+	FOnPlayerStatChangedSignature OnPlayerLevelChanged;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnAttributeChangedSignature OnXPPercentChanged;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnXPValueChanged OnXPValueUpdated;
+
+	UPROPERTY(BlueprintAssignable)
 	FOnItemUpdated HandleOnItemUpdated;
 
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
@@ -83,6 +92,7 @@ private:
 	void UpdateEquipmentEffect();
 	void UpdateMonkAbility();
 	void UpdateItemAbilities();
+	void OnXPChanged(int32 NewXP);
 	
 	TMap<FGameplayTag, FEquippedItem> EquippedItems;
 	TMap<FGameplayTag, FEquippedItem> PreviouslyEquippedItems;

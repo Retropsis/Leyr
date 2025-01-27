@@ -6,13 +6,25 @@
 #include "GameplayEffect.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
+#include "AbilitySystem/Data/LevelUpInfo.h"
 #include "Game/BaseGameplayTags.h"
 #include "Inventory/InventoryComponent.h"
+#include "Player/PlayerCharacterState.h"
 
 void UInventoryWidgetController::BindCallbacksToDependencies()
 {
 	checkf(InventoryComponent, TEXT("InventoryComponent is NULL, please check [%s]"), *GetName());
 	InventoryComponent->OnItemUpdated.AddDynamic(this, &UInventoryWidgetController::HandleItemUpdated);
+	
+	GetBasePS()->OnXPChangedDelegate.AddUObject(this, &UInventoryWidgetController::OnXPChanged);
+	GetBasePS()->OnLevelChangedDelegate.AddLambda(
+		[this](int32 NewLevel)
+		{
+			OnPlayerLevelChanged.Broadcast(NewLevel);
+		}
+	);
+
+	
 	UpdateEquipmentEffect();
 	UpdateMonkAbility();
 }
@@ -306,5 +318,28 @@ void UInventoryWidgetController::UpdateItemAbilities()
 				ULeyrAbilitySystemLibrary::UpdateAbilities(this, AbilitySystemComponent, EquippedItem.Value.ItemData.Asset.Get(), GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key], EquippedItem.Value.Abilities);
 			}
 		}
+	}
+}
+
+void UInventoryWidgetController::OnXPChanged(int32 NewXP)
+{
+	const ULevelUpInfo* LevelUpInfo = GetBasePS()->LevelUpInfo;
+	checkf(LevelUpInfo, TEXT("Unabled to find LevelUpInfo. Please fill out BasePlayerState Blueprint"));
+
+	const int32 Level = LevelUpInfo->FindLevelForXP(NewXP);
+	const int32 MaxLevel = LevelUpInfo->LevelUpInformation.Num();
+
+	if (Level <= MaxLevel && Level > 0)
+	{
+		const int32 LevelUpRequirement = LevelUpInfo->LevelUpInformation[Level].LevelUpRequirement;
+		const int32 PreviousLevelUpRequirement = LevelUpInfo->LevelUpInformation[Level - 1].LevelUpRequirement;
+
+		const int32 DeltaLevelRequirement = LevelUpRequirement - PreviousLevelUpRequirement;
+		const int32 XPForThisLevel = NewXP - PreviousLevelUpRequirement;
+
+		const float XPBarPercent = static_cast<float>(XPForThisLevel) / static_cast<float>(DeltaLevelRequirement);
+
+		OnXPPercentChanged.Broadcast(XPBarPercent);
+		OnXPValueUpdated.Broadcast(XPForThisLevel);
 	}
 }
