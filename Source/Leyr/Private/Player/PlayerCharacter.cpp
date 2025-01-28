@@ -551,6 +551,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 	case ECombatState::HoppingLedge:
 		MovementSpeed = ClimbingWalkSpeed;
 		MovementTarget = GetActorLocation() + FVector(GetActorForwardVector().X * 50.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 15.f);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Hopping);
 		break;
 	case ECombatState::Climbing:
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
