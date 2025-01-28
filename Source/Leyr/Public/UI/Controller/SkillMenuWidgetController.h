@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ActiveGameplayEffectHandle.h"
+#include "GameplayEffect.h"
 #include "GameplayTagContainer.h"
 #include "Game/BaseGameplayTags.h"
 #include "UI/Controller/WidgetController.h"
@@ -16,6 +18,11 @@ struct FSelectedAbility
 {
 	FGameplayTag Ability = FGameplayTag();
 	FGameplayTag Status = FGameplayTag();
+};
+
+struct FPassiveEffect
+{
+	TArray<FGameplayModifierInfo> Modifiers;
 };
 
 /**
@@ -62,10 +69,17 @@ public:
 
 	void OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& Status, const FGameplayTag& Slot, const FGameplayTag& PreviousSlot);
 
+	
+	UFUNCTION(BlueprintCallable)
+	void ActivateButtonPressed(const FGameplayTag& AbilityTag);
+
 private:
 	static void ShouldEnableButtons(const FGameplayTag& AbilityStatus, int32 SkillPoints, bool& bShouldEnableSkillPointsButton, bool& bShouldEnableEquipButton);
 	FSelectedAbility SelectedAbility = { FBaseGameplayTags::Get().Abilities_None,  FBaseGameplayTags::Get().Abilities_Status_Locked };
 	int32 CurrentSpellPoints = 0;
 	bool bWaitingForEquipSelection = false;
 	FGameplayTag SelectedSlot;
+
+	TMap<FGameplayTag, FPassiveEffect> ActivatedEffects;
+	FActiveGameplayEffectHandle ActiveEquipmentEffectHandle;
 };

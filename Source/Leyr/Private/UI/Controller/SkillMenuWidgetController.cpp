@@ -4,6 +4,7 @@
 #include "GameplayTagContainer.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/Data/AbilityInfo.h"
+#include "AbilitySystem/Data/PassiveInfo.h"
 #include "Game/BaseGameplayTags.h"
 #include "Player/PlayerCharacterState.h"
 
@@ -113,6 +114,40 @@ void USkillMenuWidgetController::EquipButtonPressed()
 	if (SelectedStatus.MatchesTagExact(FBaseGameplayTags::Get().Abilities_Status_Equipped))
 	{
 		SelectedSlot = GetBaseASC()->GetInputTagFromAbilityTag(SelectedAbility.Ability);
+	}
+}
+
+void USkillMenuWidgetController::ActivateButtonPressed(const FGameplayTag& AbilityTag)
+{
+	const FBasePassiveInfo Passive = PassiveInfo->FindPassiveInfoForTag(AbilityTag);
+
+	if (Passive.Modifiers.IsEmpty()) return;
+
+	ActivatedEffects.Add(AbilityTag, FPassiveEffect{ Passive.Modifiers });
+	
+	if(ActiveEquipmentEffectHandle.IsValid()) AbilitySystemComponent->RemoveActiveGameplayEffect(ActiveEquipmentEffectHandle);
+	
+	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
+
+	FString SourceObjectName = FString::Printf(TEXT("GE_MasteryEffects"));
+	UGameplayEffect* Effect = NewObject<UGameplayEffect>(this, FName(SourceObjectName));
+
+	Effect->DurationPolicy = EGameplayEffectDurationType::Infinite;
+	
+	// UTargetTagsGameplayEffectComponent& AssetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
+	// FInheritedTagContainer InheritedTagContainer;
+	// InheritedTagContainer.Added.AddTag(EquipmentSlot);
+	// AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
+
+	for (const TTuple<FGameplayTag, FPassiveEffect> ActivatedEffect : ActivatedEffects)
+	{
+		Effect->Modifiers.Append(ActivatedEffect.Value.Modifiers);
+	}
+
+	if (FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec(Effect, EffectContext, 1.f))
+	{
+		ActiveEquipmentEffectHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*MutableSpec, AbilitySystemComponent);
 	}
 }
 
