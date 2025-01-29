@@ -159,6 +159,12 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	
 	GameplayTags.Abilities_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.HitReact"), FString("HitReact Ability Effect"));
 	
+	GameplayTags.Abilities_Passive = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive"), FString("Passive Ability"));
+	GameplayTags.Abilities_Passive_Mastery = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery"), FString("Passive Ability Mastery"));
+	GameplayTags.Abilities_Passive_Mastery_Sword = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery.Sword"), FString("Sword Mastery"));
+	GameplayTags.Abilities_Passive_Mastery_Blunt = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery.Blunt"), FString("Blunt Mastery"));
+	GameplayTags.Abilities_Passive_Mastery_DualWield = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery.DualWield"), FString("DualWield Mastery"));
+	
 	GameplayTags.Abilities_Passive_Barrier = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Barrier"), FString("Passive Ability Barrier"));
 	GameplayTags.Abilities_Passive_HealthDrain = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.HealthDrain"), FString("Passive Ability Health Drain"));
 	GameplayTags.Abilities_Passive_ManaDrain = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.ManaDrain"), FString("Passive Ability Mana Drain"));

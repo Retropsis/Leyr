@@ -3,7 +3,6 @@
 #include "AbilitySystem/Ability/BaseGameplayAbility.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
-#include "Data/InventoryCostData.h"
 #include "Data/ItemData.h"
 #include "Game/BaseGameplayTags.h"
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"

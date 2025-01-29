@@ -12,7 +12,7 @@
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInputAssignedSignature, FInventoryItemData, ItemData, FGameplayTag, InputTag);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInputRemovedSignature, FGameplayTag, InputTag);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemEquippedSignature, FGameplayTag, SlotTag, FInventoryItemData, ItemData);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnItemUnequippedSignature, FGameplayTag, SlotTag);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemUnequippedSignature, FGameplayTag, SlotTag, TSoftObjectPtr<UItemData>, Asset);
 
 USTRUCT()
 struct FEquippedItem

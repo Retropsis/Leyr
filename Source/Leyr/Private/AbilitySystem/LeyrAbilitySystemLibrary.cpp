@@ -363,10 +363,10 @@ void ULeyrAbilitySystemLibrary::SetIsExecuteHit(FGameplayEffectContextHandle& Ef
 FGameplayEffectContextHandle ULeyrAbilitySystemLibrary::ApplyAdditionalEffect(const FAdditionalEffectParams& AdditionalEffectParams)
 {
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-	const AActor* SourceAvatarActor = AdditionalEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
+	// const AActor* SourceAvatarActor = AdditionalEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
 
 	FGameplayEffectContextHandle EffectContextHandle = AdditionalEffectParams.SourceAbilitySystemComponent->MakeEffectContext();
-	EffectContextHandle.AddSourceObject(SourceAvatarActor);
+	EffectContextHandle.AddSourceObject(AdditionalEffectParams.SourceObject);
 	SetDeathImpulse(EffectContextHandle, AdditionalEffectParams.DeathImpulse);
 	SetAirborneForce(EffectContextHandle, AdditionalEffectParams.AirborneForce);
 	const FGameplayEffectSpecHandle SpecHandle = AdditionalEffectParams.SourceAbilitySystemComponent->MakeOutgoingSpec(AdditionalEffectParams.AdditionalEffectClass, AdditionalEffectParams.AbilityLevel, EffectContextHandle);

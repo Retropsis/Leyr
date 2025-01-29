@@ -47,4 +47,7 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite)
 	FVector CursorHitLocation;
+
+private:
+	FActiveGameplayEffectHandle ActiveSourceObjectEffectHandle;
 };

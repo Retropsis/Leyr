@@ -14,6 +14,7 @@ struct FAdditionalEffectParams
 	FAdditionalEffectParams(){}
 
 	UPROPERTY(BlueprintReadWrite) TObjectPtr<UObject> WorldContextObject = nullptr;
+	UPROPERTY(BlueprintReadWrite) TObjectPtr<UObject> SourceObject = nullptr;
 	UPROPERTY(BlueprintReadWrite) TSubclassOf<UGameplayEffect> AdditionalEffectClass = nullptr;
 	UPROPERTY(BlueprintReadWrite) TObjectPtr<UAbilitySystemComponent> SourceAbilitySystemComponent;
 	UPROPERTY(BlueprintReadWrite) TObjectPtr<UAbilitySystemComponent> TargetAbilitySystemComponent;

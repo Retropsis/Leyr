@@ -153,6 +153,12 @@ FGameplayTag Abilities_Noxious_Bio_1;
 FGameplayTag Abilities_Cure_1;
 FGameplayTag Abilities_Cure_2;
 
+FGameplayTag Abilities_Passive;
+FGameplayTag Abilities_Passive_Mastery;
+FGameplayTag Abilities_Passive_Mastery_Sword;
+FGameplayTag Abilities_Passive_Mastery_Blunt;
+FGameplayTag Abilities_Passive_Mastery_DualWield;
+ 
 FGameplayTag Abilities_Passive_Barrier;
 FGameplayTag Abilities_Passive_HealthDrain;
 FGameplayTag Abilities_Passive_ManaDrain;

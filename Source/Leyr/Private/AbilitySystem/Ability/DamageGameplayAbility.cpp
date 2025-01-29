@@ -145,6 +145,7 @@ FAdditionalEffectParams UDamageGameplayAbility::MakeAdditionalEffectParamsFromCl
 
 	// TODO: Could Additional Effect Class be specialised ? (Using AdditionalEffectClass instead of DamageEffectClass)
 	Params.AdditionalEffectClass = DamageEffectClass;
+	Params.SourceObject = GetSourceObject(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo());
 	Params.SourceAbilitySystemComponent = GetAbilitySystemComponentFromActorInfo();
 	Params.TargetAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 	Params.AbilityPower = AbilityPower.GetRandomFloatFromScalableRange(GetAbilityLevel());

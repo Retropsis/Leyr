@@ -69,6 +69,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	TArray<FGameplayModifierInfo> Modifiers;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item", meta=(Categories="Abilities"))
+	FGameplayTag MasteryTag = FGameplayTag();
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item", meta=(Categories="Cost"))
 	FGameplayTag CostTag = FGameplayTag();

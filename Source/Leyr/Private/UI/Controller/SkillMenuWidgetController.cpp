@@ -6,6 +6,7 @@
 #include "AbilitySystem/Data/AbilityInfo.h"
 #include "AbilitySystem/Data/PassiveInfo.h"
 #include "Game/BaseGameplayTags.h"
+#include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "Player/PlayerCharacterState.h"
 
 void USkillMenuWidgetController::BroadcastInitialValues()
@@ -135,15 +136,15 @@ void USkillMenuWidgetController::ActivateButtonPressed(const FGameplayTag& Abili
 
 	Effect->DurationPolicy = EGameplayEffectDurationType::Infinite;
 	
-	// UTargetTagsGameplayEffectComponent& AssetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
-	// FInheritedTagContainer InheritedTagContainer;
-	// InheritedTagContainer.Added.AddTag(EquipmentSlot);
-	// AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
+	UTargetTagsGameplayEffectComponent& AssetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
+	FInheritedTagContainer InheritedTagContainer;
 
 	for (const TTuple<FGameplayTag, FPassiveEffect> ActivatedEffect : ActivatedEffects)
 	{
 		Effect->Modifiers.Append(ActivatedEffect.Value.Modifiers);
+		InheritedTagContainer.Added.AddTag(ActivatedEffect.Key);
 	}
+	AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
 
 	if (FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec(Effect, EffectContext, 1.f))
 	{

@@ -5,6 +5,7 @@
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
+#include "Data/ItemData.h"
 #include "Game/BaseGameplayTags.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -184,6 +185,19 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		DamageTypeValue *= ( 100.f - Resistance ) / 100.f;
 		Damage += DamageTypeValue;
 	}
+
+	float PhysicalAttackMastery = 1.f;
+	if (UObject* SourceObject = ExecutionParams.GetOwningSpec().GetContext().GetSourceObject())
+	{
+		if (UItemData* Asset = Cast<UItemData>(SourceObject))
+		{
+			if(SourceTags->HasTagExact(Asset->MasteryTag))
+			{
+				PhysicalAttackMastery = 1.05f;
+			}
+		}
+	}
+	const FActiveGameplayEffectHandle ActiveSourceObjectEffectHandle = ApplyEquipmentEffects(ExecutionParams);
 	
 	float SourcePhysicalAttack = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().PhysicalAttackDef, EvaluationParameters, SourcePhysicalAttack);
@@ -194,7 +208,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	// const FRealCurve* EffectivePhysicalAttackCurve = CharacterClassInfo->DamageCalculationCoefficients->FindCurve(FName("EffectivePhysicalAttack"), FString());
 	// const float EffectivePhysicalAttackCoefficient = EffectivePhysicalAttackCurve->Eval(TargetCharacterLevel);
 	GEngine->AddOnScreenDebugMessage(445577, 5.f, FColor::Cyan, FString::Printf(TEXT("EffectivePAtk: [%f]"), EffectivePhysicalAttack));
-	Damage += Damage * EffectivePhysicalAttack;
+	Damage += Damage * EffectivePhysicalAttack * PhysicalAttackMastery;
 	
 	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
 	
@@ -273,6 +287,38 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	const FGameplayModifierEvaluatedData EvaluatedData(UBaseAttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, Damage);
 	OutExecutionOutput.AddOutputModifier(EvaluatedData);
+	
+	if(ActiveSourceObjectEffectHandle.IsValid()) ExecutionParams.GetSourceAbilitySystemComponent()->RemoveActiveGameplayEffect(ActiveSourceObjectEffectHandle);
+}
+
+FActiveGameplayEffectHandle UExecCalc_Damage::ApplyEquipmentEffects(const FGameplayEffectCustomExecutionParameters& ExecutionParams) const
+{
+	UObject* SourceObject = ExecutionParams.GetOwningSpec().GetContext().GetSourceObject();
+	if(SourceObject == nullptr) return FActiveGameplayEffectHandle();
+	
+	FGameplayEffectContextHandle EffectContext = ExecutionParams.GetSourceAbilitySystemComponent()->MakeEffectContext();
+	EffectContext.AddSourceObject(SourceObject);
+
+	FString SourceObjectName = FString::Printf(TEXT("GE_SourceObjectEffects"));
+	UGameplayEffect* Effect = NewObject<UGameplayEffect>(SourceObject, FName(SourceObjectName));
+
+	Effect->DurationPolicy = EGameplayEffectDurationType::Infinite;
+	
+	// UTargetTagsGameplayEffectComponent& AssetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
+	// FInheritedTagContainer InheritedTagContainer;
+	// InheritedTagContainer.Added.AddTag(EquipmentSlot);
+	// AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
+	
+	if (const UItemData* Asset = Cast<UItemData>(SourceObject))
+	{
+		Effect->Modifiers.Append(Asset->Modifiers);
+	}
+
+	if (FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec(Effect, EffectContext, 1.f))
+	{
+		return ExecutionParams.GetSourceAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*MutableSpec, ExecutionParams.GetSourceAbilitySystemComponent());
+	}
+	return FActiveGameplayEffectHandle();
 }
 
 void UExecCalc_Damage::DetermineStatusEffect(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FGameplayEffectSpec& Spec, FAggregatorEvaluateParameters EvaluationParameters,

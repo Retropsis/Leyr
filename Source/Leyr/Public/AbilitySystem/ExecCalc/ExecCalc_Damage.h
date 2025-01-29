@@ -16,6 +16,8 @@ class LEYR_API UExecCalc_Damage : public UGameplayEffectExecutionCalculation
 	
 public:
 	UExecCalc_Damage();
+
+	FActiveGameplayEffectHandle ApplyEquipmentEffects(const FGameplayEffectCustomExecutionParameters& ExecutionParams) const;
 	
 	void DetermineStatusEffect(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FGameplayEffectSpec& Spec, FAggregatorEvaluateParameters EvaluationParameters,
 					 const TMap<FGameplayTag, FGameplayEffectAttributeCaptureDefinition>& InTagsToDefs) const;

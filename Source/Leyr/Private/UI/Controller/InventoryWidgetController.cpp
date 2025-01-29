@@ -23,7 +23,6 @@ void UInventoryWidgetController::BindCallbacksToDependencies()
 			OnPlayerLevelChanged.Broadcast(NewLevel);
 		}
 	);
-
 	
 	UpdateEquipmentEffect();
 	UpdateMonkAbility();
@@ -52,7 +51,7 @@ void UInventoryWidgetController::AssignButtonPressed(const FInventoryItemData It
 	{
 		ItemToClearFromInput = *EquippedItem;
 		InputToClear = InputToAssign;
-		// SlotToUnequip = EquippedItem.Key;
+		SlotToUnequip = SlotToEquip;
 		bShouldClear = true;
 	}
 
@@ -107,7 +106,7 @@ void UInventoryWidgetController::Assign(const FGameplayTag InputToAssign, const 
 void UInventoryWidgetController::Clear(const FGameplayTag InputToClear, const FGameplayTag SlotToUnequip)
 {
 	OnInputRemoved.Broadcast(InputToClear);
-	OnItemUnequipped.Broadcast(SlotToUnequip);
+	OnItemUnequipped.Broadcast(SlotToUnequip, EquippedItems[SlotToUnequip].ItemData.Asset);
 	EquippedItems.Remove(SlotToUnequip);
 }
 
@@ -130,19 +129,23 @@ void UInventoryWidgetController::Equip(const FInventoryItemData& ItemData)
 	{
 		if (Slot.MatchesTagExact(EquippedItem.Key))
 		{
-			if (EquippedItems.Contains(Slot) && ItemData.Asset.Get() == EquippedItem.Value.ItemData.Asset.Get())
+			if (EquippedItems.Contains(Slot))
 			{
-				OnItemUnequipped.Broadcast(Slot);	
+				OnItemUnequipped.Broadcast(Slot, EquippedItem.Value.ItemData.Asset);	
 				EquippedItems.Remove(Slot);
 				UpdateEquipmentEffect();
-				return;
+				
+				if(ItemData.Asset.Get() == EquippedItem.Value.ItemData.Asset.Get()) return;
+				
+				break;
 			}
 		}
 	}
 	
 	FEquippedItem ItemToEquip{ItemData };	
-	OnItemEquipped.Broadcast(Slot, ItemData);
 	ItemToEquip.Modifiers = Asset->Modifiers;
+	
+	OnItemEquipped.Broadcast(Slot, ItemData);
 	EquippedItems.Add(Slot, ItemToEquip);
 	UpdateEquipmentEffect();
 }
@@ -226,6 +229,7 @@ void UInventoryWidgetController::UpdateEquipmentEffect()
 
 	for (const TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
 	{
+		if (EquippedItem.Key.MatchesTag(FBaseGameplayTags::Get().Equipment_ActionSlot)) continue;
 		Effect->Modifiers.Append(EquippedItem.Value.Modifiers);
 	}
 
@@ -272,7 +276,7 @@ void UInventoryWidgetController::UpdateItemAbilities()
 			{
 				if(EquippedItem.Value.ItemData.Asset.Get() != FoundItem->ItemData.Asset.Get())
 				{
-					ULeyrAbilitySystemLibrary::UpdateAbilities(this, AbilitySystemComponent, EquippedItem.Value.ItemData.Asset.Get(), GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key], FoundItem->Abilities);
+					ULeyrAbilitySystemLibrary::UpdateAbilities(this, AbilitySystemComponent, FoundItem->ItemData.Asset.Get(), GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key], FoundItem->Abilities);
 				}
 			}
 			// Did it move ?
