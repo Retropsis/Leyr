@@ -125,7 +125,6 @@ void UInventoryComponent::UpdateInventorySlotUI(int32 SlotIndex, const FInventor
 	case EContainerType::Inventory:
 	case EContainerType::Hotbar:
 		IPlayerInterface::Execute_UpdateInventorySlot(GetOwner(), ContainerType, SlotIndex, ItemData);
-		OnItemUpdated.Broadcast(ContainerType, SlotIndex, ItemData);
 		break;
 	case EContainerType::Container:
 		break;
@@ -143,7 +142,6 @@ void UInventoryComponent::ResetInventorySlotUI(int32 SlotIndex, const FInventory
 	case EContainerType::Inventory:
 	case EContainerType::Hotbar:
 		IPlayerInterface::Execute_ResetInventorySlot(GetOwner(), ContainerType, SlotIndex);
-		OnItemUpdated.Broadcast(ContainerType, SlotIndex, ItemData);
 		break;
 	case EContainerType::Container:
 		break;
@@ -190,6 +188,7 @@ bool UInventoryComponent::UseItem(UItemData* Asset, int32 Amount)
 				ResetInventorySlotUI(i, Items[i]);
 				RemoveItemAtIndex(i);
 			}
+			OnItemQuantityUpdated.Broadcast(Items[i]);
 			return true;
 		}
 	}

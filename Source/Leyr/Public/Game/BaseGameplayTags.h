@@ -378,6 +378,9 @@ FGameplayTag Montage_Window_Execute;
  FGameplayTag Equipment_Wrist;
  FGameplayTag Equipment_Waist;
  FGameplayTag Equipment_Ammunition;
+ FGameplayTag Equipment_Ammunition_1;
+ FGameplayTag Equipment_Ammunition_2;
+ FGameplayTag Equipment_Ammunition_3;
 
  TMap<FGameplayTag, FGameplayTag> EquipmentSlotToInputTags;
  

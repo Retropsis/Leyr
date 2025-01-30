@@ -14,7 +14,18 @@
 void UInventoryWidgetController::BindCallbacksToDependencies()
 {
 	checkf(InventoryComponent, TEXT("InventoryComponent is NULL, please check [%s]"), *GetName());
-	InventoryComponent->OnItemUpdated.AddDynamic(this, &UInventoryWidgetController::HandleItemUpdated);
+	
+	InventoryComponent->OnItemQuantityUpdated.AddLambda([this](const FInventoryItemData& ItemData)
+		{
+			for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
+			{
+				if (EquippedItem.Value.ItemData.Asset.Get() == ItemData.Asset.Get())
+				{
+					OnEquipmentSlotQuantityUpdated.Broadcast(EquippedItem.Key, ItemData);
+				}
+			}
+		}
+	);
 	
 	GetBasePS()->OnXPChangedDelegate.AddUObject(this, &UInventoryWidgetController::OnXPChanged);
 	GetBasePS()->OnLevelChangedDelegate.AddLambda(
@@ -120,10 +131,39 @@ void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData)
 
 void UInventoryWidgetController::Equip(const FInventoryItemData& ItemData)
 {
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 	UItemData* Asset = ItemData.Asset.LoadSynchronous();
 	FGameplayTag Slot = ItemData.EquipmentSlot;
 	
-	if(Asset == nullptr || Slot.MatchesTagExact(FBaseGameplayTags::Get().Equipment_ActionSlot)) return;
+	if(Asset == nullptr || Slot.MatchesTagExact(GameplayTags.Equipment_ActionSlot)) return;
+	
+	// if(Slot.MatchesTag(GameplayTags.Equipment_Ammunition))
+	// {
+	// 	if(const FGameplayTag* OldSlot = EquippedItems.FindKey(FEquippedItem{ ItemData }))
+	// 	{
+	// 		OnItemUnequipped.Broadcast(*OldSlot, ItemData.Asset);	
+	// 		EquippedItems.Remove(*OldSlot);
+	// 		UpdateEquipmentEffect();
+	// 		return;
+	// 	}
+	// 	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
+	// 	{
+	// 		if(EquippedItem.Key.MatchesTag(GameplayTags.Equipment_Ammunition))
+	// 		{
+	// 			OnItemUnequipped.Broadcast(Slot, EquippedItem.Value.ItemData.Asset);	
+	// 			EquippedItems.Remove(Slot);
+	// 			UpdateEquipmentEffect();
+	// 			
+	// 			FEquippedItem ItemToEquip{ItemData };	
+	// 			ItemToEquip.Modifiers = Asset->Modifiers;
+	//
+	// 			OnItemEquipped.Broadcast(Slot, ItemData);
+	// 			EquippedItems.Add(Slot, ItemToEquip);
+	// 			UpdateEquipmentEffect();		
+	// 			return;
+	// 		}
+	// 	}
+	// }
 	
 	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
 	{
@@ -150,31 +190,17 @@ void UInventoryWidgetController::Equip(const FInventoryItemData& ItemData)
 	UpdateEquipmentEffect();
 }
 
-void UInventoryWidgetController::HandleItemUpdated(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData Item)
-{
-	HandleOnItemUpdated.Broadcast(ContainerType, SlotIndex, Item);
-	
-	const UItemData* Asset =  Item.Asset.LoadSynchronous();
-	if (Item.Quantity == 0 && Asset && Asset->bRemoveStackIfEmpty)
-	{
-		for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
-		{
-			if(EquippedItem.Value.ItemData.Asset.Get() == Item.Asset.Get())
-			{
-				Clear(FBaseGameplayTags::Get().EquipmentSlotToInputTags[EquippedItem.Key], EquippedItem.Key);
-				return;
-			}
-		}
-	}
-}
-
 UItemData* UInventoryWidgetController::HasCompatibleItemCostInAmmunitionSlot(const FGameplayTag CostTag)
 {
-	if (const FEquippedItem* EquippedItem = EquippedItems.Find(FBaseGameplayTags::Get().Equipment_Ammunition))
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
 	{
-		if(UItemData* Asset = EquippedItem->ItemData.Asset.LoadSynchronous())
+		if(EquippedItem.Key.MatchesTag(GameplayTags.Equipment_Ammunition))
 		{
-			return Asset->CostTag.MatchesTagExact(CostTag) ? Asset : nullptr;
+			if(UItemData* Asset = EquippedItem.Value.ItemData.Asset.LoadSynchronous())
+            {
+            	return Asset->CostTag.MatchesTagExact(CostTag) ? Asset : nullptr;
+            }
 		}
 	}
 	return nullptr;

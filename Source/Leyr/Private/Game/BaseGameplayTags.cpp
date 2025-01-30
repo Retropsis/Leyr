@@ -415,6 +415,9 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Equipment_Wrist = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.Wrist"), FString("Equipment Wrist"));
 	GameplayTags.Equipment_Waist = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.Waist"), FString("Equipment Waist"));
 	GameplayTags.Equipment_Ammunition = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.Ammunition"), FString("Equipment Ammunition"));
+	GameplayTags.Equipment_Ammunition_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.Ammunition.1"), FString("Equipment Ammunition 1"));
+	GameplayTags.Equipment_Ammunition_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.Ammunition.2"), FString("Equipment Ammunition 2"));
+	GameplayTags.Equipment_Ammunition_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.Ammunition.3"), FString("Equipment Ammunition 3"));
 	
 	/*
 	 * Inventory Cost Tags

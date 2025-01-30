@@ -46,7 +46,7 @@ enum class EContainerType : uint8
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChanged);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnItemUpdated, EContainerType, ContainerType, int32, SlotIndex, FInventoryItemData, Item);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemQuantityUpdatedSignature, const FInventoryItemData& ItemData);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class LEYR_API UInventoryComponent : public UActorComponent
@@ -56,9 +56,6 @@ class LEYR_API UInventoryComponent : public UActorComponent
 public:	
 	UInventoryComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	UPROPERTY(BlueprintAssignable)
-	FOnItemUpdated OnItemUpdated;
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void ServerAddItem(FInventoryItemData ItemToAdd);
@@ -71,6 +68,8 @@ public:
 	void UpdateInventorySlotUI(int32 SlotIndex, const FInventoryItemData& ItemData) const;
 	void ResetInventorySlotUI(int32 SlotIndex, const FInventoryItemData& ItemData) const;
 	void SetInventorySize(int32 Size);
+
+	FOnItemQuantityUpdatedSignature OnItemQuantityUpdated;
 
 	virtual void TransferItem(UInventoryComponent* TargetInventory, int32 SourceSlotIndex, int32 TargetSlotIndex);
 	virtual void TransferItemToEmptySlot(UInventoryComponent* TargetInventory, int32 SourceSlotIndex);

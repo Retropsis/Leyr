@@ -13,6 +13,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInputAssignedSignature, FInvento
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInputRemovedSignature, FGameplayTag, InputTag);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemEquippedSignature, FGameplayTag, SlotTag, FInventoryItemData, ItemData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemUnequippedSignature, FGameplayTag, SlotTag, TSoftObjectPtr<UItemData>, Asset);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEquipmentSlotQuantityUpdatedSignature, FGameplayTag, SlotTag, const FInventoryItemData&, ItemData);
 
 USTRUCT()
 struct FEquippedItem
@@ -58,9 +59,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetContainerOpen(bool bIsOpen) { bContainerIsOpen = bIsOpen; }
 
-	UFUNCTION()
-	void HandleItemUpdated(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData Item);
-
 	UPROPERTY(BlueprintAssignable)
 	FOnInputAssignedSignature OnInputAssigned;
 	
@@ -72,6 +70,9 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnItemUnequippedSignature OnItemUnequipped;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnEquipmentSlotQuantityUpdatedSignature OnEquipmentSlotQuantityUpdated;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnPlayerStatChangedSignature OnPlayerLevelChanged;
@@ -81,9 +82,6 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnXPValueChanged OnXPValueUpdated;
-
-	UPROPERTY(BlueprintAssignable)
-	FOnItemUpdated HandleOnItemUpdated;
 
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
 	TObjectPtr<UInventoryComponent> InventoryComponent;
