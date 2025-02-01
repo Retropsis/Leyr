@@ -2,16 +2,15 @@
 
 #include "AI/AICharacter.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "GameplayTagsManager.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AbilitySystem/Data/EncounterInfo.h"
 #include "AI/BaseAIController.h"
-#include "AI/NavigationSystemBase.h"
 #include "AI/SplineComponentActor.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BlackboardComponent.h"
-#include "Components/BrushComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SplineComponent.h"
 #include "Components/WidgetComponent.h"
@@ -21,6 +20,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
+#include "World/Level/Zone/Arena.h"
 
 AAICharacter::AAICharacter()
 {
@@ -98,6 +98,12 @@ void AAICharacter::PossessedBy(AController* NewController)
 	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), false);
 	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("RangedAttacker"), CharacterClass != ECharacterClass::Warrior);
 	BaseAIController->SetPawn(this);
+
+	if (Arena)
+	{
+		Arena->OnPlayerEntering.AddLambda([this](AActor* Player) { HandlePlayerOverlappingArena(Player, true); });
+		Arena->OnPlayerLeaving.AddLambda([this](AActor* Player) { HandlePlayerOverlappingArena(Player, false); });
+	}
 
 	StartLocation = GetActorLocation();
 
@@ -447,4 +453,35 @@ void AAICharacter::ResetShouldAttack()
 	{
 		ShouldAttack(true);
 	}), AttackCooldown, false);
+}
+
+void AAICharacter::HandlePlayerOverlappingArena(AActor* Player, bool bIsEntering)
+{
+	GEngine->AddOnScreenDebugMessage(4456545, 5.f, FColor::Magenta, bIsEntering ? "Entering Arena" : "Leaving Arena");
+	if(bIsEntering)
+	{
+		if (BaseAIController) BaseAIController->GetBlackboardComponent()->SetValueAsObject(FName("TargetToFollow"), Player);
+	}
+	else
+	{
+		if (BaseAIController) BaseAIController->GetBlackboardComponent()->SetValueAsObject(FName("TargetToFollow"), nullptr);
+	}
+}
+
+FName AAICharacter::GetNextBehaviourPattern_Implementation(const FName PatternName)
+{
+	FGameplayTag PatternTag = UGameplayTagsManager::Get().RequestGameplayTag(PatternName, false);
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	if(!PatternTag.MatchesTag(GameplayTags.AI_Pattern)) PatternTag = GameplayTags.AI_Pattern_Random;
+	
+	if(PatternTag.MatchesTagExact(GameplayTags.AI_Pattern_Random))
+	{
+		return BehaviourPatterns[FMath::RandRange(0, BehaviourPatterns.Num() - 1)].GetTagName();
+	}
+	int32 Index = BehaviourPatterns.IndexOfByKey(PatternTag);
+	
+	if(Index == INDEX_NONE) return GameplayTags.AI_Pattern_None.GetTagName();
+	
+	Index = Index + 1 >= BehaviourPatterns.Num() ? 0 : Index + 1;
+	return BehaviourPatterns[Index].GetTagName();
 }

@@ -7,6 +7,7 @@
 #include "Leyr/Leyr.h"
 #include "BaseGameplayAbility.generated.h"
 
+class UPaperZDAnimInstance;
 class UItemData;
 /**
  * 
@@ -34,7 +35,7 @@ public:
 
 protected:
 	UFUNCTION(BlueprintCallable)
-	virtual void InitAbility() {}
+	virtual void InitAbility();
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void PrepareToEndAbility() {}
@@ -47,6 +48,9 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite)
 	FVector CursorHitLocation;
+	
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UPaperZDAnimInstance> PaperAnimInstance = nullptr;
 
 private:
 	FActiveGameplayEffectHandle ActiveSourceObjectEffectHandle;

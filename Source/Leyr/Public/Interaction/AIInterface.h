@@ -4,11 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "GameplayTagContainer.h"
 #include "AIInterface.generated.h"
 
 enum class EEncounterSize : uint8;
 enum class EMovementType : uint8;
 enum class EBehaviourState : uint8;
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UAIInterface : public UInterface
@@ -60,4 +62,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetNewMovementSpeed(EMovementMode InMovementMode, float NewSpeed);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FName GetNextBehaviourPattern(FName PatternName);
 };

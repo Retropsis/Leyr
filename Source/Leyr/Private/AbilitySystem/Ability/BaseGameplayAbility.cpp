@@ -8,7 +8,13 @@
 #include "Data/ItemData.h"
 #include "Game/BaseGameplayTags.h"
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
+#include "Interaction/CombatInterface.h"
 #include "Interaction/PlayerInterface.h"
+
+void UBaseGameplayAbility::InitAbility()
+{
+	PaperAnimInstance = ICombatInterface::Execute_GetPaperAnimInstance(GetAvatarActorFromActorInfo());
+}
 
 void UBaseGameplayAbility::MakeAndApplyExecuteEffectToTarget(const FGameplayTag& TagToApply, UAbilitySystemComponent* TargetASC, int32 Level)
 {

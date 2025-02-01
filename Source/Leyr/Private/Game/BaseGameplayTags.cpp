@@ -477,4 +477,29 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Player_Block_InputHeld = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Player.Block.InputHeld"), FString("Block input pressed from player"));
 	GameplayTags.Player_Block_InputReleased = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Player.Block.InputReleased"), FString("Block input pressed from player"));
 	GameplayTags.Player_Block_CursorTrace = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Player.Block.CursorTrace"), FString("Block trace under cursor"));
+	
+	/*
+	* AI Pattern Tags
+	*/
+	GameplayTags.AI_Pattern = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern"), FString("AI Pattern"));
+	GameplayTags.AI_Pattern_None = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.None"), FString("AI Pattern None"));
+	GameplayTags.AI_Pattern_Random = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Random"), FString("AI Pattern Randomly"));
+	GameplayTags.AI_Pattern_Phase1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase1"), FString("AI Pattern Phase 1"));
+	GameplayTags.AI_Pattern_Phase1_Random = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase1.Random"), FString("AI Pattern Phase 1 Randomly"));
+	GameplayTags.AI_Pattern_Phase1_A = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase1.A"), FString("AI Pattern Phase 1 Set A"));
+	GameplayTags.AI_Pattern_Phase1_B = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase1.B"), FString("AI Pattern Phase 1 Set B"));
+	GameplayTags.AI_Pattern_Phase1_C = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase1.C"), FString("AI Pattern Phase 1 Set C"));
+	GameplayTags.AI_Pattern_Phase1_D = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase1.D"), FString("AI Pattern Phase 1 Set D"));
+	GameplayTags.AI_Pattern_Phase2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase2"), FString("AI Pattern Phase 2"));
+	GameplayTags.AI_Pattern_Phase2_Random = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase2.Random"), FString("AI Pattern Phase 2 Randomly"));
+	GameplayTags.AI_Pattern_Phase2_A = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase2.A"), FString("AI Pattern Phase 2 Set A"));
+	GameplayTags.AI_Pattern_Phase2_B = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase2.B"), FString("AI Pattern Phase 2 Set B"));
+	GameplayTags.AI_Pattern_Phase2_C = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase2.C"), FString("AI Pattern Phase 2 Set C"));
+	GameplayTags.AI_Pattern_Phase2_D = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase2.D"), FString("AI Pattern Phase 2 Set D"));
+	GameplayTags.AI_Pattern_Phase3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase3"), FString("AI Pattern Phase 3"));
+	GameplayTags.AI_Pattern_Phase3_Random = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase3.Random"), FString("AI Pattern Phase 3 Randomly"));
+	GameplayTags.AI_Pattern_Phase3_A = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase3.A"), FString("AI Pattern Phase 3 Set A"));
+	GameplayTags.AI_Pattern_Phase3_B = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase3.B"), FString("AI Pattern Phase 3 Set B"));
+	GameplayTags.AI_Pattern_Phase3_C = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase3.C"), FString("AI Pattern Phase 3 Set C"));
+	GameplayTags.AI_Pattern_Phase3_D = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase3.D"), FString("AI Pattern Phase 3 Set D"));
 }

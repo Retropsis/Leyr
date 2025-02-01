@@ -11,6 +11,7 @@
 #include "UI/Controller/OverlayWidgetController.h"
 #include "AICharacter.generated.h"
 
+class AArena;
 class ANavMeshBoundsVolume;
 enum class EEncounterName : uint8;
 enum class EBehaviourType : uint8;
@@ -35,6 +36,7 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 	void HandleBehaviourState(EBehaviourState NewState);
+	void HandlePlayerOverlappingArena(AActor* Player, bool bIsEntering);
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
@@ -58,6 +60,7 @@ public:
 	virtual bool FollowSplinePoints_Implementation(int32 SplineIndex) override;
 	virtual void SetNewMovementSpeed_Implementation(EMovementMode InMovementMode, float NewSpeed) override;
 	virtual EEncounterSize GetEncounterSize_Implementation() override { return EncounterSize; }
+	virtual FName GetNextBehaviourPattern_Implementation(FName PatternName);
 	/** end AI Interface */
 
 	/** Enemy Interface */
@@ -94,6 +97,12 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	EMovementType MovementType = EMovementType::Destination;
+
+	UPROPERTY(EditInstanceOnly, Category = "Character|AI")
+	TObjectPtr<AArena> Arena = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Character|AI")
+	TArray<FGameplayTag> BehaviourPatterns;
 
 protected:
 	virtual void BeginPlay() override;

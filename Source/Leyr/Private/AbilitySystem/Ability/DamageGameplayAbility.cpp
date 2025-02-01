@@ -5,7 +5,6 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "Game/BaseGameplayTags.h"
-#include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "Interaction/InteractionInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -14,7 +13,6 @@ void UDamageGameplayAbility::InitAbility()
 	Super::InitAbility();
 	bHasHitTarget = false;
 	ICombatInterface::Execute_SetMovementEnabled(GetAvatarActorFromActorInfo(), false);
-	PaperAnimInstance = ICombatInterface::Execute_GetPaperAnimInstance(GetAvatarActorFromActorInfo());
 }
 
 void UDamageGameplayAbility::PrepareToEndAbility()

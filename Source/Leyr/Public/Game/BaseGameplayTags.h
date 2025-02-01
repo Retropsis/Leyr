@@ -436,6 +436,31 @@ FGameplayTag Player_Block_InputHeld;
 FGameplayTag Player_Block_InputReleased;
 FGameplayTag Player_Block_CursorTrace;
 
+ /*
+ * AI Pattern Tags
+ */
+ FGameplayTag AI_Pattern;
+ FGameplayTag AI_Pattern_None;
+ FGameplayTag AI_Pattern_Random;
+ FGameplayTag AI_Pattern_Phase1;
+ FGameplayTag AI_Pattern_Phase1_Random;
+ FGameplayTag AI_Pattern_Phase1_A;
+ FGameplayTag AI_Pattern_Phase1_B;
+ FGameplayTag AI_Pattern_Phase1_C;
+ FGameplayTag AI_Pattern_Phase1_D;
+ FGameplayTag AI_Pattern_Phase2;
+ FGameplayTag AI_Pattern_Phase2_Random;
+ FGameplayTag AI_Pattern_Phase2_A;
+ FGameplayTag AI_Pattern_Phase2_B;
+ FGameplayTag AI_Pattern_Phase2_C;
+ FGameplayTag AI_Pattern_Phase2_D;
+ FGameplayTag AI_Pattern_Phase3;
+ FGameplayTag AI_Pattern_Phase3_Random;
+ FGameplayTag AI_Pattern_Phase3_A;
+ FGameplayTag AI_Pattern_Phase3_B;
+ FGameplayTag AI_Pattern_Phase3_C;
+ FGameplayTag AI_Pattern_Phase3_D;
+ 
 private:
 	static FBaseGameplayTags GameplayTags;
 };
