@@ -98,7 +98,7 @@ public:
 	virtual void SetContainer_Implementation(AContainer* Container) override;
 	virtual void CloseContainer_Implementation() override;
 	virtual UInventoryComponent* GetInventoryComponentByType_Implementation(EContainerType Type) override;
-	virtual bool UseItem_Implementation(UItemData* Asset, int32 Amount, bool bIsSelfCost) override;
+	virtual bool UseItem_Implementation(UItemData* Asset, int32 Amount, bool bIsSelfCost, int32& OutQuantity) override;
 	
 	virtual void AddToXP_Implementation(int32 InXP) override;
 	virtual void LevelUp_Implementation() override;

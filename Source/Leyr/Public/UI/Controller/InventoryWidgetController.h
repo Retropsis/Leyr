@@ -40,6 +40,7 @@ public:
 	void Clear(FGameplayTag InputToClear, FGameplayTag SlotToUnequip);
 	void Assign(FGameplayTag InputToAssign, FGameplayTag SlotToEquip, FEquippedItem& ItemToEquip);
 	UItemData* HasCompatibleItemCostInAmmunitionSlot(const FGameplayTag CostTag);
+	bool HasCompatibleItemCostInInventory(const FGameplayTag CostTag, FInventoryItemData& OutItem) const;
 
 	UFUNCTION(BlueprintCallable)
 	void AssignButtonPressed(FInventoryItemData ItemData, const FGameplayTag InputTag);
@@ -89,6 +90,7 @@ public:
 private:
 	void UpdateEquipmentEffect();
 	void UpdateMonkAbility();
+	void UpdateAmmunitionCounter(FGameplayTag Slot, FEquippedItem EquippedItem) const;
 	void UpdateItemAbilities();
 	void OnXPChanged(int32 NewXP);
 	

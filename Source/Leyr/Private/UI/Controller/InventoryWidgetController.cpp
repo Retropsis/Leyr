@@ -7,6 +7,7 @@
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AbilitySystem/Data/LevelUpInfo.h"
+#include "Data/InventoryCostData.h"
 #include "Game/BaseGameplayTags.h"
 #include "Inventory/InventoryComponent.h"
 #include "Player/PlayerCharacterState.h"
@@ -26,6 +27,13 @@ void UInventoryWidgetController::BindCallbacksToDependencies()
 			}
 		}
 	);
+	// InventoryComponent->OnItemAdded.AddLambda([this](const FInventoryItemData& ItemData)
+	// 	{
+	// 		const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	// 		BaseASC->AbilityCostCommitted.Broadcast(GameplayTags.Abilities_None, GameplayTags.Cost_None, -1);
+	// 		UpdateAmmunitionCounter(GameplayTags.Equipment_Ammunition, )
+	// 	}
+	// );
 	
 	GetBasePS()->OnXPChangedDelegate.AddUObject(this, &UInventoryWidgetController::OnXPChanged);
 	GetBasePS()->OnLevelChangedDelegate.AddLambda(
@@ -89,6 +97,7 @@ void UInventoryWidgetController::AssignButtonPressed(const FInventoryItemData It
 			UpdateEquipmentEffect();
 			UpdateItemAbilities();
 			UpdateMonkAbility();
+			UpdateAmmunitionCounter(SlotToUnequip, ItemToClearFromInput);
 			return;
 		}
 	}
@@ -99,6 +108,7 @@ void UInventoryWidgetController::AssignButtonPressed(const FInventoryItemData It
 	UpdateEquipmentEffect();
 	UpdateItemAbilities();
 	UpdateMonkAbility();
+	UpdateAmmunitionCounter(SlotToEquip,ItemToEquip);
 }
 
 void UInventoryWidgetController::Assign(const FGameplayTag InputToAssign, const FGameplayTag SlotToEquip, FEquippedItem& ItemToEquip)
@@ -136,34 +146,6 @@ void UInventoryWidgetController::Equip(const FInventoryItemData& ItemData)
 	FGameplayTag Slot = ItemData.EquipmentSlot;
 	
 	if(Asset == nullptr || Slot.MatchesTagExact(GameplayTags.Equipment_ActionSlot)) return;
-	
-	// if(Slot.MatchesTag(GameplayTags.Equipment_Ammunition))
-	// {
-	// 	if(const FGameplayTag* OldSlot = EquippedItems.FindKey(FEquippedItem{ ItemData }))
-	// 	{
-	// 		OnItemUnequipped.Broadcast(*OldSlot, ItemData.Asset);	
-	// 		EquippedItems.Remove(*OldSlot);
-	// 		UpdateEquipmentEffect();
-	// 		return;
-	// 	}
-	// 	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
-	// 	{
-	// 		if(EquippedItem.Key.MatchesTag(GameplayTags.Equipment_Ammunition))
-	// 		{
-	// 			OnItemUnequipped.Broadcast(Slot, EquippedItem.Value.ItemData.Asset);	
-	// 			EquippedItems.Remove(Slot);
-	// 			UpdateEquipmentEffect();
-	// 			
-	// 			FEquippedItem ItemToEquip{ItemData };	
-	// 			ItemToEquip.Modifiers = Asset->Modifiers;
-	//
-	// 			OnItemEquipped.Broadcast(Slot, ItemData);
-	// 			EquippedItems.Add(Slot, ItemToEquip);
-	// 			UpdateEquipmentEffect();		
-	// 			return;
-	// 		}
-	// 	}
-	// }
 	
 	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
 	{
@@ -204,6 +186,26 @@ UItemData* UInventoryWidgetController::HasCompatibleItemCostInAmmunitionSlot(con
 		}
 	}
 	return nullptr;
+}
+
+bool UInventoryWidgetController::HasCompatibleItemCostInInventory(const FGameplayTag CostTag, FInventoryItemData& OutItem) const
+{
+	if(const UInventoryCostData* InventoryCostData = ULeyrAbilitySystemLibrary::GetInventoryCostData(this))
+	{		
+		FInventoryCost InventoryCost = InventoryCostData->FindCostInfoForTag(CostTag);
+		for (const UItemData* CompatibleItem : InventoryCost.CompatibleItems)
+		{
+			for (FInventoryItemData ItemData : InventoryComponent->Items)
+			{
+				if (ItemData.Asset.Get() == CompatibleItem)
+				{
+					OutItem = ItemData;
+					return true;
+				}
+			}
+		}
+	}
+	return false;
 }
 
 /*
@@ -303,6 +305,7 @@ void UInventoryWidgetController::UpdateItemAbilities()
 				if(EquippedItem.Value.ItemData.Asset.Get() != FoundItem->ItemData.Asset.Get())
 				{
 					ULeyrAbilitySystemLibrary::UpdateAbilities(this, AbilitySystemComponent, FoundItem->ItemData.Asset.Get(), GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key], FoundItem->Abilities);
+					
 				}
 			}
 			// Did it move ?
@@ -347,6 +350,24 @@ void UInventoryWidgetController::UpdateItemAbilities()
 				// Add
 				ULeyrAbilitySystemLibrary::UpdateAbilities(this, AbilitySystemComponent, EquippedItem.Value.ItemData.Asset.Get(), GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key], EquippedItem.Value.Abilities);
 			}
+		}
+	}
+}
+
+void UInventoryWidgetController::UpdateAmmunitionCounter(FGameplayTag Slot, FEquippedItem EquippedItem) const
+{
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent))
+	{
+		if(EquippedItem.ItemData.Asset.Get()->CostTag.IsValid())
+		{
+			FInventoryItemData CompatibleAmmunition;
+			int32 Quantity = HasCompatibleItemCostInInventory(EquippedItem.ItemData.Asset.Get()->CostTag, CompatibleAmmunition) ? CompatibleAmmunition.Quantity : 0;
+			BaseASC->AbilityCostCommitted.Broadcast(EquippedItem.Abilities[0], EquippedItem.ItemData.Asset.Get()->CostTag, Quantity);
+		}
+		else
+		{
+			BaseASC->AbilityCostCommitted.Broadcast(GameplayTags.Abilities_None, GameplayTags.Cost_None, -1);
 		}
 	}
 }

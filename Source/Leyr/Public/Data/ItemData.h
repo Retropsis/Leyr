@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayEffect.h"
 #include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
 #include "ItemData.generated.h"
 
-struct FGameplayModifierInfo;
 class UPaperFlipbook;
 class UGameplayEffect;
 class AItem;
@@ -78,4 +78,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	float Weight = 0.f;
+
+	UFUNCTION(BlueprintPure, Category="Item")
+	float GetPrimaryAttributeMagnitude();
 };

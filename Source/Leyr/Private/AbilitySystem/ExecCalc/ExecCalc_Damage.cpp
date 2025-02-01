@@ -186,17 +186,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		Damage += DamageTypeValue;
 	}
 
-	float PhysicalAttackMastery = 1.f;
-	if (UObject* SourceObject = ExecutionParams.GetOwningSpec().GetContext().GetSourceObject())
-	{
-		if (UItemData* Asset = Cast<UItemData>(SourceObject))
-		{
-			if(SourceTags->HasTagExact(Asset->MasteryTag))
-			{
-				PhysicalAttackMastery = 1.05f;
-			}
-		}
-	}
+	float PhysicalAttackMastery = ApplyMasteryEffects(ExecutionParams);
 	const FActiveGameplayEffectHandle ActiveSourceObjectEffectHandle = ApplyEquipmentEffects(ExecutionParams);
 	
 	float SourcePhysicalAttack = 0.f;
@@ -289,6 +279,30 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	OutExecutionOutput.AddOutputModifier(EvaluatedData);
 	
 	if(ActiveSourceObjectEffectHandle.IsValid()) ExecutionParams.GetSourceAbilitySystemComponent()->RemoveActiveGameplayEffect(ActiveSourceObjectEffectHandle);
+}
+
+float UExecCalc_Damage::ApplyMasteryEffects(const FGameplayEffectCustomExecutionParameters& ExecutionParams) const
+{
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	FGameplayTagContainer MasteryTags;
+	MasteryTags.AddTag(GameplayTags.Abilities_Passive_Mastery);
+	TArray<FGameplayAbilitySpec*> MasteryAbilities;
+	ExecutionParams.GetSourceAbilitySystemComponent()->GetActivatableGameplayAbilitySpecsByAllMatchingTags(MasteryTags, MasteryAbilities);
+
+	if (UObject* SourceObject = ExecutionParams.GetOwningSpec().GetContext().GetSourceObject())
+	{
+		if (const UItemData* Asset = Cast<UItemData>(SourceObject))
+		{
+			for (const FGameplayAbilitySpec* Mastery : MasteryAbilities)
+			{
+				if(Mastery->Ability->AbilityTags.HasTagExact(Asset->MasteryTag))
+				{
+					return 1.f + FMath::Min(Mastery->Level * 0.05, 1.f);
+				}
+			}
+		}
+	}
+	return 1.f;
 }
 
 FActiveGameplayEffectHandle UExecCalc_Damage::ApplyEquipmentEffects(const FGameplayEffectCustomExecutionParameters& ExecutionParams) const

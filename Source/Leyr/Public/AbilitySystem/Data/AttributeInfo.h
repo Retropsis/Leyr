@@ -24,6 +24,9 @@ struct FBaseAttributeInfo
 
 	UPROPERTY( BlueprintReadOnly)
 	float AttributeValue = 0.f;
+
+	UPROPERTY( BlueprintReadOnly)
+	float AttributeBaseValue = 0.f;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayAttribute AttributeGetter;

@@ -1001,9 +1001,9 @@ UInventoryComponent* APlayerCharacter::GetInventoryComponentByType_Implementatio
 	return nullptr;
 }
 
-bool APlayerCharacter::UseItem_Implementation(UItemData* Asset, int32 Amount, bool bIsSelfCost)
+bool APlayerCharacter::UseItem_Implementation(UItemData* Asset, int32 Amount, bool bIsSelfCost, int32& OutQuantity)
 {
-	if(bIsSelfCost) return PlayerInventory->UseItem(Asset, Amount);
+	if(bIsSelfCost) return PlayerInventory->UseItem(Asset, Amount, OutQuantity);
 	
 	const UInventoryCostData* InventoryCostData = ULeyrAbilitySystemLibrary::GetInventoryCostData(this);
 	bool bHasFoundCompatibleItem = false;
@@ -1014,7 +1014,7 @@ bool APlayerCharacter::UseItem_Implementation(UItemData* Asset, int32 Amount, bo
 		{
 			if(UItemData* PreferredAsset = IC->HasCompatibleItemCostInAmmunitionSlot(Asset->CostTag))
 			{		
-				bHasFoundCompatibleItem = PlayerInventory->UseItem(PreferredAsset, Amount);
+				bHasFoundCompatibleItem = PlayerInventory->UseItem(PreferredAsset, Amount, OutQuantity);
 			}
 		}
 	}
@@ -1024,7 +1024,7 @@ bool APlayerCharacter::UseItem_Implementation(UItemData* Asset, int32 Amount, bo
 		FInventoryCost InventoryCost = InventoryCostData->FindCostInfoForTag(Asset->CostTag);
 		for (UItemData* CompatibleItem : InventoryCost.CompatibleItems)
 		{
-			if(PlayerInventory->UseItem(CompatibleItem, Amount))
+			if(PlayerInventory->UseItem(CompatibleItem, Amount, OutQuantity))
 			{
 				bHasFoundCompatibleItem = true;
 				break;

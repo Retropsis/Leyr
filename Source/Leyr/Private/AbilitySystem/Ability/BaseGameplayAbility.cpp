@@ -1,6 +1,8 @@
 // @ Retropsis 2024-2025.
 
 #include "AbilitySystem/Ability/BaseGameplayAbility.h"
+
+#include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "Data/ItemData.h"
@@ -57,7 +59,13 @@ bool UBaseGameplayAbility::CommitInventoryCost(bool bIsSelfCost)
 	const FGameplayAbilitySpec* AbilitySpec = GetCurrentAbilitySpec();
 	if(UItemData* ItemData = Cast<UItemData>(AbilitySpec->SourceObject.Get()))
 	{
-		return IPlayerInterface::Execute_UseItem(GetAvatarActorFromActorInfo(), ItemData, 1, bIsSelfCost);
+		int32 OutQuantity;
+		const bool bWasSuccessful = IPlayerInterface::Execute_UseItem(GetAvatarActorFromActorInfo(), ItemData, 1, bIsSelfCost, OutQuantity);
+		if (UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo()); bWasSuccessful && BaseASC)
+		{
+			BaseASC->AbilityCostCommitted.Broadcast(AbilityTags.First(), ItemData->CostTag, OutQuantity);
+		}
+		return bWasSuccessful;
 	}
 	return false;
 }

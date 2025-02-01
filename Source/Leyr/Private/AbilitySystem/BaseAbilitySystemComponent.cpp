@@ -1,7 +1,6 @@
 // @ Retropsis 2024-2025.
 
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
-
 #include "AbilitySystemBlueprintLibrary.h"
 #include "LeyrLogChannels.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
@@ -338,7 +337,7 @@ void UBaseAbilitySystemComponent::UpdateAbilityStatuses(int32 Level)
 	for (const FBaseAbilityInfo& Info : AbilityInfo->AbilityInformation)
 	{
 		if (!Info.AbilityTag.IsValid()) continue;
-		if (Level < Info.LevelRequirement) continue;
+		if (Level < Info.LevelRequirement || Info.LevelRequirement < 0) continue;
 		if (GetSpecFromAbilityTag(Info.AbilityTag) == nullptr)
 		{
 			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(Info.Ability, 1);

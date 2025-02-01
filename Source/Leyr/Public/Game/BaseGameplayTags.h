@@ -156,8 +156,14 @@ FGameplayTag Abilities_Cure_2;
 FGameplayTag Abilities_Passive;
 FGameplayTag Abilities_Passive_Mastery;
 FGameplayTag Abilities_Passive_Mastery_Sword;
+FGameplayTag Abilities_Passive_Mastery_Dagger;
+FGameplayTag Abilities_Passive_Mastery_Axe;
 FGameplayTag Abilities_Passive_Mastery_Blunt;
 FGameplayTag Abilities_Passive_Mastery_DualWield;
+FGameplayTag Abilities_Passive_Mastery_GreatSword;
+FGameplayTag Abilities_Passive_Mastery_Bow;
+FGameplayTag Abilities_Passive_Mastery_Crossbow;
+FGameplayTag Abilities_Passive_Mastery_Buckler;
  
 FGameplayTag Abilities_Passive_Barrier;
 FGameplayTag Abilities_Passive_HealthDrain;
@@ -294,6 +300,16 @@ FGameplayTag Cooldown_Item_Average;
 FGameplayTag Cooldown_Item_Long;
 FGameplayTag Cooldown_Item_VeryLong;
  
+ /*
+  * Inventory Cost Tags
+  */
+ FGameplayTag Cost;
+ FGameplayTag Cost_None;
+ FGameplayTag Cost_Arrow;
+ FGameplayTag Cost_Bolt;
+ FGameplayTag Cost_Bone;
+ FGameplayTag Cost_Feather;
+ 
 /*
  * Side Effects
  */
@@ -372,6 +388,7 @@ FGameplayTag Montage_Window_Execute;
  FGameplayTag Equipment_ActionSlot_2;
  FGameplayTag Equipment_ActionSlot_3;
  FGameplayTag Equipment_Headgear;
+ FGameplayTag Equipment_Neck;
  FGameplayTag Equipment_UpperBody;
  FGameplayTag Equipment_LowerBody;
  FGameplayTag Equipment_Footwear;
@@ -383,16 +400,6 @@ FGameplayTag Montage_Window_Execute;
  FGameplayTag Equipment_Ammunition_3;
 
  TMap<FGameplayTag, FGameplayTag> EquipmentSlotToInputTags;
- 
- /*
-  * Inventory Cost Tags
-  */
- FGameplayTag Cost;
- FGameplayTag Cost_None;
- FGameplayTag Cost_Arrow;
- FGameplayTag Cost_Bolt;
- FGameplayTag Cost_Bone;
- FGameplayTag Cost_Feather;
  
  /*
   * Input Tags

@@ -105,7 +105,7 @@ public:
 	void CloseContainer();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	bool UseItem(UItemData* Asset, int32 Amount, bool bIsSelfCost);
+	bool UseItem(UItemData* Asset, int32 Amount, bool bIsSelfCost, int32& OutQuantity);
 	
 	/*
 	 * Combat

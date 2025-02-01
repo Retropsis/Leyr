@@ -47,6 +47,7 @@ enum class EContainerType : uint8
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChanged);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemQuantityUpdatedSignature, const FInventoryItemData& ItemData);
+// DECLARE_MULTICAST_DELEGATE_OneParam(FOnItemAddedSignature, const FInventoryItemData& ItemData);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class LEYR_API UInventoryComponent : public UActorComponent
@@ -70,10 +71,11 @@ public:
 	void SetInventorySize(int32 Size);
 
 	FOnItemQuantityUpdatedSignature OnItemQuantityUpdated;
+	// FOnItemAddedSignature OnItemAdded;
 
 	virtual void TransferItem(UInventoryComponent* TargetInventory, int32 SourceSlotIndex, int32 TargetSlotIndex);
 	virtual void TransferItemToEmptySlot(UInventoryComponent* TargetInventory, int32 SourceSlotIndex);
-	virtual bool UseItem(UItemData* Asset, int32 Amount);
+	virtual bool UseItem(UItemData* Asset, int32 Amount, int32& OutQuantity);
 	virtual bool UpdateItemInputTag(FInventoryItemData ItemData, FGameplayTag InputTag) { return false; }
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

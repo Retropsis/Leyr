@@ -162,8 +162,14 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_Passive = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive"), FString("Passive Ability"));
 	GameplayTags.Abilities_Passive_Mastery = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery"), FString("Passive Ability Mastery"));
 	GameplayTags.Abilities_Passive_Mastery_Sword = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery.Sword"), FString("Sword Mastery"));
+	GameplayTags.Abilities_Passive_Mastery_Dagger = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery.Dagger"), FString("Dagger Mastery"));
+	GameplayTags.Abilities_Passive_Mastery_Axe = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery.Axe"), FString("Axe Mastery"));
 	GameplayTags.Abilities_Passive_Mastery_Blunt = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery.Blunt"), FString("Blunt Mastery"));
 	GameplayTags.Abilities_Passive_Mastery_DualWield = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery.DualWield"), FString("DualWield Mastery"));
+	GameplayTags.Abilities_Passive_Mastery_GreatSword = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery.GreatSword"), FString("GreatSword Mastery"));
+	GameplayTags.Abilities_Passive_Mastery_Bow = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery.Bow"), FString("Bow Mastery"));
+	GameplayTags.Abilities_Passive_Mastery_Crossbow = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery.Crossbow"), FString("Crossbow Mastery"));
+	GameplayTags.Abilities_Passive_Mastery_Buckler = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery.Buckler"), FString("Buckler Mastery"));
 	
 	GameplayTags.Abilities_Passive_Barrier = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Barrier"), FString("Passive Ability Barrier"));
 	GameplayTags.Abilities_Passive_HealthDrain = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.HealthDrain"), FString("Passive Ability Health Drain"));
@@ -408,7 +414,8 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Equipment_ActionSlot_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.ActionSlot.1"), FString("Equipment ActionSlot 1"));
 	GameplayTags.Equipment_ActionSlot_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.ActionSlot.2"), FString("Equipment ActionSlot 2"));
 	GameplayTags.Equipment_ActionSlot_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.ActionSlot.3"), FString("Equipment ActionSlot 3"));
-	GameplayTags.Equipment_Headgear = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.Headgear"), FString("Equipment ActionSlot"));
+	GameplayTags.Equipment_Headgear = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.Headgear"), FString("Equipment Headgear"));
+	GameplayTags.Equipment_Neck = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.Neck"), FString("Equipment Neck"));
 	GameplayTags.Equipment_UpperBody = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.UpperBody"), FString("Equipment UpperBody"));
 	GameplayTags.Equipment_LowerBody = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.LowerBody"), FString("Equipment LowerBody"));
 	GameplayTags.Equipment_Footwear = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.Footwear"), FString("Equipment Footwear"));

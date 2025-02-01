@@ -59,7 +59,7 @@ public:
 	void SkillSlotDeselect();
 	
 	UFUNCTION(BlueprintCallable)
-	void SpendPointButtonPressed();
+	bool SpendPointButtonPressed();
 	
 	UFUNCTION(BlueprintCallable)
 	void EquipButtonPressed();

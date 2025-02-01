@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayEffectExecutionCalculation.h"
+#include "Game/BaseGameplayTags.h"
 #include "ExecCalc_Damage.generated.h"
 
 /**
@@ -17,6 +18,7 @@ class LEYR_API UExecCalc_Damage : public UGameplayEffectExecutionCalculation
 public:
 	UExecCalc_Damage();
 
+	float ApplyMasteryEffects(const FGameplayEffectCustomExecutionParameters& ExecutionParams) const;
 	FActiveGameplayEffectHandle ApplyEquipmentEffects(const FGameplayEffectCustomExecutionParameters& ExecutionParams) const;
 	
 	void DetermineStatusEffect(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FGameplayEffectSpec& Spec, FAggregatorEvaluateParameters EvaluationParameters,

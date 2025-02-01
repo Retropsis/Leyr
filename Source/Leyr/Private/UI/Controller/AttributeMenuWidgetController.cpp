@@ -46,5 +46,6 @@ void UAttributeMenuWidgetController::BroadcastAttributeInfo(const FGameplayTag& 
 {
 	FBaseAttributeInfo Info = AttributeInfo->FindAttributeInfoForTag(AttributeTag);
 	Info.AttributeValue = Info.AttributeGetter.GetNumericValue(AttributeSet);
+	Info.AttributeBaseValue = Info.AttributeGetter.GetGameplayAttributeData(AttributeSet)->GetBaseValue();
 	AttributeInfoDelegate.Broadcast(Info);
 }

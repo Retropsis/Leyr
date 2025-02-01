@@ -7,11 +7,13 @@
 #include "AbilitySystem/Data/PassiveInfo.h"
 #include "Game/BaseGameplayTags.h"
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
+#include "Interaction/PlayerInterface.h"
 #include "Player/PlayerCharacterState.h"
 
 void USkillMenuWidgetController::BroadcastInitialValues()
 {
 	BroadcastAbilityInfo();
+	BaseAbilitySystemComponent->UpdateAbilityStatuses(PlayerCharacterState->GetCharacterLevel());
 	SkillPointsChanged.Broadcast(GetBasePS()->GetSkillPoints());
 }
 
@@ -186,9 +188,20 @@ void USkillMenuWidgetController::OnAbilityEquipped(const FGameplayTag& AbilityTa
 	SkillSlotDeselect();
 }
 
-void USkillMenuWidgetController::SpendPointButtonPressed()
+bool USkillMenuWidgetController::SpendPointButtonPressed()
 {
-	if (GetBaseASC()) GetBaseASC()->ServerSpendSkillPoint(SelectedAbility.Ability);
+	if (GetBaseASC())
+	{
+		if (GetBaseASC()->GetAvatarActor()->Implements<UPlayerInterface>())
+		{
+			if (IPlayerInterface::Execute_GetSkillPoints(GetBaseASC()->GetAvatarActor()) > 0)
+			{
+				GetBaseASC()->ServerSpendSkillPoint(SelectedAbility.Ability);
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 void USkillMenuWidgetController::ShouldEnableButtons(const FGameplayTag& AbilityStatus, int32 SkillPoints, bool& bShouldEnableSkillPointsButton, bool& bShouldEnableEquipButton)

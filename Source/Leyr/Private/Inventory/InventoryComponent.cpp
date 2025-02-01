@@ -42,6 +42,7 @@ void UInventoryComponent::AddItem(FInventoryItemData& ItemToAdd, const bool bIte
 				ItemQuantityToAdd -= Amount;
 				ItemToAdd.Quantity = ItemQuantityToAdd;
 				UpdateInventorySlotUI(i, Items[i]);
+				// OnItemAdded.Broadcast(Items[i]);
 				if(ItemQuantityToAdd == 0) break;
 			}
 		}
@@ -51,6 +52,7 @@ void UInventoryComponent::AddItem(FInventoryItemData& ItemToAdd, const bool bIte
 	{
 		Items[EmptySlotIndex] = ItemToAdd;
 		UpdateInventorySlotUI(EmptySlotIndex, ItemToAdd);
+		// OnItemAdded.Broadcast(ItemToAdd);
 	}
 }
 
@@ -172,13 +174,14 @@ bool UInventoryComponent::FindEmptySlot(int32& EmptySlotIndex)
 /*
  * Custom Functions
  */
-bool UInventoryComponent::UseItem(UItemData* Asset, int32 Amount)
+bool UInventoryComponent::UseItem(UItemData* Asset, int32 Amount, int32& OutQuantity)
 {
 	for (int i = 0; i < Items.Num(); ++i)
 	{
 		if (Items[i].Asset == Asset && Items[i].Quantity >= Amount)
 		{
 			Items[i].Quantity -= Amount;
+			OutQuantity = Items[i].Quantity;
 			if (Items[i].Quantity > 0 || !Asset->bRemoveStackIfEmpty)
 			{
 				UpdateInventorySlotUI(i, Items[i]);
