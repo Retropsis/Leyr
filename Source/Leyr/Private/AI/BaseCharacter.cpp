@@ -212,6 +212,19 @@ void ABaseCharacter::Die(const FVector& DeathImpulse)
 	MulticastHandleDeath(DeathImpulse);
 }
 
+void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImpulse)
+{
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	GetCapsuleComponent()->SetSimulatePhysics(true);
+	GetCapsuleComponent()->AddImpulse(DeathImpulse, NAME_None, true);
+	
+	UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation(), GetActorRotation());
+	bDead = true;
+	BurnStatusEffectComponent->Deactivate();
+	OnDeath.Broadcast(this);
+}
+
 void ABaseCharacter::SetGravityScale_Implementation(float GravityValue)
 {
 	GetCharacterMovement()->GravityScale = GravityValue;
@@ -252,19 +265,6 @@ void ABaseCharacter::AdjustDirection_Implementation()
 	{
 		SetActorRotation(UKismetMathLibrary::ComposeRotators(GetActorRotation(), FRotator(0.f, 180.f, 0.f)));
 	}
-}
-
-void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImpulse)
-{
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-	GetCapsuleComponent()->SetSimulatePhysics(true);
-	GetCapsuleComponent()->AddImpulse(DeathImpulse, NAME_None, true);
-	
-	UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation(), GetActorRotation());
-	bDead = true;
-	BurnStatusEffectComponent->Deactivate();
-	OnDeath.Broadcast(this);
 }
 
 void ABaseCharacter::AddImpulse_Implementation(FVector Impulse)

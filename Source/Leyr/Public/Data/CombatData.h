@@ -79,6 +79,7 @@ enum class ECombatState : uint8
 	ClimbingRope UMETA(DisplayName="Climbing Rope"),
 	UnCrouching UMETA(DisplayName="UnCrouching"),
 	RollingEnd UMETA(DisplayName="RollingEnd"),
+	Defeated UMETA(DisplayName="Defeated"),	
 };
 
 UENUM(BlueprintType)

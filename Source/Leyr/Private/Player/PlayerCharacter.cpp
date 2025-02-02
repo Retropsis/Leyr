@@ -339,6 +339,7 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	case ECombatState::Dodging:
 	case ECombatState::Rolling:
 	case ECombatState::RollingEnd:
+	case ECombatState::Defeated:
 		break;
 	}
 }
@@ -423,7 +424,7 @@ void APlayerCharacter::HandleCrouching(bool bShouldCrouch)
 
 void APlayerCharacter::JumpButtonPressed()
 {
-	if(CombatState == ECombatState::Aiming) return;;
+	if(CombatState >= ECombatState::Aiming) return;
 	if(CombatState == ECombatState::Entangled)
 	{
 		GetCharacterMovement()->AddImpulse(FVector::UpVector * 500.f, true);
@@ -592,6 +593,9 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 	case ECombatState::Aiming:
 		GetCharacterMovement()->MaxWalkSpeed = AimingWalkSpeed;
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Aiming);
+		break;
+	case ECombatState::Defeated:
+		MakeAndApplyEffectToSelf(FBaseGameplayTags::Get().CombatState_Defeated);
 		break;
 	}
 }
@@ -1149,4 +1153,10 @@ int32 APlayerCharacter::GetCharacterLevel_Implementation()
 void APlayerCharacter::SetCombatState_Implementation(ECombatState NewState)
 {
 	CombatState = NewState;
+}
+
+void APlayerCharacter::Die(const FVector& DeathImpulse)
+{
+	Super::Die(DeathImpulse);
+	HandleCombatState(ECombatState::Defeated);
 }

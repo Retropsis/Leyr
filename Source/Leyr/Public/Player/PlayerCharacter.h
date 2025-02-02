@@ -35,6 +35,7 @@ public:
 	virtual void OnRep_PlayerState() override;
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
+	virtual void Die(const FVector& DeathImpulse) override;
 	
 	void Move(const FVector2D MovementVector);
 	void Pitch(float InPitch);
