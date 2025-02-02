@@ -88,12 +88,14 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 
 void APlayerCharacter::ForceMove(float DeltaSeconds)
 {
+	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
 	if(CombatState == ECombatState::ClimbingRope)
 	{
 		SetActorLocation(FMath::VInterpTo(GetActorLocation(), MovementTarget, DeltaSeconds, MovementSpeed));
 		if (FMath::IsNearlyZero(UKismetMathLibrary::Vector_Distance(GetActorLocation(), MovementTarget), 5.f))
 		{
 			HandleCombatState(ECombatState::Unoccupied);
+			GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(GameplayTags.CombatDirections);
 		}
 	}
 	if(CombatState == ECombatState::HoppingLedge)
@@ -102,6 +104,7 @@ void APlayerCharacter::ForceMove(float DeltaSeconds)
 		if (FMath::IsNearlyZero(UKismetMathLibrary::Vector_Distance(GetActorLocation(), MovementTarget), 5.f))
 		{
 			HandleCombatState(ECombatState::Unoccupied);
+			GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(GameplayTags.CombatDirections);
 		}
 	}
 	if(CombatState == ECombatState::Dodging)
@@ -547,6 +550,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 	case ECombatState::ClimbingRope:
 		MovementSpeed = ClimbingSpeed;
 		MovementTarget = GetActorLocation() + FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f + 10.f);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_ClimbingRope);
 		break;
 	case ECombatState::HoppingLedge:
 		MovementSpeed = ClimbingWalkSpeed;

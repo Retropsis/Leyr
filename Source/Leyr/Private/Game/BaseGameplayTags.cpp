@@ -240,6 +240,11 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_Combo_Window_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Combo.Window.Execute"), FString("Abilities Combo Window Execute"));
 
 	/*
+	 * AI Abilities
+	 */
+	GameplayTags.Abilities_Dodge = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Dodge"), FString("Abilities Dodge"));
+	
+	/*
 	 * Combat States
 	 */
 	GameplayTags.CombatState_Unoccupied = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Unoccupied"), FString("CombatState Unoccupied"));
@@ -253,6 +258,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatState_Ladder = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Ladder"), FString("CombatState Ladder"));
 	GameplayTags.CombatState_Elevator = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Elevator"), FString("CombatState Elevator"));
 	GameplayTags.CombatState_Climbing = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Climbing"), FString("CombatState Climbing"));
+	GameplayTags.CombatState_ClimbingRope = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.ClimbingRope"), FString("CombatState ClimbingRope"));
 	GameplayTags.CombatState_Hopping = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Hopping"), FString("CombatState Hopping"));
 	GameplayTags.CombatState_Falling = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Falling"), FString("CombatState Falling"));
 	GameplayTags.CombatState_Crouching = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Crouching"), FString("CombatState Crouching"));
@@ -275,6 +281,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Rope);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Ledge);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Climbing);
+	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_ClimbingRope);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Hopping);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Hook);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Slope);
