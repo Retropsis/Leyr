@@ -110,18 +110,18 @@ void UDamageGameplayAbility::SelectMontageTagFromCombatState()
 	MontageTag = GameplayTags.Montage_Attack_1;
 	bShouldAddImpulseOnHit = false; 
 	
-	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Falling ))
+	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Condition_Falling ))
 	{
 		if (OwnedTags.HasTagExact(GameplayTags.CombatState_Directional_Downward )) { MontageTag = GameplayTags.Montage_Falling_Attack; bShouldAddImpulseOnHit = true; return; }
 		MontageTag = GameplayTags.Montage_Jump_Attack; return;
 	}
-	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Crouching )) { MontageTag = GameplayTags.Montage_Crouch_Attack; return; }
+	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Condition_Crouching )) { MontageTag = GameplayTags.Montage_Crouch_Attack; return; }
 	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Directional_Upward )) { MontageTag = GameplayTags.Montage_Upward_Attack; return; }
-	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Rolling )) { MontageTag = GameplayTags.Montage_Roll_Attack; return; }
-	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Rope )) { MontageTag = GameplayTags.Montage_Rope_Attack; return; }
-	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Ladder )) { MontageTag = GameplayTags.Montage_Ladder_Attack; return; }
-	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Slope )) { MontageTag = GameplayTags.Montage_Slope_Attack; return; }
-	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Swimming ))	{ MontageTag = GameplayTags.Montage_Swim_Attack; }
+	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Transient_Rolling )) { MontageTag = GameplayTags.Montage_Roll_Attack; return; }
+	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Condition_Rope )) { MontageTag = GameplayTags.Montage_Rope_Attack; return; }
+	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Condition_Ladder )) { MontageTag = GameplayTags.Montage_Ladder_Attack; return; }
+	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Condition_Slope )) { MontageTag = GameplayTags.Montage_Slope_Attack; return; }
+	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Condition_Swimming ))	{ MontageTag = GameplayTags.Montage_Swim_Attack; }
 }
 
 void UDamageGameplayAbility::ExecuteDamageGameplayCue(FGameplayTag GameplayCueTag)

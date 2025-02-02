@@ -124,12 +124,12 @@ void APlayerCharacter::HandleCharacterMovementUpdated(float DeltaSeconds, FVecto
 	PreviousMovementMode = GetCharacterMovement()->MovementMode;
 	if (GetCharacterMovement()->MovementMode == MOVE_Falling)
 	{
-		MakeAndApplyEffectToSelf(FBaseGameplayTags::Get().CombatState_Falling);
+		MakeAndApplyEffectToSelf(FBaseGameplayTags::Get().CombatState_Condition_Falling);
 		// CombatState = ECombatState::Falling;
 	}
 	else
 	{
-		GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(FBaseGameplayTags::Get().CombatState_Falling.GetSingleTagContainer());
+		GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(FBaseGameplayTags::Get().CombatState_Condition_Falling.GetSingleTagContainer());
 	}
 }
 
@@ -290,7 +290,7 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	case ECombatState::Falling:
 	case ECombatState::Crouching:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
-		if (GetCharacterMovement()->MovementMode == MOVE_Falling) MakeAndApplyEffectToSelf(FBaseGameplayTags::Get().CombatState_Falling);
+		if (GetCharacterMovement()->MovementMode == MOVE_Falling) MakeAndApplyEffectToSelf(FBaseGameplayTags::Get().CombatState_Condition_Falling);
 		break;
 	case ECombatState::Walking:
 	case ECombatState::WalkingPeaceful:
@@ -478,11 +478,11 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		break;
 	case ECombatState::Walking:
 		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
-		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Walking);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Walking);
 		break;
 	case ECombatState::WalkingPeaceful:
 		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
-		MakeAndApplyEffectToSelf(GameplayTags.CombatState_WalkingPeaceful);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Peaceful);
 		break;
 	case ECombatState::Crouching:
 		Crouch();
@@ -490,7 +490,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		{
 			PlayerCharacterAnimInstance->bIsCrouched = true;
 		}
-		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Crouching);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Crouching);
 		break;
 	case ECombatState::UnCrouching:
 		UnCrouch();
@@ -506,24 +506,24 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 	case ECombatState::HangingLedge:
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Ledge);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Ledge);
 		break;
 	case ECombatState::HangingRope:
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->MaxFlySpeed = RopeWalkSpeed;
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Rope);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Rope);
 		break;
 	case ECombatState::HangingHook:
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Hook);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Hook);
 		break;
 	case ECombatState::HangingLadder:
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->MaxFlySpeed = LadderWalkSpeed;
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Ladder);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Ladder);
 		break;
 	case ECombatState::OnElevator:
 		// GetCharacterMovement()->SetMovementMode(MOVE_Flying);
@@ -531,7 +531,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		break;
 	case ECombatState::OnGroundSlope:
 		GetCharacterMovement()->GravityScale = GroundSlopeGravityScale;
-		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Slope);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Slope);
 		break;
 	case ECombatState::OnRopeSlope:
 		break;
@@ -539,35 +539,35 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		break;
 	case ECombatState::Entangled:
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Entangled);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Entangled);
 		break;
 	case ECombatState::Swimming:
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		GetCharacterMovement()->MaxFlySpeed = SwimmingSpeed;
 		// GetCharacterMovement()->GetPhysicsVolume()->bWaterVolume = true;
-		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Swimming);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Swimming);
 		break;
 	case ECombatState::ClimbingRope:
 		MovementSpeed = ClimbingSpeed;
 		MovementTarget = GetActorLocation() + FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f + 10.f);
-		MakeAndApplyEffectToSelf(GameplayTags.CombatState_ClimbingRope);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Rope);
 		break;
 	case ECombatState::HoppingLedge:
 		MovementSpeed = ClimbingWalkSpeed;
 		MovementTarget = GetActorLocation() + FVector(GetActorForwardVector().X * 50.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 15.f);
-		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Hopping);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Ledge);
 		break;
 	case ECombatState::Climbing:
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		GetCharacterMovement()->MaxFlySpeed = ClimbingWalkSpeed;
-		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Climbing);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Climbing);
 		break;
 	case ECombatState::Dodging:
 		GetCharacterMovement()->MaxWalkSpeed = DodgingSpeed;
 		GetCharacterMovement()->MaxAcceleration = DodgingMaxAcceleration;
 		GetCharacterMovement()->BrakingFrictionFactor = DodgingBrakeFrictionFactor;
 		GetCapsuleComponent()->SetCollisionObjectType(ECC_WorldDynamic);
-		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Dodging);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Dodging);
 		break;
 	case ECombatState::Rolling:
 		// GetCharacterMovement()->SetMovementMode(MOVE_Flying);
@@ -579,7 +579,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetSprite()->SetRelativeLocation(FVector(0.f, 0.f, 44.f));
 		// HalfHeightCapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		// GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Rolling);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Rolling);
 		break;
 	case ECombatState::RollingEnd:
 		UnCrouch();
@@ -591,7 +591,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		break;
 	case ECombatState::Aiming:
 		GetCharacterMovement()->MaxWalkSpeed = AimingWalkSpeed;
-		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Aiming);
+		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Aiming);
 		break;
 	}
 }
