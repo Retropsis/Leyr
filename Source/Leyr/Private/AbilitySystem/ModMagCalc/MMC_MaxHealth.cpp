@@ -47,7 +47,7 @@ float UMMC_MaxHealth::CalculateBaseMagnitude_Implementation(const FGameplayEffec
 			break;
 		case EEncounterSize::Large: EncounterSizeFactor = 3.f;
 			break;
-		case EEncounterSize::Boss: EncounterSizeFactor = 5.f;
+		case EEncounterSize::Boss: EncounterSizeFactor = 20.f;
 			break;
 		}
 	}

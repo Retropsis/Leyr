@@ -29,8 +29,9 @@ public:
 	ABaseCharacter();
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
-	
 	void ChangeDirections();
+	
+	FOnDeath OnDeath;
 
 protected:
 	/*
@@ -44,7 +45,6 @@ protected:
 	void MakeAndApplyEffectToSelf(const FGameplayTag Tag, float Level = 1.f) const;
 	
 	FOnASCRegistered OnASCRegistered;
-	FOnDeath OnDeath;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Character|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
@@ -65,7 +65,7 @@ protected:
 	 * Attacking
 	 */
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USceneComponent> Weapon;
+	TObjectPtr<USceneComponent> WeaponSocket;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USceneComponent> BoxTraceStart;
@@ -109,6 +109,7 @@ protected:
 	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
 	virtual UPaperZDAnimSequence* GetHitReactSequence_Implementation() override { return HitReactSequence; }
 	virtual UPaperZDAnimInstance* GetPaperAnimInstance_Implementation() override { return AnimationComponent->GetAnimInstance(); }
+	virtual UPaperZDAnimInstance* GetWeaponAnimInstance_Implementation() override { return WeaponComponent->GetAnimInstance(); }
 	virtual void GetAttackAnimationData_Implementation(FVector& InBoxTraceStart, FVector& InBoxTraceEnd) override;
 	virtual FBoxTraceData GetBoxTraceDataByTag_Implementation(FGameplayTag MontageTag, ESequenceType SequenceType) override;
 	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation(ESequenceType SequenceType) override;
@@ -144,10 +145,16 @@ protected:
 	TObjectPtr<UPaperFlipbookComponent> UpperBody;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="PaperZD")
+	TObjectPtr<UPaperFlipbookComponent> WeaponFlipbook;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="PaperZD")
 	TObjectPtr<UPaperZDAnimationComponent> AnimationComponent;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="PaperZD")
-	TObjectPtr<UPaperZDAnimationComponent> UpperBodyAnimationComponent;
+	TObjectPtr<UPaperZDAnimationComponent> UpperBodyComponent;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="PaperZD")
+	TObjectPtr<UPaperZDAnimationComponent> WeaponComponent;
 
 	/*
 	 * Data Asset
@@ -155,7 +162,7 @@ protected:
 	virtual void InitializeCharacterInfo() {}
 
 	UPROPERTY() TObjectPtr<UNiagaraSystem> ImpactEffect;
-	UPROPERTY() TObjectPtr<USoundBase> DeathSound;
+	UPROPERTY() TObjectPtr<USoundBase> DefeatedSound;
 	
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	TObjectPtr<UPaperZDAnimSequence> HitReactSequence;

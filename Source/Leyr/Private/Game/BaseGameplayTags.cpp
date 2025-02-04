@@ -205,6 +205,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	
 	GameplayTags.Abilities_Weapon_OneHanded_States = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.OneHanded.States"), FString("Abilities Weapon OneHanded States"));
 	GameplayTags.Abilities_Weapon_OneHanded_Combo = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.OneHanded.Combo"), FString("Abilities Weapon OneHanded Combo"));
+	GameplayTags.Abilities_Weapon_OneHanded_Generic = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.OneHanded.Generic"), FString("Abilities Weapon OneHanded Generic"));
 	GameplayTags.Abilities_Weapon_OneHanded_Extra = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.OneHanded.Extra"), FString("Abilities Weapon OneHanded Extra"));
 	GameplayTags.Abilities_Weapon_TwoHanded_States = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.TwoHanded.States"), FString("Abilities Weapon TwoHanded States"));
 	GameplayTags.Abilities_Weapon_TwoHanded_Combo = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.TwoHanded.Combo"), FString("Abilities Weapon TwoHanded Combo"));
@@ -243,6 +244,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	 * AI Abilities
 	 */
 	GameplayTags.Abilities_Dodge = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Dodge"), FString("Abilities Dodge"));
+	GameplayTags.Abilities_JumpToLocation = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.JumpToLocation"), FString("Abilities JumpToLocation"));
 	
 	/*
 	 * Combat States
@@ -396,6 +398,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Montage_Attack_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.2"), FString("Montage Attack 2"));
 	GameplayTags.Montage_Attack_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.3"), FString("Montage Attack 3"));
 	GameplayTags.Montage_Attack_4 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.4"), FString("Montage Attack 4"));
+	GameplayTags.Montage_Attack_Generic = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.Generic"), FString("Montage Attack Generic"));
 	GameplayTags.Montage_Crouch_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Crouch.Attack"), FString("Montage Crouch Attack"));
 	GameplayTags.Montage_Jump_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Jump.Attack"), FString("Montage Jump Attack"));
 	GameplayTags.Montage_Falling_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Falling.Attack"), FString("Montage Falling Attack"));

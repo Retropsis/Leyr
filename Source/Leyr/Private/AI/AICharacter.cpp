@@ -248,7 +248,7 @@ void AAICharacter::InitializeCharacterInfo()
 	DivingSpeed = Info.DivingSpeed;
 	bCollisionCauseDamage = Info.bCollisionCauseDamage;
 	ImpactEffect = Info.ImpactEffect;
-	DeathSound = Info.DeathSound;
+	DefeatedSound = Info.DeathSound;
 	HitReactSequence = Info.HitReactSequence;
 	AttackSequenceInfo = Info.AttackSequenceInfo;
 	if(bCollisionCauseDamage)
@@ -285,7 +285,29 @@ void AAICharacter::Die(const FVector& DeathImpulse)
 {
 	SetLifeSpan(LifeSpan);
 	if (BaseAIController) BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("Dead"), true);
+	if(Arena)
+	{
+		Arena->OnPlayerEntering.Clear();
+		Arena->OnPlayerLeaving.Clear();
+	}
 	Super::Die(DeathImpulse);
+}
+
+void AAICharacter::SetCombatTarget_Implementation(AActor* InCombatTarget)
+{
+	CombatTarget = InCombatTarget;
+	if(ABaseCharacter* Player = Cast<ABaseCharacter>(CombatTarget))
+	{
+		if (!Player->OnDeath.IsAlreadyBound(this, &AAICharacter::HandleCombatTargetDefeated))
+		{
+			Player->OnDeath.AddDynamic(this, &AAICharacter::HandleCombatTargetDefeated);
+		}
+	}
+}
+
+void AAICharacter::HandleCombatTargetDefeated(AActor* Actor)
+{
+	if (BaseAIController) BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("ShouldEndCombat"), true);
 }
 
 /*
@@ -460,11 +482,13 @@ void AAICharacter::HandlePlayerOverlappingArena(AActor* Player, bool bIsEntering
 	GEngine->AddOnScreenDebugMessage(4456545, 5.f, FColor::Magenta, bIsEntering ? "Entering Arena" : "Leaving Arena");
 	if(bIsEntering)
 	{
-		if (BaseAIController) BaseAIController->GetBlackboardComponent()->SetValueAsObject(FName("TargetToFollow"), Player);
+		if (IsValid(BaseAIController)) BaseAIController->GetBlackboardComponent()->SetValueAsObject(FName("TargetToFollow"), Player);
+		CombatTarget = Player;
 	}
 	else
 	{
-		if (BaseAIController) BaseAIController->GetBlackboardComponent()->SetValueAsObject(FName("TargetToFollow"), nullptr);
+		if (IsValid(BaseAIController)) BaseAIController->GetBlackboardComponent()->SetValueAsObject(FName("TargetToFollow"), nullptr);
+		CombatTarget = nullptr;
 	}
 }
 

@@ -197,6 +197,7 @@ FGameplayTag Abilities_Weapon_Monk_Combo;
 FGameplayTag Abilities_Weapon_Monk_Extra;
 FGameplayTag Abilities_Weapon_OneHanded_States;
 FGameplayTag Abilities_Weapon_OneHanded_Combo;
+FGameplayTag Abilities_Weapon_OneHanded_Generic;
 FGameplayTag Abilities_Weapon_OneHanded_Extra;
 FGameplayTag Abilities_Weapon_TwoHanded_States;
 FGameplayTag Abilities_Weapon_TwoHanded_Combo;
@@ -222,6 +223,7 @@ FGameplayTag Abilities_Throw_2;
   * AI Abilities
   */
 FGameplayTag Abilities_Dodge;
+FGameplayTag Abilities_JumpToLocation;
 
  /*
   * Combat States
@@ -363,6 +365,7 @@ FGameplayTag Montage_Attack_1;
 FGameplayTag Montage_Attack_2;
 FGameplayTag Montage_Attack_3;
 FGameplayTag Montage_Attack_4;
+FGameplayTag Montage_Attack_Generic;
 FGameplayTag Montage_Crouch_Attack;
 FGameplayTag Montage_Jump_Attack;
 FGameplayTag Montage_Falling_Attack;

@@ -44,10 +44,13 @@ public:
 	
 	/** Combat Interface */
 	virtual int32 GetCharacterLevel_Implementation() override { return Level; }
-	virtual void SetCombatTarget_Implementation(AActor* InCombatTarget) override { CombatTarget = InCombatTarget; }
+	virtual void SetCombatTarget_Implementation(AActor* InCombatTarget) override;
 	virtual AActor* GetCombatTarget_Implementation() const override { return CombatTarget; }
 	virtual void Die(const FVector& DeathImpulse) override;
 	/** end Combat Interface */
+
+	UFUNCTION()
+	void HandleCombatTargetDefeated(AActor* Actor);
 	
 	/** AI Interface */
 	virtual FVector FindRandomLocation_Implementation() override;

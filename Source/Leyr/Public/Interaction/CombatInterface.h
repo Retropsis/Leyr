@@ -54,6 +54,9 @@ public:
 	UPaperZDAnimInstance* GetPaperAnimInstance();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UPaperZDAnimInstance* GetWeaponAnimInstance();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void AdjustDirection();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)

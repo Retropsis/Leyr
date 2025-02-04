@@ -235,7 +235,7 @@ void APlayerCharacter::InitializeCharacterInfo()
 	//
 	const FCharacterDefaultInfo Info = CharacterInfo->GetCharacterDefaultInfo(CharacterName);
 	ImpactEffect = Info.ImpactEffect;
-	DeathSound = Info.DeathSound;
+	DefeatedSound = Info.DeathSound;
 	HitReactSequence = Info.HitReactSequence;
 	AttackSequenceInfo = Info.AttackSequenceInfo;
 }
@@ -262,6 +262,12 @@ void APlayerCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 
 		// GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		HandleCombatState(PreviousCombatState);
 	}
+}
+
+void APlayerCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
+{
+	Super::OnStartCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+	HandleCombatState(ECombatState::Crouching);
 }
 
 void APlayerCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)

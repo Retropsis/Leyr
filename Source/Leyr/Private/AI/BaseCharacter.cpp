@@ -29,8 +29,8 @@ ABaseCharacter::ABaseCharacter()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Overlap);
 	GetCapsuleComponent()->SetGenerateOverlapEvents(true);
 
-	Weapon = CreateDefaultSubobject<USceneComponent>("Weapon");
-	Weapon->SetupAttachment(GetRootComponent());
+	WeaponSocket = CreateDefaultSubobject<USceneComponent>("WeaponSocket");
+	WeaponSocket->SetupAttachment(GetRootComponent());
 
 	BoxTraceStart = CreateDefaultSubobject<USceneComponent>("BoxTraceStart");
 	BoxTraceStart->SetupAttachment(GetRootComponent());
@@ -49,7 +49,13 @@ ABaseCharacter::ABaseCharacter()
 	UpperBody->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	UpperBody->SetupAttachment(GetRootComponent());
 
-	UpperBodyAnimationComponent = CreateDefaultSubobject<UPaperZDAnimationComponent>("UpperBodyAnimationComponent");
+	UpperBodyComponent = CreateDefaultSubobject<UPaperZDAnimationComponent>("UpperBodyComponent");
+
+	WeaponFlipbook = CreateDefaultSubobject<UPaperFlipbookComponent>("WeaponFlipbook");
+	WeaponFlipbook->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	WeaponFlipbook->SetupAttachment(GetRootComponent());
+
+	WeaponComponent = CreateDefaultSubobject<UPaperZDAnimationComponent>("WeaponComponent");
 }
 
 /*
@@ -136,7 +142,7 @@ FVector ABaseCharacter::GetCombatSocketLocation_Implementation(const FGameplayTa
 	// return GetSprite()->GetSocketLocation(WeaponTipSocketName);
 	// TODO: Implements this for both weapons or just hands
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Weapon) && IsValid(Weapon))
+	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Weapon) && IsValid(WeaponSocket))
 	{
 		return GetSprite()->GetSocketLocation(WeaponSocketName);
 	}
@@ -165,7 +171,7 @@ FVector ABaseCharacter::GetCombatSocketLocation_Implementation(const FGameplayTa
 		// return GetMesh()->GetSocketLocation(RightFootSocketName);
 	}
 	// return FVector();
-	return Weapon->GetComponentLocation();
+	return WeaponSocket->GetComponentLocation();
 }
 
 void ABaseCharacter::GetAttackAnimationData_Implementation(FVector& InBoxTraceStart, FVector& InBoxTraceEnd)
@@ -216,10 +222,12 @@ void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImp
 {
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Player, ECR_Ignore);
 	GetCapsuleComponent()->SetSimulatePhysics(true);
 	GetCapsuleComponent()->AddImpulse(DeathImpulse, NAME_None, true);
 	
-	UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation(), GetActorRotation());
+	UGameplayStatics::PlaySoundAtLocation(this, DefeatedSound, GetActorLocation(), GetActorRotation());
 	bDead = true;
 	BurnStatusEffectComponent->Deactivate();
 	OnDeath.Broadcast(this);

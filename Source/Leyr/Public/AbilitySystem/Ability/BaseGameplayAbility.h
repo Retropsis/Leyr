@@ -51,6 +51,9 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UPaperZDAnimInstance> PaperAnimInstance = nullptr;
+	
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UPaperZDAnimInstance> WeaponAnimInstance = nullptr;
 
 private:
 	FActiveGameplayEffectHandle ActiveSourceObjectEffectHandle;
