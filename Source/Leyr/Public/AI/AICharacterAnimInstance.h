@@ -39,4 +39,7 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, Category="AICharacter")
 	bool bIsDiving = false;
+	
+	UPROPERTY(BlueprintReadOnly, Category="AICharacter")
+	bool bIsCombatTargetDefeated = false;
 };

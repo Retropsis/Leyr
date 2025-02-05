@@ -7,6 +7,7 @@
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AbilitySystem/Data/EncounterInfo.h"
+#include "AI/AICharacterAnimInstance.h"
 #include "AI/BaseAIController.h"
 #include "AI/SplineComponentActor.h"
 #include "BehaviorTree/BehaviorTree.h"
@@ -92,11 +93,15 @@ void AAICharacter::PossessedBy(AController* NewController)
 	
 	if (!HasAuthority()) return;
 	InitializeCharacterInfo();
+
+	StartLocation = GetActorLocation();
+	
 	BaseAIController = Cast<ABaseAIController>(NewController);
 	BaseAIController->GetBlackboardComponent()->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
 	BaseAIController->RunBehaviorTree(BehaviorTree);
 	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), false);
 	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("RangedAttacker"), CharacterClass != ECharacterClass::Warrior);
+	BaseAIController->GetBlackboardComponent()->SetValueAsVector(FName("StartLocation"), StartLocation);
 	BaseAIController->SetPawn(this);
 
 	if (Arena)
@@ -104,8 +109,6 @@ void AAICharacter::PossessedBy(AController* NewController)
 		Arena->OnPlayerEntering.AddLambda([this](AActor* Player) { HandlePlayerOverlappingArena(Player, true); });
 		Arena->OnPlayerLeaving.AddLambda([this](AActor* Player) { HandlePlayerOverlappingArena(Player, false); });
 	}
-
-	StartLocation = GetActorLocation();
 
 	if(bCollisionCauseDamage)
 	{
@@ -308,6 +311,10 @@ void AAICharacter::SetCombatTarget_Implementation(AActor* InCombatTarget)
 void AAICharacter::HandleCombatTargetDefeated(AActor* Actor)
 {
 	if (BaseAIController) BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("ShouldEndCombat"), true);
+	if (UAICharacterAnimInstance* Instance = Cast<UAICharacterAnimInstance>(AnimationComponent->GetAnimInstance()))
+	{
+		Instance->bIsCombatTargetDefeated = true;
+	}
 }
 
 /*
@@ -508,4 +515,41 @@ FName AAICharacter::GetNextBehaviourPattern_Implementation(const FName PatternNa
 	
 	Index = Index + 1 >= BehaviourPatterns.Num() ? 0 : Index + 1;
 	return BehaviourPatterns[Index].GetTagName();
+}
+
+FBoundLocations AAICharacter::CalculateBoundsAtActorZ() const
+{
+	const FBoundLocations Bounds = Arena->GetArenaBounds();
+	const FVector Left = FVector{ Bounds.Left.X, 0.f, GetActorLocation().Z };
+	const FVector Right = FVector{ Bounds.Right.X, 0.f, GetActorLocation().Z };
+	return FBoundLocations{ Left, Right };
+}
+
+FBoundLocations AAICharacter::GetArenaBounds_Implementation()
+{
+	if(Arena)
+	{
+		return CalculateBoundsAtActorZ();
+	}
+	return FBoundLocations();
+}
+
+bool AAICharacter::IsWithinBounds_Implementation(const FVector& Location)
+{
+	if(Arena == nullptr) return false;
+	
+	const FBoundLocations BoundLocations = CalculateBoundsAtActorZ();
+	const FVector Extent = FVector{ GetCapsuleComponent()->GetScaledCapsuleRadius() * 2.f, 0.f, 200.f };
+	UKismetSystemLibrary::DrawDebugBox(this, FVector{ BoundLocations.Left.X + Extent.X / 2.f, 0.f, BoundLocations.Left.Z }, Extent, FLinearColor::Blue, FRotator::ZeroRotator, 5.f);
+	UKismetSystemLibrary::DrawDebugBox(this, FVector{ BoundLocations.Right.X - Extent.X / 2.f, 0.f, BoundLocations.Right.Z }, Extent, FLinearColor::Red, FRotator::ZeroRotator, 5.f);
+	
+	if (GetActorForwardVector().X < 0.f)
+	{
+		return FVector::Distance(Location, BoundLocations.Right) > Extent.X * 2.f;
+	}
+	if (GetActorForwardVector().X > 0.f)
+	{
+		return FVector::Distance(Location, BoundLocations.Left) > Extent.X * 2.f;
+	}
+	return false;
 }

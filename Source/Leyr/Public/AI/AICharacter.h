@@ -63,7 +63,10 @@ public:
 	virtual bool FollowSplinePoints_Implementation(int32 SplineIndex) override;
 	virtual void SetNewMovementSpeed_Implementation(EMovementMode InMovementMode, float NewSpeed) override;
 	virtual EEncounterSize GetEncounterSize_Implementation() override { return EncounterSize; }
-	virtual FName GetNextBehaviourPattern_Implementation(FName PatternName);
+	virtual FName GetNextBehaviourPattern_Implementation(FName PatternName) override;
+	FBoundLocations CalculateBoundsAtActorZ() const;
+	virtual FBoundLocations GetArenaBounds_Implementation() override;
+	virtual bool IsWithinBounds_Implementation(const FVector& Location) override;
 	/** end AI Interface */
 
 	/** Enemy Interface */

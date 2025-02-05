@@ -6,6 +6,18 @@
 #include "GameFramework/Actor.h"
 #include "Arena.generated.h"
 
+USTRUCT(BlueprintType)
+struct FBoundLocations
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector Left = FVector::ZeroVector;
+	
+	UPROPERTY(BlueprintReadOnly)
+	FVector Right = FVector::ZeroVector;
+};
+
 class UBoxComponent;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerOverlap, AActor* Player);
@@ -17,6 +29,9 @@ class LEYR_API AArena : public AActor
 	
 public:	
 	AArena();
+
+	UFUNCTION(BlueprintPure)
+	FBoundLocations GetArenaBounds() const;
 
 	FOnPlayerOverlap OnPlayerEntering;
 	FOnPlayerOverlap OnPlayerLeaving;

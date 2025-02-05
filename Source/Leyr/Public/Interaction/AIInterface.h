@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "GameplayTagContainer.h"
+#include "World/Level/Zone/Arena.h"
 #include "AIInterface.generated.h"
 
 enum class EEncounterSize : uint8;
@@ -65,4 +65,10 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FName GetNextBehaviourPattern(FName PatternName);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FBoundLocations GetArenaBounds();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool IsWithinBounds(const FVector& Location);
 };

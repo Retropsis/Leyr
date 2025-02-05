@@ -58,3 +58,10 @@ void AArena::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 {
 	if(OtherActor->ActorHasTag("Player")) OnPlayerLeaving.Broadcast(OtherActor);
 }
+
+FBoundLocations AArena::GetArenaBounds() const
+{
+	const float Extent = EnteringArea->GetScaledBoxExtent().X;
+	const FVector Location = EnteringArea->GetComponentLocation();
+	return FBoundLocations{ FVector{ Location.X - Extent, 0.f, Location.Z }, FVector{ Location.X + Extent, 0.f, Location.Z } };
+}
