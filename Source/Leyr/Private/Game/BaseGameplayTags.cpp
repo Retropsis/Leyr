@@ -246,6 +246,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	 */
 	GameplayTags.Abilities_Dodge = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Dodge"), FString("Abilities Dodge"));
 	GameplayTags.Abilities_JumpToLocation = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.JumpToLocation"), FString("Abilities JumpToLocation"));
+	GameplayTags.Abilities_Range_GroundBurst = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Range.GroundBurst"), FString("Abilities Range GroundBurst"));
 	
 	/*
 	 * Combat States

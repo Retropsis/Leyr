@@ -225,6 +225,7 @@ FGameplayTag Abilities_Throw_2;
   */
 FGameplayTag Abilities_Dodge;
 FGameplayTag Abilities_JumpToLocation;
+FGameplayTag Abilities_Range_GroundBurst;
 
  /*
   * Combat States
