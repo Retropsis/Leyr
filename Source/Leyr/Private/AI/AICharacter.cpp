@@ -486,7 +486,6 @@ void AAICharacter::ResetShouldAttack()
 
 void AAICharacter::HandlePlayerOverlappingArena(AActor* Player, bool bIsEntering)
 {
-	GEngine->AddOnScreenDebugMessage(4456545, 5.f, FColor::Magenta, bIsEntering ? "Entering Arena" : "Leaving Arena");
 	if(bIsEntering)
 	{
 		if (IsValid(BaseAIController)) BaseAIController->GetBlackboardComponent()->SetValueAsObject(FName("TargetToFollow"), Player);

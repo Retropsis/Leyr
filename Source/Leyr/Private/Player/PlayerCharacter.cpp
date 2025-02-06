@@ -267,7 +267,7 @@ void APlayerCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 
 void APlayerCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
 {
 	Super::OnStartCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
-	HandleCombatState(ECombatState::Crouching);
+	// HandleCombatState(ECombatState::Crouching);
 }
 
 void APlayerCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)

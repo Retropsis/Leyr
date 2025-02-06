@@ -171,6 +171,10 @@ public:
 	FGameplayAttributeData MaxMana;
 	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, MaxMana);
 	
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing=OnRep_Poise, Category="Attributes|Secondary")
+	FGameplayAttributeData Poise;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, Poise);
+	
 	/*
 	 * Resistance Attributes
 	*/
@@ -323,6 +327,9 @@ public:
 
 	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const;
+
+	UFUNCTION()
+	void OnRep_Poise(const FGameplayAttributeData& OldPoise) const;
 	
 	/* Resistance Attributes Rep Notifies */
 	UFUNCTION()

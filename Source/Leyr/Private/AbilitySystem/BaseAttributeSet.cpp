@@ -49,6 +49,7 @@ void UBaseAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, ManaRegeneration, COND_None, REPNOTIFY_Always);	
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);	
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, MaxMana, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, Poise, COND_None, REPNOTIFY_Always);
 	
 	// Resistance Attributes
 	DOREPLIFETIME_CONDITION_NOTIFY(UBaseAttributeSet, PhysicalResistance, COND_None, REPNOTIFY_Always);
@@ -405,6 +406,11 @@ void UBaseAttributeSet::OnRep_Spirit(const FGameplayAttributeData& OldSpirit) co
 void UBaseAttributeSet::OnRep_Luck(const FGameplayAttributeData& OldLuck) const
 {
 	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, Luck, OldLuck);
+}
+
+void UBaseAttributeSet::OnRep_Poise(const FGameplayAttributeData& OldPoise) const
+{
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UBaseAttributeSet, Poise, OldPoise);
 }
 
 void UBaseAttributeSet::OnRep_PhysicalAttackBase(const FGameplayAttributeData& OldPhysicalAttackBase) const

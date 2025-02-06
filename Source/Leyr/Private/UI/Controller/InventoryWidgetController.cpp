@@ -295,17 +295,31 @@ void UInventoryWidgetController::UpdateMonkAbility()
 void UInventoryWidgetController::UpdateItemAbilities()
 {
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	const FScopedAbilityListLock ScopedLock = FScopedAbilityListLock(*AbilitySystemComponent);
+	TArray<FGameplayTag> RequiredItemAbilities;
+	
+	for (TTuple<FGameplayTag, FEquippedItem> NewlyEquippedItem : EquippedItems)
+	{
+		if(NewlyEquippedItem.Key.MatchesTag(GameplayTags.Equipment_ActionSlot))
+		{
+			for (FGameplayTag AbilityTag : NewlyEquippedItem.Value.Abilities)
+			{
+				RequiredItemAbilities.AddUnique(AbilityTag);
+			}
+		}
+	}
+	
 	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : PreviouslyEquippedItems)
 	{
 		if(EquippedItem.Key.MatchesTag(GameplayTags.Equipment_ActionSlot))
 		{
+			
 			// Was it replaced ?
 			if (FEquippedItem* FoundItem = EquippedItems.Find(EquippedItem.Key))
 			{
 				if(EquippedItem.Value.ItemData.Asset.Get() != FoundItem->ItemData.Asset.Get())
 				{
 					ULeyrAbilitySystemLibrary::UpdateAbilities(this, AbilitySystemComponent, FoundItem->ItemData.Asset.Get(), GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key], FoundItem->Abilities);
-					
 				}
 			}
 			// Did it move ?
@@ -316,11 +330,8 @@ void UInventoryWidgetController::UpdateItemAbilities()
 				{
 					if(EquippedItem.Value.ItemData.Asset.Get() == NewlyEquippedItem.Value.ItemData.Asset.Get())
 					{
-						ULeyrAbilitySystemLibrary::UpdateAbilities(
-							this, AbilitySystemComponent,
-							NewlyEquippedItem.Value.ItemData.Asset.Get(),
-							GameplayTags.EquipmentSlotToInputTags[NewlyEquippedItem.Key],
-							NewlyEquippedItem.Value.Abilities);
+						ULeyrAbilitySystemLibrary::UpdateAbilities(this, AbilitySystemComponent, NewlyEquippedItem.Value.ItemData.Asset.Get(),
+							GameplayTags.EquipmentSlotToInputTags[NewlyEquippedItem.Key], NewlyEquippedItem.Value.Abilities);
 						bItemFound = true;
 						break;
 					}
@@ -333,6 +344,8 @@ void UInventoryWidgetController::UpdateItemAbilities()
 			{
 				for (FGameplayTag AbilityTag : EquippedItem.Value.Abilities)
 				{
+					if (RequiredItemAbilities.Contains(AbilityTag)) continue;
+					
 					FGameplayAbilitySpec* AbilitySpec = BaseASC->GetSpecFromAbilityTag(AbilityTag);
 					AbilitySystemComponent->ClearAbility(AbilitySpec->Handle);
 					AbilitySystemComponent->MarkAbilitySpecDirty(*AbilitySpec);

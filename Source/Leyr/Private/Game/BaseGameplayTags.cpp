@@ -40,6 +40,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Attributes_Secondary_ManaRegeneration = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Secondary.ManaRegeneration"), FString("Amount of mana healed every 1 second"));
 	GameplayTags.Attributes_Secondary_MaxHealth = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Secondary.MaxHealth"), FString("Max amount of health"));
 	GameplayTags.Attributes_Secondary_MaxMana = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Secondary.MaxMana"), FString("Max amount of mana"));
+	GameplayTags.Attributes_Secondary_Poise = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Secondary.Poise"), FString("Amount of balance using abilities"));
 	
 	/*
 	 * Resistance Attributes
@@ -313,6 +314,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Shackled = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Shackled"), FString("Shackled"));
 	GameplayTags.Defeated = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Defeated"), FString("Defeated"));
 	GameplayTags.Peaceful = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Peaceful"), FString("Peaceful"));
+	GameplayTags.Poise = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Poise"), FString("Poise"));
 	
 	/*
 	 * Gameplay Cues

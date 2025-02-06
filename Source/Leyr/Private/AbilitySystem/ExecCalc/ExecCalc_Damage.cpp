@@ -197,7 +197,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	// const float EffectivePhysicalAttack = SourcePhysicalAttack *= ( 100 - SourceArmorPenetration * ArmorPenetrationCoefficient ) / 100.f;
 	// const FRealCurve* EffectivePhysicalAttackCurve = CharacterClassInfo->DamageCalculationCoefficients->FindCurve(FName("EffectivePhysicalAttack"), FString());
 	// const float EffectivePhysicalAttackCoefficient = EffectivePhysicalAttackCurve->Eval(TargetCharacterLevel);
-	GEngine->AddOnScreenDebugMessage(445577, 5.f, FColor::Cyan, FString::Printf(TEXT("EffectivePAtk: [%f]"), EffectivePhysicalAttack));
+	// GEngine->AddOnScreenDebugMessage(445577, 5.f, FColor::Cyan, FString::Printf(TEXT("EffectivePAtk: [%f]"), EffectivePhysicalAttack));
 	Damage += Damage * EffectivePhysicalAttack * PhysicalAttackMastery;
 	
 	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();

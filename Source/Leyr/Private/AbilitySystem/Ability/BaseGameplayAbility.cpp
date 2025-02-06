@@ -1,6 +1,8 @@
 // @ Retropsis 2024-2025.
 
 #include "AbilitySystem/Ability/BaseGameplayAbility.h"
+
+#include "PaperZDAnimInstance.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
@@ -14,6 +16,24 @@ void UBaseGameplayAbility::InitAbility()
 {
 	PaperAnimInstance = ICombatInterface::Execute_GetPaperAnimInstance(GetAvatarActorFromActorInfo());
 	WeaponAnimInstance = ICombatInterface::Execute_GetWeaponAnimInstance(GetAvatarActorFromActorInfo());
+	WeaponAnimInstance->StopAllAnimationOverrides();
+	
+	const float PoiseChance = GetAbilitySystemComponentFromActorInfo()->GetNumericAttribute(UBaseAttributeSet::GetPoiseAttribute());
+	const float EffectivePoiseChance = PoiseChance + AbilityPoise;
+
+	if(FMath::RandRange(1, 100) < EffectivePoiseChance)
+	{
+		GetAbilitySystemComponentFromActorInfo()->AddLooseGameplayTag(FBaseGameplayTags::Get().Poise);
+		bPoiseWasApplied = true;
+	}
+}
+
+void UBaseGameplayAbility::PrepareToEndAbility()
+{
+	if(bPoiseWasApplied)
+	{
+		GetAbilitySystemComponentFromActorInfo()->RemoveLooseGameplayTag(FBaseGameplayTags::Get().Poise);
+	}
 }
 
 void UBaseGameplayAbility::MakeAndApplyExecuteEffectToTarget(const FGameplayTag& TagToApply, UAbilitySystemComponent* TargetASC, int32 Level)

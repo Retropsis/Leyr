@@ -38,13 +38,16 @@ protected:
 	virtual void InitAbility();
 	
 	UFUNCTION(BlueprintCallable)
-	virtual void PrepareToEndAbility() {}
+	virtual void PrepareToEndAbility();
 	
 	float GetManaCost(float InLevel = 1.f) const;
 	float GetCooldown(float InLevel = 1.f) const;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability")
 	FValueRange AbilityPower;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability")
+	float AbilityPoise = 0.f;
 
 	UPROPERTY(BlueprintReadWrite)
 	FVector CursorHitLocation;
@@ -57,4 +60,5 @@ protected:
 
 private:
 	FActiveGameplayEffectHandle ActiveSourceObjectEffectHandle;
+	bool bPoiseWasApplied = false;
 };

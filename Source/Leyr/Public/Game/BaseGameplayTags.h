@@ -50,6 +50,7 @@ FGameplayTag Attributes_Secondary_HealthRegeneration;
 FGameplayTag Attributes_Secondary_ManaRegeneration;
 FGameplayTag Attributes_Secondary_MaxHealth;
 FGameplayTag Attributes_Secondary_MaxMana;
+FGameplayTag Attributes_Secondary_Poise;
  
  /*
  * Resistances Attributes
@@ -267,6 +268,7 @@ FGameplayTag CombatState_Directional_ForwardDown;
  FGameplayTag Peaceful;
  FGameplayTag Shackled;
  FGameplayTag Defeated;
+ FGameplayTag Poise;
 
  /*
   * Gameplay Cues
