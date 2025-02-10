@@ -76,6 +76,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UPaperZDAnimSequence> SelectedMontage = nullptr;
+	
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UPaperZDAnimSequence> SelectedWeaponMontage = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Montage"), Category="Ability|Defaults")
 	FGameplayTag MontageTag = FGameplayTag();

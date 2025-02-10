@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CombatData.h"
 #include "GameplayEffect.h"
 #include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
@@ -78,6 +79,12 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	float Weight = 0.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation")
+	TArray<FTaggedMontage> DefaultSequences;
+
+	UFUNCTION()
+	FTaggedMontage FindSequenceInfoForTag(const FGameplayTag& MontageTag, bool bLogNotFound = false) const;
 
 	UFUNCTION(BlueprintPure, Category="Item")
 	float GetPrimaryAttributeMagnitude();

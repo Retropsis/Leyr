@@ -4,6 +4,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
+#include "Data/ItemData.h"
 #include "Game/BaseGameplayTags.h"
 #include "Interaction/InteractionInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -101,6 +102,12 @@ void UDamageGameplayAbility::SetCurrentSequence()
 {
 	FTaggedMontage TaggedMontage = ICombatInterface::Execute_GetTaggedMontageByTag(GetAvatarActorFromActorInfo(), MontageTag, SequenceType);
 	SelectedMontage = TaggedMontage.Montage;
+
+	if (UItemData* Asset = Cast<UItemData>(GetSourceObjectFromAbilitySpec()))
+	{
+		FTaggedMontage TaggedWeaponMontage = Asset->FindSequenceInfoForTag(MontageTag);
+		SelectedWeaponMontage = TaggedWeaponMontage.Montage;
+	}
 }
 
 void UDamageGameplayAbility::SelectMontageTagFromCombatState()
@@ -113,15 +120,19 @@ void UDamageGameplayAbility::SelectMontageTagFromCombatState()
 	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Condition_Falling ))
 	{
 		if (OwnedTags.HasTagExact(GameplayTags.CombatState_Directional_Downward )) { MontageTag = GameplayTags.Montage_Falling_Attack; bShouldAddImpulseOnHit = true; return; }
+		if (OwnedTags.HasTagExact(GameplayTags.CombatState_Directional_ForwardUp )) { MontageTag = GameplayTags.Montage_JumpForwardUp_Attack; return; }
+		if (OwnedTags.HasTagExact(GameplayTags.CombatState_Directional_ForwardDown )) { MontageTag = GameplayTags.Montage_JumpForwardDown_Attack; return; }
+		if (OwnedTags.HasTagExact(GameplayTags.CombatState_Directional_Upward )) { MontageTag = GameplayTags.Montage_JumpUpward_Attack; return; }
 		MontageTag = GameplayTags.Montage_Jump_Attack; return;
 	}
 	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Condition_Crouching )) { MontageTag = GameplayTags.Montage_Crouch_Attack; return; }
 	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Directional_Upward )) { MontageTag = GameplayTags.Montage_Upward_Attack; return; }
+	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Directional_ForwardUp )) { MontageTag = GameplayTags.Montage_ForwardUp_Attack; return; }
 	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Transient_Rolling )) { MontageTag = GameplayTags.Montage_Roll_Attack; return; }
 	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Condition_Rope )) { MontageTag = GameplayTags.Montage_Rope_Attack; return; }
 	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Condition_Ladder )) { MontageTag = GameplayTags.Montage_Ladder_Attack; return; }
 	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Condition_Slope )) { MontageTag = GameplayTags.Montage_Slope_Attack; return; }
-	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Condition_Swimming ))	{ MontageTag = GameplayTags.Montage_Swim_Attack; }
+	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Condition_Swimming )) { MontageTag = GameplayTags.Montage_Swim_Attack; }
 }
 
 void UDamageGameplayAbility::ExecuteDamageGameplayCue(FGameplayTag GameplayCueTag)
