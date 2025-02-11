@@ -403,6 +403,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Montage_Attack_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.3"), FString("Montage Attack 3"));
 	GameplayTags.Montage_Attack_4 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.4"), FString("Montage Attack 4"));
 	GameplayTags.Montage_Attack_Generic = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.Generic"), FString("Montage Attack Generic"));
+	GameplayTags.Montage_2H_Attack_Generic = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.2H.Attack.Generic"), FString("Montage 2H Attack Generic"));
 	GameplayTags.Montage_Crouch_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Crouch.Attack"), FString("Montage Crouch Attack"));
 	GameplayTags.Montage_Jump_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Jump.Attack"), FString("Montage Jump Attack"));
 	GameplayTags.Montage_JumpForwardUp_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.JumpForwardUp.Attack"), FString("Montage Jump ForwardUp Attack"));

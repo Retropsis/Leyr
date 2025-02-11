@@ -27,16 +27,16 @@ class LEYR_API UAttackSequenceInfo : public UDataAsset
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation", meta=(TitleProperty="MontageTag"))
 	TArray<FTaggedMontage> DefaultSequences;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation", meta=(TitleProperty="MontageTag"))
 	TArray<FTaggedMontage> MartialArtSequences;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation", meta=(TitleProperty="MontageTag"))
 	TArray<FTaggedMontage> OneHandedSequences;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation", meta=(TitleProperty="MontageTag"))
 	TArray<FTaggedMontage> TowHandedSequences;
 
 	FTaggedMontage FindSequenceInfoForTag(const FGameplayTag& MontageTag, ESequenceType SequenceType, bool bLogNotFound = false) const;

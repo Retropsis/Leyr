@@ -4,6 +4,7 @@
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectTypes.h"
 #include "PaperFlipbookComponent.h"
+#include "PaperZDAnimInstance.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AbilitySystem/Data/AttackSequenceInfo.h"
@@ -286,4 +287,14 @@ void ABaseCharacter::AddImpulse_Implementation(FVector Impulse)
 void ABaseCharacter::ChangeDirections()
 {
 	SetActorRotation(UKismetMathLibrary::ComposeRotators(GetActorRotation(), FRotator(0.f, 180.f, 0.f)));
+}
+
+UPaperZDAnimInstance* ABaseCharacter::SetWeaponAnimInstance(const TSubclassOf<UPaperZDAnimInstance>& AnimInstance) const
+{
+	WeaponComponent->SetAnimInstanceClass(AnimInstance);
+	GEngine->AddOnScreenDebugMessage(554475, 5.f, FColor::Red, *WeaponComponent->GetRenderComponent()->GetName());
+	return WeaponComponent->GetOrCreateAnimInstance();
+	// GEngine->AddOnScreenDebugMessage(554485, 5.f, FColor::Red, *WeaponComponent->GetAnimInstance()->GetName());
+	
+	// WeaponComponent->InitRenderComponent(WeaponFlipbook);
 }

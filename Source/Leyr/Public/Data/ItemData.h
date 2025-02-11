@@ -9,6 +9,7 @@
 #include "Engine/DataAsset.h"
 #include "ItemData.generated.h"
 
+class UPaperZDAnimInstance;
 class UPaperFlipbook;
 class UGameplayEffect;
 class AItem;
@@ -80,8 +81,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	float Weight = 0.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
 	TArray<FTaggedMontage> DefaultSequences;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
+	TSubclassOf<UPaperZDAnimInstance> AnimationInstance = nullptr;
 
 	UFUNCTION()
 	FTaggedMontage FindSequenceInfoForTag(const FGameplayTag& MontageTag, bool bLogNotFound = false) const;

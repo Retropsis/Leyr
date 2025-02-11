@@ -2,10 +2,12 @@
 
 #include "AbilitySystem/Ability/BaseGameplayAbility.h"
 
+#include "PaperZDAnimationComponent.h"
 #include "PaperZDAnimInstance.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
+#include "AI/BaseCharacter.h"
 #include "Data/ItemData.h"
 #include "Game/BaseGameplayTags.h"
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
@@ -17,6 +19,28 @@ void UBaseGameplayAbility::InitAbility()
 	PaperAnimInstance = ICombatInterface::Execute_GetPaperAnimInstance(GetAvatarActorFromActorInfo());
 	WeaponAnimInstance = ICombatInterface::Execute_GetWeaponAnimInstance(GetAvatarActorFromActorInfo());
 	WeaponAnimInstance->StopAllAnimationOverrides();
+
+	if (const UItemData* Asset = Cast<UItemData>(GetSourceObjectFromAbilitySpec()))
+	{
+		if (Asset->AnimationInstance)
+		{
+			if (const ABaseCharacter* Character = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo()))
+			{
+				WeaponAnimInstance = Character->SetWeaponAnimInstance(Asset->AnimationInstance);
+				GEngine->AddOnScreenDebugMessage(554455, 5.f, FColor::Red, *WeaponAnimInstance->GetName());
+				// if (UPaperZDAnimInstance* Instance = NewObject<UPaperZDAnimInstance>(this, Asset->AnimationInstance))
+				// {
+				// 	WeaponAnimInstance = Instance;
+				// 	GEngine->AddOnScreenDebugMessage(554455, 5.f, FColor::Red, *WeaponAnimInstance->GetName());
+				// }
+			}
+			// if(Asset->AnimationInstance->GetDefaultObject<UPaperZDAnimInstance>() == WeaponAnimInstance)
+			// {
+			// 	GEngine->AddOnScreenDebugMessage(554455, 5.f, FColor::Red, *WeaponAnimInstance->GetName());
+			// 	GEngine->AddOnScreenDebugMessage(554465, 5.f, FColor::Magenta, *Asset->AnimationInstance->GetDefaultObject<UPaperZDAnimInstance>()->GetName());
+			// }
+		}
+	}
 	
 	const float PoiseChance = GetAbilitySystemComponentFromActorInfo()->GetNumericAttribute(UBaseAttributeSet::GetPoiseAttribute());
 	const float EffectivePoiseChance = PoiseChance + AbilityPoise;
@@ -90,6 +114,10 @@ bool UBaseGameplayAbility::CommitInventoryCost(bool bIsSelfCost)
 		if (UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(GetAbilitySystemComponentFromActorInfo()); bWasSuccessful && BaseASC)
 		{
 			BaseASC->AbilityCostCommitted.Broadcast(AbilityTags.First(), ItemData->CostTag, OutQuantity);
+		}
+		else if (!bWasSuccessful)
+		{
+			BaseASC->AbilityCostFailed.Broadcast();
 		}
 		return bWasSuccessful;
 	}

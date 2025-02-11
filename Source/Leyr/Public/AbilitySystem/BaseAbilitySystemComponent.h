@@ -14,6 +14,7 @@ DECLARE_MULTICAST_DELEGATE_ThreeParams(FAbilityStatusChanged, const FGameplayTag
 DECLARE_MULTICAST_DELEGATE_FourParams(FAbilityEquipped, const FGameplayTag& /*AbilityTag*/, const FGameplayTag& /*Status*/, const FGameplayTag& /*Slot*/, const FGameplayTag& /*PrevSlot*/);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAbilityCostCommitted, const FGameplayTag&, AbilityTag, const FGameplayTag&, CostTag, int32, Quantity);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAbilityCostFailed);
 
 /**
  * 
@@ -67,6 +68,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FAbilityCostCommitted AbilityCostCommitted;
+
+	UPROPERTY(BlueprintAssignable)
+	FAbilityCostFailed AbilityCostFailed;
 	
 	bool bStartupAbilitiesGiven = false;
 	

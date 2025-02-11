@@ -370,6 +370,7 @@ FGameplayTag Montage_Attack_2;
 FGameplayTag Montage_Attack_3;
 FGameplayTag Montage_Attack_4;
 FGameplayTag Montage_Attack_Generic;
+FGameplayTag Montage_2H_Attack_Generic;
 FGameplayTag Montage_Crouch_Attack;
 FGameplayTag Montage_Jump_Attack;
 FGameplayTag Montage_JumpForwardUp_Attack;
