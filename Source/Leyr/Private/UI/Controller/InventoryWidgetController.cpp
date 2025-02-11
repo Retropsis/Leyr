@@ -7,9 +7,12 @@
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AbilitySystem/Data/LevelUpInfo.h"
+#include "AI/BaseCharacter.h"
 #include "Data/InventoryCostData.h"
 #include "Game/BaseGameplayTags.h"
 #include "Inventory/InventoryComponent.h"
+#include "Player/PlayerCharacter.h"
+#include "Player/PlayerCharacterController.h"
 #include "Player/PlayerCharacterState.h"
 
 void UInventoryWidgetController::BindCallbacksToDependencies()
@@ -313,7 +316,6 @@ void UInventoryWidgetController::UpdateItemAbilities()
 	{
 		if(EquippedItem.Key.MatchesTag(GameplayTags.Equipment_ActionSlot))
 		{
-			
 			// Was it replaced ?
 			if (FEquippedItem* FoundItem = EquippedItems.Find(EquippedItem.Key))
 			{

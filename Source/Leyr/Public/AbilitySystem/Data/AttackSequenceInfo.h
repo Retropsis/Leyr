@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Data/CombatData.h"
 #include "Engine/DataAsset.h"
 #include "AttackSequenceInfo.generated.h"
 
 struct FGameplayTag;
-struct FTaggedMontage;
 
 UENUM(BlueprintType)
 enum class ESequenceType : uint8
@@ -16,6 +16,10 @@ enum class ESequenceType : uint8
 	MartialArt,
 	OneHanded,
 	TwoHanded,
+	Use,
+	Throw,
+	Dagger,
+	Piercing,
 };
 
 /**
@@ -37,7 +41,19 @@ public:
 	TArray<FTaggedMontage> OneHandedSequences;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation", meta=(TitleProperty="MontageTag"))
-	TArray<FTaggedMontage> TowHandedSequences;
+	TArray<FTaggedMontage> TwoHandedSequences;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation", meta=(TitleProperty="MontageTag"))
+	FTaggedMontage UseSequence;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation", meta=(TitleProperty="MontageTag"))
+	FTaggedMontage ThrowSequence;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation", meta=(TitleProperty="MontageTag"))
+	TArray<FTaggedMontage> DaggerSequences;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation", meta=(TitleProperty="MontageTag"))
+	TArray<FTaggedMontage> PiercingSequences;
 
 	FTaggedMontage FindSequenceInfoForTag(const FGameplayTag& MontageTag, ESequenceType SequenceType, bool bLogNotFound = false) const;
 	TArray<FTaggedMontage> GetSequencesByType(ESequenceType SequenceType);

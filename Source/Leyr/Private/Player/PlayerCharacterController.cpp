@@ -148,6 +148,12 @@ UInventoryWidgetController* APlayerCharacterController::GetInventoryWidgetContro
 	return InventoryWidgetController;
 }
 
+APlayerCharacter* APlayerCharacterController::GetPlayerCharacter()
+{
+	if(PlayerCharacter == nullptr) PlayerCharacter = Cast<APlayerCharacter>(GetCharacter());
+	return PlayerCharacter;
+}
+
 void APlayerCharacterController::HotbarButtonPressed(int32 Index)
 {
 }

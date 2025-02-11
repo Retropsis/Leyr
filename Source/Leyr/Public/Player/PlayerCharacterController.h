@@ -34,7 +34,7 @@ public:
 	
 	UInventoryWidgetController* GetInventoryWidgetController(const FWidgetControllerParams& WCParams);
 	UInventoryWidgetController* GetInventoryWidgetController() { return InventoryWidgetController; }
-	APlayerCharacter* GetPlayerCharacter() { return PlayerCharacter; }
+	APlayerCharacter* GetPlayerCharacter();
 
 	UFUNCTION(Client, Reliable)
 	void ClientShowDamageNumber(const FUIMessageData& MessageData);

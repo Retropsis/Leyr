@@ -90,7 +90,7 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerOnSlotDrop(EContainerType TargetContainer, EContainerType SourceContainer, int32 SourceSlotIndex, int32 TargetSlotIndex, EArmorType ArmorType);
 	virtual void OnSlotDrop_Implementation(EContainerType TargetContainer, EContainerType SourceContainer, int32 SourceSlotIndex, int32 TargetSlotIndex, EArmorType ArmorType) override;
-	virtual AContainer* GetContainer_Implementation() override { return InteractingContainer; } 
+	virtual AContainer* GetContainer_Implementation() override { return InteractingContainer; }
 
 	/** Player Interface */
 	virtual USpringArmComponent* GetSpringArmComponent_Implementation() override { return SpringArm; }

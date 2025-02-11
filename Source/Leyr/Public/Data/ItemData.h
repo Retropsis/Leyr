@@ -6,6 +6,7 @@
 #include "CombatData.h"
 #include "GameplayEffect.h"
 #include "GameplayTagContainer.h"
+#include "AbilitySystem/Data/AttackSequenceInfo.h"
 #include "Engine/DataAsset.h"
 #include "ItemData.generated.h"
 
@@ -83,6 +84,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
 	TArray<FTaggedMontage> DefaultSequences;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
+	ESequenceType SequenceType = ESequenceType::Default;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
 	TSubclassOf<UPaperZDAnimInstance> AnimationInstance = nullptr;

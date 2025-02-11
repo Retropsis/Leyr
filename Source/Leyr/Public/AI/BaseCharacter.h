@@ -30,7 +30,6 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	void ChangeDirections();
-
 	UPaperZDAnimInstance* SetWeaponAnimInstance(const TSubclassOf<UPaperZDAnimInstance>& AnimInstance) const;
 	
 	FOnDeath OnDeath;
@@ -142,7 +141,10 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bDead = false;
-	
+
+	/*
+	 * Animation
+	 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="PaperZD")
 	TObjectPtr<UPaperFlipbookComponent> UpperBody;
 	

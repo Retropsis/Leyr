@@ -16,8 +16,14 @@ FTaggedMontage UAttackSequenceInfo::FindSequenceInfoForTag(const FGameplayTag& M
 		break;
 	case ESequenceType::OneHanded: Sequences = OneHandedSequences;
 		break;
-	case ESequenceType::TwoHanded: Sequences = MartialArtSequences;
+	case ESequenceType::TwoHanded: Sequences = TwoHandedSequences;
 		break;
+	case ESequenceType::Dagger: Sequences = DaggerSequences;
+		break;
+	case ESequenceType::Piercing: Sequences = PiercingSequences;
+		break;
+	case ESequenceType::Use: return UseSequence;
+	case ESequenceType::Throw: return ThrowSequence;
 	}
 	
 	for (const FTaggedMontage& Info : Sequences)
@@ -43,7 +49,11 @@ TArray<FTaggedMontage> UAttackSequenceInfo::GetSequencesByType(ESequenceType Seq
 	case ESequenceType::Default: return DefaultSequences;
 	case ESequenceType::MartialArt: return MartialArtSequences;
 	case ESequenceType::OneHanded: return OneHandedSequences;
-	case ESequenceType::TwoHanded: return MartialArtSequences;
+	case ESequenceType::TwoHanded: return TwoHandedSequences;
+	case ESequenceType::Dagger: return DaggerSequences;
+	case ESequenceType::Piercing: return PiercingSequences;
+	case ESequenceType::Use: return TArray{ UseSequence };
+	case ESequenceType::Throw: return TArray{ ThrowSequence };
 	}
 	return DefaultSequences;
 }

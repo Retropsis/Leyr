@@ -1,8 +1,6 @@
 // @ Retropsis 2024-2025.
 
 #include "AbilitySystem/Ability/BaseGameplayAbility.h"
-
-#include "PaperZDAnimationComponent.h"
 #include "PaperZDAnimInstance.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
@@ -19,7 +17,7 @@ void UBaseGameplayAbility::InitAbility()
 	PaperAnimInstance = ICombatInterface::Execute_GetPaperAnimInstance(GetAvatarActorFromActorInfo());
 	WeaponAnimInstance = ICombatInterface::Execute_GetWeaponAnimInstance(GetAvatarActorFromActorInfo());
 	WeaponAnimInstance->StopAllAnimationOverrides();
-
+	
 	if (const UItemData* Asset = Cast<UItemData>(GetSourceObjectFromAbilitySpec()))
 	{
 		if (Asset->AnimationInstance)
@@ -27,18 +25,7 @@ void UBaseGameplayAbility::InitAbility()
 			if (const ABaseCharacter* Character = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo()))
 			{
 				WeaponAnimInstance = Character->SetWeaponAnimInstance(Asset->AnimationInstance);
-				GEngine->AddOnScreenDebugMessage(554455, 5.f, FColor::Red, *WeaponAnimInstance->GetName());
-				// if (UPaperZDAnimInstance* Instance = NewObject<UPaperZDAnimInstance>(this, Asset->AnimationInstance))
-				// {
-				// 	WeaponAnimInstance = Instance;
-				// 	GEngine->AddOnScreenDebugMessage(554455, 5.f, FColor::Red, *WeaponAnimInstance->GetName());
-				// }
 			}
-			// if(Asset->AnimationInstance->GetDefaultObject<UPaperZDAnimInstance>() == WeaponAnimInstance)
-			// {
-			// 	GEngine->AddOnScreenDebugMessage(554455, 5.f, FColor::Red, *WeaponAnimInstance->GetName());
-			// 	GEngine->AddOnScreenDebugMessage(554465, 5.f, FColor::Magenta, *Asset->AnimationInstance->GetDefaultObject<UPaperZDAnimInstance>()->GetName());
-			// }
 		}
 	}
 	

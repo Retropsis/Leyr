@@ -211,6 +211,12 @@ FTaggedMontage ABaseCharacter::GetTaggedMontageInfoByTag(const FGameplayTag& Mon
 	return AttackSequenceInfo->FindSequenceInfoForTag(MontageTag, SequenceType);
 }
 
+UPaperZDAnimInstance* ABaseCharacter::SetWeaponAnimInstance(const TSubclassOf<UPaperZDAnimInstance>& AnimInstance) const
+{
+	WeaponComponent->SetAnimInstanceClass(AnimInstance);
+	return WeaponComponent->GetOrCreateAnimInstance();
+}
+
 void ABaseCharacter::Die(const FVector& DeathImpulse)
 {
 	bDead = true;
@@ -287,14 +293,4 @@ void ABaseCharacter::AddImpulse_Implementation(FVector Impulse)
 void ABaseCharacter::ChangeDirections()
 {
 	SetActorRotation(UKismetMathLibrary::ComposeRotators(GetActorRotation(), FRotator(0.f, 180.f, 0.f)));
-}
-
-UPaperZDAnimInstance* ABaseCharacter::SetWeaponAnimInstance(const TSubclassOf<UPaperZDAnimInstance>& AnimInstance) const
-{
-	WeaponComponent->SetAnimInstanceClass(AnimInstance);
-	GEngine->AddOnScreenDebugMessage(554475, 5.f, FColor::Red, *WeaponComponent->GetRenderComponent()->GetName());
-	return WeaponComponent->GetOrCreateAnimInstance();
-	// GEngine->AddOnScreenDebugMessage(554485, 5.f, FColor::Red, *WeaponComponent->GetAnimInstance()->GetName());
-	
-	// WeaponComponent->InitRenderComponent(WeaponFlipbook);
 }

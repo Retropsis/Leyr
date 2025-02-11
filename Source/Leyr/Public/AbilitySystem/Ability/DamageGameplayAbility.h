@@ -50,13 +50,13 @@ public:
 	FAdditionalEffectParams MakeAdditionalEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability|Defaults")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability")
 	ESequenceType SequenceType = ESequenceType::Default;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Defaults")
+	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	bool bShouldApplyExecute = false;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability|Defaults")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability")
 	FVector HitImpulse = FVector::ZeroVector;
 	
 	UPROPERTY(BlueprintReadOnly)
@@ -80,16 +80,16 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UPaperZDAnimSequence> SelectedWeaponMontage = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Montage"), Category="Ability|Defaults")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Montage"), Category="Ability")
 	FGameplayTag MontageTag = FGameplayTag();
 
 	/*
 	 * Damage
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability|Damage")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability")
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
 
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Damage", meta=(Categories="Damage"))
+	UPROPERTY(EditDefaultsOnly, Category="Ability", meta=(Categories="Damage"))
 	FGameplayTag DamageType;
 
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Status Effect")
