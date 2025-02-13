@@ -171,7 +171,17 @@ void AAICharacter::BeginPlay()
 		AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Indicator_Execute, EGameplayTagEventType::NewOrRemoved).AddLambda(
 		[this] (const FGameplayTag CallbackTag, int32 NewCount)
 		{
-			OnGameplayTagAddedOrRemoved.Broadcast(CallbackTag, NewCount);
+			if (NewCount <= 0) OnGameplayTagAddedOrRemoved.Broadcast(CallbackTag, NewCount);
+		});
+		AbilitySystemComponent->OnGameplayEffectAppliedDelegateToTarget.AddLambda([this] (UAbilitySystemComponent* Target, const FGameplayEffectSpec& SpecApplied, FActiveGameplayEffectHandle ActiveHandle)
+		{
+			FGameplayTagContainer GrantedTags;
+			SpecApplied.GetAllGrantedTags(GrantedTags);
+			if (GrantedTags.HasTag(FBaseGameplayTags::Get().Indicator_Execute))
+			{
+				// AbilitySystemComponent->OnGameplayEffectStackChangeDelegate()
+				OnGameplayTagAddedOrRemoved.Broadcast(FBaseGameplayTags::Get().Indicator_Execute, AbilitySystemComponent->GetCurrentStackCount(ActiveHandle));
+			}
 		});
 		
 		OnHealthChanged.Broadcast(BaseAS->GetHealth());

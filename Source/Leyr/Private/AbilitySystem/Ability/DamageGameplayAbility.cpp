@@ -58,6 +58,8 @@ void UDamageGameplayAbility::CauseDamage(UAbilitySystemComponent* TargetASC)
 	}
 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, DamageType, ScaledDamage);
 	if(bShouldApplyExecute) MakeAndApplyExecuteEffectToTarget(FBaseGameplayTags::Get().Indicator_Execute, TargetASC);
+
+	MakeAndApplyExecuteEffectToTarget(FBaseGameplayTags::Get().Indicator_Execute, TargetASC);
 	
 	GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), TargetASC);
 }
