@@ -1161,8 +1161,8 @@ void APlayerCharacter::SetCombatState_Implementation(ECombatState NewState)
 	CombatState = NewState;
 }
 
-void APlayerCharacter::Die(const FVector& DeathImpulse)
+void APlayerCharacter::Die(const FVector& DeathImpulse, bool bExecute)
 {
-	Super::Die(DeathImpulse);
+	Super::Die(DeathImpulse, bExecute);
 	HandleCombatState(ECombatState::Defeated);
 }

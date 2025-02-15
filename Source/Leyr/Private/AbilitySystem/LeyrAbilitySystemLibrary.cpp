@@ -268,9 +268,27 @@ void ULeyrAbilitySystemLibrary::UpdateAbilities(const UObject* WorldContextObjec
 		for (FGameplayTag AbilityTag : Abilities)
 		{
 			if(FGameplayAbilitySpec* FoundAbilitySpec = BaseASC->GetSpecFromAbilityTag(AbilityTag))
-			{
+			{				
 				FoundAbilitySpec->DynamicAbilityTags.Reset();
-				FoundAbilitySpec->DynamicAbilityTags.AddTag(InputTag);
+				if(AbilityTag.ToString().Contains("Execute"))
+				{
+					if (InputTag.MatchesTagExact(GameplayTags.InputTag_LMB))
+					{
+						FoundAbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.InputTag_Execute_LMB);
+					}
+					if (InputTag.MatchesTagExact(GameplayTags.InputTag_RMB))
+					{
+						FoundAbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.InputTag_Execute_RMB);
+					}
+					if (InputTag.MatchesTagExact(GameplayTags.InputTag_1))
+					{
+						FoundAbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.InputTag_Execute_1);
+					}					
+				}
+				else
+				{
+					FoundAbilitySpec->DynamicAbilityTags.AddTag(InputTag);
+				}
 				ASC->MarkAbilitySpecDirty(*FoundAbilitySpec);
 				BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
 			}
@@ -278,7 +296,25 @@ void ULeyrAbilitySystemLibrary::UpdateAbilities(const UObject* WorldContextObjec
 			{
 				const FBaseAbilityInfo BaseAbilityInfo = AbilityInfo->FindAbilityInfoForTag(AbilityTag);
 				FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(BaseAbilityInfo.Ability, 1);
-				AbilitySpec.DynamicAbilityTags.AddTag(InputTag);
+				if(AbilityTag.ToString().Contains("Execute"))
+				{
+					if (InputTag.MatchesTagExact(GameplayTags.InputTag_LMB))
+					{
+						AbilitySpec.DynamicAbilityTags.AddTag(GameplayTags.InputTag_Execute_LMB);
+					}
+					if (InputTag.MatchesTagExact(GameplayTags.InputTag_RMB))
+					{
+						AbilitySpec.DynamicAbilityTags.AddTag(GameplayTags.InputTag_Execute_RMB);
+					}
+					if (InputTag.MatchesTagExact(GameplayTags.InputTag_1))
+					{
+						AbilitySpec.DynamicAbilityTags.AddTag(GameplayTags.InputTag_Execute_1);
+					}					
+				}
+				else
+				{
+					AbilitySpec.DynamicAbilityTags.AddTag(InputTag);
+				}
 				AbilitySpec.SourceObject = SourceObject;
 				ASC->GiveAbility(AbilitySpec);
 				ASC->MarkAbilitySpecDirty(AbilitySpec);
@@ -396,7 +432,7 @@ void ULeyrAbilitySystemLibrary::GetLivePlayersWithinRadius(const UObject* WorldC
 		World->OverlapMultiByObjectType(Overlaps, SphereOrigin, FQuat::Identity, FCollisionObjectQueryParams(FCollisionObjectQueryParams::InitType::AllDynamicObjects), FCollisionShape::MakeSphere(Radius), SphereParams);
 		for (FOverlapResult& Overlap : Overlaps)
 		{
-			if (Overlap.GetActor()->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsDead(Overlap.GetActor()))
+			if (Overlap.GetActor()->Implements<UCombatInterface>() && ICombatInterface::Execute_GetDefeatState(Overlap.GetActor()) == EDefeatState::None)
 			{
 				OutOverlappingActors.AddUnique(ICombatInterface::Execute_GetAvatar(Overlap.GetActor()));
 			}

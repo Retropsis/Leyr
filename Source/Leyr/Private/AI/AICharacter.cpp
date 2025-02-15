@@ -168,10 +168,10 @@ void AAICharacter::BeginPlay()
 			}
 		);
 		AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAICharacter::HitReactTagChanged);
-		AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Indicator_Execute, EGameplayTagEventType::NewOrRemoved).AddLambda(
-		[this] (const FGameplayTag CallbackTag, int32 NewCount)
+		AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Indicator_Execute, EGameplayTagEventType::NewOrRemoved).AddLambda([this] (const FGameplayTag CallbackTag, int32 NewCount)
 		{
-			if (NewCount <= 0) OnGameplayTagAddedOrRemoved.Broadcast(CallbackTag, NewCount);
+			OnGameplayTagAddedOrRemoved.Broadcast(CallbackTag, NewCount);
+			if (NewCount == 0) AbilitySystemComponent->RemoveLooseGameplayTag(FBaseGameplayTags::Get().Execute);
 		});
 		AbilitySystemComponent->OnGameplayEffectAppliedDelegateToTarget.AddLambda([this] (UAbilitySystemComponent* Target, const FGameplayEffectSpec& SpecApplied, FActiveGameplayEffectHandle ActiveHandle)
 		{
@@ -179,11 +179,17 @@ void AAICharacter::BeginPlay()
 			SpecApplied.GetAllGrantedTags(GrantedTags);
 			if (GrantedTags.HasTag(FBaseGameplayTags::Get().Indicator_Execute))
 			{
-				// AbilitySystemComponent->OnGameplayEffectStackChangeDelegate()
-				OnGameplayTagAddedOrRemoved.Broadcast(FBaseGameplayTags::Get().Indicator_Execute, AbilitySystemComponent->GetCurrentStackCount(ActiveHandle));
+				if (!AbilitySystemComponent->OnGameplayEffectStackChangeDelegate(ActiveHandle)->IsBound())
+				{
+					AbilitySystemComponent->OnGameplayEffectStackChangeDelegate(ActiveHandle)->AddLambda([this, SpecApplied] (FActiveGameplayEffectHandle Handle, int32 NewStackCount, int32 PreviousStackCount)
+					{
+						const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+						OnGameplayTagAddedOrRemoved.Broadcast(GameplayTags.Indicator_Execute, NewStackCount);
+						if(NewStackCount == SpecApplied.Def.Get()->GetStackLimitCount()) AbilitySystemComponent->AddLooseGameplayTag(GameplayTags.Execute);
+					});
+				}
 			}
 		});
-		
 		OnHealthChanged.Broadcast(BaseAS->GetHealth());
 		OnMaxHealthChanged.Broadcast(BaseAS->GetMaxHealth());
 	}
@@ -294,7 +300,7 @@ void AAICharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewC
 /*
  * Combat Interface
  */
-void AAICharacter::Die(const FVector& DeathImpulse)
+void AAICharacter::Die(const FVector& DeathImpulse, bool bExecute)
 {
 	SetLifeSpan(LifeSpan);
 	if (BaseAIController) BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("Dead"), true);
@@ -303,7 +309,7 @@ void AAICharacter::Die(const FVector& DeathImpulse)
 		Arena->OnPlayerEntering.Clear();
 		Arena->OnPlayerLeaving.Clear();
 	}
-	Super::Die(DeathImpulse);
+	Super::Die(DeathImpulse, bExecute);
 }
 
 void AAICharacter::SetCombatTarget_Implementation(AActor* InCombatTarget)

@@ -196,14 +196,17 @@ FGameplayTag Abilities_Weapon_Monk;
 FGameplayTag Abilities_Weapon_Monk_States;
 FGameplayTag Abilities_Weapon_Monk_Combo;
 FGameplayTag Abilities_Weapon_Monk_Extra;
+FGameplayTag Abilities_Weapon_Monk_Execute;
 FGameplayTag Abilities_Weapon_OneHanded_Attack;
 FGameplayTag Abilities_Weapon_OneHanded_States;
 FGameplayTag Abilities_Weapon_OneHanded_Combo;
 FGameplayTag Abilities_Weapon_OneHanded_Extra;
+FGameplayTag Abilities_Weapon_OneHanded_Execute;
 FGameplayTag Abilities_Weapon_TwoHanded_Attack;
 FGameplayTag Abilities_Weapon_TwoHanded_States;
 FGameplayTag Abilities_Weapon_TwoHanded_Combo;
 FGameplayTag Abilities_Weapon_TwoHanded_Extra;
+FGameplayTag Abilities_Weapon_TwoHanded_Execute;
  
 FGameplayTag Abilities_Combo_Attack_1;
 FGameplayTag Abilities_Combo_Attack_2;
@@ -254,6 +257,8 @@ FGameplayTag CombatState_Transient_Ledge;
 FGameplayTag CombatState_Transient_Dodging;
 FGameplayTag CombatState_Transient_Rolling;
  
+FGameplayTag CombatState_Execute;
+ 
 FGameplayTag CombatState_Directional_Upward;
 FGameplayTag CombatState_Directional_Downward;
 FGameplayTag CombatState_Directional_Forward;
@@ -271,6 +276,7 @@ FGameplayTag CombatState_Directional_ForwardDown;
  FGameplayTag Shackled;
  FGameplayTag Defeated;
  FGameplayTag Poise;
+ FGameplayTag Execute;
 
  /*
   * Gameplay Cues
@@ -389,6 +395,7 @@ FGameplayTag Montage_EndAbility;
 FGameplayTag Montage_Parry;
 FGameplayTag Montage_Parry_Begin;
 FGameplayTag Montage_Parry_End;
+FGameplayTag Montage_Execute;
  
 FGameplayTag Montage_Window_Combo;
 FGameplayTag Montage_Window_Execute;
@@ -440,6 +447,9 @@ FGameplayTag InputTag_Passive_4;
 FGameplayTag InputTag_Passive_5; 
 FGameplayTag InputTag_Throw_1;
 FGameplayTag InputTag_Throw_2;
+FGameplayTag InputTag_Execute_LMB;
+FGameplayTag InputTag_Execute_RMB;
+FGameplayTag InputTag_Execute_1;
  
  /*
  * Player Tags

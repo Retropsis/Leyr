@@ -30,10 +30,15 @@ void UPlayerCharacterAnimInstance::Tick(float DeltaTime)
 	bIsCrouched = PlayerCharacter->bIsCrouched;
 	CombatState = PlayerCharacter->Execute_GetCombatState(PlayerCharacter);
 
-	if(PlayerCharacter->Execute_IsDead(PlayerCharacter) && !bDead)
+	if(PlayerCharacter->Execute_GetDefeatState(PlayerCharacter) == EDefeatState::Defeated && !bDead)
 	{
 		bDead = true;
 		JumpToNode("Defeat");
+	}
+	if(PlayerCharacter->Execute_GetDefeatState(PlayerCharacter) == EDefeatState::Executed && !bExecuted)
+	{
+		bExecuted = true;
+		JumpToNode("Executed");
 	}
 
 	GEngine->AddOnScreenDebugMessage(159, 1.f, FColor::Cyan, FString::Printf(TEXT("%s"), *UEnum::GetValueAsString(CombatState)));

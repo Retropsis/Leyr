@@ -193,6 +193,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_Weapon_Monk_States = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Monk.States"), FString("Abilities Weapon Monk States"));
 	GameplayTags.Abilities_Weapon_Monk_Combo = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Monk.Combo"), FString("Abilities Weapon Monk Combo"));
 	GameplayTags.Abilities_Weapon_Monk_Extra = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Monk.Extra"), FString("Abilities Weapon Monk Extra"));
+	GameplayTags.Abilities_Weapon_Monk_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Monk.Execute"), FString("Abilities Weapon Monk Execute"));
 	
 	/*
 	 * Melee Weapons
@@ -208,10 +209,12 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_Weapon_OneHanded_States = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.OneHanded.States"), FString("Abilities Weapon OneHanded States"));
 	GameplayTags.Abilities_Weapon_OneHanded_Combo = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.OneHanded.Combo"), FString("Abilities Weapon OneHanded Combo"));
 	GameplayTags.Abilities_Weapon_OneHanded_Extra = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.OneHanded.Extra"), FString("Abilities Weapon OneHanded Extra"));
+	GameplayTags.Abilities_Weapon_OneHanded_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.OneHanded.Execute"), FString("Abilities Weapon OneHanded Execute"));
 	GameplayTags.Abilities_Weapon_TwoHanded_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.TwoHanded.Attack"), FString("Abilities Weapon TwoHanded Attack"));
 	GameplayTags.Abilities_Weapon_TwoHanded_States = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.TwoHanded.States"), FString("Abilities Weapon TwoHanded States"));
 	GameplayTags.Abilities_Weapon_TwoHanded_Combo = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.TwoHanded.Combo"), FString("Abilities Weapon TwoHanded Combo"));
 	GameplayTags.Abilities_Weapon_TwoHanded_Extra = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.TwoHanded.Extra"), FString("Abilities Weapon TwoHanded Extra"));
+	GameplayTags.Abilities_Weapon_TwoHanded_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.TwoHanded.Execute"), FString("Abilities Weapon TwoHanded Execute"));
 
 	/*
 	 * Range Weapons
@@ -275,6 +278,8 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatState_Transient_Dodging = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Transient.Dodging"), FString("CombatState Transient Dodging"));
 	GameplayTags.CombatState_Transient_Rolling = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Transient.Rolling"), FString("CombatState Transient Rolling"));
 	
+	GameplayTags.CombatState_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Execute"), FString("CombatState Execute"));
+	
 	GameplayTags.CombatState_Directional_Upward = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Directional.Upward"), FString("CombatState Directional Upward"));
 	GameplayTags.CombatState_Directional_Downward = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Directional.Downward"), FString("CombatState Directional Downward"));
 	GameplayTags.CombatState_Directional_Forward = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Directional.Forward"), FString("CombatState Directional Forward"));
@@ -317,6 +322,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Defeated = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Defeated"), FString("Defeated"));
 	GameplayTags.Peaceful = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Peaceful"), FString("Peaceful"));
 	GameplayTags.Poise = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Poise"), FString("Poise"));
+	GameplayTags.Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Execute"), FString("Execute"));
 	
 	/*
 	 * Gameplay Cues
@@ -422,6 +428,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Montage_Parry = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Parry"), FString("Montage Parry"));
 	GameplayTags.Montage_Parry_Begin = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Parry.Begin"), FString("Montage Parry Begin"));
 	GameplayTags.Montage_Parry_End = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Parry.End"), FString("Montage Parry End"));
+	GameplayTags.Montage_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Execute"), FString("Montage Execute"));
 	
 	GameplayTags.Montage_Window_Combo = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Window.Combo"), FString("Montage Window Combo"));
 	GameplayTags.Montage_Window_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Window.Execute"), FString("Montage Window Execute"));
@@ -481,6 +488,9 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.InputTag_Passive_5 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Passive.5"), FString("Passive 5"));	
 	GameplayTags.InputTag_Throw_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Throw.1"), FString("Throw 1"));
 	GameplayTags.InputTag_Throw_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Throw.2"), FString("Throw 2"));
+	GameplayTags.InputTag_Execute_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Execute.LMB"), FString("Execute LMB"));
+	GameplayTags.InputTag_Execute_RMB = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Execute.RMB"), FString("Execute RMB"));
+	GameplayTags.InputTag_Execute_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Execute.1"), FString("Execute 1"));
 
 	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_1, GameplayTags.InputTag_LMB);
 	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_2, GameplayTags.InputTag_RMB);

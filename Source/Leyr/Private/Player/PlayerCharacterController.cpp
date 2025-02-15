@@ -50,7 +50,7 @@ void APlayerCharacterController::SetupInputComponent()
 		BaseInputComponent->BindAction(HotbarAction_8, ETriggerEvent::Started, this, &APlayerCharacterController::HotbarButtonPressed, 7);
 		BaseInputComponent->BindAction(HotbarAction_9, ETriggerEvent::Started, this, &APlayerCharacterController::HotbarButtonPressed, 8);
 		
-		BaseInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld);
+		BaseInputComponent->BindAbilityActions(InputConfig, this, &ThisClass::AbilityInputTagPressed, &ThisClass::AbilityInputTagReleased, &ThisClass::AbilityInputTagHeld, &ThisClass::AbilityInputTagCombo);
 	}
 }
 
@@ -67,6 +67,11 @@ void APlayerCharacterController::AbilityInputTagReleased(FGameplayTag InputTag)
 void APlayerCharacterController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
 	if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
+}
+
+void APlayerCharacterController::AbilityInputTagCombo(FGameplayTag InputTag)
+{
+	if (GetASC()) GetASC()->AbilityInputTagCombo(InputTag);
 }
 
 UBaseAbilitySystemComponent* APlayerCharacterController::GetASC()

@@ -123,8 +123,8 @@ protected:
 	virtual AActor* GetAvatar_Implementation() override { return this; }
 	virtual FOnASCRegistered& GetOnASCRegistered() override { return OnASCRegistered; }
 	virtual FOnDeath& GetOnDeath() override { return OnDeath; }
-	virtual void Die(const FVector& DeathImpulse) override;
-	virtual bool IsDead_Implementation() const override { return  bDead; }
+	virtual void Die(const FVector& DeathImpulse, bool bExecute) override;
+	virtual EDefeatState GetDefeatState_Implementation() const override { return  DefeatState; }
 	virtual void SetGravityScale_Implementation(float GravityValue) override;
 	virtual float GetGravityScale_Implementation() override;
 	virtual void ResetGravityScale_Implementation() override;
@@ -137,10 +137,10 @@ protected:
 	FTaggedMontage GetTaggedMontageInfoByTag(const FGameplayTag& MontageTag, ESequenceType SequenceType) const;
 
 	UFUNCTION(NetMulticast, Reliable)
-	virtual void MulticastHandleDeath(const FVector& DeathImpulse);
+	virtual void MulticastHandleDeath(const FVector& DeathImpulse, EDefeatState InDefeatState);
 
 	UPROPERTY(BlueprintReadOnly)
-	bool bDead = false;
+	EDefeatState DefeatState = EDefeatState::None;
 
 	/*
 	 * Animation

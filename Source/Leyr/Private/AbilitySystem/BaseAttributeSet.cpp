@@ -90,7 +90,7 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	FEffectProperties Props;
 	SetEffectProperties(Data, Props);
 	
-	if(Props.TargetAvatarActor->Implements<UCombatInterface>() && ICombatInterface::Execute_IsDead(Props.TargetAvatarActor)) return;
+	if(Props.TargetAvatarActor->Implements<UCombatInterface>() && ICombatInterface::Execute_GetDefeatState(Props.TargetAvatarActor) >= EDefeatState::Defeated) return;
 	if(Props.TargetAvatarActor->Implements<UAbilityActorInterface>() && IAbilityActorInterface::Execute_IsDestroyed(Props.TargetAvatarActor)) return;
 	// if(Props.TargetCharacter->Implements<UCombatInterface>() && ICombatInterface::Execute_IsDead(Props.TargetCharacter)) return;
 
@@ -205,7 +205,7 @@ void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 		{
 			if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Props.TargetAvatarActor))
 			{
-				CombatInterface->Die(ULeyrAbilitySystemLibrary::GetDeathImpulse(Props.EffectContextHandle));
+				CombatInterface->Die(ULeyrAbilitySystemLibrary::GetDeathImpulse(Props.EffectContextHandle), ULeyrAbilitySystemLibrary::IsExecuteHit(Props.EffectContextHandle));
 			}
 			if (IAbilityActorInterface* AbilityActorInterface = Cast<IAbilityActorInterface>(Props.TargetAvatarActor))
 			{
@@ -228,7 +228,6 @@ void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 		
 		const bool bBlockedHit = ULeyrAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
 		const bool bCriticalHit = ULeyrAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
-		const bool bExecuteHit = ULeyrAbilitySystemLibrary::IsExecuteHit(Props.EffectContextHandle);
 		FUIMessageData MessageData{ EMessageType::DamageToEnemy, LocalIncomingDamage, Props.TargetAvatarActor, bBlockedHit, bCriticalHit };
 		ShowFloatingText(Props, MessageData);
 		if (ULeyrAbilitySystemLibrary::IsSuccessfulStatusEffect(Props.EffectContextHandle))

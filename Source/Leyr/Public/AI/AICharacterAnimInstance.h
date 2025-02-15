@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "PaperZDAnimInstance.h"
+#include "Data/CombatData.h"
 #include "AICharacterAnimInstance.generated.h"
 
+enum class EDefeatState : uint8;
 class AAICharacter;
 /**
  * 
@@ -35,7 +37,7 @@ public:
 	bool bIsAccelerating;
 
 	UPROPERTY(BlueprintReadOnly, Category="AICharacter")
-	bool bDead = false;
+	EDefeatState DefeatState = EDefeatState::None;
 	
 	UPROPERTY(BlueprintReadOnly, Category="AICharacter")
 	bool bIsDiving = false;

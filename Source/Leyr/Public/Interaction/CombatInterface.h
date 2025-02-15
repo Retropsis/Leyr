@@ -36,7 +36,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	int32 GetCharacterLevel();
 	
-	virtual void Die(const FVector& DeathImpulse) = 0;
+	virtual void Die(const FVector& DeathImpulse, bool bExecute) = 0;
 	virtual FOnASCRegistered& GetOnASCRegistered() = 0;
 	virtual FOnDeath& GetOnDeath() = 0;
 	// virtual FOnTakeDamage& GetOnTakeDamage() = 0;
@@ -90,7 +90,7 @@ public:
 	EObjectTypeQuery GetTraceObjectType();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	bool IsDead() const;
+	EDefeatState GetDefeatState() const;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	AActor* GetAvatar();

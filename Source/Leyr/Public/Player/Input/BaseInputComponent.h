@@ -16,12 +16,12 @@ class LEYR_API UBaseInputComponent : public UEnhancedInputComponent
 	GENERATED_BODY()
 	
 public:
-	template<class UserClass, typename PressedFuncType, typename ReleasedFuncType, typename HeldFuncType>
-	void BindAbilityActions(const UInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, HeldFuncType HeldFunc);
+	template<class UserClass, typename PressedFuncType, typename ReleasedFuncType, typename HeldFuncType, typename ComboFuncType>
+	void BindAbilityActions(const UInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, HeldFuncType HeldFunc, ComboFuncType ComboFunc);
 };
 
-template <class UserClass, typename PressedFuncType, typename ReleasedFuncType, typename HeldFuncType>
-void UBaseInputComponent::BindAbilityActions(const UInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, HeldFuncType HeldFunc)
+template <class UserClass, typename PressedFuncType, typename ReleasedFuncType, typename HeldFuncType, typename ComboFuncType>
+void UBaseInputComponent::BindAbilityActions(const UInputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, HeldFuncType HeldFunc, ComboFuncType ComboFunc)
 {
 	check(InputConfig);
 
@@ -42,6 +42,16 @@ void UBaseInputComponent::BindAbilityActions(const UInputConfig* InputConfig, Us
 			if (HeldFunc)
 			{
 				BindAction(Action.InputAction, ETriggerEvent::Triggered, Object, HeldFunc, Action.InputTag);
+			}
+		}
+	}
+	for (const FBaseInputAction& Action : InputConfig->AbilityInputCombos)
+	{
+		if (Action.InputAction && Action.InputTag.IsValid())
+		{
+			if (ComboFunc)
+			{
+				BindAction(Action.InputAction, ETriggerEvent::Completed, Object, ComboFunc, Action.InputTag);
 			}
 		}
 	}

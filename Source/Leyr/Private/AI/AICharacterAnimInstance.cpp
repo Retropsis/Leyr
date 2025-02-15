@@ -26,10 +26,12 @@ void UAICharacterAnimInstance::Tick(float DeltaTime)
 	bAirborne = AICharacter->GetCharacterMovement()->IsFalling();
 	// bIsAccelerating = AICharacter->IsAccelerating();
 	bIsDiving = AICharacter->GetBehaviourState() == EBehaviourState::Dive;
-
-	if(AICharacter->Execute_IsDead(AICharacter) && !bDead)
-	{
-		bDead = true;
-		// JumpToNode("Defeat");
-	}
+	
+	DefeatState = AICharacter->Execute_GetDefeatState(AICharacter);
+	
+	// if(AICharacter->Execute_GetDefeatState(AICharacter) ==  && !DefeatState)
+	// {
+	// 	DefeatState = AICharacter->Execute_GetDefeatState(AICharacter);
+	// 	// JumpToNode("Defeat");
+	// }
 }

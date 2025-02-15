@@ -46,7 +46,7 @@ public:
 	virtual int32 GetCharacterLevel_Implementation() override { return Level; }
 	virtual void SetCombatTarget_Implementation(AActor* InCombatTarget) override;
 	virtual AActor* GetCombatTarget_Implementation() const override { return CombatTarget; }
-	virtual void Die(const FVector& DeathImpulse) override;
+	virtual void Die(const FVector& DeathImpulse, bool bExecute) override;
 	/** end Combat Interface */
 
 	UFUNCTION()

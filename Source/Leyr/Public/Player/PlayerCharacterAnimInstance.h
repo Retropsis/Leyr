@@ -55,4 +55,5 @@ public:
 
 private:
 	bool bDead = false;
+	bool bExecuted = false;
 };

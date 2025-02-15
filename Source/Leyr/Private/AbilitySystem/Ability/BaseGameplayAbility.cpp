@@ -57,15 +57,17 @@ void UBaseGameplayAbility::MakeAndApplyExecuteEffectToTarget(const FGameplayTag&
 	UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(TagName));
 
 	Effect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
-	Effect->DurationMagnitude = FGameplayEffectModifierMagnitude{ 5.f };
+	Effect->DurationMagnitude = FGameplayEffectModifierMagnitude{ 2.25f };
+	Effect->StackingType = EGameplayEffectStackingType::AggregateByTarget;
+	Effect->StackLimitCount = 3;
+	Effect->StackExpirationPolicy = EGameplayEffectStackingExpirationPolicy::RemoveSingleStackAndRefreshDuration;
+	Effect->bDenyOverflowApplication = true;
+	Effect->bClearStackOnOverflow = true;
 	
 	UTargetTagsGameplayEffectComponent& AssetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
 	FInheritedTagContainer InheritedTagContainer;
 	InheritedTagContainer.Added.AddTag(TagToApply);
 	AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
-	
-	Effect->StackingType = EGameplayEffectStackingType::AggregateByTarget;
-	Effect->StackLimitCount = 3;
 
 	// const int32 Index = Effect->Modifiers.Num();
 	// Effect->Modifiers.Add(FGameplayModifierInfo());
@@ -81,8 +83,8 @@ void UBaseGameplayAbility::MakeAndApplyExecuteEffectToTarget(const FGameplayTag&
 		// TSharedPtr<FGameplayTag> StatusEffectDamageType = MakeShareable(new FGameplayTag(DamageType));
 		// BaseContext->SetDamageType(StatusEffectDamageType);
 
-		FActiveGameplayEffectHandle Handle = GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*MutableSpec, TargetASC);
-		TargetASC->OnGameplayEffectAppliedToTarget(TargetASC, *MutableSpec, Handle);
+		const FActiveGameplayEffectHandle Handle = GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*MutableSpec, TargetASC);
+		if (Handle.IsValid()) TargetASC->OnGameplayEffectAppliedToTarget(TargetASC, *MutableSpec, Handle);
 	}
 }
 

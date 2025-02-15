@@ -104,3 +104,12 @@ enum class ECombatStance : uint8
 	Buckler UMETA(DisplayName="Buckler"),
 	Rod UMETA(DisplayName="Rod"),
 };
+
+UENUM(BlueprintType)
+enum class EDefeatState : uint8
+{
+	None UMETA(DisplayName="None"),
+	Defeated UMETA(DisplayName="Defeated"),
+	Executed UMETA(DisplayName="Executed"),
+	KnockedOut UMETA(DisplayName="KnockedOut"),
+};

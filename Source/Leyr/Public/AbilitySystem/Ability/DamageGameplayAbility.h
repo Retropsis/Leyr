@@ -56,11 +56,17 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	bool bShouldApplyExecute = false;
 	
+	UPROPERTY(EditDefaultsOnly, Category="Ability")
+	bool bShouldExecute = false;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability")
 	FVector HitImpulse = FVector::ZeroVector;
 	
 	UPROPERTY(BlueprintReadOnly)
 	bool bHasHitTarget = false;
+
+	UPROPERTY(BlueprintReadOnly)
+	bool bExecuteSuccessful = false;
 	
 	UPROPERTY(BlueprintReadOnly)
 	bool bShouldAddImpulseOnHit = false;

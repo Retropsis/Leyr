@@ -217,15 +217,15 @@ UPaperZDAnimInstance* ABaseCharacter::SetWeaponAnimInstance(const TSubclassOf<UP
 	return WeaponComponent->GetOrCreateAnimInstance();
 }
 
-void ABaseCharacter::Die(const FVector& DeathImpulse)
+void ABaseCharacter::Die(const FVector& DeathImpulse, bool bExecute)
 {
-	bDead = true;
+	DefeatState = bExecute ? EDefeatState::Executed : EDefeatState::Defeated;
 	//TODO: for 3D meshes, could try also with 2D Weapon
 	// Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
-	MulticastHandleDeath(DeathImpulse);
+	MulticastHandleDeath(DeathImpulse, DefeatState);
 }
 
-void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImpulse)
+void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImpulse, EDefeatState InDefeatState)
 {
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
@@ -235,7 +235,7 @@ void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImp
 	GetCapsuleComponent()->AddImpulse(DeathImpulse, NAME_None, true);
 	
 	UGameplayStatics::PlaySoundAtLocation(this, DefeatedSound, GetActorLocation(), GetActorRotation());
-	bDead = true;
+	DefeatState = InDefeatState;
 	BurnStatusEffectComponent->Deactivate();
 	OnDeath.Broadcast(this);
 }

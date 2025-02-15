@@ -49,17 +49,19 @@ TArray<FHitResult> UDamageGameplayAbility::BoxTrace(bool bDebug)
 
 void UDamageGameplayAbility::CauseDamage(UAbilitySystemComponent* TargetASC)
 {
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 	FGameplayEffectSpecHandle DamageSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass, GetAbilityLevel());
 	const float ScaledDamage =AbilityPower.GetRandomFloatFromScalableRange(GetAbilityLevel());
 	
-	if (TargetASC->HasMatchingGameplayTag(FBaseGameplayTags::Get().Indicator_Execute))
+	if (TargetASC->HasMatchingGameplayTag(GameplayTags.Execute) && bShouldExecute)
 	{
-		DamageType = FBaseGameplayTags::Get().Damage_Execute;
+		TargetASC->RemoveActiveEffectsWithGrantedTags(GameplayTags.Indicator_Execute.GetSingleTagContainer());
+		DamageType = GameplayTags.Damage_Execute;
+		bExecuteSuccessful = true;
 	}
+	
 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, DamageType, ScaledDamage);
-	if(bShouldApplyExecute) MakeAndApplyExecuteEffectToTarget(FBaseGameplayTags::Get().Indicator_Execute, TargetASC);
-
-	MakeAndApplyExecuteEffectToTarget(FBaseGameplayTags::Get().Indicator_Execute, TargetASC);
+	if(bShouldApplyExecute) MakeAndApplyExecuteEffectToTarget(GameplayTags.Indicator_Execute, TargetASC);
 	
 	GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), TargetASC);
 }
