@@ -171,7 +171,9 @@ void AAICharacter::BeginPlay()
 		AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Indicator_Execute, EGameplayTagEventType::NewOrRemoved).AddLambda([this] (const FGameplayTag CallbackTag, int32 NewCount)
 		{
 			OnGameplayTagAddedOrRemoved.Broadcast(CallbackTag, NewCount);
-			if (NewCount == 0) AbilitySystemComponent->RemoveLooseGameplayTag(FBaseGameplayTags::Get().Execute);
+			const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+			if (NewCount == 0) AbilitySystemComponent->RemoveLooseGameplayTag(GameplayTags.Execute);
+			else AbilitySystemComponent->AddLooseGameplayTag(GameplayTags.Execute);
 		});
 		AbilitySystemComponent->OnGameplayEffectAppliedDelegateToTarget.AddLambda([this] (UAbilitySystemComponent* Target, const FGameplayEffectSpec& SpecApplied, FActiveGameplayEffectHandle ActiveHandle)
 		{
@@ -185,7 +187,6 @@ void AAICharacter::BeginPlay()
 					{
 						const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 						OnGameplayTagAddedOrRemoved.Broadcast(GameplayTags.Indicator_Execute, NewStackCount);
-						if(NewStackCount == SpecApplied.Def.Get()->GetStackLimitCount()) AbilitySystemComponent->AddLooseGameplayTag(GameplayTags.Execute);
 					});
 				}
 			}

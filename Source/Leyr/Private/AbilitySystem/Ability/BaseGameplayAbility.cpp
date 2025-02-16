@@ -57,12 +57,10 @@ void UBaseGameplayAbility::MakeAndApplyExecuteEffectToTarget(const FGameplayTag&
 	UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(TagName));
 
 	Effect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
-	Effect->DurationMagnitude = FGameplayEffectModifierMagnitude{ 2.25f };
+	Effect->DurationMagnitude = FGameplayEffectModifierMagnitude{ 1.75f };
 	Effect->StackingType = EGameplayEffectStackingType::AggregateByTarget;
-	Effect->StackLimitCount = 3;
+	Effect->StackLimitCount = 6;
 	Effect->StackExpirationPolicy = EGameplayEffectStackingExpirationPolicy::RemoveSingleStackAndRefreshDuration;
-	Effect->bDenyOverflowApplication = true;
-	Effect->bClearStackOnOverflow = true;
 	
 	UTargetTagsGameplayEffectComponent& AssetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
 	FInheritedTagContainer InheritedTagContainer;

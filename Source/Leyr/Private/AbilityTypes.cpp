@@ -77,7 +77,7 @@ bool FBaseGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		}
 	}
 
-	Ar.SerializeBits(&RepBits, 17);
+	Ar.SerializeBits(&RepBits, 18);
 
 	if (RepBits & (1 << 0))
 	{

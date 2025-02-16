@@ -5,8 +5,10 @@
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
+#include "AI/AIData.h"
 #include "Data/ItemData.h"
 #include "Game/BaseGameplayTags.h"
+#include "Interaction/AIInterface.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -257,6 +259,12 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	if (ExecutionDamageValue > 0.f)
 	{
 		ULeyrAbilitySystemLibrary::SetIsExecuteHit(EffectContextHandle, true);
+		int32 StackCount = 0;
+		
+		FGameplayEffectQuery Query;
+		Query.MakeQuery_MatchAnyEffectTags(GameplayTags.Indicator_Execute.GetSingleTagContainer());
+		StackCount = TargetASC->GetAggregatedStackCount(Query);
+		TargetASC->RemoveActiveEffectsWithGrantedTags(GameplayTags.Indicator_Execute.GetSingleTagContainer());
 		
 		float TargetHealth = 0.f;
 		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().HealthDef, EvaluationParameters, TargetHealth);
@@ -266,9 +274,31 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().MaxHealthDef, EvaluationParameters, TargetMaxHealth);
 		TargetMaxHealth = FMath::Max<float>(TargetMaxHealth, 0.f);
 
-		float PercentMissingHealth = 1.f - UKismetMathLibrary::SafeDivide(TargetHealth, TargetMaxHealth);
-		float CappedPercentMissingHealth = FMath::Max<float>(PercentMissingHealth, .75f);
-		float MissingHealthBonusDamage = TargetMaxHealth * PercentMissingHealth;
+		float Scaler = 0.f;
+		float MaxScaler = .15f;
+		switch (IAIInterface::Execute_GetEncounterSize(TargetAvatar))
+		{
+		case EEncounterSize::Critter: 
+		case EEncounterSize::Default:
+			break;
+		case EEncounterSize::Humanoid:
+			Scaler = .65f;
+			MaxScaler = .65f;
+			break;
+		case EEncounterSize::Large:
+			Scaler = .1f;
+			MaxScaler = .2f;
+			break;
+		case EEncounterSize::Boss:
+			Scaler = .03f;
+			MaxScaler = .15f;
+			break;
+		}
+
+		float PercentMissingHealth = UKismetMathLibrary::SafeDivide(TargetHealth, TargetMaxHealth);
+		float CappedPercentMissingHealth = FMath::Min(StackCount * Scaler, MaxScaler);
+		
+		float MissingHealthBonusDamage = TargetMaxHealth * CappedPercentMissingHealth;
 		Damage += MissingHealthBonusDamage;
 	}
 

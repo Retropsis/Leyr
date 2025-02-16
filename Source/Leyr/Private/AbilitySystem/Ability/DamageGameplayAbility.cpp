@@ -55,7 +55,6 @@ void UDamageGameplayAbility::CauseDamage(UAbilitySystemComponent* TargetASC)
 	
 	if (TargetASC->HasMatchingGameplayTag(GameplayTags.Execute) && bShouldExecute)
 	{
-		TargetASC->RemoveActiveEffectsWithGrantedTags(GameplayTags.Indicator_Execute.GetSingleTagContainer());
 		DamageType = GameplayTags.Damage_Execute;
 		bExecuteSuccessful = true;
 	}
