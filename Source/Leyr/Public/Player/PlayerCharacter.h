@@ -137,6 +137,9 @@ protected:
 	void HandleCombatState(ECombatState NewState);
 	void HandleHangingOnLedge(const FVector& HangingTarget);
 	
+	UPROPERTY(EditDefaultsOnly, Category="Debug")
+	bool Invincibility = false;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Player")
 	ECharacterName CharacterName = ECharacterName::FirstCharacter;
 	
@@ -269,6 +272,7 @@ private:
 	float MovementSpeed = 0.f;
 	float CurrentMinZ = 0.f;
 	float OverridePitch = 0.f;
+	bool bResetCollisionResponse = false;
 
 	UPROPERTY()
 	APawn* Elevator = nullptr;

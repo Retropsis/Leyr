@@ -193,6 +193,8 @@ void UBaseAttributeSet::SendXPEvent(const FEffectProperties& Props)
 
 void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 {
+	if(Props.TargetASC && Props.TargetASC->HasMatchingGameplayTag(FBaseGameplayTags::Get().Invincibility)) return;
+	
 	float LocalIncomingDamage = Props.TargetAvatarActor->Implements<UAbilityActorInterface>() ? 1.f :  GetIncomingDamage();
 	SetIncomingDamage(0.f);
 	

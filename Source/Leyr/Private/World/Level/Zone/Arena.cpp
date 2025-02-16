@@ -12,16 +12,16 @@ AArena::AArena()
 	SetRootComponent(EnteringArea);
 	EnteringArea->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	EnteringArea->SetCollisionResponseToAllChannels(ECR_Ignore);
-	EnteringArea->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-	EnteringArea->SetCollisionResponseToChannel(ECC_Player, ECR_Ignore);
+	EnteringArea->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	EnteringArea->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
 	EnteringArea->InitBoxExtent(FVector(320.f, 100.f, 320.f));
 
 	LeavingArea = CreateDefaultSubobject<UBoxComponent>("LeavingArea");
 	LeavingArea->SetupAttachment(GetRootComponent());
 	LeavingArea->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	LeavingArea->SetCollisionResponseToAllChannels(ECR_Ignore);
-	LeavingArea->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-	LeavingArea->SetCollisionResponseToChannel(ECC_Player, ECR_Ignore);
+	LeavingArea->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	LeavingArea->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
 	LeavingArea->InitBoxExtent(FVector(360.f, 100.f, 360.f));
 
 	EnteringBoundaryVisualizer = CreateDefaultSubobject<UStaticMeshComponent>("EnteringBoundaryVisualizer");

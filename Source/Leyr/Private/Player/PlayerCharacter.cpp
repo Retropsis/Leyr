@@ -224,6 +224,7 @@ void APlayerCharacter::InitAbilityActorInfo()
 
 	//TODO: Move this to some other (PlayerState, BeginPlay)
 	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::HitReactTagChanged);
+	if (Invincibility) AbilitySystemComponent->AddLooseGameplayTag(FBaseGameplayTags::Get().Invincibility);
 }
 
 void APlayerCharacter::InitializeCharacterInfo()
@@ -283,7 +284,7 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 {
 	if(CombatState >= ECombatState::Dodging) return;
 	
-	if(CombatState != ECombatState::Aiming) RotateController();
+	if(CombatState < ECombatState::Aiming && CombatState != ECombatState::Attacking) RotateController();
 	
 	PreviousCombatDirection = CombatDirection;
 	CombatDirection = GetCombatDirectionFromVector2D(MovementVector);
@@ -460,14 +461,15 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 {
 	CombatState = NewState;
 	GetCharacterMovement()->GravityScale = BaseGravityScale;
-	GetCapsuleComponent()->SetCollisionObjectType(ECC_Pawn);
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	// HalfHeightCapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	if(bResetCollisionResponse)
+	{
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Enemy, ECR_Overlap);
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Overlap);
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	}
 
 	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
 	GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(GameplayTags.CombatStates);
-	// GetAbilitySystemComponent()->RemoveActiveEffectsWithTags(CombatStates);
-	// GetAbilitySystemComponent()->RemoveActiveEffectsWithAppliedTags(CombatStates);
 	
 	switch (CombatState) {
 	case ECombatState::Unoccupied:
@@ -573,7 +575,9 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetCharacterMovement()->MaxWalkSpeed = DodgingSpeed;
 		GetCharacterMovement()->MaxAcceleration = DodgingMaxAcceleration;
 		GetCharacterMovement()->BrakingFrictionFactor = DodgingBrakeFrictionFactor;
-		GetCapsuleComponent()->SetCollisionObjectType(ECC_WorldDynamic);
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Enemy, ECR_Ignore);
+		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Ignore);
+		bResetCollisionResponse = true;
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Dodging);
 		break;
 	case ECombatState::Rolling:
