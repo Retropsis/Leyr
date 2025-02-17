@@ -5,6 +5,8 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/Actor/Projectile.h"
 #include "Interaction/CombatInterface.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 void UProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
@@ -16,7 +18,8 @@ void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation
 	if (!GetAvatarActorFromActorInfo()->HasAuthority()) return;
 
 	const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), SocketTag);
-	FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
+	FRotator Rotation = UKismetMathLibrary::FindLookAtRotation(SocketLocation, ProjectileTargetLocation);
+	// FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
 	if (bOverridePitch)
 	{
 		Rotation.Pitch = PitchOverride;

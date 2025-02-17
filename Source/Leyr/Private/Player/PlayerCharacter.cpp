@@ -848,17 +848,25 @@ void APlayerCharacter::TraceForLedge()
 	if(!bCanGrabLedge || !GetCharacterMovement()->IsFalling()) return;;
 	
 	TArray<AActor*> ActorsToIgnore;
+	FHitResult BottomHit;
 	FHitResult MidHit;
 	FHitResult TopHit;
-	FVector Delta = FVector(GetCapsuleComponent()->GetScaledCapsuleRadius(), 0.f, 0.f) * GetActorForwardVector().X;
+	const FVector Delta = FVector(GetCapsuleComponent()->GetScaledCapsuleRadius(), 0.f, 0.f) * GetActorForwardVector().X;
+
+	const FVector BottomStart = GetActorLocation() - GetActorUpVector() * GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	const FVector BottomEnd = BottomStart - GetActorUpVector() * 25.f;
+	UKismetSystemLibrary::LineTraceSingle(this, BottomStart, BottomEnd, TraceTypeQuery1,
+	false, ActorsToIgnore, EDrawDebugTrace::None, BottomHit, true);
+	
 	UKismetSystemLibrary::LineTraceSingle(this, GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 45.f, TraceTypeQuery1,
 	false, ActorsToIgnore, EDrawDebugTrace::None, MidHit, true);
+	
 	UKismetSystemLibrary::LineTraceSingle(this, RopeHangingCollision->GetComponentLocation(), RopeHangingCollision->GetComponentLocation() + RopeHangingCollision->GetForwardVector() * 45.f, TraceTypeQuery1,
 		false, ActorsToIgnore, EDrawDebugTrace::None, TopHit, true);
 
 	if(MidHit.bBlockingHit && MidHit.GetActor() && MidHit.GetActor()->ActorHasTag("Platform")) return;
 
-	if(MidHit.bBlockingHit && !TopHit.bBlockingHit)
+	if(MidHit.bBlockingHit && !TopHit.bBlockingHit && !BottomHit.bBlockingHit)
 	{		
 		FHitResult LedgeHit;		
 		for (int i = 0; i < (RopeHangingCollision->GetComponentLocation() - TopHit.TraceEnd).Length() + 45; i += 5)

@@ -310,6 +310,7 @@ void AAICharacter::Die(const FVector& DeathImpulse, bool bExecute)
 		Arena->OnPlayerEntering.Clear();
 		Arena->OnPlayerLeaving.Clear();
 	}
+	BaseAIController->StopMovement();
 	Super::Die(DeathImpulse, bExecute);
 }
 

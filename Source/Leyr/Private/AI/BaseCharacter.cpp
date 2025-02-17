@@ -235,6 +235,7 @@ void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImp
 	GetCapsuleComponent()->AddImpulse(DeathImpulse, NAME_None, true);
 	
 	UGameplayStatics::PlaySoundAtLocation(this, DefeatedSound, GetActorLocation(), GetActorRotation());
+	GetAbilitySystemComponent()->AddLooseGameplayTag(FBaseGameplayTags::Get().Defeated);
 	DefeatState = InDefeatState;
 	BurnStatusEffectComponent->Deactivate();
 	OnDeath.Broadcast(this);
