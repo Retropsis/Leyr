@@ -5,7 +5,7 @@
 #include "Game/LoadMenuSaveGame.h"
 #include "Inventory/InventoryComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "UI/ViewModel/MVVM_LoadFile.h"
+#include "UI/ViewModel/MVVM_LoadSlot.h"
 
 FInventoryItemData ALeyrGameMode::FindItemDataByID(int32 ItemID) const
 {
@@ -30,7 +30,7 @@ FInventoryItemData ALeyrGameMode::FindItemDataByRowName(FName RowName) const
 	return FInventoryItemData();
 }
 
-void ALeyrGameMode::SaveSlotData(UMVVM_LoadFile* LoadSlot, int32 SlotIndex)
+void ALeyrGameMode::SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex)
 {
 	if (UGameplayStatics::DoesSaveGameExist(LoadSlot->LoadSlotName, SlotIndex))
 	{

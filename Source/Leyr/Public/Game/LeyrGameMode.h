@@ -8,7 +8,7 @@
 #include "LeyrGameMode.generated.h"
 
 class USaveGame;
-class UMVVM_LoadFile;
+class UMVVM_LoadSlot;
 class UInventoryCostData;
 class UMapInfo;
 class UBehaviourInfo;
@@ -51,7 +51,7 @@ public:
 	FInventoryItemData FindItemDataByID(int32 ItemID) const;
 	FInventoryItemData FindItemDataByRowName(FName RowName) const;
 
-	void SaveSlotData(UMVVM_LoadFile* LoadSlot, int32 SlotIndex);
+	void SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex);
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<USaveGame> LoadMenuSaveGameClass;

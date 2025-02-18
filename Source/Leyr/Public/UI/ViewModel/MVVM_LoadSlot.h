@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "MVVMViewModelBase.h"
-#include "MVVM_LoadFile.generated.h"
+#include "MVVM_LoadSlot.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSetWidgetSwitcherIndex, int32, WidgetSwitcherIndex);
 
@@ -12,7 +12,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSetWidgetSwitcherIndex, int32, Widg
  * 
  */
 UCLASS()
-class LEYR_API UMVVM_LoadFile : public UMVVMViewModelBase
+class LEYR_API UMVVM_LoadSlot : public UMVVMViewModelBase
 {
 	GENERATED_BODY()
 

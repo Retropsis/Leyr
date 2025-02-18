@@ -6,7 +6,7 @@
 #include "MVVMViewModelBase.h"
 #include "MVVM_LoadMenu.generated.h"
 
-class UMVVM_LoadFile;
+class UMVVM_LoadSlot;
 /**
  * 
  */
@@ -20,10 +20,10 @@ public:
 	void InitializeLoadSlots();
 
 	UFUNCTION(BlueprintPure)
-	UMVVM_LoadFile* GetLoadSlotViewModelByIndex(int32 Index) const;
+	UMVVM_LoadSlot* GetLoadSlotViewModelByIndex(int32 Index) const;
 	
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<UMVVM_LoadFile> LoadSlotViewModelClass;
+	TSubclassOf<UMVVM_LoadSlot> LoadSlotViewModelClass;
 
 	UFUNCTION(BlueprintCallable)
 	void NewSlotButtonPressed(int32 SlotIndex, const FString& EnteredName);
@@ -36,14 +36,14 @@ public:
 
 private:
 	UPROPERTY()
-	TMap<int32, UMVVM_LoadFile*> LoadSlots;
+	TMap<int32, UMVVM_LoadSlot*> LoadSlots;
 
 	UPROPERTY()
-	TObjectPtr<UMVVM_LoadFile> LoadSlot_0;
+	TObjectPtr<UMVVM_LoadSlot> LoadSlot_0;
 	
 	UPROPERTY()
-	TObjectPtr<UMVVM_LoadFile> LoadSlot_1;
+	TObjectPtr<UMVVM_LoadSlot> LoadSlot_1;
 	
 	UPROPERTY()
-	TObjectPtr<UMVVM_LoadFile> LoadSlot_2;
+	TObjectPtr<UMVVM_LoadSlot> LoadSlot_2;
 };
