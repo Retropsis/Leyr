@@ -6,6 +6,8 @@
 #include "MVVMViewModelBase.h"
 #include "MVVM_LoadMenu.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSlotSelected);
+
 class UMVVM_LoadSlot;
 /**
  * 
@@ -18,6 +20,10 @@ class LEYR_API UMVVM_LoadMenu : public UMVVMViewModelBase
 	
 public:
 	void InitializeLoadSlots();
+	void LoadData();
+
+	UPROPERTY(BlueprintAssignable)
+	FSlotSelected SlotSelected;
 
 	UFUNCTION(BlueprintPure)
 	UMVVM_LoadSlot* GetLoadSlotViewModelByIndex(int32 Index) const;
@@ -33,6 +39,12 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SelectSlotButtonPressed(int32 SlotIndex);
+	
+	UFUNCTION(BlueprintCallable)
+	void DeleteButtonPressed();
+	
+	UFUNCTION(BlueprintCallable)
+	void PlayButtonPressed();
 
 private:
 	UPROPERTY()
@@ -46,4 +58,7 @@ private:
 	
 	UPROPERTY()
 	TObjectPtr<UMVVM_LoadSlot> LoadSlot_2;
+	
+	UPROPERTY()
+	TObjectPtr<UMVVM_LoadSlot> SelectedSlot;
 };

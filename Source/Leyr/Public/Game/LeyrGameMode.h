@@ -7,6 +7,7 @@
 #include "Inventory/InventoryComponent.h"
 #include "LeyrGameMode.generated.h"
 
+class ULoadMenuSaveGame;
 class USaveGame;
 class UMVVM_LoadSlot;
 class UInventoryCostData;
@@ -39,9 +40,23 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Ability Info")
 	TObjectPtr<UAbilityInfo> AbilityInfo;
 	
+	/* Maps */
 	UPROPERTY(EditDefaultsOnly, Category = "Map Info")
 	TObjectPtr<UMapInfo> MapInfo;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Map Info")
+	FString DefaultMapName;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Map Info")
+	TSoftObjectPtr<UWorld> DefaultMap;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Map Info")
+	TMap<FString, TSoftObjectPtr<UWorld>> Maps;
+
+	void TravelToMap(UMVVM_LoadSlot* Slot);
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	
+	/* Inventory */
 	UPROPERTY(EditDefaultsOnly, Category="Inventory")
 	TObjectPtr<UInventoryCostData> InventoryCostInfo;
 
@@ -51,8 +66,15 @@ public:
 	FInventoryItemData FindItemDataByID(int32 ItemID) const;
 	FInventoryItemData FindItemDataByRowName(FName RowName) const;
 
+	/* Saving */
+	static void DeleteSlot(const FString& SlotName, int32 SlotIndex);
+
 	void SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex);
+	ULoadMenuSaveGame* GetSaveSlotData(const FString& SlotName, int32 SlotIndex) const;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<USaveGame> LoadMenuSaveGameClass;
+
+protected:
+	virtual void BeginPlay() override;
 };
