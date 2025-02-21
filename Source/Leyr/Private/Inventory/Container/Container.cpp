@@ -23,6 +23,15 @@ AContainer::AContainer()
 	Container = CreateDefaultSubobject<UContainerComponent>("ContainerComponent");
 }
 
+void AContainer::LoadActor_Implementation()
+{
+	if (bInitialized)
+	{
+		Container->Items = Items;
+		Container->SetSlotCount( FMath::Max(Container->Items.Num(), 1));
+	}
+}
+
 void AContainer::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -47,16 +56,15 @@ void AContainer::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEv
 void AContainer::BeginPlay()
 {
 	Super::BeginPlay();
-	if(HasAuthority())
-	{
-		Container->SetSlotCount(SlotCount);
-		BuildContainerLoot();
-	}
+	BuildContainerLoot();
 }
 
-void AContainer::BuildContainerLoot() const
+void AContainer::BuildContainerLoot()
 {
+	if(!HasAuthority() || bInitialized) return;
 	checkf(ContainerData, TEXT("Please add a DataAsset to this container: %s"), *GetName());
+	
+	Container->SetSlotCount(ContainerData->Items.Num());
 	
 	for (FContainerItem ContainerItem : ContainerData->Items)
 	{
@@ -66,6 +74,7 @@ void AContainer::BuildContainerLoot() const
 		ItemToAdd.Quantity = ContainerItem.Quantity;
 		Container->ServerAddItem(ItemToAdd);
 	}
+	bInitialized = true;
 }
 
 void AContainer::Interact_Implementation(AActor* InteractingActor)

@@ -7,6 +7,7 @@
 #include "Data/ContainerData.h"
 #include "GameFramework/Actor.h"
 #include "Interaction/InteractionInterface.h"
+#include "Interaction/SaveInterface.h"
 #include "Inventory/ContainerComponent.h"
 #include "Inventory/Data/InventoryData.h"
 #include "Container.generated.h"
@@ -16,12 +17,16 @@ class UContainerComponent;
 class UBoxComponent;
 
 UCLASS()
-class LEYR_API AContainer : public APaperFlipbookActor, public IInteractionInterface
+class LEYR_API AContainer : public APaperFlipbookActor, public IInteractionInterface, public ISaveInterface
 {
 	GENERATED_BODY()
 	
 public:	
 	AContainer();
+
+	/* Save Interface */
+	virtual void LoadActor_Implementation() override;
+	/* Save Interface */
 
 	#if WITH_EDITOR
 		virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
@@ -34,7 +39,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ToggleContainerLid(bool bOpen);
 	
-	void BuildContainerLoot() const;
+	void BuildContainerLoot();
 	
 	UFUNCTION(Server, Reliable)
 	void ServerStopInteracting(AActor* InteractingActor);
@@ -55,6 +60,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Container")
 	TObjectPtr<UContainerComponent> Container;
+
+	UPROPERTY(SaveGame)
+	TArray<FInventoryItemData> Items;
+	
+	UPROPERTY(SaveGame)
+	bool bInitialized = false;
 
 	UPROPERTY(EditInstanceOnly, Category="Container|Initialization")
 	UContainerData* ContainerData = nullptr;
