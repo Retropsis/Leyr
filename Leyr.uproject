@@ -18,7 +18,8 @@
 				"EnhancedInput",
 				"AIModule",
 				"Niagara",
-				"ModelViewViewModel"
+				"ModelViewViewModel",
+				"CommonUI"
 			]
 		}
 	],
