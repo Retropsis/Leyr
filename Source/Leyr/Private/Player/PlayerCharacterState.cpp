@@ -44,7 +44,7 @@ void APlayerCharacterState::AddToXP(int32 InXP)
 void APlayerCharacterState::AddToLevel(int32 InLevel)
 {
 	Level += InLevel;
-	OnLevelChangedDelegate.Broadcast(Level);
+	OnLevelChangedDelegate.Broadcast(Level, true);
 }
 
 void APlayerCharacterState::SetXP(int32 InXP)
@@ -56,7 +56,19 @@ void APlayerCharacterState::SetXP(int32 InXP)
 void APlayerCharacterState::SetLevel(int32 InLevel)
 {
 	Level = InLevel;
-	OnLevelChangedDelegate.Broadcast(Level);
+	OnLevelChangedDelegate.Broadcast(Level, false);
+}
+
+void APlayerCharacterState::SetAttributePoints(int32 InPoints)
+{
+	AttributePoints = InPoints;
+	OnAttributePointsChangedDelegate.Broadcast(AttributePoints);
+}
+
+void APlayerCharacterState::SetSkillPoints(int32 InPoints)
+{
+	SkillPoints = InPoints;
+	OnSkillPointsChangedDelegate.Broadcast(SkillPoints);
 }
 
 void APlayerCharacterState::AddToAttributePoints(int32 InPoints)
@@ -78,7 +90,7 @@ void APlayerCharacterState::OnRep_XP(int32 OldXP)
 
 void APlayerCharacterState::OnRep_Level(int32 OldLevel)
 {
-	OnLevelChangedDelegate.Broadcast(Level);
+	OnLevelChangedDelegate.Broadcast(Level, true);
 }
 
 void APlayerCharacterState::OnRep_AttributePoints(int32 OldAttributePoints)

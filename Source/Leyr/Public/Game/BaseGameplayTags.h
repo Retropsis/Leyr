@@ -138,7 +138,9 @@ TArray<FGameplayTag> AlterationEffects;
   */
 FGameplayTag Abilities_None;
 FGameplayTag Abilities_Attack;
+FGameplayTag Abilities_Dodge;
 FGameplayTag Abilities_Parry;
+FGameplayTag Abilities_Roll;
 FGameplayTag Abilities_Block;
 FGameplayTag Abilities_Summon;
 FGameplayTag Abilities_HitReact;
@@ -155,6 +157,7 @@ FGameplayTag Abilities_Cure_1;
 FGameplayTag Abilities_Cure_2;
 
 FGameplayTag Abilities_Passive;
+FGameplayTag Abilities_Passive_ListenForEvent;
 FGameplayTag Abilities_Passive_Mastery;
 FGameplayTag Abilities_Passive_Mastery_Sword;
 FGameplayTag Abilities_Passive_Mastery_Dagger;
@@ -178,6 +181,8 @@ FGameplayTag Abilities_Status_Equipped;
 FGameplayTag Abilities_Type_Offensive;
 FGameplayTag Abilities_Type_Passive;
 FGameplayTag Abilities_Type_None;
+FGameplayTag Abilities_Type_ActionSlot;
+FGameplayTag Abilities_Type_PassiveSlot;
 
  /*
   * Player Abilities
@@ -227,7 +232,6 @@ FGameplayTag Abilities_Throw_2;
  /*
   * AI Abilities
   */
-FGameplayTag Abilities_Dodge;
 FGameplayTag Abilities_JumpToLocation;
 FGameplayTag Abilities_Range_GroundBurst;
 

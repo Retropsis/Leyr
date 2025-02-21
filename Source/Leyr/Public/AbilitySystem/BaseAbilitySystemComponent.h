@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "BaseAbilitySystemComponent.generated.h"
 
+class ULoadMenuSaveGame;
 // TODO: Could do it for GrantedTags as well ?
 DECLARE_MULTICAST_DELEGATE_OneParam(FEffectAssetTags, const FGameplayTagContainer& /*AssetTags*/);
 DECLARE_MULTICAST_DELEGATE(FAbilitiesGiven);
@@ -26,6 +27,7 @@ class LEYR_API UBaseAbilitySystemComponent : public UAbilitySystemComponent
 	
 public:
 	void AbilityActorInfoSet();
+	void AddCharacterAbilitiesFromSaveData(ULoadMenuSaveGame* SaveData);
 	void AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities);
 	void AddCharacterPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupPassiveAbilities);
 	void AddCharacterCommonAbilities(const TArray<TSubclassOf<UGameplayAbility>>& CommonAbilities);

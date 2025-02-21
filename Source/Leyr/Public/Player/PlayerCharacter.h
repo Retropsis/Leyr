@@ -126,6 +126,9 @@ public:
 	virtual void ReduceWalkSpeed_Implementation(float AmountToReduce) override;
 	virtual void SetWalkSpeed_Implementation(float NewSpeed) override;
 	virtual void ToggleAiming_Implementation(bool bAiming) override;
+
+	virtual void SaveProgress_Implementation(const FName& SavePointTag) override;
+	void LoadProgress();
 	/** end Player Interface */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -276,6 +279,11 @@ private:
 
 	UPROPERTY()
 	APawn* Elevator = nullptr;
+
+	UPROPERTY(EditDefaultsOnly)
+	float DefeatTime = 5.f;
+
+	FTimerHandle DefeatTimer;
 
 public:
 	FORCEINLINE bool IsAirborne() const { return bAirborne; }

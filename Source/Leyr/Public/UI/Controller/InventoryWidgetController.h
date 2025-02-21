@@ -20,8 +20,13 @@ struct FEquippedItem
 {
 	GENERATED_BODY()
 
+	UPROPERTY()
 	FInventoryItemData ItemData = FInventoryItemData();
+	
+	UPROPERTY()
 	TArray<FGameplayTag> Abilities;
+	
+	UPROPERTY()
 	TArray<FGameplayModifierInfo> Modifiers;
 };
 
@@ -36,11 +41,19 @@ class LEYR_API UInventoryWidgetController : public UWidgetController
 	GENERATED_BODY()
 
 public:
+	void BroadcastEquippedItems();
 	virtual void BindCallbacksToDependencies() override;
 	void Clear(FGameplayTag InputToClear, FGameplayTag SlotToUnequip);
 	void Assign(FGameplayTag InputToAssign, FGameplayTag SlotToEquip, FEquippedItem& ItemToEquip);
 	UItemData* HasCompatibleItemCostInAmmunitionSlot(const FGameplayTag CostTag);
 	bool HasCompatibleItemCostInInventory(const FGameplayTag CostTag, FInventoryItemData& OutItem) const;
+	TMap<FGameplayTag, FEquippedItem> GetEquippedItems() { return EquippedItems; }
+	void SetupEquippedItems(const TMap<FGameplayTag, FEquippedItem>& ItemsToEquip);
+
+	void UpdateInventorySlots() const;
+	
+	UFUNCTION(BlueprintCallable)
+	void RequestUpdateInventorySlotsOnce();
 
 	UFUNCTION(BlueprintCallable)
 	void AssignButtonPressed(FInventoryItemData ItemData, const FGameplayTag InputTag);
@@ -98,4 +111,5 @@ private:
 	TMap<FGameplayTag, FEquippedItem> PreviouslyEquippedItems;
 	FActiveGameplayEffectHandle ActiveEquipmentEffectHandle;
 	bool bContainerIsOpen = false;
+	bool bRequestUpdateInventorySlots = true;
 };

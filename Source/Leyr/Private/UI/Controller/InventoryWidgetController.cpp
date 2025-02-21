@@ -7,12 +7,13 @@
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AbilitySystem/Data/LevelUpInfo.h"
-#include "AI/BaseCharacter.h"
 #include "Data/InventoryCostData.h"
 #include "Game/BaseGameplayTags.h"
+#include "Game/LeyrGameInstance.h"
+#include "Game/LeyrGameMode.h"
+#include "Game/LoadMenuSaveGame.h"
 #include "Inventory/InventoryComponent.h"
-#include "Player/PlayerCharacter.h"
-#include "Player/PlayerCharacterController.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/PlayerCharacterState.h"
 
 void UInventoryWidgetController::BindCallbacksToDependencies()
@@ -40,13 +41,20 @@ void UInventoryWidgetController::BindCallbacksToDependencies()
 	
 	GetBasePS()->OnXPChangedDelegate.AddUObject(this, &UInventoryWidgetController::OnXPChanged);
 	GetBasePS()->OnLevelChangedDelegate.AddLambda(
-		[this](int32 NewLevel)
+		[this](int32 NewLevel, bool bLevelUp)
 		{
 			OnPlayerLevelChanged.Broadcast(NewLevel);
 		}
 	);
-	
+
+	const ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this));
+	const ULeyrGameInstance* LeyrGameInstance = Cast<ULeyrGameInstance>(LeyrGameMode->GetGameInstance());
+	if (const ULoadMenuSaveGame* SaveGame = LeyrGameMode->GetSaveSlotData(LeyrGameInstance->LoadSlotName, LeyrGameInstance->LoadSlotIndex))
+	{
+		EquippedItems = SaveGame->SavedEquippedItems;
+	}
 	UpdateEquipmentEffect();
+	UpdateItemAbilities();
 	UpdateMonkAbility();
 }
 
@@ -209,6 +217,39 @@ bool UInventoryWidgetController::HasCompatibleItemCostInInventory(const FGamepla
 		}
 	}
 	return false;
+}
+
+void UInventoryWidgetController::SetupEquippedItems(const TMap<FGameplayTag, FEquippedItem>& ItemsToEquip)
+{
+	EquippedItems = ItemsToEquip;
+}
+
+void UInventoryWidgetController::UpdateInventorySlots() const
+{
+	InventoryComponent->UpdateInventorySlots();
+}
+
+void UInventoryWidgetController::RequestUpdateInventorySlotsOnce()
+{
+	if (bRequestUpdateInventorySlots)
+	{
+		InventoryComponent->UpdateInventorySlots();
+		BroadcastEquippedItems();
+		bRequestUpdateInventorySlots = false;
+	}
+}
+
+void UInventoryWidgetController::BroadcastEquippedItems()
+{
+	for (TTuple<FGameplayTag, FEquippedItem> Item : EquippedItems)
+	{
+		const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+		if(Item.Key.MatchesTag(GameplayTags.Equipment_ActionSlot))
+		{
+			OnInputAssigned.Broadcast(Item.Value.ItemData, GameplayTags.EquipmentSlotToInputTags[Item.Key]);
+		}
+		OnItemEquipped.Broadcast(Item.Key, Item.Value.ItemData);
+	}
 }
 
 /*

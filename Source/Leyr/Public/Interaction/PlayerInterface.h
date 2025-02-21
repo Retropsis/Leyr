@@ -148,4 +148,10 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void HandleOverlapZone(ECombatState NewState, bool bEndOverlap);
+
+	/*
+	 * Saving
+	 */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SaveProgress(const FName& SavePointTag);
 };

@@ -1,6 +1,8 @@
 // @ Retropsis 2024-2025.
 
 #include "UI/ViewModel/MVVM_LoadMenu.h"
+
+#include "Game/LeyrGameInstance.h"
 #include "Game/LeyrGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/ViewModel/MVVM_LoadSlot.h"
@@ -26,12 +28,16 @@ void UMVVM_LoadMenu::InitializeLoadSlots()
 void UMVVM_LoadMenu::LoadData()
 {
 	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this));
+	if (!IsValid(LeyrGameMode)) return;;
+	
 	for (TTuple<int32, UMVVM_LoadSlot*> LoadSlot : LoadSlots)
 	{
 		const ULoadMenuSaveGame* SaveObject = LeyrGameMode->GetSaveSlotData(LoadSlot.Value->GetLoadSlotName(), LoadSlot.Key);
 		LoadSlot.Value->SetPlayerName(SaveObject->PlayerName);
 		LoadSlot.Value->SetMapName(SaveObject->MapName);
+		LoadSlot.Value->SetPlayerLevel(SaveObject->Level);
 		LoadSlot.Value->SlotStatus =  SaveObject->SaveSlotStatus;
+		LoadSlot.Value->PlayerStartTag =  SaveObject->PlayerStartTag;
 		LoadSlot.Value->InitializeSlot();
 	}
 }
@@ -44,12 +50,26 @@ UMVVM_LoadSlot* UMVVM_LoadMenu::GetLoadSlotViewModelByIndex(int32 Index) const
 void UMVVM_LoadMenu::NewSlotButtonPressed(int32 SlotIndex, const FString& EnteredName)
 {
 	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this));
+	if (!IsValid(LeyrGameMode))
+	{
+		GEngine->AddOnScreenDebugMessage(1, 15.f, FColor::Magenta, FString("Switch to Single Player"));
+		return;
+	}
+	
 	LoadSlots[SlotIndex]->SetMapName(LeyrGameMode->DefaultMapName);
 	LoadSlots[SlotIndex]->SetPlayerName(EnteredName);
+	LoadSlots[SlotIndex]->SetPlayerLevel(1);
 	LoadSlots[SlotIndex]->SlotStatus = Taken;
+	LoadSlots[SlotIndex]->PlayerStartTag = LeyrGameMode->DefaultPlayerStartTag;
+	LoadSlots[SlotIndex]->MapAssetName = LeyrGameMode->DefaultMap.ToSoftObjectPath().GetAssetName();
 	
 	LeyrGameMode->SaveSlotData(LoadSlots[SlotIndex], SlotIndex);
 	LoadSlots[SlotIndex]->InitializeSlot();
+
+	ULeyrGameInstance* LeyrGameInstance = Cast<ULeyrGameInstance>(LeyrGameMode->GetGameInstance());
+	LeyrGameInstance->LoadSlotName = LoadSlots[SlotIndex]->GetLoadSlotName();
+	LeyrGameInstance->LoadSlotIndex = LoadSlots[SlotIndex]->SlotIndex;
+	LeyrGameInstance->PlayerStartTag = LeyrGameMode->DefaultPlayerStartTag;
 }
 
 void UMVVM_LoadMenu::NewGameButtonPressed(int32 SlotIndex)
@@ -81,5 +101,10 @@ void UMVVM_LoadMenu::DeleteButtonPressed()
 void UMVVM_LoadMenu::PlayButtonPressed()
 {
 	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this));
+	ULeyrGameInstance* LeyrGameInstance = Cast<ULeyrGameInstance>(LeyrGameMode->GetGameInstance());
+	LeyrGameInstance->PlayerStartTag = SelectedSlot->PlayerStartTag;
+	LeyrGameInstance->LoadSlotName = SelectedSlot->GetLoadSlotName();
+	LeyrGameInstance->LoadSlotIndex = SelectedSlot->SlotIndex;
+	
 	if(IsValid(SelectedSlot)) LeyrGameMode->TravelToMap(SelectedSlot);
 }

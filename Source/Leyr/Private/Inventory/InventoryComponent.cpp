@@ -158,6 +158,14 @@ void UInventoryComponent::SetInventorySize(int32 Size)
 	Items.SetNum(Size, EAllowShrinking::No);
 }
 
+void UInventoryComponent::UpdateInventorySlots()
+{
+	for (int i = 0; i < Items.Num(); ++i)
+	{
+		if(Items[i].ID != 0) UpdateInventorySlotUI(i, Items[i]);
+	}
+}
+
 bool UInventoryComponent::FindEmptySlot(int32& EmptySlotIndex)
 {
 	for (int i = 0; i < Items.Num(); ++i)

@@ -46,6 +46,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Map Info")
 	FString DefaultMapName;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Map Info")
+	FName DefaultPlayerStartTag;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Map Info")
 	TSoftObjectPtr<UWorld> DefaultMap;
@@ -71,9 +74,17 @@ public:
 
 	void SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex);
 	ULoadMenuSaveGame* GetSaveSlotData(const FString& SlotName, int32 SlotIndex) const;
+	ULoadMenuSaveGame* RetrieveInGameSaveData() const;
+	void SaveInGameProgressData(ULoadMenuSaveGame* SaveObject) const;
+
+	void SaveWorldState(UWorld* World, const FString& DestinationMapAssetName = FString("")) const;
+	void LoadWorldState(UWorld* World) const;
+	FString GetMapNameFromMapAssetName(const FString& MapAssetName) const;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<USaveGame> LoadMenuSaveGameClass;
+
+	void PlayerDefeated(ACharacter* Character);
 
 protected:
 	virtual void BeginPlay() override;

@@ -7,11 +7,39 @@
 #include "AbilitySystem/Ability/BaseGameplayAbility.h"
 #include "AbilitySystem/Data/AbilityInfo.h"
 #include "Game/BaseGameplayTags.h"
+#include "Game/LoadMenuSaveGame.h"
 #include "Interaction/PlayerInterface.h"
 
 void UBaseAbilitySystemComponent::AbilityActorInfoSet()
 {
 	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &UBaseAbilitySystemComponent::ClientEffectApplied);
+}
+
+void UBaseAbilitySystemComponent::AddCharacterAbilitiesFromSaveData(ULoadMenuSaveGame* SaveData)
+{
+	for (const FAbilitySaveData& SavedAbility : SaveData->SavedAbilities)
+	{		
+		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(SavedAbility.GameplayAbility, SavedAbility.AbilityLevel);
+		AbilitySpec.DynamicAbilityTags.AddTag(SavedAbility.AbilityInput);
+		AbilitySpec.DynamicAbilityTags.AddTag(SavedAbility.AbilityStatus);
+		if (SavedAbility.AbilityType == FBaseGameplayTags::Get().Abilities_Type_Offensive)
+		{
+			GiveAbility(AbilitySpec);
+		}
+		if (SavedAbility.AbilityType == FBaseGameplayTags::Get().Abilities_Type_Passive)
+		{
+			if (SavedAbility.AbilityStatus.MatchesTagExact(FBaseGameplayTags::Get().Abilities_Status_Equipped))
+			{
+				GiveAbilityAndActivateOnce(AbilitySpec);
+			}
+			else
+			{
+				GiveAbility(AbilitySpec);
+			}
+		}
+	}
+	bStartupAbilitiesGiven = true;
+	AbilitiesGivenDelegate.Broadcast();
 }
 
 void UBaseAbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupAbilities)
@@ -35,6 +63,7 @@ void UBaseAbilitySystemComponent::AddCharacterPassiveAbilities(const TArray<TSub
 	for (const TSubclassOf<UGameplayAbility> AbilityClass : StartupPassiveAbilities)
 	{
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
+		AbilitySpec.DynamicAbilityTags.AddTag(FBaseGameplayTags::Get().Abilities_Status_Equipped);
 		GiveAbilityAndActivateOnce(AbilitySpec);
 	}
 }
@@ -308,6 +337,10 @@ void UBaseAbilitySystemComponent::ServerEquipAbility_Implementation(const FGamep
 				AbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.Abilities_Status_Equipped);
 			}
 			MarkAbilitySpecDirty(*AbilitySpec);
+
+			//TODO: This should be added is passive ability are added from course
+			// AbilitySpec->DynamicAbilityTags.RemoveTag(GetStatusFromSpec(*AbilitySpec));
+			// AbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.Abilities_Status_Equipped);
 		}
 		ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, Slot, PreviousSlot);
 	}

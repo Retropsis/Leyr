@@ -142,6 +142,8 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	 */
 	GameplayTags.Abilities_None = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.None"), FString("None"));
 	GameplayTags.Abilities_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Attack"), FString("Melee Attack"));
+	GameplayTags.Abilities_Dodge = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Dodge"), FString("Abilities Dodge"));
+	GameplayTags.Abilities_Roll = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Roll"), FString("Abilities Roll"));
 	GameplayTags.Abilities_Parry = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Parry"), FString("Melee Parry"));
 	GameplayTags.Abilities_Block = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Block"), FString("Melee Block"));
 	GameplayTags.Abilities_Summon = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Summon"), FString("Ability Summon"));
@@ -161,6 +163,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.HitReact"), FString("HitReact Ability Effect"));
 	
 	GameplayTags.Abilities_Passive = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive"), FString("Passive Ability"));
+	GameplayTags.Abilities_Passive_ListenForEvent = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.ListenForEvent"), FString("Passive Ability ListenForEvent"));
 	GameplayTags.Abilities_Passive_Mastery = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery"), FString("Passive Ability Mastery"));
 	GameplayTags.Abilities_Passive_Mastery_Sword = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery.Sword"), FString("Sword Mastery"));
 	GameplayTags.Abilities_Passive_Mastery_Dagger = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery.Dagger"), FString("Dagger Mastery"));
@@ -184,6 +187,8 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_Type_None = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Type.None"), FString("Abilities Type None"));
 	GameplayTags.Abilities_Type_Offensive = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Type.Offensive"), FString("Abilities Type Offensive"));
 	GameplayTags.Abilities_Type_Passive = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Type.Passive"), FString("Abilities Type Passive"));
+	GameplayTags.Abilities_Type_ActionSlot = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Type.ActionSlot"), FString("Abilities Type ActionSlot"));
+	GameplayTags.Abilities_Type_PassiveSlot = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Type.PassiveSlot"), FString("Abilities Type PassiveSlot"));
 
 	/*
 	 * Fighting
@@ -248,7 +253,6 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	/*
 	 * AI Abilities
 	 */
-	GameplayTags.Abilities_Dodge = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Dodge"), FString("Abilities Dodge"));
 	GameplayTags.Abilities_JumpToLocation = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.JumpToLocation"), FString("Abilities JumpToLocation"));
 	GameplayTags.Abilities_Range_GroundBurst = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Range.GroundBurst"), FString("Abilities Range GroundBurst"));
 	

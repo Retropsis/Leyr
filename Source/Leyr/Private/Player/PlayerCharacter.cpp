@@ -26,10 +26,15 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "NiagaraComponent.h"
 #include "PaperFlipbookComponent.h"
+#include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
+#include "AbilitySystem/Data/AbilityInfo.h"
 #include "AbilitySystem/Data/CharacterInfo.h"
 #include "Data/InventoryCostData.h"
+#include "Game/LeyrGameMode.h"
+#include "Game/LoadMenuSaveGame.h"
 #include "Interaction/ElevatorInterface.h"
+#include "Kismet/GameplayStatics.h"
 #include "UI/Controller/InventoryWidgetController.h"
 #include "World/Map/ParallaxController.h"
 
@@ -139,7 +144,13 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 	// Init Ability Actor Info Server Side
 	InitAbilityActorInfo();
 	InitializeCharacterInfo();
-	AddCharacterAbilities();
+	LoadProgress();
+	
+	if (ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this)))
+	{
+		LeyrGameMode->LoadWorldState(GetWorld());
+	}
+	
 	GetCharacterMovement()->MaxWalkSpeed = BaseRunSpeed;
 	GetCharacterMovement()->GravityScale = BaseGravityScale;
 	OnCharacterMovementUpdated.AddDynamic(this, &APlayerCharacter::HandleCharacterMovementUpdated);
@@ -220,7 +231,6 @@ void APlayerCharacter::InitAbilityActorInfo()
 			PlayerHUD->InitOverlay(PlayerCharacterController, PlayerCharacterState, AbilitySystemComponent, AttributeSet);
 		}
 	}
-	InitializeDefaultAttributes();
 
 	//TODO: Move this to some other (PlayerState, BeginPlay)
 	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::HitReactTagChanged);
@@ -794,6 +804,104 @@ void APlayerCharacter::ToggleAiming_Implementation(bool bAiming)
 }
 
 /*
+ * Saving / Loading
+ */
+void APlayerCharacter::SaveProgress_Implementation(const FName& SavePointTag)
+{
+	if (const ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this)))
+	{
+		ULoadMenuSaveGame* SaveData = LeyrGameMode->RetrieveInGameSaveData();
+		if(SaveData == nullptr) return;
+
+		SaveData->PlayerStartTag = SavePointTag;
+
+		if (APlayerCharacterState* PlayerCharacterState = Cast<APlayerCharacterState>(GetPlayerState()))
+		{
+			SaveData->Level = PlayerCharacterState->GetCharacterLevel();
+			SaveData->Experience = PlayerCharacterState->GetXP();
+			SaveData->SkillPoints = PlayerCharacterState->GetSkillPoints();
+			SaveData->AttributePoints = PlayerCharacterState->GetAttributePoints();
+		}
+		SaveData->Strength = UBaseAttributeSet::GetStrengthAttribute().GetNumericValue(GetAttributeSet());
+		SaveData->Dexterity = UBaseAttributeSet::GetDexterityAttribute().GetNumericValue(GetAttributeSet());
+		SaveData->Vitality = UBaseAttributeSet::GetVitalityAttribute().GetNumericValue(GetAttributeSet());
+		SaveData->Intelligence = UBaseAttributeSet::GetIntelligenceAttribute().GetNumericValue(GetAttributeSet());
+		SaveData->Wisdom = UBaseAttributeSet::GetWisdomAttribute().GetNumericValue(GetAttributeSet());
+		SaveData->Spirit = UBaseAttributeSet::GetSpiritAttribute().GetNumericValue(GetAttributeSet());
+
+		SaveData->bFirstTimeLoadIn = false;
+
+		if(!HasAuthority()) return;
+
+		SaveData->SavedItems = PlayerInventory->Items;
+	
+		if(APlayerCharacterController* PlayerCharacterController = Cast<APlayerCharacterController>(Controller))
+		{
+			if(UInventoryWidgetController* IC =PlayerCharacterController->GetInventoryWidgetController())
+			{
+				SaveData->SavedEquippedItems = IC->GetEquippedItems();
+			}
+		}
+
+		UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent);
+		FForEachAbility SaveAbilityDelegate;
+		SaveData->SavedAbilities.Empty();
+		SaveAbilityDelegate.BindLambda([this, BaseASC, SaveData] (const FGameplayAbilitySpec& AbilitySpec)
+		{
+			const FGameplayTag AbilityTag = BaseASC->GetAbilityTagFromSpec(AbilitySpec);
+			const UAbilityInfo* AbilityInfo = ULeyrAbilitySystemLibrary::GetAbilityInfo(this);
+			const FBaseAbilityInfo Info = AbilityInfo->FindAbilityInfoForTag(AbilityTag);
+			
+			FAbilitySaveData AbilitySaveData;
+			AbilitySaveData.GameplayAbility = Info.Ability;
+			AbilitySaveData.AbilityLevel = AbilitySpec.Level;
+			AbilitySaveData.AbilityInput = BaseASC->GetInputTagFromAbilityTag(AbilityTag);
+			AbilitySaveData.AbilityStatus = BaseASC->GetStatusFromAbilityTag(AbilityTag);
+			AbilitySaveData.AbilityTag = AbilityTag;
+			AbilitySaveData.AbilityType = Info.AbilityType;
+
+			SaveData->SavedAbilities.AddUnique(AbilitySaveData);
+		});
+		BaseASC->ForEachAbility(SaveAbilityDelegate);
+		
+		LeyrGameMode->SaveInGameProgressData(SaveData);
+	}
+}
+
+void APlayerCharacter::LoadProgress()
+{
+	if (const ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this)))
+	{
+		ULoadMenuSaveGame* SaveData = LeyrGameMode->RetrieveInGameSaveData();
+		if(SaveData == nullptr) return;
+
+		
+		if (SaveData->bFirstTimeLoadIn)
+		{
+			InitializeDefaultAttributes();
+			AddCharacterAbilities();
+		}
+		else
+		{
+			if (UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent))
+			{
+				BaseASC->AddCharacterAbilitiesFromSaveData(SaveData);
+			}			
+			if (APlayerCharacterState* PlayerCharacterState = Cast<APlayerCharacterState>(GetPlayerState()))
+			{
+				PlayerCharacterState->SetLevel(SaveData->Level);
+				PlayerCharacterState->SetXP(SaveData->Experience);
+				PlayerCharacterState->SetSkillPoints(SaveData->SkillPoints);
+				PlayerCharacterState->SetAttributePoints(SaveData->AttributePoints);
+			}
+			ULeyrAbilitySystemLibrary::InitializeCharacterAttributesFromSaveData(this, GetAbilitySystemComponent(), SaveData);
+
+			PlayerInventory->Items = SaveData->SavedItems;
+		}
+	}
+}
+
+/*
  * Platform Traces
  */
 void APlayerCharacter::TraceForPlatforms() const
@@ -1177,4 +1285,15 @@ void APlayerCharacter::Die(const FVector& DeathImpulse, bool bExecute)
 {
 	Super::Die(DeathImpulse, bExecute);
 	HandleCombatState(ECombatState::Defeated);
+
+	FTimerDelegate DefeatTimerDelegate;
+	DefeatTimerDelegate.BindLambda([this] ()
+	{
+		if (ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this)))
+		{
+			LeyrGameMode->PlayerDefeated(this);
+		}
+	});
+	GetWorldTimerManager().SetTimer(DefeatTimer, DefeatTimerDelegate, DefeatTime, false);
+	FollowCamera->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 }

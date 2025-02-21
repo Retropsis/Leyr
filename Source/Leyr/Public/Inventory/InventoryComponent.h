@@ -69,6 +69,7 @@ public:
 	void UpdateInventorySlotUI(int32 SlotIndex, const FInventoryItemData& ItemData) const;
 	void ResetInventorySlotUI(int32 SlotIndex, const FInventoryItemData& ItemData) const;
 	void SetInventorySize(int32 Size);
+	void UpdateInventorySlots();
 
 	FOnItemQuantityUpdatedSignature OnItemQuantityUpdated;
 	// FOnItemAddedSignature OnItemAdded;
