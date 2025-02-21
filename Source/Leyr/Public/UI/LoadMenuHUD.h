@@ -6,8 +6,8 @@
 #include "GameFramework/HUD.h"
 #include "LoadMenuHUD.generated.h"
 
+class UCommonLoadMenuWidget;
 class UMVVM_LoadMenu;
-class ULoadMenuWidget;
 /**
  * 
  */
@@ -21,7 +21,7 @@ public:
 	TSubclassOf<UUserWidget> LoadMenuWidgetClass;
 
 	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<ULoadMenuWidget> LoadMenuWidget;
+	TObjectPtr<UCommonLoadMenuWidget> LoadMenuWidget;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UMVVM_LoadMenu> LoadMenuViewModelClass;
