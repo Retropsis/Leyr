@@ -27,6 +27,9 @@ public:
 	
 	void InitializeSlot();
 
+	UFUNCTION(BlueprintPure)
+	ESaveSlotStatus GetSlotStatus() const { return SlotStatus; }
+
 	UPROPERTY()
 	TEnumAsByte<ESaveSlotStatus> SlotStatus;
 
