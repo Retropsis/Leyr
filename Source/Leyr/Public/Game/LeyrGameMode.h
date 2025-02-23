@@ -84,7 +84,11 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<USaveGame> LoadMenuSaveGameClass;
 
+	UFUNCTION(BlueprintCallable)
 	void PlayerDefeated(ACharacter* Character);
+	
+	UFUNCTION(BlueprintCallable)
+	void BackToMainMenu(ACharacter* Character);
 
 protected:
 	virtual void BeginPlay() override;

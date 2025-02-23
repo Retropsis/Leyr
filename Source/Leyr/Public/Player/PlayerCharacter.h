@@ -281,7 +281,7 @@ private:
 	APawn* Elevator = nullptr;
 
 	UPROPERTY(EditDefaultsOnly)
-	float DefeatTime = 5.f;
+	float DefeatTime = 2.f;
 
 	FTimerHandle DefeatTimer;
 

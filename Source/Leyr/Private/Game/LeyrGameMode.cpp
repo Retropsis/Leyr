@@ -241,5 +241,10 @@ void ALeyrGameMode::PlayerDefeated(ACharacter* Character)
 	ULoadMenuSaveGame* SaveGame = RetrieveInGameSaveData();
 	if (!IsValid(SaveGame)) return;
 
-	UGameplayStatics::OpenLevel(Character, FName(SaveGame->MapName));
+	UGameplayStatics::OpenLevel(Character, FName(SaveGame->MapAssetName));
+}
+
+void ALeyrGameMode::BackToMainMenu(ACharacter* Character)
+{
+	UGameplayStatics::OpenLevel(Character, FName("MainMenu"));
 }

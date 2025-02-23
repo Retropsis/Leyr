@@ -1291,9 +1291,17 @@ void APlayerCharacter::Die(const FVector& DeathImpulse, bool bExecute)
 	{
 		if (ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this)))
 		{
-			LeyrGameMode->PlayerDefeated(this);
+			// LeyrGameMode->PlayerDefeated(this);
+			if (APlayerCharacterController* PlayerCharacterController = Cast<APlayerCharacterController>(Controller))
+			{
+				if (APlayerHUD* PlayerHUD = Cast<APlayerHUD>(PlayerCharacterController->GetHUD()))
+				{
+					if(IsValid(PlayerHUD)) PlayerHUD->PlayerDefeated();
+				}
+			}
 		}
 	});
 	GetWorldTimerManager().SetTimer(DefeatTimer, DefeatTimerDelegate, DefeatTime, false);
+	
 	FollowCamera->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 }

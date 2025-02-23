@@ -2,6 +2,7 @@
 
 #include "UI/PlayerHUD.h"
 
+#include "CommonActivatableWidget.h"
 #include "UI/Controller/AttributeMenuWidgetController.h"
 #include "UI/Controller/OverlayWidgetController.h"
 #include "UI/Controller/SkillMenuWidgetController.h"
@@ -55,6 +56,17 @@ void APlayerHUD::InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySy
 	WidgetController->BroadcastInitialValues();
 	
 	Widget->AddToViewport();
+}
+
+void APlayerHUD::PlayerDefeated()
+{
+	checkf(PlayerDefeatWidgetClass, TEXT("Player Defeat Widget Class uninitialized, please fill out BP_PlayerHUD"));
+
+	if (UWorld* World = GetWorld())
+	{
+		PlayerDefeatWidget = CreateWidget<UCommonActivatableWidget>(World, PlayerDefeatWidgetClass);
+		PlayerDefeatWidget->AddToViewport();
+	}
 }
 
 void APlayerHUD::ToggleInventory()

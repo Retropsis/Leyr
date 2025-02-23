@@ -404,7 +404,7 @@ void UInventoryWidgetController::UpdateItemAbilities()
 			if (!PreviouslyEquippedItems.Contains(EquippedItem.Key))
 			{
 				// Add
-				ULeyrAbilitySystemLibrary::UpdateAbilities(this, AbilitySystemComponent, EquippedItem.Value.ItemData.Asset.Get(), GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key], EquippedItem.Value.Abilities);
+				ULeyrAbilitySystemLibrary::UpdateAbilities(this, AbilitySystemComponent, EquippedItem.Value.ItemData.Asset.LoadSynchronous(), GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key], EquippedItem.Value.Abilities);
 			}
 		}
 	}

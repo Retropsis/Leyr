@@ -475,7 +475,13 @@ void AAICharacter::SetShouldAttack_Implementation(bool InShouldAttack)
 void AAICharacter::ShouldAttack(bool InShouldAttack)
 {
 	bShouldAttack = InShouldAttack;
-	if(BaseAIController) BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("ShouldAttack"), InShouldAttack);
+	if(IsValid(BaseAIController))
+	{
+		if (UBlackboardComponent* BlackboardComponent = BaseAIController->GetBlackboardComponent())
+		{
+			BlackboardComponent->SetValueAsBool(FName("ShouldAttack"), InShouldAttack);
+		}
+	}
 }
 
 void AAICharacter::CauseDamage(AActor* TargetActor)

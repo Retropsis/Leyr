@@ -1,7 +1,6 @@
 // @ Retropsis 2024-2025.
 
 #include "UI/ViewModel/MVVM_LoadMenu.h"
-
 #include "Game/LeyrGameInstance.h"
 #include "Game/LeyrGameMode.h"
 #include "Kismet/GameplayStatics.h"
@@ -108,11 +107,14 @@ void UMVVM_LoadMenu::DeleteButtonPressed()
 
 void UMVVM_LoadMenu::PlayButtonPressed()
 {
-	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this));
-	ULeyrGameInstance* LeyrGameInstance = Cast<ULeyrGameInstance>(LeyrGameMode->GetGameInstance());
-	LeyrGameInstance->PlayerStartTag = SelectedSlot->PlayerStartTag;
-	LeyrGameInstance->LoadSlotName = SelectedSlot->GetLoadSlotName();
-	LeyrGameInstance->LoadSlotIndex = SelectedSlot->SlotIndex;
-	
-	if(IsValid(SelectedSlot) && SelectedSlot->SlotStatus == Taken) LeyrGameMode->TravelToMap(SelectedSlot);
+	if(IsValid(SelectedSlot) && SelectedSlot->SlotStatus == Taken)
+	{
+		ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this));
+		ULeyrGameInstance* LeyrGameInstance = Cast<ULeyrGameInstance>(LeyrGameMode->GetGameInstance());
+		LeyrGameInstance->PlayerStartTag = SelectedSlot->PlayerStartTag;
+		LeyrGameInstance->LoadSlotName = SelectedSlot->GetLoadSlotName();
+		LeyrGameInstance->LoadSlotIndex = SelectedSlot->SlotIndex;
+		
+		LeyrGameMode->TravelToMap(SelectedSlot);
+	}
 }

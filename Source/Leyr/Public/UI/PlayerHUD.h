@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "PlayerHUD.generated.h"
 
+class UCommonActivatableWidget;
 class USkillMenuWidgetController;
 class UAttributeMenuWidgetController;
 class UAttributeSet;
@@ -28,6 +29,8 @@ public:
 	USkillMenuWidgetController* GetSkillMenuWidgetController(const FWidgetControllerParams& WCParams);
 	
 	void InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS);
+
+	void PlayerDefeated();
 
 	void ToggleInventory();
 
@@ -66,4 +69,13 @@ private:
 	TSubclassOf<UBaseUserWidget> InventoryWidgetClass;
 
 	bool bIsInventoryOpen = false;
+
+	/*
+	 * Player Defeat
+	*/
+	UPROPERTY()
+	TObjectPtr<UCommonActivatableWidget> PlayerDefeatWidget;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UCommonActivatableWidget>PlayerDefeatWidgetClass;
 };
