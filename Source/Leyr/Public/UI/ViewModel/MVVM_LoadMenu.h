@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "MVVMViewModelBase.h"
+#include "MVVM_LoadSlot.h"
 #include "MVVM_LoadMenu.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSlotSelected);
@@ -27,6 +28,9 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	UMVVM_LoadSlot* GetLoadSlotViewModelByIndex(int32 Index) const;
+	
+	UFUNCTION(BlueprintPure)
+	bool CanDeleteSelectedSlot() const;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UMVVM_LoadSlot> LoadSlotViewModelClass;

@@ -9,6 +9,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSetWidgetSwitcherIndex, int32, WidgetSwitcherIndex);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEnableSelectSlotButton, bool, bEnable);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEnterNameActivated);
 
 /**
  * 
@@ -24,6 +25,9 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 	FEnableSelectSlotButton EnableSelectSlotButton;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnEnterNameActivated OnEnterNameActivated;
 	
 	void InitializeSlot();
 

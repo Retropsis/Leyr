@@ -47,6 +47,13 @@ UMVVM_LoadSlot* UMVVM_LoadMenu::GetLoadSlotViewModelByIndex(int32 Index) const
 	return LoadSlots.FindChecked(Index);
 }
 
+bool UMVVM_LoadMenu::CanDeleteSelectedSlot() const
+{
+	if(!IsValid(SelectedSlot)) return false;
+	
+	return SelectedSlot->SlotStatus == Taken;
+}
+
 void UMVVM_LoadMenu::NewSlotButtonPressed(int32 SlotIndex, const FString& EnteredName)
 {
 	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this));
@@ -75,6 +82,7 @@ void UMVVM_LoadMenu::NewSlotButtonPressed(int32 SlotIndex, const FString& Entere
 void UMVVM_LoadMenu::NewGameButtonPressed(int32 SlotIndex)
 {
 	LoadSlots[SlotIndex]->SetWidgetSwitcherIndex.Broadcast(1);
+	LoadSlots[SlotIndex]->OnEnterNameActivated.Broadcast();
 }
 
 void UMVVM_LoadMenu::SelectSlotButtonPressed(int32 SlotIndex)
@@ -89,7 +97,7 @@ void UMVVM_LoadMenu::SelectSlotButtonPressed(int32 SlotIndex)
 
 void UMVVM_LoadMenu::DeleteButtonPressed()
 {
-	if(IsValid(SelectedSlot))
+	if(IsValid(SelectedSlot) && SelectedSlot->SlotStatus == Taken)
 	{
 		ALeyrGameMode::DeleteSlot(SelectedSlot->GetLoadSlotName(), SelectedSlot->SlotIndex);
 		SelectedSlot->SlotStatus = Vacant;
@@ -106,5 +114,5 @@ void UMVVM_LoadMenu::PlayButtonPressed()
 	LeyrGameInstance->LoadSlotName = SelectedSlot->GetLoadSlotName();
 	LeyrGameInstance->LoadSlotIndex = SelectedSlot->SlotIndex;
 	
-	if(IsValid(SelectedSlot)) LeyrGameMode->TravelToMap(SelectedSlot);
+	if(IsValid(SelectedSlot) && SelectedSlot->SlotStatus == Taken) LeyrGameMode->TravelToMap(SelectedSlot);
 }

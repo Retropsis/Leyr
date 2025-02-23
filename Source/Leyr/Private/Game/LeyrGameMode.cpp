@@ -71,7 +71,7 @@ void ALeyrGameMode::TravelToMap(UMVVM_LoadSlot* Slot)
 	const FString SlotName = Slot->GetLoadSlotName();
 	const int32 SlotIndex = Slot->SlotIndex;
 	
-	;UGameplayStatics::OpenLevelBySoftObjectPtr(Slot, Maps.FindChecked(Slot->GetMapName()));
+	UGameplayStatics::OpenLevelBySoftObjectPtr(Slot, Maps.FindChecked(Slot->GetMapName()));
 }
 
 AActor* ALeyrGameMode::ChoosePlayerStart_Implementation(AController* Player)
