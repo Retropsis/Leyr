@@ -8,6 +8,7 @@
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AbilitySystem/Data/LevelUpInfo.h"
 #include "Data/InventoryCostData.h"
+#include "Engine/AssetManager.h"
 #include "Game/BaseGameplayTags.h"
 #include "Game/LeyrGameInstance.h"
 #include "Game/LeyrGameMode.h"
@@ -404,7 +405,17 @@ void UInventoryWidgetController::UpdateItemAbilities()
 			if (!PreviouslyEquippedItems.Contains(EquippedItem.Key))
 			{
 				// Add
-				ULeyrAbilitySystemLibrary::UpdateAbilities(this, AbilitySystemComponent, EquippedItem.Value.ItemData.Asset.LoadSynchronous(), GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key], EquippedItem.Value.Abilities);
+				TArray<FSoftObjectPath> TargetsToStream;
+				TargetsToStream.Add(EquippedItem.Value.ItemData.Asset.ToSoftObjectPath());
+				
+				UAssetManager::GetStreamableManager().RequestAsyncLoad(EquippedItem.Value.ItemData.Asset.ToSoftObjectPath(), [this, EquippedItem, GameplayTags]() {
+					UItemData* Asset = EquippedItem.Value.ItemData.Asset.Get();
+					if (IsValid(Asset)) {
+						ULeyrAbilitySystemLibrary::UpdateAbilities(
+							this, AbilitySystemComponent, Asset, GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key], EquippedItem.Value.Abilities);
+					}
+				}, FStreamableManager::AsyncLoadHighPriority);
+				
 			}
 		}
 	}

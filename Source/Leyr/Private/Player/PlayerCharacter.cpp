@@ -821,13 +821,15 @@ void APlayerCharacter::SaveProgress_Implementation(const FName& SavePointTag)
 			SaveData->Experience = PlayerCharacterState->GetXP();
 			SaveData->SkillPoints = PlayerCharacterState->GetSkillPoints();
 			SaveData->AttributePoints = PlayerCharacterState->GetAttributePoints();
-		}
-		SaveData->Strength = UBaseAttributeSet::GetStrengthAttribute().GetNumericValue(GetAttributeSet());
-		SaveData->Dexterity = UBaseAttributeSet::GetDexterityAttribute().GetNumericValue(GetAttributeSet());
-		SaveData->Vitality = UBaseAttributeSet::GetVitalityAttribute().GetNumericValue(GetAttributeSet());
-		SaveData->Intelligence = UBaseAttributeSet::GetIntelligenceAttribute().GetNumericValue(GetAttributeSet());
-		SaveData->Wisdom = UBaseAttributeSet::GetWisdomAttribute().GetNumericValue(GetAttributeSet());
-		SaveData->Spirit = UBaseAttributeSet::GetSpiritAttribute().GetNumericValue(GetAttributeSet());
+		}		
+		SaveData->Strength = UBaseAttributeSet::GetStrengthAttribute().GetGameplayAttributeData(GetAttributeSet())->GetBaseValue();
+		SaveData->Dexterity = UBaseAttributeSet::GetDexterityAttribute().GetGameplayAttributeData(GetAttributeSet())->GetBaseValue();
+		SaveData->Vitality = UBaseAttributeSet::GetVitalityAttribute().GetGameplayAttributeData(GetAttributeSet())->GetBaseValue();
+		SaveData->Intelligence = UBaseAttributeSet::GetIntelligenceAttribute().GetGameplayAttributeData(GetAttributeSet())->GetBaseValue();
+		SaveData->Wisdom = UBaseAttributeSet::GetWisdomAttribute().GetGameplayAttributeData(GetAttributeSet())->GetBaseValue();
+		SaveData->Spirit = UBaseAttributeSet::GetSpiritAttribute().GetGameplayAttributeData(GetAttributeSet())->GetBaseValue();
+		
+		
 
 		SaveData->bFirstTimeLoadIn = false;
 
