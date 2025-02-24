@@ -106,6 +106,7 @@ private:
 	void UpdateAmmunitionCounter(FGameplayTag Slot, FEquippedItem EquippedItem) const;
 	void UpdateItemAbilities();
 	void OnXPChanged(int32 NewXP);
+	void AsyncUpdateAbilities(TSoftObjectPtr<UItemData> AssetToLoad, FGameplayTag InputTag, TArray<FGameplayTag> Abilities) const;
 	
 	TMap<FGameplayTag, FEquippedItem> EquippedItems;
 	TMap<FGameplayTag, FEquippedItem> PreviouslyEquippedItems;

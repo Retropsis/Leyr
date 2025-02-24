@@ -363,7 +363,7 @@ void UInventoryWidgetController::UpdateItemAbilities()
 			{
 				if(EquippedItem.Value.ItemData.Asset.Get() != FoundItem->ItemData.Asset.Get())
 				{
-					ULeyrAbilitySystemLibrary::UpdateAbilities(this, AbilitySystemComponent, FoundItem->ItemData.Asset.Get(), GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key], FoundItem->Abilities);
+					AsyncUpdateAbilities(FoundItem->ItemData.Asset, GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key], FoundItem->Abilities);
 				}
 			}
 			// Did it move ?
@@ -374,8 +374,7 @@ void UInventoryWidgetController::UpdateItemAbilities()
 				{
 					if(EquippedItem.Value.ItemData.Asset.Get() == NewlyEquippedItem.Value.ItemData.Asset.Get())
 					{
-						ULeyrAbilitySystemLibrary::UpdateAbilities(this, AbilitySystemComponent, NewlyEquippedItem.Value.ItemData.Asset.Get(),
-							GameplayTags.EquipmentSlotToInputTags[NewlyEquippedItem.Key], NewlyEquippedItem.Value.Abilities);
+						AsyncUpdateAbilities(NewlyEquippedItem.Value.ItemData.Asset, GameplayTags.EquipmentSlotToInputTags[NewlyEquippedItem.Key], NewlyEquippedItem.Value.Abilities);						
 						bItemFound = true;
 						break;
 					}
@@ -405,20 +404,23 @@ void UInventoryWidgetController::UpdateItemAbilities()
 			if (!PreviouslyEquippedItems.Contains(EquippedItem.Key))
 			{
 				// Add
-				TArray<FSoftObjectPath> TargetsToStream;
-				TargetsToStream.Add(EquippedItem.Value.ItemData.Asset.ToSoftObjectPath());
-				
-				UAssetManager::GetStreamableManager().RequestAsyncLoad(EquippedItem.Value.ItemData.Asset.ToSoftObjectPath(), [this, EquippedItem, GameplayTags]() {
-					UItemData* Asset = EquippedItem.Value.ItemData.Asset.Get();
-					if (IsValid(Asset)) {
-						ULeyrAbilitySystemLibrary::UpdateAbilities(
-							this, AbilitySystemComponent, Asset, GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key], EquippedItem.Value.Abilities);
-					}
-				}, FStreamableManager::AsyncLoadHighPriority);
-				
+				AsyncUpdateAbilities(EquippedItem.Value.ItemData.Asset, GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key], EquippedItem.Value.Abilities);
 			}
 		}
 	}
+}
+
+void UInventoryWidgetController::AsyncUpdateAbilities(TSoftObjectPtr<UItemData> AssetToLoad, FGameplayTag InputTag, TArray<FGameplayTag> Abilities) const
+{
+	// TArray<FSoftObjectPath> TargetsToStream;
+	// TargetsToStream.Add(EquippedItem.Value.ItemData.Asset.ToSoftObjectPath());
+	UAssetManager::GetStreamableManager().RequestAsyncLoad(AssetToLoad.ToSoftObjectPath(), [this, AssetToLoad, InputTag, Abilities] () {
+		UItemData* LoadedAsset = AssetToLoad.Get();
+		if (IsValid(LoadedAsset))
+		{
+			ULeyrAbilitySystemLibrary::UpdateAbilities(this, AbilitySystemComponent, LoadedAsset, InputTag, Abilities);
+		}
+	}, FStreamableManager::AsyncLoadHighPriority);
 }
 
 void UInventoryWidgetController::UpdateAmmunitionCounter(FGameplayTag Slot, FEquippedItem EquippedItem) const
