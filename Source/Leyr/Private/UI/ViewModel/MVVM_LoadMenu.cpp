@@ -118,3 +118,8 @@ void UMVVM_LoadMenu::PlayButtonPressed()
 		LeyrGameMode->TravelToMap(SelectedSlot);
 	}
 }
+
+void UMVVM_LoadMenu::CancelEnterName(int32 SlotIndex)
+{
+	LoadSlots[SlotIndex]->SetWidgetSwitcherIndex.Broadcast(0);
+}

@@ -28,6 +28,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	int32 StackSize = 0;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	bool bEquipped = false;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSoftObjectPtr<UItemData> Asset = nullptr;

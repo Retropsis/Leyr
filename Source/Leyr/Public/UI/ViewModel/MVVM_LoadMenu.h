@@ -49,6 +49,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void PlayButtonPressed();
+	
+	UFUNCTION(BlueprintCallable)
+	void CancelEnterName(int32 SlotIndex);
 
 private:
 	UPROPERTY()
