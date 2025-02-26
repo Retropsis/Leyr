@@ -17,6 +17,10 @@ class LEYR_API APulley : public ALever
 public:	
 	APulley();
 
+	//~ Save Interface
+	virtual void LoadActor_Implementation() override;
+	//~ Save Interface
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void Interact_Implementation(AActor* InteractingActor) override;

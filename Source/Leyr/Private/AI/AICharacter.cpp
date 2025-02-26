@@ -18,6 +18,7 @@
 #include "Game/BaseGameplayTags.h"
 #include "Game/LeyrGameMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Interaction/PlayerInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
@@ -313,6 +314,12 @@ void AAICharacter::Die(const FVector& DeathImpulse, bool bExecute)
 	BaseAIController->StopMovement();
 	PassiveIndicatorComponent->DestroyComponent();
 	HealthBar->DestroyComponent();
+	
+	if(CombatTarget)
+	{
+		IPlayerInterface::Execute_ToggleCameraInterpToActor(CombatTarget, nullptr, true);
+	}
+	
 	Super::Die(DeathImpulse, bExecute);
 }
 
@@ -515,11 +522,13 @@ void AAICharacter::HandlePlayerOverlappingArena(AActor* Player, bool bIsEntering
 	if(bIsEntering)
 	{
 		if (IsValid(BaseAIController)) BaseAIController->GetBlackboardComponent()->SetValueAsObject(FName("TargetToFollow"), Player);
+		IPlayerInterface::Execute_ToggleCameraInterpToActor(Player, this, true);
 		CombatTarget = Player;
 	}
 	else
 	{
 		if (IsValid(BaseAIController)) BaseAIController->GetBlackboardComponent()->SetValueAsObject(FName("TargetToFollow"), nullptr);
+		IPlayerInterface::Execute_ToggleCameraInterpToActor(Player, nullptr, true);
 		CombatTarget = nullptr;
 	}
 }

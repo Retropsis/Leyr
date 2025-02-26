@@ -51,7 +51,7 @@ void ALeyrGameMode::DeleteSlot(const FString& SlotName, int32 SlotIndex)
 	}
 }
 
-void ALeyrGameMode::SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex)
+void ALeyrGameMode::SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex) const
 {
 	DeleteSlot(LoadSlot->GetLoadSlotName(), SlotIndex);
 	USaveGame* SaveGameObject = UGameplayStatics::CreateSaveGameObject(LoadMenuSaveGameClass);

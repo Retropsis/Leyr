@@ -13,6 +13,15 @@ ALever::ALever()
 	OverlapBox->SetupAttachment(GetRootComponent());
 }
 
+void ALever::LoadActor_Implementation()
+{
+	if (LeverState == ELeverState::On)
+	{
+		HandleLeverVisualState(LeverState);
+		OnLeverStateChanged.Broadcast(LeverState);
+	}
+}
+
 void ALever::BeginPlay()
 {
 	Super::BeginPlay();

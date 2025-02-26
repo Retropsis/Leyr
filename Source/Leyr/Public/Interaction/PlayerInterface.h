@@ -7,6 +7,7 @@
 #include "UObject/Interface.h"
 #include "PlayerInterface.generated.h"
 
+class UCameraComponent;
 class USpringArmComponent;
 class AContainer;
 enum class ECombatState : uint8;
@@ -34,6 +35,12 @@ public:
 	 */
 	UFUNCTION(BlueprintNativeEvent)
 	USpringArmComponent* GetSpringArmComponent();
+	
+	UFUNCTION(BlueprintNativeEvent)
+	UCameraComponent* GetCameraComponent();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void ToggleCameraInterpToActor(AActor* InActorToFollow, bool bToggle);
 	
 	/*
 	 * Ability System

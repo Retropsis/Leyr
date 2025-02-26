@@ -87,8 +87,8 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	TraceForPlatforms();
 	TraceForLedge();
 	TraceForSlope();
-
 	ForceMove(DeltaSeconds);
+	InterpCameraToActor(DeltaSeconds);
 }
 
 void APlayerCharacter::ForceMove(float DeltaSeconds)
@@ -169,12 +169,39 @@ void APlayerCharacter::InitializeParallaxController()
 {
 	FActorSpawnParameters SpawnParameters;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	if(AParallaxController* ParallaxController = GetWorld()->SpawnActor<AParallaxController>(AParallaxController::StaticClass(), GetActorLocation(), FRotator::ZeroRotator, SpawnParameters))
+	ParallaxController = GetWorld()->SpawnActor<AParallaxController>(AParallaxController::StaticClass(), GetActorLocation(), FRotator::ZeroRotator, SpawnParameters);
+	if(ParallaxController)
 	{
 		ParallaxController->CurrentMapName = FName("Dorn");
 		ParallaxController->InitializeMapParallax(this);
 		ParallaxController->AttachToComponent(SpringArm, FAttachmentTransformRules::KeepWorldTransform);
 	}
+}
+
+void APlayerCharacter::InterpCameraToActor(float DeltaTime)
+{
+	if (!bShouldInterpCameraToActor) return;
+	
+	FTransform AdditiveOffset;
+	float FOV = FollowCamera->FieldOfView;
+	FVector TargetAdditiveOffset = FVector::ZeroVector;
+	float InterpSpeed = 10.f;
+	FollowCamera->GetAdditiveOffset(AdditiveOffset, FOV);
+	FollowCamera->ClearAdditiveOffset();
+	
+	if(ActorToInterp)
+	{
+		const FVector MidPoint{ (ActorToInterp->GetActorLocation() + GetActorLocation()) / 2.f };
+		UKismetSystemLibrary::DrawDebugLine(this, GetActorLocation(), ActorToInterp->GetActorLocation(), FLinearColor::Red);
+		UKismetSystemLibrary::DrawDebugSphere(this, MidPoint, 25.f, 12, FLinearColor::Red);
+		const FVector Delta = MidPoint - GetActorLocation();
+		TargetAdditiveOffset = FVector{ 0.f, Delta.X, Delta.Z };
+		InterpSpeed = 2.f;
+		UKismetSystemLibrary::DrawDebugSphere(this, FollowCamera->GetComponentLocation() + Delta, 25.f, 12, FLinearColor::Green);
+	}
+	CurrentAdditiveOffset = FMath::VInterpTo(AdditiveOffset.GetLocation(), TargetAdditiveOffset, DeltaTime, InterpSpeed);
+	AdditiveOffset.SetLocation(CurrentAdditiveOffset);
+	FollowCamera->AddAdditiveOffset(AdditiveOffset, FOV);
 }
 
 void APlayerCharacter::ServerInteract_Implementation()
@@ -870,7 +897,7 @@ void APlayerCharacter::SaveProgress_Implementation(const FName& SavePointTag)
 	}
 }
 
-void APlayerCharacter::LoadProgress()
+void APlayerCharacter::LoadProgress() const
 {
 	if (const ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this)))
 	{
@@ -1175,6 +1202,13 @@ void APlayerCharacter::ServerCloseContainer_Implementation()
 	InteractingContainer->ServerStopInteracting(this);
 	InteractingContainer = nullptr;
 	// IControllerInterface::Execute_ToggleContainer(Controller, 0);
+}
+
+void APlayerCharacter::ToggleCameraInterpToActor_Implementation(AActor* InActorToFollow, bool bToggle)
+{
+	bShouldInterpCameraToActor = bToggle;
+	ActorToInterp = InActorToFollow;
+	CurrentAdditiveOffset = GetActorLocation();
 }
 
 /*

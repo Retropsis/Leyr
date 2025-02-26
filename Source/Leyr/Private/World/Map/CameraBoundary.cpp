@@ -4,6 +4,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/TimelineComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
 #include "Interaction/PlayerInterface.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -35,6 +36,15 @@ void ACameraBoundary::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	SetSocket();
+	
+	if (bShouldInterpZ)
+	{
+		Alpha+= DeltaTime * .5f;
+		const FVector Start{ SpringArm->GetComponentLocation().X, 0.f, SpringArm->GetComponentLocation().Z };
+		const FVector Target{ SpringArm->GetComponentLocation().X, 0.f, GetActorLocation().Z };
+		SpringArm->SetWorldLocation(UKismetMathLibrary::VLerp(Start, Target, Alpha));
+		if(Alpha >= 1.f) bShouldInterpZ = false;
+	}
 }
 
 void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -48,18 +58,21 @@ void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 		if (SpringArm)
 		{
 			// FTimerHandle DetachTimer;
-			// FDetachmentTransformRules DetachmentTransformRules{
-			// 	EDetachmentRule::KeepWorld,
-			// 	EDetachmentRule::KeepRelative,
-			// 	EDetachmentRule::KeepRelative,
-			// 	false};
-			// SpringArm->DetachFromComponent(DetachmentTransformRules);
+			FDetachmentTransformRules DetachmentTransformRules{
+				EDetachmentRule::KeepWorld,
+				EDetachmentRule::KeepRelative,
+				EDetachmentRule::KeepRelative,
+				false};
+			SpringArm->DetachFromComponent(DetachmentTransformRules);
 			// GetWorld()->GetTimerManager().SetTimer(DetachTimer, FTimerDelegate::CreateLambda([this]()
 			// {
 			// }), .25f, false);
-			SpringArm->bEnableCameraLag = false;
-			OriginalSocketOffset = SpringArm->SocketOffset;
+
+			
+			// SpringArm->bEnableCameraLag = false;
+			// OriginalSocketOffset = SpringArm->SocketOffset;
 			SetActorTickEnabled(true);
+			bShouldInterpZ = true;
 		}
 	}
 }
@@ -72,12 +85,18 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 		SpringArm = IPlayerInterface::Execute_GetSpringArmComponent(OtherActor);
 		if (SpringArm)
 		{
-			SpringArm->AttachToComponent(OtherActor->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+			FAttachmentTransformRules AttachmentTransformRules{
+				EAttachmentRule::SnapToTarget,
+				EAttachmentRule::SnapToTarget,
+				EAttachmentRule::KeepRelative,
+				false};
+			SpringArm->AttachToComponent(OtherActor->GetRootComponent(), AttachmentTransformRules);
+			SpringArm->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
 			SpringArm->bEnableCameraLag = true;
-			ResetSocketOffset = SpringArm->SocketOffset;
-			ResetSocketOffset = FVector(0.f);
+			// ResetSocketOffset = SpringArm->SocketOffset;
+			// ResetSocketOffset = FVector(0.f);
 			SetActorTickEnabled(false);
-			ResetSocket();
+			// ResetSocket();
 		}
 	}
 }
@@ -91,7 +110,9 @@ void ACameraBoundary::SetSocket()
 		SpringArm->SocketOffset = FVector(SpringArm->SocketOffset.X, SpringArm->SocketOffset.Y, VerticalSocketOffsetZ());
 		break;
 	case EExitDirection::Horizontal:
-		SpringArm->SocketOffset = FVector(SpringArm->SocketOffset.X, HorizontalSocketOffsetY(), SpringArm->SocketOffset.Z);
+		// SpringArm->SocketOffset = FVector(SpringArm->SocketOffset.X, HorizontalSocketOffsetY(), SpringArm->SocketOffset.Z);
+		// FollowCamera->ClearAdditiveOffset();
+		// FollowCamera->AddAdditiveOffset(FTransform{ FVector(GetDistanceTo(Player), 0.f, 0.f) }, 90.f);
 		break;
 	}
 }
@@ -106,7 +127,7 @@ float ACameraBoundary::HorizontalSocketOffsetY() const
 	return ExitLocation.X + OriginalSocketOffset.X - Player->GetActorLocation().X + OriginalSocketOffset.Y;
 }
 
-void ACameraBoundary::InterpSocketOffset(float Alpha)
+void ACameraBoundary::InterpSocketOffset(float InAlpha)
 {
 	FVector SocketOffset = SpringArm->SocketOffset;
 	switch (ExitDirection) {
@@ -117,6 +138,6 @@ void ACameraBoundary::InterpSocketOffset(float Alpha)
 		SocketOffset = FVector(SocketOffset.X, OriginalSocketOffset.Y, SocketOffset.Z);
 		break;
 	}
-	SpringArm->SocketOffset = UKismetMathLibrary::VLerp(ResetSocketOffset, SocketOffset, Alpha);
+	SpringArm->SocketOffset = UKismetMathLibrary::VLerp(ResetSocketOffset, SocketOffset, InAlpha);
 }
 

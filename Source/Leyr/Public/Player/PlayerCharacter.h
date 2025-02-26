@@ -10,6 +10,7 @@
 #include "Inventory/Container/Container.h"
 #include "PlayerCharacter.generated.h"
 
+class AParallaxController;
 enum class ECharacterName : uint8;
 class UCharacterInfo;
 class UBoxComponent;
@@ -56,6 +57,12 @@ public:
 	void TraceForPlatforms() const;
 	void TraceForHoppingLedge(float MovementVectorX);
 	
+	void InterpCameraToActor(float DeltaTime);
+	UPROPERTY() TObjectPtr<AActor> ActorToInterp;
+	float InterpCameraAlpha = 0.f;
+	bool bShouldInterpCameraToActor = false;
+	float CurrentTargetDistance = 0.f;
+	
 	/** Combat Interface */
 	virtual int32 GetCharacterLevel_Implementation() override;
 	virtual ECombatState GetCombatState_Implementation() const override { return CombatState; }
@@ -94,6 +101,8 @@ public:
 
 	/** Player Interface */
 	virtual USpringArmComponent* GetSpringArmComponent_Implementation() override { return SpringArm; }
+	virtual UCameraComponent* GetCameraComponent_Implementation() override { return FollowCamera; }
+	virtual void ToggleCameraInterpToActor_Implementation(AActor* InActorToFollow, bool bToggle) override;
 	virtual void ResetInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex) override;
 	virtual void UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData) override;
 	virtual void UpdateContainerSlots_Implementation(int32 TotalSlots) override;
@@ -128,7 +137,7 @@ public:
 	virtual void ToggleAiming_Implementation(bool bAiming) override;
 
 	virtual void SaveProgress_Implementation(const FName& SavePointTag) override;
-	void LoadProgress();
+	void LoadProgress() const;
 	/** end Player Interface */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -230,6 +239,12 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UCameraComponent> FollowCamera;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))
+	TObjectPtr<USpringArmComponent> ParallaxSpringArm;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))
+	TObjectPtr<AParallaxController> ParallaxController;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UInventoryComponent> PlayerInventory;
 	
@@ -284,6 +299,9 @@ private:
 	float DefeatTime = 2.f;
 
 	FTimerHandle DefeatTimer;
+
+	FVector CurrentAdditiveOffset;
+	float LastActorToInterpDistance;;
 
 public:
 	FORCEINLINE bool IsAirborne() const { return bAirborne; }

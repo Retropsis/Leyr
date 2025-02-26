@@ -72,7 +72,7 @@ public:
 	/* Saving */
 	static void DeleteSlot(const FString& SlotName, int32 SlotIndex);
 
-	void SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex);
+	void SaveSlotData(UMVVM_LoadSlot* LoadSlot, int32 SlotIndex) const;
 	ULoadMenuSaveGame* GetSaveSlotData(const FString& SlotName, int32 SlotIndex) const;
 	ULoadMenuSaveGame* RetrieveInGameSaveData() const;
 	void SaveInGameProgressData(ULoadMenuSaveGame* SaveObject) const;

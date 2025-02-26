@@ -16,7 +16,7 @@ class LEYR_API ULeyrGameInstance : public UGameInstance
 
 public:
 	UPROPERTY()
-	FName PlayerStartTag = FName();
+	FName PlayerStartTag = FName("EditorStart");
 
 	UPROPERTY()
 	FString LoadSlotName = FString();

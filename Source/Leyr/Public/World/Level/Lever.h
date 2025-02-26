@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "PaperFlipbookActor.h"
 #include "Interaction/InteractionInterface.h"
+#include "Interaction/SaveInterface.h"
 #include "Lever.generated.h"
 
 class UBoxComponent;
@@ -33,7 +34,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnLeverStateChanged, ELeverState NewState);
  * 
  */
 UCLASS()
-class LEYR_API ALever : public APaperFlipbookActor, public IInteractionInterface
+class LEYR_API ALever : public APaperFlipbookActor, public IInteractionInterface, public ISaveInterface
 {
 	GENERATED_BODY()
 
@@ -42,6 +43,11 @@ public:
 	virtual void Interact_Implementation(AActor* InteractingActor) override;
 	virtual bool ShouldBlockProjectile_Implementation() override { return bShouldBlockProjectile; }
 	void HandleLeverVisualState(ELeverState NewState);
+	ELeverState GetLeverState() const { return LeverState; }
+
+	//~ Save Interface
+	virtual void LoadActor_Implementation() override;
+	//~ Save Interface
 	
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -60,8 +66,10 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category="Platform")
 	ELeverType LeverType = ELeverType::Switch;
-	
+
+	UPROPERTY(SaveGame)
 	ELeverState LeverState = ELeverState::Off;
+	
 	bool bShouldBlockProjectile = true;
 	
 	UPROPERTY(EditAnywhere, Category="Platform")

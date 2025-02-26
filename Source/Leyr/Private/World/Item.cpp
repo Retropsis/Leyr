@@ -43,6 +43,16 @@ void AItem::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 	}
 }
 
+void AItem::LoadActor_Implementation()
+{
+	if (bPickedUp)
+	{
+		Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetRenderComponent()->SetVisibility(false);
+		bPickedUp = true;
+	}
+}
+
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
@@ -76,6 +86,8 @@ void AItem::Interact_Implementation(AActor* InteractingActor)
 	{
 		InventoryComponent->ServerAddItem(ItemData);
 		UGameplayStatics::PlaySoundAtLocation(this, PickupSound, GetActorLocation());
-		Destroy();
+		Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetRenderComponent()->SetVisibility(false);
+		bPickedUp = true;
 	}
 }

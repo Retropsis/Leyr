@@ -13,6 +13,15 @@ APulley::APulley()
 	bShouldBlockProjectile = false;
 }
 
+void APulley::LoadActor_Implementation()
+{
+	Super::LoadActor_Implementation();
+	WeightHitBox->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	WeightHitBox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	WeightHitBox->SetEnableGravity(true);
+	WeightHitBox->SetSimulatePhysics(true);
+}
+
 void APulley::BeginPlay()
 {
 	// Skip Lever BeginPlay

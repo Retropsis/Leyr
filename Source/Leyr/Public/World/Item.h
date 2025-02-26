@@ -7,6 +7,7 @@
 #include "PaperFlipbookActor.h"
 #include "GameFramework/Actor.h"
 #include "Interaction/InteractionInterface.h"
+#include "Interaction/SaveInterface.h"
 #include "Inventory/InventoryComponent.h"
 #include "Item.generated.h"
 
@@ -15,7 +16,7 @@ class UPaperSprite;
 class USphereComponent;
 
 UCLASS()
-class LEYR_API AItem : public APaperFlipbookActor, public IInteractionInterface
+class LEYR_API AItem : public APaperFlipbookActor, public IInteractionInterface, public ISaveInterface
 {
 	GENERATED_BODY()
 	
@@ -30,6 +31,10 @@ public:
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 	virtual void Interact_Implementation(AActor* InteractingActor) override;
+
+	//~ Save Interface
+	virtual void LoadActor_Implementation() override;
+	//~ Save Interface
 	
 	UPROPERTY(EditDefaultsOnly, Category="Container|Initialization")
 	TObjectPtr<UDataTable> ItemDataTable;
@@ -57,4 +62,5 @@ protected:
 
 private:
 	UPROPERTY() TObjectPtr<AActor> OverlappingActor;
+	UPROPERTY(SaveGame) bool bPickedUp = false;
 };

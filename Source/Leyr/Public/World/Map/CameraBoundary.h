@@ -7,6 +7,7 @@
 #include "World/Data/CameraData.h"
 #include "CameraBoundary.generated.h"
 
+class UCameraComponent;
 class USpringArmComponent;
 class UTimelineComponent;
 class UBoxComponent;
@@ -28,7 +29,7 @@ protected:
 	void ResetSocket();
 
 	UFUNCTION(BlueprintCallable)
-	void InterpSocketOffset(float Alpha);
+	void InterpSocketOffset(float InAlpha);
 
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -53,8 +54,11 @@ private:
 	float HorizontalSocketOffsetY() const;
 	
 	TObjectPtr<USpringArmComponent> SpringArm;
+	TObjectPtr<UCameraComponent> FollowCamera;
 	UPROPERTY() TObjectPtr<AActor> Player;
 	FVector ExitLocation = FVector::ZeroVector;
 	FVector OriginalSocketOffset = FVector::ZeroVector;
 	FVector ResetSocketOffset = FVector::ZeroVector;
+	bool bShouldInterpZ = false;
+	float Alpha = 0.f;
 };

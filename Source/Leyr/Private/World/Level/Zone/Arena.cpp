@@ -2,6 +2,7 @@
 
 #include "World/Level/Zone/Arena.h"
 #include "Components/BoxComponent.h"
+#include "Interaction/PlayerInterface.h"
 #include "Leyr/Leyr.h"
 
 AArena::AArena()
@@ -51,12 +52,18 @@ void AArena::BeginPlay()
 
 void AArena::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if(OtherActor->ActorHasTag("Player")) OnPlayerEntering.Broadcast(OtherActor);
+	if(OtherActor->ActorHasTag("Player"))
+	{
+		OnPlayerEntering.Broadcast(OtherActor);
+	}
 }
 
 void AArena::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if(OtherActor->ActorHasTag("Player")) OnPlayerLeaving.Broadcast(OtherActor);
+	if(OtherActor->ActorHasTag("Player"))
+	{
+		OnPlayerLeaving.Broadcast(OtherActor);
+	}
 }
 
 FBoundLocations AArena::GetArenaBounds() const

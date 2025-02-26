@@ -43,10 +43,17 @@ void ADoor::BeginPlay()
 	if(IsValid(Switch))
 	{
 		bIsProximityDoor = false;
-		Switch->OnLeverStateChanged.AddLambda([this] (const ELeverState NewState)
+		if(Switch->GetLeverState() == ELeverState::On)
 		{
-			HandleDoorState(NewState == ELeverState::On);
-		});
+			HandleDoorState(true);
+		}
+		else
+		{
+			Switch->OnLeverStateChanged.AddLambda([this] (const ELeverState NewState)
+			{
+				HandleDoorState(NewState == ELeverState::On);
+			});
+		}
 	}
 	
 	if (HasAuthority() && bIsProximityDoor)
