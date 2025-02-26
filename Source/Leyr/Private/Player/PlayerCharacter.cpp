@@ -89,6 +89,7 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	TraceForSlope();
 	ForceMove(DeltaSeconds);
 	InterpCameraToActor(DeltaSeconds);
+	ClampCameraToExtents();
 }
 
 void APlayerCharacter::ForceMove(float DeltaSeconds)
@@ -189,7 +190,7 @@ void APlayerCharacter::InterpCameraToActor(float DeltaTime)
 	FollowCamera->GetAdditiveOffset(AdditiveOffset, FOV);
 	FollowCamera->ClearAdditiveOffset();
 	
-	if(ActorToInterp)
+	if(ActorToInterp && GetDistanceTo(ActorToInterp) < 1300.f)
 	{
 		const FVector MidPoint{ (ActorToInterp->GetActorLocation() + GetActorLocation()) / 2.f };
 		UKismetSystemLibrary::DrawDebugLine(this, GetActorLocation(), ActorToInterp->GetActorLocation(), FLinearColor::Red);
@@ -202,6 +203,38 @@ void APlayerCharacter::InterpCameraToActor(float DeltaTime)
 	CurrentAdditiveOffset = FMath::VInterpTo(AdditiveOffset.GetLocation(), TargetAdditiveOffset, DeltaTime, InterpSpeed);
 	AdditiveOffset.SetLocation(CurrentAdditiveOffset);
 	FollowCamera->AddAdditiveOffset(AdditiveOffset, FOV);
+}
+
+void APlayerCharacter::ClampCameraToExtents() const
+{
+	if (!bShouldUseCameraExtents) return;
+
+	const FVector CameraLocation = FollowCamera->GetComponentLocation();
+	const FVector CameraExtentLocation = CameraExtent->GetComponentLocation();
+	const FVector CameraExtents = CameraExtent->GetScaledBoxExtent();
+	
+	const FVector Left { CameraExtentLocation.X - CameraExtents.X, 10.f, CameraLocation.Z };
+	const FVector Right { CameraExtentLocation.X + CameraExtents.X, 10.f, CameraLocation.Z };
+	const FVector Top { CameraLocation.X, 10.f, CameraExtentLocation.Z + CameraExtents.Z };
+	const FVector Bottom { CameraLocation.X, 10.f, CameraExtentLocation.Z - CameraExtents.Z };
+	UKismetSystemLibrary:: DrawDebugPoint(this, Left, 15.f, FLinearColor::White);
+	UKismetSystemLibrary:: DrawDebugPoint(this, Right, 15.f, FLinearColor::White);
+	UKismetSystemLibrary:: DrawDebugPoint(this, Bottom, 15.f, FLinearColor::White);
+	UKismetSystemLibrary:: DrawDebugPoint(this, Top, 15.f, FLinearColor::White);
+	
+	FVector PreferredCameraLocation = CameraLocation;
+	if (CameraLocation.X < Left.X || CameraLocation.X > Right.X)
+	{
+		PreferredCameraLocation.X = FMath::Clamp(CameraLocation.X, Left.X, Right.X);
+	}
+	if (CameraLocation.Z < Bottom.Z || CameraLocation.Z > Top.Z)
+	{
+		PreferredCameraLocation.Z = FMath::Clamp(CameraLocation.Z, Bottom.Z, Top.Z);
+	}
+	
+	const FVector Delta = CameraLocation - PreferredCameraLocation;
+	FollowCamera->ClearAdditiveOffset();
+	FollowCamera->AddAdditiveOffset(FTransform{ -Delta }, FollowCamera->FieldOfView);
 }
 
 void APlayerCharacter::ServerInteract_Implementation()
@@ -1209,6 +1242,12 @@ void APlayerCharacter::ToggleCameraInterpToActor_Implementation(AActor* InActorT
 	bShouldInterpCameraToActor = bToggle;
 	ActorToInterp = InActorToFollow;
 	CurrentAdditiveOffset = GetActorLocation();
+}
+
+void APlayerCharacter::SetCameraExtents_Implementation(UBoxComponent* Extent, bool bEnable)
+{
+	CameraExtent = Extent;
+	bShouldUseCameraExtents = bEnable;
 }
 
 /*

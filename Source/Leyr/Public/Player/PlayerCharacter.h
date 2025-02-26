@@ -56,12 +56,18 @@ public:
 	void TraceForSlope();
 	void TraceForPlatforms() const;
 	void TraceForHoppingLedge(float MovementVectorX);
-	
+
+	/*
+	 * Camera
+	 */
 	void InterpCameraToActor(float DeltaTime);
+	void ClampCameraToExtents() const;
 	UPROPERTY() TObjectPtr<AActor> ActorToInterp;
 	float InterpCameraAlpha = 0.f;
 	bool bShouldInterpCameraToActor = false;
 	float CurrentTargetDistance = 0.f;
+	bool bShouldUseCameraExtents = false;
+	TObjectPtr<UBoxComponent> CameraExtent;
 	
 	/** Combat Interface */
 	virtual int32 GetCharacterLevel_Implementation() override;
@@ -103,6 +109,7 @@ public:
 	virtual USpringArmComponent* GetSpringArmComponent_Implementation() override { return SpringArm; }
 	virtual UCameraComponent* GetCameraComponent_Implementation() override { return FollowCamera; }
 	virtual void ToggleCameraInterpToActor_Implementation(AActor* InActorToFollow, bool bToggle) override;
+	virtual void SetCameraExtents_Implementation(UBoxComponent* Extent, bool bEnable) override;
 	virtual void ResetInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex) override;
 	virtual void UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData) override;
 	virtual void UpdateContainerSlots_Implementation(int32 TotalSlots) override;

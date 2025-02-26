@@ -4,7 +4,6 @@
 #include "Components/BoxComponent.h"
 #include "Components/TimelineComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Camera/CameraComponent.h"
 #include "Interaction/PlayerInterface.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -12,9 +11,22 @@ ACameraBoundary::ACameraBoundary()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>("Root");
+	SetRootComponent(Root);
+	
 	Boundary = CreateDefaultSubobject<UBoxComponent>("Boundary");
 	Boundary->InitBoxExtent(FVector(50.f));
-	SetRootComponent(Boundary);
+	Boundary->SetupAttachment(GetRootComponent());
+	Boundary->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	Boundary->SetCollisionResponseToAllChannels(ECR_Ignore);
+	Boundary->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	Boundary->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
+	
+	Extent = CreateDefaultSubobject<UBoxComponent>("Extent");
+	Extent->InitBoxExtent(FVector(50.f));
+	Extent->SetupAttachment(GetRootComponent());
+	Extent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Extent->SetHiddenInGame(true);
 
 	BoundaryVisualizer = CreateDefaultSubobject<UStaticMeshComponent>("BoundaryVisualizer");
 	BoundaryVisualizer->SetupAttachment(GetRootComponent());
@@ -57,22 +69,21 @@ void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 		SpringArm = IPlayerInterface::Execute_GetSpringArmComponent(OtherActor);
 		if (SpringArm)
 		{
-			// FTimerHandle DetachTimer;
 			FDetachmentTransformRules DetachmentTransformRules{
 				EDetachmentRule::KeepWorld,
 				EDetachmentRule::KeepRelative,
 				EDetachmentRule::KeepRelative,
 				false};
-			SpringArm->DetachFromComponent(DetachmentTransformRules);
-			// GetWorld()->GetTimerManager().SetTimer(DetachTimer, FTimerDelegate::CreateLambda([this]()
-			// {
-			// }), .25f, false);
-
-			
-			// SpringArm->bEnableCameraLag = false;
-			// OriginalSocketOffset = SpringArm->SocketOffset;
-			SetActorTickEnabled(true);
-			bShouldInterpZ = true;
+			switch (BoundaryRule) {
+			case EBoundaryRule::Detachment:
+				SpringArm->DetachFromComponent(DetachmentTransformRules);
+				SetActorTickEnabled(true);
+				bShouldInterpZ = true;
+				break;
+			case EBoundaryRule::Extent:
+				IPlayerInterface::Execute_SetCameraExtents(OtherActor, Extent, true);
+				break;
+			}
 		}
 	}
 }
@@ -90,13 +101,17 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 				EAttachmentRule::SnapToTarget,
 				EAttachmentRule::KeepRelative,
 				false};
-			SpringArm->AttachToComponent(OtherActor->GetRootComponent(), AttachmentTransformRules);
-			SpringArm->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
-			SpringArm->bEnableCameraLag = true;
-			// ResetSocketOffset = SpringArm->SocketOffset;
-			// ResetSocketOffset = FVector(0.f);
-			SetActorTickEnabled(false);
-			// ResetSocket();
+			switch (BoundaryRule) {
+			case EBoundaryRule::Detachment:
+				SpringArm->AttachToComponent(OtherActor->GetRootComponent(), AttachmentTransformRules);
+				SpringArm->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+				SpringArm->bEnableCameraLag = true;
+				SetActorTickEnabled(false);
+				break;
+			case EBoundaryRule::Extent:
+				IPlayerInterface::Execute_SetCameraExtents(OtherActor, nullptr, false);
+				break;
+			}
 		}
 	}
 }

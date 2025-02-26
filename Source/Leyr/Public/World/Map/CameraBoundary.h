@@ -13,6 +13,13 @@ class UTimelineComponent;
 class UBoxComponent;
 enum class EExitDirection : uint8;
 
+UENUM(BlueprintType)
+enum class EBoundaryRule : uint8
+{
+	Detachment,
+	Extent,
+};
+
 UCLASS()
 class LEYR_API ACameraBoundary : public AActor
 {
@@ -39,6 +46,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBoxComponent> Boundary;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UBoxComponent> Extent;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> BoundaryVisualizer;
@@ -47,6 +57,9 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	EExitDirection ExitDirection = EExitDirection::Horizontal;
+	
+	UPROPERTY(EditAnywhere)
+	EBoundaryRule BoundaryRule = EBoundaryRule::Detachment;
 
 private:
 	void SetSocket();
