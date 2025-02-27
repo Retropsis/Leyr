@@ -5,6 +5,7 @@
 #include "Components/TimelineComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Interaction/PlayerInterface.h"
+#include "PaperTileMapComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
 ACameraBoundary::ACameraBoundary()
@@ -59,6 +60,18 @@ void ACameraBoundary::Tick(float DeltaTime)
 	}
 }
 
+void ACameraBoundary::InitializeCameraExtent()
+{
+	if (TileMap)
+	{
+		SetActorLocation(TileMap->GetRenderComponent()->Bounds.Origin);
+		const FBoxSphereBounds Bounds = TileMap->GetRenderComponent()->Bounds;
+		Boundary->SetBoxExtent(Bounds.BoxExtent);
+		BoundaryVisualizer->SetWorldScale3D(FVector{ Bounds.BoxExtent.X / 50.f, 2.f, Bounds.BoxExtent.Z / 50.f });
+		Extent->SetBoxExtent(FVector{ bConstrainX ? FMath::Min(0.f, Bounds.BoxExtent.X - 1280.f) : Bounds.BoxExtent.X, 0.f, bConstrainZ ? FMath::Min(0.f, Bounds.BoxExtent.Z - 384.f) : Bounds.BoxExtent.Z });
+	}
+}
+
 void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>())
@@ -82,6 +95,8 @@ void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 				break;
 			case EBoundaryRule::Extent:
 				IPlayerInterface::Execute_SetCameraExtents(OtherActor, Extent, true);
+				break;
+			case EBoundaryRule::Arena:
 				break;
 			}
 		}
@@ -110,6 +125,8 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 				break;
 			case EBoundaryRule::Extent:
 				IPlayerInterface::Execute_SetCameraExtents(OtherActor, nullptr, false);
+				break;
+			case EBoundaryRule::Arena:
 				break;
 			}
 		}

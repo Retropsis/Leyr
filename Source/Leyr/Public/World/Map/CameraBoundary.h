@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "World/Data/CameraData.h"
+#include "PaperTileMapActor.h"
 #include "CameraBoundary.generated.h"
 
 class UCameraComponent;
@@ -18,6 +19,7 @@ enum class EBoundaryRule : uint8
 {
 	Detachment,
 	Extent,
+	Arena,
 };
 
 UCLASS()
@@ -28,6 +30,9 @@ class LEYR_API ACameraBoundary : public AActor
 public:	
 	ACameraBoundary();
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(CallInEditor, Category="Camera Boundary")
+	virtual void InitializeCameraExtent();
 
 protected:
 	virtual void BeginPlay() override;
@@ -54,11 +59,20 @@ protected:
 	TObjectPtr<UStaticMeshComponent> BoundaryVisualizer;
 
 	TObjectPtr<UTimelineComponent> TimelineComponent;
+	
+	UPROPERTY(EditAnywhere, Category="Camera Boundary")
+	TObjectPtr<APaperTileMapActor> TileMap;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Camera Boundary")
+	bool bConstrainZ = false;
+	
+	UPROPERTY(EditAnywhere, Category="Camera Boundary")
+	bool bConstrainX = false;
+
+	UPROPERTY(EditAnywhere, Category="Camera Boundary")
 	EExitDirection ExitDirection = EExitDirection::Horizontal;
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Camera Boundary")
 	EBoundaryRule BoundaryRule = EBoundaryRule::Detachment;
 
 private:

@@ -44,6 +44,9 @@ public:
 	void ToggleCameraInterpToActor(AActor* InActorToFollow, bool bToggle);
 	
 	UFUNCTION(BlueprintNativeEvent)
+	void ToggleCameraInterpToTarget(FVector InTargetToFollow, bool bToggle);
+	
+	UFUNCTION(BlueprintNativeEvent)
 	void SetCameraExtents(UBoxComponent* Extent, bool bEnable);
 	
 	/*
