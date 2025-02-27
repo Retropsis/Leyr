@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "World/Map/CameraBoundary.h"
 #include "Arena.generated.h"
 
 USTRUCT(BlueprintType)
@@ -23,7 +24,7 @@ class UBoxComponent;
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerOverlap, AActor* Player);
 
 UCLASS()
-class LEYR_API AArena : public AActor
+class LEYR_API AArena : public ACameraBoundary
 {
 	GENERATED_BODY()
 	
@@ -35,24 +36,18 @@ public:
 
 	FOnPlayerOverlap OnPlayerEntering;
 	FOnPlayerOverlap OnPlayerLeaving;
+	
+	virtual void InitializeCameraExtent() override;
+	virtual void HandleOnBeginOverlap(AActor* OtherActor) override;
 
 protected:
 	virtual void BeginPlay() override;
 	
 	UFUNCTION()
-	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	
-	UFUNCTION()
-	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UBoxComponent> EnteringArea;
+	virtual void OnLeavingBoundary(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UBoxComponent> LeavingArea;
-
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UStaticMeshComponent> EnteringBoundaryVisualizer;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> LeavingBoundaryVisualizer;

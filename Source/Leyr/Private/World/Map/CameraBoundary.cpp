@@ -76,30 +76,7 @@ void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 {
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>())
 	{
-		TimelineComponent->Stop();
-		ExitLocation = OtherActor->GetActorLocation();
-		Player = OtherActor;
-		SpringArm = IPlayerInterface::Execute_GetSpringArmComponent(OtherActor);
-		if (SpringArm)
-		{
-			FDetachmentTransformRules DetachmentTransformRules{
-				EDetachmentRule::KeepWorld,
-				EDetachmentRule::KeepRelative,
-				EDetachmentRule::KeepRelative,
-				false};
-			switch (BoundaryRule) {
-			case EBoundaryRule::Detachment:
-				SpringArm->DetachFromComponent(DetachmentTransformRules);
-				SetActorTickEnabled(true);
-				bShouldInterpZ = true;
-				break;
-			case EBoundaryRule::Extent:
-				IPlayerInterface::Execute_SetCameraExtents(OtherActor, Extent, true);
-				break;
-			case EBoundaryRule::Arena:
-				break;
-			}
-		}
+		HandleOnBeginOverlap(OtherActor);
 	}
 }
 
@@ -107,29 +84,7 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 {
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>())
 	{
-		Player = OtherActor;
-		SpringArm = IPlayerInterface::Execute_GetSpringArmComponent(OtherActor);
-		if (SpringArm)
-		{
-			FAttachmentTransformRules AttachmentTransformRules{
-				EAttachmentRule::SnapToTarget,
-				EAttachmentRule::SnapToTarget,
-				EAttachmentRule::KeepRelative,
-				false};
-			switch (BoundaryRule) {
-			case EBoundaryRule::Detachment:
-				SpringArm->AttachToComponent(OtherActor->GetRootComponent(), AttachmentTransformRules);
-				SpringArm->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
-				SpringArm->bEnableCameraLag = true;
-				SetActorTickEnabled(false);
-				break;
-			case EBoundaryRule::Extent:
-				IPlayerInterface::Execute_SetCameraExtents(OtherActor, nullptr, false);
-				break;
-			case EBoundaryRule::Arena:
-				break;
-			}
-		}
+		HandleOnEndOverlap(OtherActor);
 	}
 }
 
@@ -146,6 +101,61 @@ void ACameraBoundary::SetSocket()
 		// FollowCamera->ClearAdditiveOffset();
 		// FollowCamera->AddAdditiveOffset(FTransform{ FVector(GetDistanceTo(Player), 0.f, 0.f) }, 90.f);
 		break;
+	}
+}
+
+void ACameraBoundary::HandleOnBeginOverlap(AActor* OtherActor)
+{
+	TimelineComponent->Stop();
+	ExitLocation = OtherActor->GetActorLocation();
+	Player = OtherActor;
+	SpringArm = IPlayerInterface::Execute_GetSpringArmComponent(OtherActor);
+	if (SpringArm)
+	{
+		FDetachmentTransformRules DetachmentTransformRules{
+			EDetachmentRule::KeepWorld,
+			EDetachmentRule::KeepRelative,
+			EDetachmentRule::KeepRelative,
+			false};
+		switch (BoundaryRule) {
+		case EBoundaryRule::Detachment:
+			SpringArm->DetachFromComponent(DetachmentTransformRules);
+			SetActorTickEnabled(true);
+			bShouldInterpZ = true;
+			break;
+		case EBoundaryRule::Extent:
+			IPlayerInterface::Execute_SetCameraExtents(OtherActor, Extent, true);
+			break;
+		case EBoundaryRule::Arena:
+			break;
+		}
+	}
+}
+
+void ACameraBoundary::HandleOnEndOverlap(AActor* OtherActor)
+{
+	Player = OtherActor;
+	SpringArm = IPlayerInterface::Execute_GetSpringArmComponent(OtherActor);
+	if (SpringArm)
+	{
+		FAttachmentTransformRules AttachmentTransformRules{
+			EAttachmentRule::SnapToTarget,
+			EAttachmentRule::SnapToTarget,
+			EAttachmentRule::KeepRelative,
+			false};
+		switch (BoundaryRule) {
+		case EBoundaryRule::Detachment:
+			SpringArm->AttachToComponent(OtherActor->GetRootComponent(), AttachmentTransformRules);
+			SpringArm->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+			SpringArm->bEnableCameraLag = true;
+			SetActorTickEnabled(false);
+			break;
+		case EBoundaryRule::Extent:
+			IPlayerInterface::Execute_SetCameraExtents(OtherActor, nullptr, false);
+			break;
+		case EBoundaryRule::Arena:
+			break;
+		}
 	}
 }
 

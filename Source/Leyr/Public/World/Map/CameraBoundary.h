@@ -33,6 +33,8 @@ public:
 
 	UFUNCTION(CallInEditor, Category="Camera Boundary")
 	virtual void InitializeCameraExtent();
+	virtual void HandleOnBeginOverlap(AActor* OtherActor);
+	virtual void HandleOnEndOverlap(AActor* OtherActor);
 
 protected:
 	virtual void BeginPlay() override;
@@ -45,7 +47,7 @@ protected:
 
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	
+
 	UFUNCTION()
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
