@@ -117,7 +117,8 @@ void UDamageGameplayAbility::SelectMontageTagFromCombatState()
 {
 	const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
 	const FGameplayTagContainer OwnedTags = GetAbilitySystemComponentFromActorInfo()->GetOwnedGameplayTags();
-	MontageTag = GameplayTags.Montage_Attack_1;
+	MontageTag = FGameplayTag();
+	// MontageTag = GameplayTags.Montage_Attack_1;
 	bShouldAddImpulseOnHit = false; 
 	
 	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Condition_Falling ))

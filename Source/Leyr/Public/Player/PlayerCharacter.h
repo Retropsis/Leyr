@@ -155,10 +155,11 @@ public:
 	virtual void ReduceWalkSpeed_Implementation(float AmountToReduce) override;
 	virtual void SetWalkSpeed_Implementation(float NewSpeed) override;
 	virtual void ToggleAiming_Implementation(bool bAiming) override;
+	virtual void SetIs
 
 	virtual void SaveProgress_Implementation(const FName& SavePointTag) override;
-	void LoadProgress() const;
 	/** end Player Interface */
+	void LoadProgress() const;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UNiagaraComponent> LevelUpNiagaraComponent;
