@@ -51,6 +51,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UBoxComponent> LeavingBoundary;
+	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> ArenaBoundary;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> LeavingBoundaryVisualizer;

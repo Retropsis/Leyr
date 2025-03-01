@@ -155,7 +155,6 @@ public:
 	virtual void ReduceWalkSpeed_Implementation(float AmountToReduce) override;
 	virtual void SetWalkSpeed_Implementation(float NewSpeed) override;
 	virtual void ToggleAiming_Implementation(bool bAiming) override;
-	virtual void SetIs
 
 	virtual void SaveProgress_Implementation(const FName& SavePointTag) override;
 	/** end Player Interface */
@@ -235,9 +234,6 @@ protected:
 
 	UPROPERTY(BlueprintReadWrite)
 	int32 AttackCount = 0;
-
-	UPROPERTY(BlueprintReadWrite)
-	bool bIsAttacking = false;
 	
 	UPROPERTY(BlueprintReadWrite)
 	bool bIsComboActivated = false;
