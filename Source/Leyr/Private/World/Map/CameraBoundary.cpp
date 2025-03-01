@@ -15,21 +15,21 @@ ACameraBoundary::ACameraBoundary()
 	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>("Root");
 	SetRootComponent(Root);
 	
-	Boundary = CreateDefaultSubobject<UBoxComponent>("Boundary");
-	Boundary->InitBoxExtent(FVector(50.f));
-	Boundary->SetupAttachment(GetRootComponent());
-	Boundary->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	Boundary->SetCollisionResponseToAllChannels(ECR_Ignore);
-	Boundary->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	Boundary->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
+	EnteringBoundary = CreateDefaultSubobject<UBoxComponent>("Entering Boundary");
+	EnteringBoundary->InitBoxExtent(FVector(50.f));
+	EnteringBoundary->SetupAttachment(GetRootComponent());
+	EnteringBoundary->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	EnteringBoundary->SetCollisionResponseToAllChannels(ECR_Ignore);
+	EnteringBoundary->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	EnteringBoundary->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
 	
-	Extent = CreateDefaultSubobject<UBoxComponent>("Extent");
-	Extent->InitBoxExtent(FVector(50.f));
-	Extent->SetupAttachment(GetRootComponent());
-	Extent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Extent->SetHiddenInGame(true);
+	CameraBoundary = CreateDefaultSubobject<UBoxComponent>("Camera Extents");
+	CameraBoundary->InitBoxExtent(FVector(50.f));
+	CameraBoundary->SetupAttachment(GetRootComponent());
+	CameraBoundary->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CameraBoundary->SetHiddenInGame(true);
 
-	BoundaryVisualizer = CreateDefaultSubobject<UStaticMeshComponent>("BoundaryVisualizer");
+	BoundaryVisualizer = CreateDefaultSubobject<UStaticMeshComponent>("Entering Boundary Visualizer");
 	BoundaryVisualizer->SetupAttachment(GetRootComponent());
 	BoundaryVisualizer->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	BoundaryVisualizer->SetHiddenInGame(true);
@@ -41,8 +41,8 @@ void ACameraBoundary::BeginPlay()
 {
 	Super::BeginPlay();
 	SetActorTickEnabled(false);
-	Boundary->OnComponentBeginOverlap.AddDynamic(this, &ACameraBoundary::OnBeginOverlap);
-	Boundary->OnComponentEndOverlap.AddDynamic(this, &ACameraBoundary::OnEndOverlap);
+	EnteringBoundary->OnComponentBeginOverlap.AddDynamic(this, &ACameraBoundary::OnBeginOverlap);
+	EnteringBoundary->OnComponentEndOverlap.AddDynamic(this, &ACameraBoundary::OnEndOverlap);
 }
 
 void ACameraBoundary::Tick(float DeltaTime)
@@ -66,9 +66,11 @@ void ACameraBoundary::InitializeCameraExtent()
 	{
 		SetActorLocation(TileMap->GetRenderComponent()->Bounds.Origin);
 		const FBoxSphereBounds Bounds = TileMap->GetRenderComponent()->Bounds;
-		Boundary->SetBoxExtent(Bounds.BoxExtent);
-		BoundaryVisualizer->SetWorldScale3D(FVector{ Bounds.BoxExtent.X / 50.f, 2.f, Bounds.BoxExtent.Z / 50.f });
-		Extent->SetBoxExtent(FVector{ bConstrainX ? FMath::Min(0.f, Bounds.BoxExtent.X - 1280.f) : Bounds.BoxExtent.X, 0.f, bConstrainZ ? FMath::Min(0.f, Bounds.BoxExtent.Z - 384.f) : Bounds.BoxExtent.Z });
+		GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Magenta, FString::Printf(TEXT("TileMapBounds: %s"), *Bounds.BoxExtent.ToString()));
+		UE_LOG(LogTemp, Warning, TEXT("TileMapBounds: %s"), *Bounds.BoxExtent.ToString());
+		EnteringBoundary->SetBoxExtent(Bounds.BoxExtent);
+		BoundaryVisualizer->SetWorldScale3D(FVector{ Bounds.BoxExtent.X / 50.f, Bounds.BoxExtent.Y / 50.f, Bounds.BoxExtent.Z / 50.f });
+		CameraBoundary->SetBoxExtent(FVector{ bConstrainX ? FMath::Max(0.f, Bounds.BoxExtent.X - 768.f) : Bounds.BoxExtent.X, 0.f, bConstrainZ ? FMath::Max(0.f, Bounds.BoxExtent.Z - 384.f) : Bounds.BoxExtent.Z });
 	}
 }
 
@@ -77,6 +79,7 @@ void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>())
 	{
 		HandleOnBeginOverlap(OtherActor);
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, FString::Printf(TEXT("Entering: %s"), *TileMap->GetActorNameOrLabel()));
 	}
 }
 
@@ -85,6 +88,7 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>())
 	{
 		HandleOnEndOverlap(OtherActor);
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, FString::Printf(TEXT("Leaving: %s"), *TileMap->GetActorNameOrLabel()));
 	}
 }
 
@@ -124,9 +128,10 @@ void ACameraBoundary::HandleOnBeginOverlap(AActor* OtherActor)
 			bShouldInterpZ = true;
 			break;
 		case EBoundaryRule::Extent:
-			IPlayerInterface::Execute_SetCameraExtents(OtherActor, Extent, true);
+			IPlayerInterface::Execute_SetCameraInterpolation(OtherActor, this, ECameraInterpState::Entering);
 			break;
 		case EBoundaryRule::Arena:
+			IPlayerInterface::Execute_SetCameraInterpolation(OtherActor, this, ECameraInterpState::Following);
 			break;
 		}
 	}
@@ -151,9 +156,10 @@ void ACameraBoundary::HandleOnEndOverlap(AActor* OtherActor)
 			SetActorTickEnabled(false);
 			break;
 		case EBoundaryRule::Extent:
-			IPlayerInterface::Execute_SetCameraExtents(OtherActor, nullptr, false);
+			IPlayerInterface::Execute_SetCameraInterpolation(OtherActor, this, ECameraInterpState::Leaving);
 			break;
 		case EBoundaryRule::Arena:
+			IPlayerInterface::Execute_SetCameraInterpolation(OtherActor, this, ECameraInterpState::Leaving);
 			break;
 		}
 	}

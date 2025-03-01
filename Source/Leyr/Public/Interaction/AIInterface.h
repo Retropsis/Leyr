@@ -65,7 +65,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FName GetNextBehaviourPattern(FName PatternName);
-
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FBoundLocations GetArenaBounds();
 	

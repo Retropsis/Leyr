@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystem/Data/CharacterInfo.h"
 #include "AI/BaseCharacter.h"
+#include "World/Data/CameraData.h"
 #include "Interaction/InventoryInterface.h"
 #include "Interaction/PlayerInterface.h"
 #include "Inventory/Container/Container.h"
@@ -60,23 +61,24 @@ public:
 	/*
 	 * Camera
 	 */
-	void InterpCameraToActor(float DeltaTime);
-	void InterpCameraToTarget(float DeltaTime);
-	void ClampCameraToExtents();
+	void InterpCameraAdditiveOffset(float DeltaTime);
+	
 	UPROPERTY() TObjectPtr<AActor> ActorToInterp;
 	FVector TargetToInterp;
 	float InterpCameraAlpha = 0.f;
-	bool bShouldInterpCameraToActor = false;
-	bool bShouldInterpCameraToTarget = false;
 	float CurrentTargetDistance = 0.f;
 	bool bShouldUseCameraExtents = false;
-	TObjectPtr<UBoxComponent> CameraExtent;
+	FCameraBounds CameraBounds;
+	ECameraInterpState CameraInterpState = ECameraInterpState::None;
 
 	UPROPERTY(EditDefaultsOnly)
-	float EnteringInterpSpeed = 5.f;
+	float FollowingInterpSpeed = 1.f;
 	
 	UPROPERTY(EditDefaultsOnly)
-	float ExitingInterpSpeed = 2.f;
+	float EnteringInterpSpeed = 8.f;
+	
+	UPROPERTY(EditDefaultsOnly)
+	float ExitingInterpSpeed = 8.f;
 	
 	UPROPERTY(EditDefaultsOnly)
 	float ActorToFollowMaxDistance = 1000.f;
@@ -120,9 +122,7 @@ public:
 	/** Player Interface */
 	virtual USpringArmComponent* GetSpringArmComponent_Implementation() override { return SpringArm; }
 	virtual UCameraComponent* GetCameraComponent_Implementation() override { return FollowCamera; }
-	virtual void ToggleCameraInterpToActor_Implementation(AActor* InActorToFollow, bool bToggle) override;
-	virtual void ToggleCameraInterpToTarget_Implementation(FVector InTargetToFollow, bool bToggle) override;
-	virtual void SetCameraExtents_Implementation(UBoxComponent* Extent, bool bEnable) override;
+	virtual void SetCameraInterpolation_Implementation(ACameraBoundary* CameraBoundary, ECameraInterpState NewState) override;
 	virtual void ResetInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex) override;
 	virtual void UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData) override;
 	virtual void UpdateContainerSlots_Implementation(int32 TotalSlots) override;
@@ -272,6 +272,9 @@ private:
 	TObjectPtr<UHotbarComponent> HotbarComponent;
 
 	UPROPERTY()
+	TObjectPtr<ACameraBoundary> CurrentCameraBoundary;
+
+	UPROPERTY()
 	TObjectPtr<AContainer> InteractingContainer;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
@@ -284,7 +287,7 @@ private:
 	TObjectPtr<UBoxComponent> SwimmingCollision;
 
 	UPROPERTY(EditDefaultsOnly, Category="Player|Plaforming")
-	float PlatformTraceDistance = 10.f;
+	float PlatformTraceDistance = 15.f;
 
 	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
 	float OverlapPlatformTime = .25f;

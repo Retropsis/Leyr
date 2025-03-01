@@ -36,6 +36,7 @@
 #include "Interaction/ElevatorInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/Controller/InventoryWidgetController.h"
+#include "World/Map/CameraBoundary.h"
 #include "World/Map/ParallaxController.h"
 
 APlayerCharacter::APlayerCharacter()
@@ -88,9 +89,7 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	TraceForLedge();
 	TraceForSlope();
 	ForceMove(DeltaSeconds);
-	InterpCameraToActor(DeltaSeconds);
-	ClampCameraToExtents();
-	InterpCameraToTarget(DeltaSeconds);
+	InterpCameraAdditiveOffset(DeltaSeconds);
 }
 
 void APlayerCharacter::ForceMove(float DeltaSeconds)
@@ -176,95 +175,108 @@ void APlayerCharacter::InitializeParallaxController()
 	{
 		ParallaxController->CurrentMapName = FName("Dorn");
 		ParallaxController->InitializeMapParallax(this);
-		ParallaxController->AttachToComponent(SpringArm, FAttachmentTransformRules::KeepWorldTransform);
+		ParallaxController->AttachToComponent(FollowCamera, FAttachmentTransformRules::KeepWorldTransform);
 	}
 }
 
-void APlayerCharacter::InterpCameraToActor(float DeltaTime)
+void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 {
-	if (!bShouldInterpCameraToActor) return;
-	
 	FTransform AdditiveOffset;
 	float FOV = FollowCamera->FieldOfView;
-	FVector TargetAdditiveOffset = FVector::ZeroVector;
-	float InterpSpeed = ExitingInterpSpeed;
+	float InterpSpeed = 10.f;
 	FollowCamera->GetAdditiveOffset(AdditiveOffset, FOV);
 	FollowCamera->ClearAdditiveOffset();
+
+	const FVector CameraLocation = FollowCamera->GetComponentLocation();
+	FVector PreferredCameraLocation = CameraLocation;
+
+	bool bClampFirst = true;
 	
-	if(ActorToInterp && GetDistanceTo(ActorToInterp) < ActorToFollowMaxDistance)
+	switch (CameraInterpState)
 	{
-		const FVector MidPoint{ (ActorToInterp->GetActorLocation() + GetActorLocation()) / 2.f };
-		UKismetSystemLibrary::DrawDebugLine(this, GetActorLocation(), ActorToInterp->GetActorLocation(), FLinearColor::Red);
-		UKismetSystemLibrary::DrawDebugSphere(this, MidPoint, 25.f, 12, FLinearColor::Red);
-		const FVector Delta = MidPoint - GetActorLocation();
-		TargetAdditiveOffset = FVector{ 0.f, Delta.X, Delta.Z };
+	case ECameraInterpState::None: return;
+	case ECameraInterpState::WithinBounds:
+		PreferredCameraLocation = GetActorLocation();
+		bClampFirst = false;
+		break;
+	case ECameraInterpState::Entering:	
 		InterpSpeed = EnteringInterpSpeed;
-		UKismetSystemLibrary::DrawDebugSphere(this, FollowCamera->GetComponentLocation() + Delta, 25.f, 12, FLinearColor::Green);
+		PreferredCameraLocation = GetActorLocation();
+		break;
+	case ECameraInterpState::Leaving:
+		PreferredCameraLocation = GetActorLocation();
+		InterpSpeed = ExitingInterpSpeed;
+		break;
+	case ECameraInterpState::Following:
+		PreferredCameraLocation = GetDistanceTo(ActorToInterp) > ActorToFollowMaxDistance ? GetActorLocation() : FVector{ (ActorToInterp->GetActorLocation() + GetActorLocation()) / 2.f };
+		InterpSpeed = FollowingInterpSpeed;
+		UKismetSystemLibrary::DrawDebugLine(this, GetActorLocation(), ActorToInterp->GetActorLocation(), FLinearColor::Red);
+		UKismetSystemLibrary::DrawDebugSphere(this, PreferredCameraLocation, 25.f, 12, FLinearColor::Red);
+		break;
 	}
+	// Clamp
+	if(CameraBounds.bInitialized && bClampFirst)
+	{
+		if (CameraLocation.X < CameraBounds.Left.X || CameraLocation.X > CameraBounds.Right.X)
+		{
+			PreferredCameraLocation.X = FMath::Clamp(CameraLocation.X, CameraBounds.Left.X, CameraBounds.Right.X);
+		}
+		if (CameraLocation.Z < CameraBounds.Bottom.Z || CameraLocation.Z > CameraBounds.Top.Z)
+		{
+			PreferredCameraLocation.Z = FMath::Clamp(CameraLocation.Z, CameraBounds.Bottom.Z, CameraBounds.Top.Z);
+		}
+	}
+	
+	FVector Delta = PreferredCameraLocation - CameraLocation;
+	FVector TargetAdditiveOffset = FVector{0.f, Delta.X, Delta.Z};
+	UKismetSystemLibrary::DrawDebugSphere(this, FollowCamera->GetComponentLocation() + Delta, 25.f, 12, FLinearColor::Green);
+	UKismetSystemLibrary::DrawDebugSphere(this, FollowCamera->GetComponentLocation() + Delta, 25.f, 12, FLinearColor::White);
+	
+	// Interp
 	CurrentAdditiveOffset = FMath::VInterpTo(AdditiveOffset.GetLocation(), TargetAdditiveOffset, DeltaTime, InterpSpeed);
 	AdditiveOffset.SetLocation(CurrentAdditiveOffset);
 	FollowCamera->AddAdditiveOffset(AdditiveOffset, FOV);
+	ParallaxController->SetActorRelativeLocation(FVector{ 600.f, CurrentAdditiveOffset.Y, CurrentAdditiveOffset.Z });
 	
-		if (FVector::PointsAreNear(CurrentAdditiveOffset, TargetAdditiveOffset, 5.f) && ActorToInterp == nullptr)
+	if(CameraBounds.bInitialized && !bClampFirst)
+	{
+		if (CameraLocation.X < CameraBounds.Left.X || CameraLocation.X > CameraBounds.Right.X)
 		{
-			bShouldInterpCameraToActor = false;
-			FollowCamera->ClearAdditiveOffset();
+			PreferredCameraLocation.X = FMath::Clamp(CameraLocation.X, CameraBounds.Left.X, CameraBounds.Right.X);
 		}
-}
-
-void APlayerCharacter::InterpCameraToTarget(float DeltaTime)
-{
-	if (!bShouldInterpCameraToTarget) return;
-		
-	FTransform AdditiveOffset;
-	float FOV = FollowCamera->FieldOfView;
-	FollowCamera->GetAdditiveOffset(AdditiveOffset, FOV);
-	FollowCamera->ClearAdditiveOffset();
+		if (CameraLocation.Z < CameraBounds.Bottom.Z || CameraLocation.Z > CameraBounds.Top.Z)
+		{
+			PreferredCameraLocation.Z = FMath::Clamp(CameraLocation.Z, CameraBounds.Bottom.Z, CameraBounds.Top.Z);
+		}
 	
-	CurrentAdditiveOffset = FMath::VInterpTo(AdditiveOffset.GetLocation(), TargetToInterp, DeltaTime, CameraExtent ? EnteringInterpSpeed : ExitingInterpSpeed);
-	AdditiveOffset.SetLocation(CurrentAdditiveOffset);
-	FollowCamera->AddAdditiveOffset(AdditiveOffset, FOV);
-
-	if (FVector::PointsAreNear(CurrentAdditiveOffset, TargetToInterp, 5.f))
-	{
-		bShouldInterpCameraToTarget = false;
-		if (CameraExtent == nullptr) FollowCamera->ClearAdditiveOffset();
-	}
-}
-
-void APlayerCharacter::ClampCameraToExtents()
-{
-	if (!bShouldUseCameraExtents) return;
-
-	const FVector CameraLocation = FollowCamera->GetComponentLocation();
-	const FVector CameraExtentLocation = CameraExtent->GetComponentLocation();
-	const FVector CameraExtents = CameraExtent->GetScaledBoxExtent();
-	
-	const FVector Left { CameraExtentLocation.X - CameraExtents.X, 10.f, CameraLocation.Z };
-	const FVector Right { CameraExtentLocation.X + CameraExtents.X, 10.f, CameraLocation.Z };
-	const FVector Top { CameraLocation.X, 10.f, CameraExtentLocation.Z + CameraExtents.Z };
-	const FVector Bottom { CameraLocation.X, 10.f, CameraExtentLocation.Z - CameraExtents.Z };
-	UKismetSystemLibrary:: DrawDebugPoint(this, Left, 15.f, FLinearColor::White);
-	UKismetSystemLibrary:: DrawDebugPoint(this, Right, 15.f, FLinearColor::White);
-	UKismetSystemLibrary:: DrawDebugPoint(this, Bottom, 15.f, FLinearColor::White);
-	UKismetSystemLibrary:: DrawDebugPoint(this, Top, 15.f, FLinearColor::White);
-	
-	FVector PreferredCameraLocation = CameraLocation;
-	if (CameraLocation.X < Left.X || CameraLocation.X > Right.X)
-	{
-		PreferredCameraLocation.X = FMath::Clamp(CameraLocation.X, Left.X, Right.X);
-	}
-	if (CameraLocation.Z < Bottom.Z || CameraLocation.Z > Top.Z)
-	{
-		PreferredCameraLocation.Z = FMath::Clamp(CameraLocation.Z, Bottom.Z, Top.Z);
-	}
-	const FVector Delta = CameraLocation - PreferredCameraLocation;
-	TargetToInterp = -Delta;
-	
-	if (!bShouldInterpCameraToTarget)
-	{
 		FollowCamera->ClearAdditiveOffset();
-		FollowCamera->AddAdditiveOffset(FTransform{ TargetToInterp }, FollowCamera->FieldOfView);
+		Delta = PreferredCameraLocation - CameraLocation;
+		TargetAdditiveOffset = FVector{ 0.f, Delta.X, Delta.Z };
+		AdditiveOffset.SetLocation(TargetAdditiveOffset);
+		FollowCamera->AddAdditiveOffset(AdditiveOffset, FOV);
+		ParallaxController->SetActorRelativeLocation(FVector{ 600.f, TargetAdditiveOffset.Y, TargetAdditiveOffset.Z });
+	}
+
+	// Check State
+	if (FVector::PointsAreNear(CurrentAdditiveOffset, TargetAdditiveOffset, 5.f))
+	{
+		if (CameraInterpState == ECameraInterpState::Entering) 	CameraInterpState = ECameraInterpState::WithinBounds;
+		if (!CameraBounds.bInitialized) FollowCamera->ClearAdditiveOffset();
+	}
+	// if (ActorToInterp) CameraInterpState = GetDistanceTo(ActorToInterp) < ActorToFollowMaxDistance ? ECameraInterpState::Following : ECameraInterpState::WithinBounds;
+}
+
+void APlayerCharacter::SetCameraInterpolation_Implementation(ACameraBoundary* CameraBoundary, ECameraInterpState NewState)
+{
+	if(NewState == ECameraInterpState::Leaving && CurrentCameraBoundary != CameraBoundary) return;
+	if(CameraBoundary)
+	{
+		CurrentCameraBoundary = CameraBoundary;
+		CameraBounds = FCameraBounds{ CameraBoundary->GetBounds(), FollowCamera->GetComponentLocation() };
+		CameraBounds.bInitialized = NewState == ECameraInterpState::Following || NewState == ECameraInterpState::Entering;
+		ActorToInterp = CameraBoundary->GetTargetActor();
+		CameraInterpState = NewState;
+		CurrentAdditiveOffset = FVector::ZeroVector;
 	}
 }
 
@@ -600,11 +612,15 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		{
 			PlayerCharacterAnimInstance->bIsCrouched = true;
 		}
+		// FollowCamera->SetRelativeLocation(FVector{0.f, 0.f, GetCharacterMovement()->GetCrouchedHalfHeight() });
+		// ParallaxController->SetActorRelativeLocation(FVector{600.f, 0.f, 0.f });
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Crouching);
 		break;
 	case ECombatState::UnCrouching:
 		UnCrouch();
 		CombatState = ECombatState::Unoccupied;
+		// FollowCamera->SetRelativeLocation(FVector::ZeroVector);
+		// ParallaxController->SetActorRelativeLocation(FVector{ 600.f, 0.f, 0.f});
 		// MakeAndApplyEffectToSelf(GameplayTags.CombatState_UnCrouching);
 		// if(const UWorld* World = GetWorld())
 		// {
@@ -1266,30 +1282,6 @@ void APlayerCharacter::ServerCloseContainer_Implementation()
 	InteractingContainer->ServerStopInteracting(this);
 	InteractingContainer = nullptr;
 	// IControllerInterface::Execute_ToggleContainer(Controller, 0);
-}
-
-void APlayerCharacter::ToggleCameraInterpToActor_Implementation(AActor* InActorToFollow, bool bToggle)
-{
-	bShouldInterpCameraToActor = bToggle;
-	ActorToInterp = InActorToFollow;
-	CurrentAdditiveOffset = GetActorLocation();
-}
-
-void APlayerCharacter::ToggleCameraInterpToTarget_Implementation(FVector InTargetToFollow, bool bToggle)
-{
-	bShouldInterpCameraToTarget = bToggle;
-	TargetToInterp = InTargetToFollow;
-	CurrentAdditiveOffset = GetActorLocation();
-}
-
-void APlayerCharacter::SetCameraExtents_Implementation(UBoxComponent* Extent, bool bEnable)
-{
-	CameraExtent = Extent;
-	bShouldUseCameraExtents = bEnable;
-
-	TargetToInterp = FVector::ZeroVector;
-	bShouldInterpCameraToTarget = true;
-	CurrentAdditiveOffset = GetActorLocation();
 }
 
 /*

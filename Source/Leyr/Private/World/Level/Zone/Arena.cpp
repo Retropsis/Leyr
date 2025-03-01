@@ -1,23 +1,23 @@
 // @ Retropsis 2024-2025.
 
 #include "World/Level/Zone/Arena.h"
+#include "AI/BaseCharacter.h"
 #include "Components/BoxComponent.h"
-#include "Interaction/PlayerInterface.h"
 #include "Leyr/Leyr.h"
 
 AArena::AArena()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	LeavingArea = CreateDefaultSubobject<UBoxComponent>("LeavingArea");
-	LeavingArea->SetupAttachment(GetRootComponent());
-	LeavingArea->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	LeavingArea->SetCollisionResponseToAllChannels(ECR_Ignore);
-	LeavingArea->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	LeavingArea->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
-	LeavingArea->InitBoxExtent(FVector(360.f, 100.f, 360.f));
+	LeavingBoundary = CreateDefaultSubobject<UBoxComponent>("Leaving Boundary");
+	LeavingBoundary->SetupAttachment(GetRootComponent());
+	LeavingBoundary->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	LeavingBoundary->SetCollisionResponseToAllChannels(ECR_Ignore);
+	LeavingBoundary->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	LeavingBoundary->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
+	LeavingBoundary->InitBoxExtent(FVector(360.f, 100.f, 360.f));
 
-	LeavingBoundaryVisualizer = CreateDefaultSubobject<UStaticMeshComponent>("LeavingBoundaryVisualizer");
+	LeavingBoundaryVisualizer = CreateDefaultSubobject<UStaticMeshComponent>("Leaving Boundary Visualizer");
 	LeavingBoundaryVisualizer->SetupAttachment(GetRootComponent());
 	LeavingBoundaryVisualizer->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	LeavingBoundaryVisualizer->SetHiddenInGame(true);
@@ -31,10 +31,10 @@ void AArena::BeginPlay()
 	SetActorTickEnabled(false);
 	if (HasAuthority())
 	{
-		Boundary->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		EnteringBoundary->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 		
-		LeavingArea->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-		LeavingArea->OnComponentEndOverlap.AddDynamic(this, &AArena::OnEndOverlap);
+		LeavingBoundary->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		LeavingBoundary->OnComponentEndOverlap.AddDynamic(this, &AArena::OnLeavingBoundary);
 	}
 }
 
@@ -48,8 +48,8 @@ void AArena::InitializeCameraExtent()
 	Super::InitializeCameraExtent();
 	if (TileMap)
 	{
-		LeavingArea->SetBoxExtent(Boundary->GetScaledBoxExtent() + 40.f);
-		LeavingBoundaryVisualizer->SetWorldScale3D(FVector{ Boundary->GetScaledBoxExtent().X / 50.f, 2.f, Boundary->GetScaledBoxExtent().Z / 50.f });
+		LeavingBoundary->SetBoxExtent(EnteringBoundary->GetScaledBoxExtent() + 40.f);
+		LeavingBoundaryVisualizer->SetWorldScale3D(FVector{ LeavingBoundary->GetScaledBoxExtent().X / 50.f, LeavingBoundary->GetScaledBoxExtent().Y / 50.f, LeavingBoundary->GetScaledBoxExtent().Z / 50.f });
 	}
 }
 
@@ -59,9 +59,14 @@ void AArena::HandleOnBeginOverlap(AActor* OtherActor)
 	OnPlayerEntering.Broadcast(OtherActor);
 }
 
+void AArena::HandleOnOwnerDeath(AActor* DeadActor)
+{
+	
+}
+
 FBoundLocations AArena::GetArenaBounds() const
 {
-	const float ArenaExtent = Boundary->GetScaledBoxExtent().X;
-	const FVector Location = Boundary->GetComponentLocation();
+	const float ArenaExtent = EnteringBoundary->GetScaledBoxExtent().X;
+	const FVector Location = EnteringBoundary->GetComponentLocation();
 	return FBoundLocations{ FVector{ Location.X - ArenaExtent, 0.f, Location.Z }, FVector{ Location.X + ArenaExtent, 0.f, Location.Z } };
 }

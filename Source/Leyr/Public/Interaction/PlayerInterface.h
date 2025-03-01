@@ -7,6 +7,7 @@
 #include "UObject/Interface.h"
 #include "PlayerInterface.generated.h"
 
+class ACameraBoundary;
 class UBoxComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -39,15 +40,9 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent)
 	UCameraComponent* GetCameraComponent();
-
-	UFUNCTION(BlueprintNativeEvent)
-	void ToggleCameraInterpToActor(AActor* InActorToFollow, bool bToggle);
 	
 	UFUNCTION(BlueprintNativeEvent)
-	void ToggleCameraInterpToTarget(FVector InTargetToFollow, bool bToggle);
-	
-	UFUNCTION(BlueprintNativeEvent)
-	void SetCameraExtents(UBoxComponent* Extent, bool bEnable);
+	void SetCameraInterpolation(ACameraBoundary* CameraBoundary, ECameraInterpState NewState);
 	
 	/*
 	 * Ability System

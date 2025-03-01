@@ -40,6 +40,9 @@ public:
 	virtual void InitializeCameraExtent() override;
 	virtual void HandleOnBeginOverlap(AActor* OtherActor) override;
 
+	UFUNCTION()
+	void HandleOnOwnerDeath(AActor* DeadActor);
+
 protected:
 	virtual void BeginPlay() override;
 	
@@ -47,7 +50,7 @@ protected:
 	virtual void OnLeavingBoundary(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UBoxComponent> LeavingArea;
+	TObjectPtr<UBoxComponent> LeavingBoundary;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> LeavingBoundaryVisualizer;

@@ -7,6 +7,7 @@
 #include "World/Data/MapInfo.h"
 #include "ParallaxController.generated.h"
 
+class UCameraComponent;
 class UPaperSpriteComponent;
 
 UCLASS()
@@ -21,6 +22,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FName CurrentMapName = FName();
+	
+	UPROPERTY()
+	TObjectPtr<UCameraComponent> Camera;
 
 protected:
 	UPROPERTY()

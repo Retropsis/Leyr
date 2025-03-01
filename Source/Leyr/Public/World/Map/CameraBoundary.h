@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "World/Data/CameraData.h"
 #include "PaperTileMapActor.h"
+#include "Components/BoxComponent.h"
 #include "CameraBoundary.generated.h"
 
 class UCameraComponent;
@@ -33,8 +34,13 @@ public:
 
 	UFUNCTION(CallInEditor, Category="Camera Boundary")
 	virtual void InitializeCameraExtent();
+	
 	virtual void HandleOnBeginOverlap(AActor* OtherActor);
 	virtual void HandleOnEndOverlap(AActor* OtherActor);
+
+	void SetTargetActor(AActor* InTargetActor) { TargetActor = InTargetActor; }
+	AActor* GetTargetActor() { return TargetActor; }
+	FBoxSphereBounds GetBounds() const { return CameraBoundary->Bounds; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -52,10 +58,10 @@ protected:
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UBoxComponent> Boundary;
+	TObjectPtr<UBoxComponent> EnteringBoundary;
 	
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UBoxComponent> Extent;
+	TObjectPtr<UBoxComponent> CameraBoundary;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> BoundaryVisualizer;
@@ -85,6 +91,7 @@ private:
 	TObjectPtr<USpringArmComponent> SpringArm;
 	TObjectPtr<UCameraComponent> FollowCamera;
 	UPROPERTY() TObjectPtr<AActor> Player;
+	UPROPERTY() TObjectPtr<AActor> TargetActor;
 	FVector ExitLocation = FVector::ZeroVector;
 	FVector OriginalSocketOffset = FVector::ZeroVector;
 	FVector ResetSocketOffset = FVector::ZeroVector;

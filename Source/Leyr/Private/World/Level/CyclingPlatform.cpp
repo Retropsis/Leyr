@@ -11,6 +11,7 @@ ACyclingPlatform::ACyclingPlatform()
 	FlipbookComponent = CreateDefaultSubobject<UPaperFlipbookComponent>("FlipbookComponent");
 	FlipbookComponent->SetupAttachment(GetRootComponent());
 	FlipbookComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	FlipbookComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 	FlipbookComponent->SetLooping(false);
 	
 	Platform = EPlatformType::Cycling;

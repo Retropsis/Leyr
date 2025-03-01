@@ -2,6 +2,7 @@
 
 #include "World/Level/Platform.h"
 #include "Components/BoxComponent.h"
+#include "Leyr/Leyr.h"
 
 APlatform::APlatform()
 {
@@ -9,6 +10,10 @@ APlatform::APlatform()
 	bReplicates = true;
 
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>("BoxCollision");
+	BoxCollision->SetCollisionObjectType(ECC_OneWayPlatform);
+	BoxCollision->SetCollisionResponseToAllChannels(ECR_Ignore);
+	BoxCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	BoxCollision->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
 	SetRootComponent(BoxCollision);
 
 	Tags.Add(FName("Platform"));

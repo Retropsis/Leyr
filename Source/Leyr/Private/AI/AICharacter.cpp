@@ -109,6 +109,7 @@ void AAICharacter::PossessedBy(AController* NewController)
 	{
 		Arena->OnPlayerEntering.AddLambda([this](AActor* Player) { HandlePlayerOverlappingArena(Player, true); });
 		Arena->OnPlayerLeaving.AddLambda([this](AActor* Player) { HandlePlayerOverlappingArena(Player, false); });
+		Arena->SetTargetActor(this);
 	}
 
 	if(bCollisionCauseDamage)
@@ -317,7 +318,7 @@ void AAICharacter::Die(const FVector& DeathImpulse, bool bExecute)
 	
 	if(CombatTarget)
 	{
-		IPlayerInterface::Execute_ToggleCameraInterpToActor(CombatTarget, nullptr, true);
+		IPlayerInterface::Execute_SetCameraInterpolation(CombatTarget, Arena, ECameraInterpState::WithinBounds);
 	}
 	
 	Super::Die(DeathImpulse, bExecute);
@@ -522,13 +523,11 @@ void AAICharacter::HandlePlayerOverlappingArena(AActor* Player, bool bIsEntering
 	if(bIsEntering)
 	{
 		if (IsValid(BaseAIController)) BaseAIController->GetBlackboardComponent()->SetValueAsObject(FName("TargetToFollow"), Player);
-		IPlayerInterface::Execute_ToggleCameraInterpToActor(Player, this, true);
 		CombatTarget = Player;
 	}
 	else
 	{
 		if (IsValid(BaseAIController)) BaseAIController->GetBlackboardComponent()->SetValueAsObject(FName("TargetToFollow"), nullptr);
-		IPlayerInterface::Execute_ToggleCameraInterpToActor(Player, nullptr, true);
 		CombatTarget = nullptr;
 	}
 }
