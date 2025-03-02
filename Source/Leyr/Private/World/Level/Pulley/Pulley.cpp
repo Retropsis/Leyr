@@ -41,11 +41,3 @@ void APulley::Interact_Implementation(AActor* InteractingActor)
 	WeightHitBox->SetSimulatePhysics(true);
 }
 
-// void APulley::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-// {
-// 	if(OtherActor&& OtherActor->ActorHasTag("HitInteraction"))
-// 	{
-// 		// Skip Lever OnBeginOverlap
-// 	}
-// }
-

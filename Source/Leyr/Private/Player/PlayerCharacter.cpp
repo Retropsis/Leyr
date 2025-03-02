@@ -1307,7 +1307,7 @@ void APlayerCharacter::TryOpenKeylock_Implementation(const TSoftObjectPtr<UItemD
 {
 	for (FInventoryItemData Item : PlayerInventory->Items)
 	{
-		if (Item.Asset == Asset)
+		if (Item.Asset == Asset && Asset.IsValid())
 		{
 			OnKeyItemUsed.Broadcast();
 			return;

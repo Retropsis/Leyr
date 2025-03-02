@@ -32,4 +32,7 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBoxComponent> LockHitBox;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UPaperFlipbookComponent> LockFlipbook;
 };
