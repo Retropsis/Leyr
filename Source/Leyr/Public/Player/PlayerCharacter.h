@@ -130,6 +130,8 @@ public:
 	virtual void CloseContainer_Implementation() override;
 	virtual UInventoryComponent* GetInventoryComponentByType_Implementation(EContainerType Type) override;
 	virtual bool UseItem_Implementation(UItemData* Asset, int32 Amount, bool bIsSelfCost, int32& OutQuantity) override;
+	virtual void TryOpenKeylock_Implementation(const TSoftObjectPtr<UItemData>& Asset) override;
+	virtual FOnKeyItemUsed& GetOnKeyItemUsed() override { return OnKeyItemUsed; }
 	
 	virtual void AddToXP_Implementation(int32 InXP) override;
 	virtual void LevelUp_Implementation() override;
@@ -168,6 +170,8 @@ protected:
 	virtual void InitializeCharacterInfo() override;
 	void HandleCombatState(ECombatState NewState);
 	void HandleHangingOnLedge(const FVector& HangingTarget);
+	void InitializeCameraBoundary();
+	virtual void BeginPlay() override;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Debug")
 	bool Invincibility = false;
@@ -321,7 +325,9 @@ private:
 	FTimerHandle DefeatTimer;
 
 	FVector CurrentAdditiveOffset;
-	float LastActorToInterpDistance;;
+	float LastActorToInterpDistance;
+	
+	FOnKeyItemUsed OnKeyItemUsed;
 
 public:
 	FORCEINLINE bool IsAirborne() const { return bAirborne; }

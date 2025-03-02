@@ -23,6 +23,8 @@ class UPlayerInterface : public UInterface
 	GENERATED_BODY()
 };
 
+DECLARE_MULTICAST_DELEGATE(FOnKeyItemUsed);
+
 /**
  * 
  */
@@ -86,6 +88,14 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ToggleAiming(bool bAiming);
 
+	/*
+	 * Inventory / Interaction
+	*/
+	UFUNCTION(BlueprintNativeEvent)
+	void TryOpenKeylock(const TSoftObjectPtr<UItemData>& Asset);
+
+	virtual FOnKeyItemUsed& GetOnKeyItemUsed() = 0;
+	
 	/*
 	 * Inventory
 	 */

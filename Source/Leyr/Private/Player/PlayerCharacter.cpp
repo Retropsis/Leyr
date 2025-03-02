@@ -139,6 +139,12 @@ void APlayerCharacter::HandleCharacterMovementUpdated(float DeltaSeconds, FVecto
 	}
 }
 
+void APlayerCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	InitializeCameraBoundary();
+}
+
 void APlayerCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
@@ -179,6 +185,24 @@ void APlayerCharacter::InitializeParallaxController()
 	}
 }
 
+void APlayerCharacter::InitializeCameraBoundary()
+{
+	TArray<AActor*> OutActors;
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(ObjectTypeQuery2);
+	UKismetSystemLibrary::BoxOverlapActors(this, GetActorLocation(), FVector{50.f }, ObjectTypes, ACameraBoundary::StaticClass(), ActorsToIgnore, OutActors);
+	for (AActor* Actor : OutActors)
+	{
+		if (ACameraBoundary* CameraBoundary = Cast<ACameraBoundary>(Actor))
+		{
+			CameraBoundary->HandleOnBeginOverlap(this);
+			break;
+		}
+	}
+}
+
 void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 {
 	FTransform AdditiveOffset;
@@ -210,8 +234,6 @@ void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 	case ECameraInterpState::Following:
 		PreferredCameraLocation = GetDistanceTo(ActorToInterp) > ActorToFollowMaxDistance ? GetActorLocation() : FVector{ (ActorToInterp->GetActorLocation() + GetActorLocation()) / 2.f };
 		InterpSpeed = FollowingInterpSpeed;
-		UKismetSystemLibrary::DrawDebugLine(this, GetActorLocation(), ActorToInterp->GetActorLocation(), FLinearColor::Red);
-		UKismetSystemLibrary::DrawDebugSphere(this, PreferredCameraLocation, 25.f, 12, FLinearColor::Red);
 		break;
 	}
 	// Clamp
@@ -226,11 +248,8 @@ void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 			PreferredCameraLocation.Z = FMath::Clamp(CameraLocation.Z, CameraBounds.Bottom.Z, CameraBounds.Top.Z);
 		}
 	}
-	
 	FVector Delta = PreferredCameraLocation - CameraLocation;
 	FVector TargetAdditiveOffset = FVector{0.f, Delta.X, Delta.Z};
-	UKismetSystemLibrary::DrawDebugSphere(this, FollowCamera->GetComponentLocation() + Delta, 25.f, 12, FLinearColor::Green);
-	UKismetSystemLibrary::DrawDebugSphere(this, FollowCamera->GetComponentLocation() + Delta, 25.f, 12, FLinearColor::White);
 	
 	// Interp
 	CurrentAdditiveOffset = FMath::VInterpTo(AdditiveOffset.GetLocation(), TargetAdditiveOffset, DeltaTime, InterpSpeed);
@@ -282,7 +301,9 @@ void APlayerCharacter::SetCameraInterpolation_Implementation(ACameraBoundary* Ca
 
 void APlayerCharacter::ServerInteract_Implementation()
 {	
-	if(CombatState == ECombatState::HangingLadder || GetCharacterMovement()->IsFalling()) return;
+	if(CombatState == ECombatState::HangingLadder ||
+		CombatState == ECombatState::Climbing ||
+		GetCharacterMovement()->IsFalling()) return;
 
 	FHitResult Hit;
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
@@ -302,6 +323,11 @@ void APlayerCharacter::ServerInteract_Implementation()
 	if(Hit.bBlockingHit && Hit.GetActor()->ActorHasTag("Ladder"))
 	{
 		HandleCombatState(ECombatState::HangingLadder);
+		return;
+	}
+	if(Hit.bBlockingHit && Hit.GetActor()->ActorHasTag("ClimbingSurface"))
+	{
+		HandleCombatState(ECombatState::Climbing);
 		return;
 	}
 	if(Hit.bBlockingHit && Hit.GetActor()->ActorHasTag("BackEntrance"))
@@ -1275,6 +1301,18 @@ bool APlayerCharacter::UseItem_Implementation(UItemData* Asset, int32 Amount, bo
 		}
 	}
 	return bHasFoundCompatibleItem;
+}
+
+void APlayerCharacter::TryOpenKeylock_Implementation(const TSoftObjectPtr<UItemData>& Asset)
+{
+	for (FInventoryItemData Item : PlayerInventory->Items)
+	{
+		if (Item.Asset == Asset)
+		{
+			OnKeyItemUsed.Broadcast();
+			return;
+		}
+	}
 }
 
 void APlayerCharacter::ServerCloseContainer_Implementation()
