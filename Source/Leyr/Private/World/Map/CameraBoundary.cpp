@@ -66,8 +66,6 @@ void ACameraBoundary::InitializeCameraExtent()
 	{
 		SetActorLocation(TileMap->GetRenderComponent()->Bounds.Origin);
 		const FBoxSphereBounds Bounds = TileMap->GetRenderComponent()->Bounds;
-		GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Magenta, FString::Printf(TEXT("TileMapBounds: %s"), *Bounds.BoxExtent.ToString()));
-		UE_LOG(LogTemp, Warning, TEXT("TileMapBounds: %s"), *Bounds.BoxExtent.ToString());
 		EnteringBoundary->SetBoxExtent(Bounds.BoxExtent);
 		BoundaryVisualizer->SetWorldScale3D(FVector{ Bounds.BoxExtent.X / 50.f, Bounds.BoxExtent.Y / 50.f, Bounds.BoxExtent.Z / 50.f });
 		CameraBoundary->SetBoxExtent(FVector{ bConstrainX ? FMath::Max(0.f, Bounds.BoxExtent.X - 768.f) : Bounds.BoxExtent.X, 0.f, bConstrainZ ? FMath::Max(0.f, Bounds.BoxExtent.Z - 384.f) : Bounds.BoxExtent.Z });
@@ -79,7 +77,6 @@ void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>())
 	{
 		HandleOnBeginOverlap(OtherActor);
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, FString::Printf(TEXT("Entering: %s"), *TileMap->GetActorNameOrLabel()));
 	}
 }
 
@@ -88,7 +85,6 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>())
 	{
 		HandleOnEndOverlap(OtherActor);
-		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, FString::Printf(TEXT("Leaving: %s"), *TileMap->GetActorNameOrLabel()));
 	}
 }
 

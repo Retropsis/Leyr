@@ -30,6 +30,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ForEachHitTryCausingDamage(TArray<FHitResult> HitResults);
+	
+	UFUNCTION(BlueprintCallable)
+	void ApplyHitStop();
 
 	UFUNCTION(BlueprintPure)
 	bool IsHostile() const;

@@ -4,6 +4,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
+#include "AI/BaseCharacter.h"
 #include "Data/ItemData.h"
 #include "Game/BaseGameplayTags.h"
 #include "Interaction/InteractionInterface.h"
@@ -88,6 +89,21 @@ void UDamageGameplayAbility::ForEachHitTryCausingDamage(TArray<FHitResult> HitRe
 	}
 }
 
+void UDamageGameplayAbility::ApplyHitStop()
+{
+	const bool bShouldHitStop = WeaponTaggedMontage.HitStopDuration > 0.f && bHasHitTarget;
+	if (HitActors.Num() <= 0 || !bShouldHitStop) return;
+
+	for (AActor* Actor : HitActors)
+	{
+		if(ABaseCharacter* Character = Cast<ABaseCharacter>(Actor)) Character->HitStop(WeaponTaggedMontage.HitStopDuration, WeaponTaggedMontage.HitStopAmount);
+	}
+	if(ABaseCharacter* Character = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo()))
+	{
+		Character->HitStop(WeaponTaggedMontage.HitStopDuration, WeaponTaggedMontage.HitStopAmount);
+	}
+}
+
 bool UDamageGameplayAbility::IsHostile() const
 {
 	return ULeyrAbilitySystemLibrary::IsHostile(GetAvatarActorFromActorInfo(), HitActor);
@@ -96,20 +112,20 @@ bool UDamageGameplayAbility::IsHostile() const
 void UDamageGameplayAbility::SetCurrentComboSequence()
 {
 	const int32 Index = ICombatInterface::Execute_GetAttackComboIndex(GetAvatarActorFromActorInfo());
-	FTaggedMontage TaggedMontage = ICombatInterface::Execute_GetTaggedMontageByIndex(GetAvatarActorFromActorInfo(), Index);
+	TaggedMontage = ICombatInterface::Execute_GetTaggedMontageByIndex(GetAvatarActorFromActorInfo(), Index);
 	SelectedMontage = TaggedMontage.Montage;
 	MontageTag = TaggedMontage.MontageTag;
 }
 
 void UDamageGameplayAbility::SetCurrentSequence()
 {
-	FTaggedMontage TaggedMontage = ICombatInterface::Execute_GetTaggedMontageByTag(GetAvatarActorFromActorInfo(), MontageTag, SequenceType);
+	TaggedMontage = ICombatInterface::Execute_GetTaggedMontageByTag(GetAvatarActorFromActorInfo(), MontageTag, SequenceType);
 	SelectedMontage = TaggedMontage.Montage;
 
-	if (UItemData* Asset = Cast<UItemData>(GetSourceObjectFromAbilitySpec()))
+	if (const UItemData* Asset = Cast<UItemData>(GetSourceObjectFromAbilitySpec()))
 	{
-		FTaggedMontage TaggedWeaponMontage = Asset->FindSequenceInfoForTag(MontageTag);
-		SelectedWeaponMontage = TaggedWeaponMontage.Montage;
+		WeaponTaggedMontage = Asset->FindSequenceInfoForTag(MontageTag);
+		SelectedWeaponMontage = WeaponTaggedMontage.Montage;
 	}
 }
 

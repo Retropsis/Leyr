@@ -56,4 +56,3 @@ void APulley::Interact_Implementation(AActor* InteractingActor)
 		WeightHitBox->SetSimulatePhysics(true);
 	}
 }
-

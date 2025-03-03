@@ -217,6 +217,13 @@ UPaperZDAnimInstance* ABaseCharacter::SetWeaponAnimInstance(const TSubclassOf<UP
 	return WeaponComponent->GetOrCreateAnimInstance();
 }
 
+void ABaseCharacter::HitStop(const float Duration, const float Amount)
+{
+	CustomTimeDilation = Amount;
+	FTimerHandle HitStopTimer;
+	GetWorld()->GetTimerManager().SetTimer(HitStopTimer, FTimerDelegate::CreateLambda([this] () { CustomTimeDilation = 1.f; }), Duration, false);
+}
+
 void ABaseCharacter::Die(const FVector& DeathImpulse, bool bExecute)
 {
 	DefeatState = bExecute ? EDefeatState::Executed : EDefeatState::Defeated;

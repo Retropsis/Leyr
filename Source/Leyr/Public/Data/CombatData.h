@@ -38,6 +38,12 @@ struct FTaggedMontage
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FVector BoxTraceExtent = FVector(40.f, 20.f, 30.f);
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(ClampMin=0.f, ClampMax=1.f))
+	float HitStopAmount = 0.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float HitStopDuration = 0.f;
 };
 
 USTRUCT(BlueprintType)

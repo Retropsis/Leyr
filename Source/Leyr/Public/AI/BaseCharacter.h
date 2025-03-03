@@ -31,6 +31,9 @@ public:
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	void ChangeDirections();
 	UPaperZDAnimInstance* SetWeaponAnimInstance(const TSubclassOf<UPaperZDAnimInstance>& AnimInstance) const;
+
+	UFUNCTION(BlueprintCallable)
+	void HitStop(float Duration, float Amount = 0.f); 
 	
 	FOnDeath OnDeath;
 

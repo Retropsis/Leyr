@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
+#include "Data/CombatData.h"
 #include "Leyr/Leyr.h"
 #include "BaseGameplayAbility.generated.h"
 
@@ -57,6 +58,9 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UPaperZDAnimInstance> WeaponAnimInstance = nullptr;
+
+	FTaggedMontage TaggedMontage;
+	FTaggedMontage WeaponTaggedMontage;
 
 private:
 	FActiveGameplayEffectHandle ActiveSourceObjectEffectHandle;

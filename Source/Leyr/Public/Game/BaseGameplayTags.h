@@ -400,6 +400,7 @@ FGameplayTag Montage_Parry;
 FGameplayTag Montage_Parry_Begin;
 FGameplayTag Montage_Parry_End;
 FGameplayTag Montage_Execute;
+FGameplayTag Montage_HitStop;
  
 FGameplayTag Montage_Window_Combo;
 FGameplayTag Montage_Window_Execute;
