@@ -18,7 +18,6 @@ AKeylock::AKeylock()
 	LockHitBox->SetupAttachment(GetRootComponent());
 	LockHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	LockHitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
-	LockHitBox->SetConstraintMode(EDOFMode::XZPlane);
 
 	LockFlipbook = CreateDefaultSubobject<UPaperFlipbookComponent>("Lock");
 	LockFlipbook->SetupAttachment(LockHitBox);
