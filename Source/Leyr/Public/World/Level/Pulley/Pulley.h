@@ -7,6 +7,7 @@
 #include "World/Level/Lever.h"
 #include "Pulley.generated.h"
 
+class UPhysicsConstraintComponent;
 class UBoxComponent;
 
 UCLASS()
@@ -28,4 +29,7 @@ protected:
 private:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBoxComponent> WeightHitBox;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UPhysicsConstraintComponent> PhysicsConstraint;
 };
