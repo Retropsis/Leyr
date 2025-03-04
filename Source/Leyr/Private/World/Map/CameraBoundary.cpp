@@ -68,7 +68,7 @@ void ACameraBoundary::InitializeCameraExtent()
 		const FBoxSphereBounds Bounds = TileMap->GetRenderComponent()->Bounds;
 		EnteringBoundary->SetBoxExtent(Bounds.BoxExtent);
 		BoundaryVisualizer->SetWorldScale3D(FVector{ Bounds.BoxExtent.X / 50.f, Bounds.BoxExtent.Y / 50.f, Bounds.BoxExtent.Z / 50.f });
-		CameraBoundary->SetBoxExtent(FVector{ bConstrainX ? FMath::Max(0.f, Bounds.BoxExtent.X - 768.f) : Bounds.BoxExtent.X, 0.f, bConstrainZ ? FMath::Max(0.f, Bounds.BoxExtent.Z - 384.f) : Bounds.BoxExtent.Z });
+		CameraBoundary->SetBoxExtent(FVector{ bConstrainX ? FMath::Max(0.f, Bounds.BoxExtent.X - 640.f) : Bounds.BoxExtent.X, 0.f, bConstrainZ ? FMath::Max(0.f, Bounds.BoxExtent.Z - 384.f) : Bounds.BoxExtent.Z });
 	}
 }
 

@@ -232,8 +232,17 @@ void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 		InterpSpeed = ExitingInterpSpeed;
 		break;
 	case ECameraInterpState::Following:
-		PreferredCameraLocation = GetDistanceTo(ActorToInterp) > ActorToFollowMaxDistance ? GetActorLocation() : FVector{ (ActorToInterp->GetActorLocation() + GetActorLocation()) / 2.f };
-		InterpSpeed = FollowingInterpSpeed;
+		if (ActorToInterp)
+		{
+			PreferredCameraLocation = GetDistanceTo(ActorToInterp) > ActorToFollowMaxDistance ? GetActorLocation() : FVector{ (ActorToInterp->GetActorLocation() + GetActorLocation()) / 2.f };
+			InterpSpeed = FollowingInterpSpeed;
+		}
+		else
+		{
+			PreferredCameraLocation = GetActorLocation();
+			bClampFirst = false;
+			CameraInterpState = ECameraInterpState::Entering;
+		}
 		break;
 	}
 	// Clamp

@@ -164,6 +164,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UNiagaraComponent> LevelUpNiagaraComponent;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Debug")
+	bool Invincibility = false;
 
 protected:
 	virtual void InitAbilityActorInfo() override;
@@ -172,9 +175,6 @@ protected:
 	void HandleHangingOnLedge(const FVector& HangingTarget);
 	void InitializeCameraBoundary();
 	virtual void BeginPlay() override;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Debug")
-	bool Invincibility = false;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Player")
 	ECharacterName CharacterName = ECharacterName::FirstCharacter;

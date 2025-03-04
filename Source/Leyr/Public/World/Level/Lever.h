@@ -69,6 +69,9 @@ protected:
 
 	UPROPERTY(SaveGame)
 	ELeverState LeverState = ELeverState::Off;
+
+	UPROPERTY(SaveGame)
+	FVector LastTransform;
 	
 	bool bShouldBlockProjectile = true;
 	

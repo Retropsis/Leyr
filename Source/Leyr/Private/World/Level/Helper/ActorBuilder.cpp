@@ -7,7 +7,9 @@ AActorBuilder::AActorBuilder()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+#if WITH_EDITORONLY_DATA
 	BillboardComponent = CreateDefaultSubobject<UBillboardComponent>("BillboardComponent");
 	BillboardComponent->SetupAttachment(GetRootComponent());
+#endif
 }
 

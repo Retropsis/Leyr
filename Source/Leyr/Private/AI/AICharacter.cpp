@@ -41,6 +41,7 @@ AAICharacter::AAICharacter()
 	PassiveIndicatorComponent->SetWidgetSpace(EWidgetSpace::Screen);
 }
 
+#if WITH_EDITOR
 void AAICharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -80,6 +81,7 @@ void AAICharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 		NavMeshBoundsVolume = nullptr;
 	}
 }
+#endif
 
 void AAICharacter::Tick(float DeltaSeconds)
 {

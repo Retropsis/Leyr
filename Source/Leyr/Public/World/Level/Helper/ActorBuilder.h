@@ -36,6 +36,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="ActorBuilder")
 	EBuildDirection BuildDirection = EBuildDirection::Horizontal;
 
+#if WITH_EDITORONLY_DATA
 	UPROPERTY(EditDefaultsOnly, Category="ActorBuilder")
 	TObjectPtr<UBillboardComponent> BillboardComponent;
+#endif
 };

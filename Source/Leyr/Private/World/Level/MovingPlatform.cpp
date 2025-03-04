@@ -20,6 +20,7 @@ AMovingPlatform::AMovingPlatform()
 	Platform = EPlatformType::Moving;
 }
 
+#if WITH_EDITOR
 void AMovingPlatform::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -29,6 +30,7 @@ void AMovingPlatform::PostEditChangeProperty(FPropertyChangedEvent& PropertyChan
 		RouteSpline->SetSplinePointType(i, ESplinePointType::Linear);
 	}
 }
+#endif
 
 void AMovingPlatform::Tick(float DeltaSeconds)
 {

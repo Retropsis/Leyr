@@ -6,6 +6,7 @@
 #include "Data/CombatData.h"
 #include "GameFramework/Actor.h"
 #include "Interaction/InteractionInterface.h"
+#include "Components/PrimitiveComponent.h"
 #include "OverlapZone.generated.h"
 
 enum class ECombatState : uint8;
@@ -34,6 +35,8 @@ protected:
 	UPROPERTY(EditAnywhere)
 	ECombatState RequiredState = ECombatState::WalkingPeaceful;
 	
+#if WITH_EDITORONLY_DATA
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UBillboardComponent> LevelDesignIcon;
+#endif
 };

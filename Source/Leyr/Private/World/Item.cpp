@@ -20,6 +20,7 @@ AItem::AItem()
 	GetRenderComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+#if WITH_EDITOR
 void AItem::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -42,6 +43,7 @@ void AItem::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 		}
 	}
 }
+#endif
 
 void AItem::LoadActor_Implementation()
 {

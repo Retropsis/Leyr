@@ -14,9 +14,11 @@ AOverlapZone::AOverlapZone()
 	OverlapZone->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	OverlapZone->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
 	SetRootComponent(OverlapZone);
-
+	
+#if WITH_EDITORONLY_DATA
 	LevelDesignIcon = CreateDefaultSubobject<UBillboardComponent>("LevelDesignIcon");
 	LevelDesignIcon->SetupAttachment(OverlapZone);
+#endif
 }
 
 void AOverlapZone::BeginPlay()

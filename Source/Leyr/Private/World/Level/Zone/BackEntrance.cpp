@@ -14,6 +14,7 @@ ABackEntrance::ABackEntrance()
 	OverlapZone->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
 }
 
+#if WITH_EDITOR
 void ABackEntrance::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -30,6 +31,7 @@ void ABackEntrance::PostEditChangeProperty(FPropertyChangedEvent& PropertyChange
 		}
 	}
 }
+#endif
 
 void ABackEntrance::Interact_Implementation(AActor* InteractingActor)
 {

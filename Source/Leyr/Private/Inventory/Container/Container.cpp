@@ -32,6 +32,7 @@ void AContainer::LoadActor_Implementation()
 	}
 }
 
+#if WITH_EDITOR
 void AContainer::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -52,6 +53,7 @@ void AContainer::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEv
 		}
 	}
 }
+#endif
 
 void AContainer::BeginPlay()
 {

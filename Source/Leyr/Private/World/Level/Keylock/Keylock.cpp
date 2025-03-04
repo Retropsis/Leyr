@@ -31,6 +31,13 @@ AKeylock::AKeylock()
 void AKeylock::LoadActor_Implementation()
 {
 	Super::LoadActor_Implementation();
+	if (LeverState == ELeverState::On)
+	{
+		LockHitBox->SetRelativeLocation(LastTransform);
+		LockHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		LockHitBox->SetEnableGravity(false);
+		LockHitBox->SetSimulatePhysics(false);
+	}
 }
 
 void AKeylock::BeginPlay()
@@ -58,7 +65,16 @@ void AKeylock::Interact_Implementation(AActor* InteractingActor)
 			LockHitBox->SetEnableGravity(true);
 			LockHitBox->SetSimulatePhysics(true);
 			LockHitBox->AddImpulse(FVector{ InteractingActor->GetActorForwardVector() *  250.f  + InteractingActor->GetActorUpVector() *  250.f }, NAME_None, true);
-			SetLifeSpan(4.f);
+
+			FTimerHandle InertTimer;
+			GetWorld()->GetTimerManager().SetTimer(InertTimer, FTimerDelegate::CreateLambda([this] ()
+			{
+				LockHitBox->SetEnableGravity(false);
+				LockHitBox->SetSimulatePhysics(false);
+				LockHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				LockHitBox->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+				LastTransform = LockHitBox->GetRelativeLocation();
+			}), 4.f, false);
 		});
 		UAssetManager::GetStreamableManager().RequestAsyncLoad(KeyData.ToSoftObjectPath(), [this, PlayerInterface, InteractingActor] () {
 			const UItemData* LoadedAsset = KeyData.Get();
