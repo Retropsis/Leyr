@@ -203,16 +203,30 @@ void APlayerCharacter::InitializeCameraBoundary()
 	}
 }
 
+void APlayerCharacter::ClampToCameraBounds(FVector& PreferredCameraLocation) const
+{
+	if (CameraBounds.bInitialized)
+	{
+		if (PreferredCameraLocation.X < CameraBounds.Left.X || PreferredCameraLocation.X > CameraBounds.Right.X)
+		{
+			PreferredCameraLocation.X = FMath::Clamp(PreferredCameraLocation.X, CameraBounds.Left.X, CameraBounds.Right.X);
+		}
+		if (PreferredCameraLocation.Z < CameraBounds.Bottom.Z || PreferredCameraLocation.Z > CameraBounds.Top.Z)
+		{
+			PreferredCameraLocation.Z = FMath::Clamp(PreferredCameraLocation.Z, CameraBounds.Bottom.Z, CameraBounds.Top.Z);
+		}
+	}
+}
+
 void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 {
 	FTransform AdditiveOffset;
 	float FOV = FollowCamera->FieldOfView;
 	float InterpSpeed = 10.f;
 	FollowCamera->GetAdditiveOffset(AdditiveOffset, FOV);
-	FollowCamera->ClearAdditiveOffset();
 
 	const FVector CameraLocation = FollowCamera->GetComponentLocation();
-	FVector PreferredCameraLocation = CameraLocation;
+	FVector PreferredCameraLocation = GetActorLocation();;
 
 	bool bClampFirst = true;
 	
@@ -220,61 +234,54 @@ void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 	{
 	case ECameraInterpState::None: return;
 	case ECameraInterpState::WithinBounds:
-		PreferredCameraLocation = GetActorLocation();
 		bClampFirst = false;
 		break;
 	case ECameraInterpState::Entering:	
 		InterpSpeed = EnteringInterpSpeed;
-		PreferredCameraLocation = GetActorLocation();
 		break;
 	case ECameraInterpState::Leaving:
-		PreferredCameraLocation = GetActorLocation();
 		InterpSpeed = ExitingInterpSpeed;
 		break;
 	case ECameraInterpState::Following:
-		if (ActorToInterp)
+		PreferredCameraLocation = GetActorLocation();
+		
+		bClampFirst = false;
+		const FRealCurve* InterpSpeedCurve = ScalableInterpSpeedCurve->FindCurve(FName("InterpSpeedCurve"), FString());
+		InterpSpeed = InterpSpeedCurve->Eval((PreferredCameraLocation - CameraLocation).Size());
+		
+		GEngine->AddOnScreenDebugMessage(788778, 1.f, FColor::Magenta, "Following Player");
+		
+		if (ActorToInterp &&  GetDistanceTo(ActorToInterp) <= ActorToFollowMaxDistance)
 		{
-			PreferredCameraLocation = GetDistanceTo(ActorToInterp) > ActorToFollowMaxDistance ? GetActorLocation() : FVector{ (ActorToInterp->GetActorLocation() + GetActorLocation()) / 2.f };
-			InterpSpeed = FollowingInterpSpeed;
-		}
-		else
-		{
-			PreferredCameraLocation = GetActorLocation();
-			bClampFirst = false;
-			CameraInterpState = ECameraInterpState::Entering;
+			PreferredCameraLocation = FVector{ (ActorToInterp->GetActorLocation() + GetActorLocation()) / 2.f };
+			GEngine->AddOnScreenDebugMessage(788778, 1.f, FColor::Magenta, "Following Actor");
 		}
 		break;
 	}
 	// Clamp
-	if(CameraBounds.bInitialized && bClampFirst)
+	if(bClampFirst)
 	{
-		if (CameraLocation.X < CameraBounds.Left.X || CameraLocation.X > CameraBounds.Right.X)
-		{
-			PreferredCameraLocation.X = FMath::Clamp(CameraLocation.X, CameraBounds.Left.X, CameraBounds.Right.X);
-		}
-		if (CameraLocation.Z < CameraBounds.Bottom.Z || CameraLocation.Z > CameraBounds.Top.Z)
-		{
-			PreferredCameraLocation.Z = FMath::Clamp(CameraLocation.Z, CameraBounds.Bottom.Z, CameraBounds.Top.Z);
-		}
+		ClampToCameraBounds(PreferredCameraLocation);
 	}
+	
+	// Interp
+	FollowCamera->ClearAdditiveOffset();
 	FVector Delta = PreferredCameraLocation - CameraLocation;
 	FVector TargetAdditiveOffset = FVector{0.f, Delta.X, Delta.Z};
 	
-	// Interp
 	CurrentAdditiveOffset = FMath::VInterpTo(AdditiveOffset.GetLocation(), TargetAdditiveOffset, DeltaTime, InterpSpeed);
+	
 	AdditiveOffset.SetLocation(CurrentAdditiveOffset);
 	FollowCamera->AddAdditiveOffset(AdditiveOffset, FOV);
 	ParallaxController->SetActorRelativeLocation(FVector{ 600.f, CurrentAdditiveOffset.Y, CurrentAdditiveOffset.Z });
 	
-	if(CameraBounds.bInitialized && !bClampFirst)
+	if(!bClampFirst)
 	{
-		if (CameraLocation.X < CameraBounds.Left.X || CameraLocation.X > CameraBounds.Right.X)
+		ClampToCameraBounds(PreferredCameraLocation);
+		if (ActorToInterp)
 		{
-			PreferredCameraLocation.X = FMath::Clamp(CameraLocation.X, CameraBounds.Left.X, CameraBounds.Right.X);
-		}
-		if (CameraLocation.Z < CameraBounds.Bottom.Z || CameraLocation.Z > CameraBounds.Top.Z)
-		{
-			PreferredCameraLocation.Z = FMath::Clamp(CameraLocation.Z, CameraBounds.Bottom.Z, CameraBounds.Top.Z);
+			UKismetSystemLibrary::DrawDebugSphere(this, FVector{ (ActorToInterp->GetActorLocation() + GetActorLocation()) / 2.f }, 25.f, 12, FLinearColor::White);
+			UKismetSystemLibrary::DrawDebugSphere(this, PreferredCameraLocation, 25.f, 12, FLinearColor::Green);
 		}
 	
 		FollowCamera->ClearAdditiveOffset();
@@ -286,12 +293,12 @@ void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 	}
 
 	// Check State
-	if (FVector::PointsAreNear(CurrentAdditiveOffset, TargetAdditiveOffset, 5.f))
+	if (FVector::PointsAreNear(CurrentAdditiveOffset, TargetAdditiveOffset, SnapDistance))
 	{
-		if (CameraInterpState == ECameraInterpState::Entering) 	CameraInterpState = ECameraInterpState::WithinBounds;
+		if (CameraInterpState == ECameraInterpState::Entering) 	CameraInterpState = ECameraInterpState::Following;
+		
 		if (!CameraBounds.bInitialized) FollowCamera->ClearAdditiveOffset();
 	}
-	// if (ActorToInterp) CameraInterpState = GetDistanceTo(ActorToInterp) < ActorToFollowMaxDistance ? ECameraInterpState::Following : ECameraInterpState::WithinBounds;
 }
 
 void APlayerCharacter::SetCameraInterpolation_Implementation(ACameraBoundary* CameraBoundary, ECameraInterpState NewState)

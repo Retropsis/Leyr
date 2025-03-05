@@ -320,7 +320,8 @@ void AAICharacter::Die(const FVector& DeathImpulse, bool bExecute)
 	
 	if(CombatTarget)
 	{
-		IPlayerInterface::Execute_SetCameraInterpolation(CombatTarget, Arena, ECameraInterpState::WithinBounds);
+		Arena->SetTargetActor(nullptr);
+		IPlayerInterface::Execute_SetCameraInterpolation(CombatTarget, Arena, ECameraInterpState::Following);
 	}
 	
 	Super::Die(DeathImpulse, bExecute);

@@ -42,7 +42,7 @@ void ACameraBoundary::BeginPlay()
 	Super::BeginPlay();
 	SetActorTickEnabled(false);
 	EnteringBoundary->OnComponentBeginOverlap.AddDynamic(this, &ACameraBoundary::OnBeginOverlap);
-	EnteringBoundary->OnComponentEndOverlap.AddDynamic(this, &ACameraBoundary::OnEndOverlap);
+	// EnteringBoundary->OnComponentEndOverlap.AddDynamic(this, &ACameraBoundary::OnEndOverlap);
 }
 
 void ACameraBoundary::Tick(float DeltaTime)
@@ -127,7 +127,7 @@ void ACameraBoundary::HandleOnBeginOverlap(AActor* OtherActor)
 			IPlayerInterface::Execute_SetCameraInterpolation(OtherActor, this, ECameraInterpState::Entering);
 			break;
 		case EBoundaryRule::Arena:
-			IPlayerInterface::Execute_SetCameraInterpolation(OtherActor, this, ECameraInterpState::Following);
+			IPlayerInterface::Execute_SetCameraInterpolation(OtherActor, this, ECameraInterpState::Entering);
 			break;
 		}
 	}

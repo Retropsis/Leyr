@@ -78,7 +78,13 @@ public:
 	float EnteringInterpSpeed = 8.f;
 	
 	UPROPERTY(EditDefaultsOnly)
+	float SnapDistance = 35.f;
+	
+	UPROPERTY(EditDefaultsOnly)
 	float ExitingInterpSpeed = 8.f;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UCurveTable> ScalableInterpSpeedCurve;
 	
 	UPROPERTY(EditDefaultsOnly)
 	float ActorToFollowMaxDistance = 1000.f;
@@ -174,6 +180,7 @@ protected:
 	void HandleCombatState(ECombatState NewState);
 	void HandleHangingOnLedge(const FVector& HangingTarget);
 	void InitializeCameraBoundary();
+	void ClampToCameraBounds(FVector& PreferredCameraLocation) const;
 	virtual void BeginPlay() override;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Player")
