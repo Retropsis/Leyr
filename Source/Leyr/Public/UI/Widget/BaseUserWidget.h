@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Interaction/BaseUserWidgetInterface.h"
 #include "BaseUserWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class LEYR_API UBaseUserWidget : public UUserWidget
+class LEYR_API UBaseUserWidget : public UUserWidget, public IBaseUserWidgetInterface
 {
 	GENERATED_BODY()
 	

@@ -9,6 +9,7 @@
 #include "UI/Data/UIData.h"
 #include "PlayerCharacterController.generated.h"
 
+class UBaseUserWidget;
 class UEquipmentWidgetController;
 struct FWidgetControllerParams;
 class UInventoryWidgetController;
@@ -35,6 +36,12 @@ public:
 	UInventoryWidgetController* GetInventoryWidgetController(const FWidgetControllerParams& WCParams);
 	UInventoryWidgetController* GetInventoryWidgetController() { return InventoryWidgetController; }
 	APlayerCharacter* GetPlayerCharacter();
+
+	UFUNCTION(BlueprintCallable)
+	void SetCurrentlyHoveredButton(UBaseUserWidget* Button) { CurrentlyHoveredButton = Button; }
+
+	UFUNCTION(BlueprintCallable)
+	void HandleButtonPressed() const;
 
 	UFUNCTION(Client, Reliable)
 	void ClientShowDamageNumber(const FUIMessageData& MessageData);
@@ -140,6 +147,8 @@ private:
 	TObjectPtr<UInputConfig> InputConfig;
 
 	FHitResult CursorHit;
+
+	TObjectPtr<UBaseUserWidget> CurrentlyHoveredButton;
 	
 	void CursorTrace();
 	void AbilityInputTagPressed(FGameplayTag InputTag);

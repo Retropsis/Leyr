@@ -232,7 +232,7 @@ protected:
 	float RollingBrakeFrictionFactor = 500.f;
 
 	FTimerHandle OffLedgeTimer;
-	float OffLedgeTime = .5f;
+	float OffLedgeTime = .2f;
 	bool bCanGrabLedge = true;
 	
 	FTimerHandle UnCrouchingTimer;

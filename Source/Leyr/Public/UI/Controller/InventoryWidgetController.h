@@ -15,6 +15,11 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemEquippedSignature, FGameplay
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemUnequippedSignature, FGameplayTag, SlotTag, TSoftObjectPtr<UItemData>, Asset);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEquipmentSlotQuantityUpdatedSignature, FGameplayTag, SlotTag, const FInventoryItemData&, ItemData);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAssignButtonPressed, FGameplayTag, SlotTag, FInventoryItemData, ItemData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEquipButtonPressed, FGameplayTag, InputTag);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAttributePointSpent, FGameplayTag, AttributeTag);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSkillPointSpent, FGameplayTag, AbilityTag);
+
 USTRUCT()
 struct FEquippedItem
 {

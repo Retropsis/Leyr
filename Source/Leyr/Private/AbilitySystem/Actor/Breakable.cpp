@@ -10,6 +10,7 @@ ABreakable::ABreakable()
 {	
 	HitBox = CreateDefaultSubobject<UBoxComponent>("HitBox");
 	HitBox->SetBoxExtent(FVector(32.f, 100.f, 32.f));
+	HitBox->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	HitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
 	HitBox->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	HitBox->SetCollisionResponseToChannel(ECC_Enemy, ECR_Block);

@@ -313,6 +313,7 @@ void AAICharacter::Die(const FVector& DeathImpulse, bool bExecute)
 	{
 		Arena->OnPlayerEntering.Clear();
 		Arena->OnPlayerLeaving.Clear();
+		Arena->SetTargetActor(nullptr);
 	}
 	BaseAIController->StopMovement();
 	PassiveIndicatorComponent->DestroyComponent();
@@ -320,7 +321,6 @@ void AAICharacter::Die(const FVector& DeathImpulse, bool bExecute)
 	
 	if(CombatTarget)
 	{
-		Arena->SetTargetActor(nullptr);
 		IPlayerInterface::Execute_SetCameraInterpolation(CombatTarget, Arena, ECameraInterpState::Following);
 	}
 	

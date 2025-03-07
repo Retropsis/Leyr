@@ -99,8 +99,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
 	TObjectPtr<UPassiveInfo> PassiveInfo;
 
-	APlayerCharacterController* GetBasePC();
-	APlayerCharacterState* GetBasePS();
-	UBaseAbilitySystemComponent* GetBaseASC();
-	UBaseAttributeSet* GetBaseAS();
+	UFUNCTION(BlueprintPure) APlayerCharacterController* GetBasePC();
+	UFUNCTION(BlueprintPure) APlayerCharacterState* GetBasePS();
+	UFUNCTION(BlueprintPure) UBaseAbilitySystemComponent* GetBaseASC();
+	UFUNCTION(BlueprintPure) UBaseAttributeSet* GetBaseAS();
 };

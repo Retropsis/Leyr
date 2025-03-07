@@ -90,20 +90,22 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	TraceForSlope();
 	ForceMove(DeltaSeconds);
 	InterpCameraAdditiveOffset(DeltaSeconds);
+
+	GEngine->AddOnScreenDebugMessage(77898798, 1.f, FColor::Magenta, UEnum::GetValueAsString(GetCharacterMovement()->MovementMode));
 }
 
 void APlayerCharacter::ForceMove(float DeltaSeconds)
 {
 	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-	if(CombatState == ECombatState::ClimbingRope)
-	{
-		SetActorLocation(FMath::VInterpTo(GetActorLocation(), MovementTarget, DeltaSeconds, MovementSpeed));
-		if (FMath::IsNearlyZero(UKismetMathLibrary::Vector_Distance(GetActorLocation(), MovementTarget), 5.f))
-		{
-			HandleCombatState(ECombatState::Unoccupied);
-			GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(GameplayTags.CombatDirections);
-		}
-	}
+	// if(CombatState == ECombatState::ClimbingRope)
+	// {
+	// 	SetActorLocation(FMath::VInterpTo(GetActorLocation(), MovementTarget, DeltaSeconds, MovementSpeed));
+	// 	if (FMath::IsNearlyZero(UKismetMathLibrary::Vector_Distance(GetActorLocation(), MovementTarget), 5.f))
+	// 	{
+	// 		HandleCombatState(ECombatState::Unoccupied);
+	// 		GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(GameplayTags.CombatDirections);
+	// 	}
+	// }
 	if(CombatState == ECombatState::HoppingLedge)
 	{
 		SetActorLocation(FMath::VInterpTo(GetActorLocation(), MovementTarget, DeltaSeconds, 8.f));
@@ -113,14 +115,14 @@ void APlayerCharacter::ForceMove(float DeltaSeconds)
 			GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(GameplayTags.CombatDirections);
 		}
 	}
-	if(CombatState == ECombatState::Dodging)
-	{
-		AddMovementInput(FVector(1.f, 0.f, 0.f), -GetActorForwardVector().X);
-	}
-	if(CombatState == ECombatState::Rolling)
-	{
-		AddMovementInput(FVector(1.f, 0.f, 0.f), GetActorForwardVector().X);
-	}
+	// if(CombatState == ECombatState::Dodging)
+	// {
+	// 	AddMovementInput(FVector(1.f, 0.f, 0.f), -GetActorForwardVector().X);
+	// }
+	// if(CombatState == ECombatState::Rolling)
+	// {
+	// 	AddMovementInput(FVector(1.f, 0.f, 0.f), GetActorForwardVector().X);
+	// }
 }
 
 void APlayerCharacter::HandleCharacterMovementUpdated(float DeltaSeconds, FVector OldLocation, FVector OldVelocity)
@@ -718,6 +720,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 	case ECombatState::ClimbingRope:
 		MovementSpeed = ClimbingSpeed;
 		MovementTarget = GetActorLocation() + FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f + 10.f);
+		AbilitySystemComponent->TryActivateAbilitiesByTag(GameplayTags.Abilities_ClimbingRope.GetSingleTagContainer());
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Rope);
 		break;
 	case ECombatState::HoppingLedge:

@@ -33,7 +33,6 @@ protected:
 	
 	virtual void MulticastHandleDestruction_Implementation() override;	
 
-protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Platform")
 	TObjectPtr<UBoxComponent> HitBox;
 	

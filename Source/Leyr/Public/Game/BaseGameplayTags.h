@@ -152,6 +152,8 @@ FGameplayTag Abilities_Lightning_Bolt_1;
 FGameplayTag Abilities_Arcane_ArcaneShards;
 FGameplayTag Abilities_Cosmos_Meteor_1;
 FGameplayTag Abilities_Noxious_Bio_1;
+ 
+FGameplayTag Abilities_ClimbingRope;
 
 FGameplayTag Abilities_Cure_1;
 FGameplayTag Abilities_Cure_2;

@@ -7,8 +7,10 @@
 #include "EnhancedInputComponent.h"
 #include "GameplayTagContainer.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
+#include "Interaction/BaseUserWidgetInterface.h"
 #include "Player/Input/BaseInputComponent.h"
 #include "UI/Controller/InventoryWidgetController.h"
+#include "UI/Widget/BaseUserWidget.h"
 #include "UI/Widget/DamageTextComponent.h"
 
 void APlayerCharacterController::BeginPlay()
@@ -157,6 +159,14 @@ APlayerCharacter* APlayerCharacterController::GetPlayerCharacter()
 {
 	if(PlayerCharacter == nullptr) PlayerCharacter = Cast<APlayerCharacter>(GetCharacter());
 	return PlayerCharacter;
+}
+
+void APlayerCharacterController::HandleButtonPressed() const
+{
+	if (const IBaseUserWidgetInterface* BaseUserWidgetInterface = Cast<IBaseUserWidgetInterface>(CurrentlyHoveredButton))
+	{
+		BaseUserWidgetInterface->Execute_HandleButtonPressed(CurrentlyHoveredButton);
+	}
 }
 
 void APlayerCharacterController::HotbarButtonPressed(int32 Index)
