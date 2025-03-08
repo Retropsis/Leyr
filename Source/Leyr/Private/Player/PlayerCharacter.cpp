@@ -1,6 +1,8 @@
 // @ Retropsis 2024-2025.
 
 #include "Player/PlayerCharacter.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "Player/PlayerCharacterAnimInstance.h"
 #include "Player/PlayerCharacterController.h"
 #include "Player/PlayerCharacterState.h"
@@ -228,7 +230,8 @@ void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 	FollowCamera->GetAdditiveOffset(AdditiveOffset, FOV);
 
 	const FVector CameraLocation = FollowCamera->GetComponentLocation();
-	FVector PreferredCameraLocation = GetActorLocation();;
+	FVector PreferredCameraLocation = GetActorLocation();
+	PreferredCameraLocation.Z += bIsCrouched ? GetCapsuleComponent()->GetScaledCapsuleHalfHeight() - GetCharacterMovement()->GetCrouchedHalfHeight() : 0.f;
 
 	bool bClampFirst = true;
 	
@@ -246,17 +249,15 @@ void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 		break;
 	case ECameraInterpState::Following:
 		PreferredCameraLocation = GetActorLocation();
+		PreferredCameraLocation.Z += bIsCrouched ? GetCapsuleComponent()->GetScaledCapsuleHalfHeight() : 0.f;
 		
 		bClampFirst = false;
 		const FRealCurve* InterpSpeedCurve = ScalableInterpSpeedCurve->FindCurve(FName("InterpSpeedCurve"), FString());
 		InterpSpeed = InterpSpeedCurve->Eval((PreferredCameraLocation - CameraLocation).Size());
 		
-		GEngine->AddOnScreenDebugMessage(788778, 1.f, FColor::Magenta, "Following Player");
-		
 		if (ActorToInterp &&  GetDistanceTo(ActorToInterp) <= ActorToFollowMaxDistance)
 		{
 			PreferredCameraLocation = FVector{ (ActorToInterp->GetActorLocation() + GetActorLocation()) / 2.f };
-			GEngine->AddOnScreenDebugMessage(788778, 1.f, FColor::Magenta, "Following Actor");
 		}
 		break;
 	}
@@ -280,11 +281,11 @@ void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 	if(!bClampFirst)
 	{
 		ClampToCameraBounds(PreferredCameraLocation);
-		if (ActorToInterp)
-		{
-			UKismetSystemLibrary::DrawDebugSphere(this, FVector{ (ActorToInterp->GetActorLocation() + GetActorLocation()) / 2.f }, 25.f, 12, FLinearColor::White);
-			UKismetSystemLibrary::DrawDebugSphere(this, PreferredCameraLocation, 25.f, 12, FLinearColor::Green);
-		}
+		// if (ActorToInterp)
+		// {
+		// 	UKismetSystemLibrary::DrawDebugSphere(this, FVector{ (ActorToInterp->GetActorLocation() + GetActorLocation()) / 2.f }, 25.f, 12, FLinearColor::White);
+		// 	UKismetSystemLibrary::DrawDebugSphere(this, PreferredCameraLocation, 25.f, 12, FLinearColor::Green);
+		// }
 	
 		FollowCamera->ClearAdditiveOffset();
 		Delta = PreferredCameraLocation - CameraLocation;
@@ -317,6 +318,13 @@ void APlayerCharacter::SetCameraInterpolation_Implementation(ACameraBoundary* Ca
 	}
 }
 
+void APlayerCharacter::DisableCameraLagForDuration_Implementation(float Duration)
+{
+	SpringArm->bEnableCameraLag = false;
+	FTimerHandle DisableCameraLagTimer;
+	GetWorld()->GetTimerManager().SetTimer(DisableCameraLagTimer, FTimerDelegate::CreateLambda([this](){ SpringArm->bEnableCameraLag = true; }), Duration, false);		
+}
+
 void APlayerCharacter::ServerInteract_Implementation()
 {	
 	if(CombatState == ECombatState::HangingLadder ||
@@ -336,25 +344,7 @@ void APlayerCharacter::ServerInteract_Implementation()
 	if(Hit.bBlockingHit && Hit.GetActor() && Hit.GetActor()->Implements<UInteractionInterface>())
 	{
 		IInteractionInterface::Execute_Interact(Hit.GetActor(), this);
-		return;
 	}	
-	if(Hit.bBlockingHit && Hit.GetActor()->ActorHasTag("Ladder"))
-	{
-		HandleCombatState(ECombatState::HangingLadder);
-		return;
-	}
-	if(Hit.bBlockingHit && Hit.GetActor()->ActorHasTag("ClimbingSurface"))
-	{
-		HandleCombatState(ECombatState::Climbing);
-		return;
-	}
-	if(Hit.bBlockingHit && Hit.GetActor()->ActorHasTag("BackEntrance"))
-	{
-		IInteractionInterface::Execute_Interact(Hit.GetActor(), this);
-		SpringArm->bEnableCameraLag = false;
-		FTimerHandle DisableCameraLagTimer;
-		GetWorld()->GetTimerManager().SetTimer(DisableCameraLagTimer, FTimerDelegate::CreateLambda([this](){ SpringArm->bEnableCameraLag = true; }), 1.f, false);		
-	}
 }
 
 /*
@@ -431,7 +421,14 @@ void APlayerCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHei
 void APlayerCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
 {
 	Super::OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
-	GetSprite()->SetRelativeLocation(FVector::ZeroVector);
+	if (CombatState != ECombatState::Rolling)
+	{
+		GetSprite()->SetRelativeLocation(FVector::ZeroVector);
+	}
+	else
+	{
+		GetSprite()->SetRelativeLocation(FVector{ 0.f, 0.f, 24.f });
+	}
 }
 
 /*
@@ -466,7 +463,7 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 		break;
 	case ECombatState::HangingRope:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
-		if(MovementVector.Y > 0.f) HandleCombatState(ECombatState::ClimbingRope);
+		TryClimbingRope(MovementVector);
 		break;
 	case ECombatState::HangingHook:
 		break;
@@ -505,6 +502,26 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	case ECombatState::RollingEnd:
 	case ECombatState::Defeated:
 		break;
+	}
+}
+
+void APlayerCharacter::TryClimbingRope(const FVector2D MovementVector)
+{
+	if(MovementVector.Y <= 0.f) return;
+
+	const FVector Start = GetActorLocation() + GetActorUpVector() * GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	const FVector End = Start + GetActorUpVector() * (GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f +10.f);
+	FHitResult Hit;
+	const float Radius = GetCapsuleComponent()->GetScaledCapsuleRadius();
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(ObjectTypeQuery1);
+	UKismetSystemLibrary::SphereTraceSingleForObjects(this, Start, End, Radius, ObjectTypes, false, ActorsToIgnore, EDrawDebugTrace::None, Hit, true);
+
+	if (!Hit.bBlockingHit)
+	{
+		HandleCombatState(ECombatState::ClimbingRope);
 	}
 }
 
@@ -656,20 +673,11 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		{
 			PlayerCharacterAnimInstance->bIsCrouched = true;
 		}
-		// FollowCamera->SetRelativeLocation(FVector{0.f, 0.f, GetCharacterMovement()->GetCrouchedHalfHeight() });
-		// ParallaxController->SetActorRelativeLocation(FVector{600.f, 0.f, 0.f });
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Crouching);
 		break;
 	case ECombatState::UnCrouching:
 		UnCrouch();
 		CombatState = ECombatState::Unoccupied;
-		// FollowCamera->SetRelativeLocation(FVector::ZeroVector);
-		// ParallaxController->SetActorRelativeLocation(FVector{ 600.f, 0.f, 0.f});
-		// MakeAndApplyEffectToSelf(GameplayTags.CombatState_UnCrouching);
-		// if(const UWorld* World = GetWorld())
-		// {
-		// 	World->GetTimerManager().SetTimer(UnCrouchingTimer, FTimerDelegate::CreateLambda([this] { HandleCombatState(ECombatState::Unoccupied); }), UnCrouchingTime, false);
-		// }
 		break;
 	case ECombatState::Attacking:
 		break;
@@ -718,9 +726,8 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Swimming);
 		break;
 	case ECombatState::ClimbingRope:
-		MovementSpeed = ClimbingSpeed;
-		MovementTarget = GetActorLocation() + FVector(0.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.f + 10.f);
 		AbilitySystemComponent->TryActivateAbilitiesByTag(GameplayTags.Abilities_ClimbingRope.GetSingleTagContainer());
+		// UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, GameplayTags.Abilities_ClimbingRope, FGameplayEventData{});
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Rope);
 		break;
 	case ECombatState::HoppingLedge:
@@ -743,15 +750,11 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Dodging);
 		break;
 	case ECombatState::Rolling:
-		// GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-		// GetCharacterMovement()->MaxFlySpeed = RollingSpeed;
 		Crouch();
 		GetCharacterMovement()->MaxWalkSpeedCrouched = RollingSpeed;
 		GetCharacterMovement()->MaxAcceleration = RollingMaxAcceleration;
 		GetCharacterMovement()->BrakingFrictionFactor = RollingBrakeFrictionFactor;
 		GetSprite()->SetRelativeLocation(FVector(0.f, 0.f, 44.f));
-		// HalfHeightCapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		// GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Rolling);
 		break;
 	case ECombatState::RollingEnd:
@@ -1085,7 +1088,7 @@ void APlayerCharacter::TraceForPlatforms() const
 		IPlatformInterface::Execute_SetBoxCollisionEnabled(Hit.GetActor(), bOverlapPlatformTimerEnded);
 	}
 	
-	if(Hit.GetComponent() && Hit.GetComponent()->ComponentHasTag("Rope") && GetVelocity().Z < -10.f)
+	if(Hit.GetComponent() && Hit.GetComponent()->ComponentHasTag("Rope") && GetVelocity().Z < -10.f && CombatState != ECombatState::ClimbingRope)
 	{
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, ECR_Overlap);
 	}
@@ -1107,7 +1110,7 @@ void APlayerCharacter::TraceForHoppingLedge(float MovementVectorX)
 
 void APlayerCharacter::TraceForLedge()
 {
-	if(!bCanGrabLedge || !GetCharacterMovement()->IsFalling()) return;;
+	if(!bCanGrabLedge || !GetCharacterMovement()->IsFalling()) return;
 	
 	TArray<AActor*> ActorsToIgnore;
 	FHitResult BottomHit;

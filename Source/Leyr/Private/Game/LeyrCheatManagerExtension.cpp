@@ -5,6 +5,20 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/PlayerCharacter.h"
 
+ULeyrCheatManagerExtension::ULeyrCheatManagerExtension()
+{
+#if UE_WITH_CHEAT_MANAGER
+	if (HasAnyFlags(RF_ClassDefaultObject))
+	{
+		UCheatManager::RegisterForOnCheatManagerCreated(FOnCheatManagerCreated::FDelegate::CreateLambda(
+		[](UCheatManager* CheatManager)
+		{
+			CheatManager->AddCheatManagerExtension(NewObject<ThisClass>(CheatManager));
+		}));
+	}
+#endif
+}
+
 void ULeyrCheatManagerExtension::Invincibility(const bool bEnable) const
 {
 	if (const APlayerCharacter* PlayerCharacter = Cast<APlayerCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0)))

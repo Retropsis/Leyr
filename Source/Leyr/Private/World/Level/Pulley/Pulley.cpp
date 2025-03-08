@@ -47,9 +47,14 @@ void APulley::BeginPlay()
 	}
 }
 
-void APulley::Interact_Implementation(AActor* InteractingActor)
+void APulley::InteractHit_Implementation(AActor* InteractingActor)
 {
-	Super::Interact_Implementation(InteractingActor);
+	Super::InteractHit_Implementation(InteractingActor);
+	
+	LeverState = ELeverState::On;
+	HandleLeverVisualState(LeverState);
+	OnLeverStateChanged.Broadcast(LeverState);
+	
 	if(PhysicsConstraint)
 	{
 		PhysicsConstraint->BreakConstraint();

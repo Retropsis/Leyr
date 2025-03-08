@@ -33,7 +33,7 @@ APhysicsConstrainedActor::APhysicsConstrainedActor()
 	PhysicsConstraint->ComponentName2.ComponentName = WeightBoxComponent->GetFName();
 }
 
-void APhysicsConstrainedActor::Interact_Implementation(AActor* InteractingActor)
+void APhysicsConstrainedActor::InteractHit_Implementation(AActor* InteractingActor)
 {
 	if(bCanBreak && PhysicsConstraint)
 	{

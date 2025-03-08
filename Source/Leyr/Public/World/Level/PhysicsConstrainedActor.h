@@ -18,7 +18,7 @@ class LEYR_API APhysicsConstrainedActor : public APaperFlipbookActor, public IIn
 	
 public:	
 	APhysicsConstrainedActor();
-	virtual void Interact_Implementation(AActor* InteractingActor) override;
+	virtual void InteractHit_Implementation(AActor* InteractingActor) override;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)

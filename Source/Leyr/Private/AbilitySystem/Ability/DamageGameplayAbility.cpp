@@ -40,9 +40,9 @@ TArray<FHitResult> UDamageGameplayAbility::BoxTrace(bool bDebug)
 	
 	for (FHitResult HitResult : Hits)
 	{
-		if(HitResult.bBlockingHit && HitResult.GetActor() && HitResult.GetActor()->ActorHasTag("HitInteraction"))
+		if(HitResult.bBlockingHit && HitResult.GetActor() && HitResult.GetActor()->Implements<UInteractionInterface>())
 		{
-			IInteractionInterface::Execute_Interact(HitResult.GetActor(), GetAvatarActorFromActorInfo());
+			IInteractionInterface::Execute_InteractHit(HitResult.GetActor(), GetAvatarActorFromActorInfo());
 		}
 	}
 	return Hits;

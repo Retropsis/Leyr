@@ -436,6 +436,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Montage_Parry_End = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Parry.End"), FString("Montage Parry End"));
 	GameplayTags.Montage_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Execute"), FString("Montage Execute"));
 	GameplayTags.Montage_HitStop = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.HitStop"), FString("Montage HitStop"));
+	GameplayTags.Montage_Impulse = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Impulse"), FString("Montage Impulse"));
 	
 	GameplayTags.Montage_Window_Combo = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Window.Combo"), FString("Montage Window Combo"));
 	GameplayTags.Montage_Window_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Window.Execute"), FString("Montage Window Execute"));

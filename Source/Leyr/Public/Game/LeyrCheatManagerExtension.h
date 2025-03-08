@@ -15,6 +15,8 @@ class LEYR_API ULeyrCheatManagerExtension : public UCheatManagerExtension
 	GENERATED_BODY()
 
 public:
+	ULeyrCheatManagerExtension();
+	
 	UFUNCTION(Exec)
 	void Invincibility(bool bEnable) const;
 };

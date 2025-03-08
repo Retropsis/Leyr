@@ -4,6 +4,7 @@
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
+#include "Interaction/PlayerInterface.h"
 
 ABackEntrance::ABackEntrance()
 {
@@ -19,11 +20,12 @@ void ABackEntrance::PostEditChangeProperty(FPropertyChangedEvent& PropertyChange
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
-	if(PairedBackEntrance == nullptr)
+	if(UWorld* World = GetWorld(); World && PairedBackEntrance == nullptr)
 	{
 		FActorSpawnParameters SpawnParameters;
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		PairedBackEntrance = GetWorld()->SpawnActor<ABackEntrance>(GetActorLocation(), FRotator::ZeroRotator, SpawnParameters);
+		const FVector PairedEntranceLocation{ GetActorLocation().X, 0.f, GetActorLocation().Z + 200.f };
+		PairedBackEntrance = World->SpawnActor<ABackEntrance>(PairedEntranceLocation, FRotator::ZeroRotator, SpawnParameters);
 		if(PairedBackEntrance)
 		{
 			PairedBackEntrance->PairedBackEntrance = this;
@@ -41,4 +43,5 @@ void ABackEntrance::Interact_Implementation(AActor* InteractingActor)
         NewLocation.Z += OverlapZone->GetScaledBoxExtent().Z / 2.f - Character->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
         InteractingActor->SetActorLocation(NewLocation);
 	}
+	IPlayerInterface::Execute_DisableCameraLagForDuration(InteractingActor, 1.f);
 }

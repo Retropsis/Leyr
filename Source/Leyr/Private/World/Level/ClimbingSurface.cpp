@@ -2,6 +2,7 @@
 
 #include "World/Level/ClimbingSurface.h"
 #include "Components/BoxComponent.h"
+#include "Interaction/CombatInterface.h"
 #include "Interaction/PlayerInterface.h"
 
 AClimbingSurface::AClimbingSurface() {}
@@ -14,6 +15,11 @@ void AClimbingSurface::BeginPlay()
 		HangingCollision->OnComponentBeginOverlap.AddDynamic(this, &AClimbingSurface::OnBeginOverlap);
 		HangingCollision->OnComponentEndOverlap.AddDynamic(this, &AClimbingSurface::OnEndOverlap);
 	}
+}
+
+void AClimbingSurface::Interact_Implementation(AActor* InteractingActor)
+{
+	ICombatInterface::Execute_SetCombatStateToHandle(InteractingActor, ECombatState::Climbing);
 }
 
 void AClimbingSurface::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

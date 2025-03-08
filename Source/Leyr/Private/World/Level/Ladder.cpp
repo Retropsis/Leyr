@@ -2,6 +2,7 @@
 
 #include "World/Level/Ladder.h"
 #include "Components/BoxComponent.h"
+#include "Interaction/CombatInterface.h"
 #include "Interaction/PlayerInterface.h"
 #include "Leyr/Leyr.h"
 
@@ -21,6 +22,11 @@ void ALadder::BeginPlay()
 		HangingCollision->OnComponentBeginOverlap.AddDynamic(this, &ALadder::OnBeginOverlap);
 		HangingCollision->OnComponentEndOverlap.AddDynamic(this, &ALadder::OnEndOverlap);
 	}
+}
+
+void ALadder::Interact_Implementation(AActor* InteractingActor)
+{
+	ICombatInterface::Execute_SetCombatStateToHandle(InteractingActor, ECombatState::HangingLadder);
 }
 
 void ALadder::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

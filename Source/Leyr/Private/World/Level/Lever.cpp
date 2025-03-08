@@ -39,7 +39,7 @@ void ALever::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 	LeverState = ELeverState::On;
 	HandleLeverVisualState(LeverState);
 	OnLeverStateChanged.Broadcast(LeverState);
-	if(UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(OnTimer, this, &ALever::HandleOnTimerEnd, OnTime);
+	if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(OnTimer, this, &ALever::HandleOnTimerEnd, OnTime);
 }
 
 void ALever::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -57,7 +57,7 @@ void ALever::Interact_Implementation(AActor* InteractingActor)
 		break;
 	case ELeverType::Timer:
 		LeverState = ELeverState::On;
-		if(UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(OnTimer, this, &ALever::HandleOnTimerEnd, OnTime);
+		if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(OnTimer, this, &ALever::HandleOnTimerEnd, OnTime);
 		break;
 	case ELeverType::SingleUse:
 		LeverState = ELeverState::On;

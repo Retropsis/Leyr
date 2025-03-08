@@ -17,6 +17,10 @@ class LEYR_API ALadder : public AHanger
 public:
 	ALadder();
 
+	//~ Interact Interface
+	virtual void Interact_Implementation(AActor* InteractingActor) override;
+	//~ Interact Interface
+	
 protected:
 	virtual void BeginPlay() override;
 	

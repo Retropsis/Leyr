@@ -8,6 +8,9 @@
 ARope::ARope()
 {
 	BuildDirection = EBuildDirection::Horizontal;
+
+	HangingCollision->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	
 	OccupancyCollision = CreateDefaultSubobject<UBoxComponent>("OccupancyCollision");
 	OccupancyCollision->SetupAttachment(GetRootComponent());
 	OccupancyCollision->SetRelativeLocation(FVector(0.f, 0.f, 32.f));

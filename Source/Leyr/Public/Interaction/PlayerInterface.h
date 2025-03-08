@@ -46,6 +46,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void SetCameraInterpolation(ACameraBoundary* CameraBoundary, ECameraInterpState NewState);
 	
+	UFUNCTION(BlueprintNativeEvent)
+	void DisableCameraLagForDuration(float Duration);
+	
 	/*
 	 * Ability System
 	 */

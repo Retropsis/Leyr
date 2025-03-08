@@ -27,8 +27,8 @@ public:
 	void Interact(AActor* InteractingActor);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	bool ShouldBlockProjectile();
+	void InteractHit(AActor* InteractingActor);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	bool TryBackEntrance(AActor* InteractingActor, float CapsuleHalfHeight);
+	bool ShouldBlockProjectile();
 };

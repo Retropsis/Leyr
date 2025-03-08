@@ -38,6 +38,7 @@ public:
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 	virtual void OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
+	void TryClimbingRope(FVector2D MovementVector);
 	virtual void Die(const FVector& DeathImpulse, bool bExecute) override;
 	
 	void Move(const FVector2D MovementVector);
@@ -129,6 +130,8 @@ public:
 	virtual USpringArmComponent* GetSpringArmComponent_Implementation() override { return SpringArm; }
 	virtual UCameraComponent* GetCameraComponent_Implementation() override { return FollowCamera; }
 	virtual void SetCameraInterpolation_Implementation(ACameraBoundary* CameraBoundary, ECameraInterpState NewState) override;
+	virtual void DisableCameraLagForDuration_Implementation(float Duration) override;
+	
 	virtual void ResetInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex) override;
 	virtual void UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData) override;
 	virtual void UpdateContainerSlots_Implementation(int32 TotalSlots) override;

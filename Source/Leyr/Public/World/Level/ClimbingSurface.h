@@ -17,6 +17,10 @@ class LEYR_API AClimbingSurface : public AHanger
 public:
 	AClimbingSurface();
 
+	//~ Interact Interface
+	virtual void Interact_Implementation(AActor* InteractingActor) override;
+	//~ Interact Interface
+
 protected:
 	virtual void BeginPlay() override;
 	
