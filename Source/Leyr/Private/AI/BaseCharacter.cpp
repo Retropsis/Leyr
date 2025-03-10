@@ -11,6 +11,8 @@
 #include "AbilitySystem/Effect/StatusEffectNiagaraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Data/ItemData.h"
+#include "Engine/AssetManager.h"
 #include "Game/BaseGameplayTags.h"
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -175,6 +177,11 @@ FVector ABaseCharacter::GetCombatSocketLocation_Implementation(const FGameplayTa
 	return WeaponSocket->GetComponentLocation();
 }
 
+UItemData* ABaseCharacter::LoadAndGetDefaultAttackData_Implementation()
+{
+	return DefaultAttackData.LoadSynchronous();
+}
+
 void ABaseCharacter::GetAttackAnimationData_Implementation(FVector& InBoxTraceStart, FVector& InBoxTraceEnd)
 {
 	InBoxTraceStart = BoxTraceStart->GetComponentLocation();
@@ -292,6 +299,7 @@ void ABaseCharacter::AdjustDirection_Implementation()
 
 void ABaseCharacter::AddImpulse_Implementation(FVector Impulse)
 {
+	if(Impulse.IsNearlyZero()) return;
 	GetCharacterMovement()->AddImpulse(Impulse, true);
 }
 

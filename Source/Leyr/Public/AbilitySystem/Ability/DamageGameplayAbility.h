@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "AbilityTypes.h"
 #include "AbilitySystem/Ability/BaseGameplayAbility.h"
-#include "AbilitySystem/Data/AttackSequenceInfo.h"
 #include "Interaction/CombatInterface.h"
 #include "DamageGameplayAbility.generated.h"
 
@@ -52,27 +51,18 @@ public:
 	UFUNCTION(BlueprintPure)
 	FAdditionalEffectParams MakeAdditionalEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
 	
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability")
-	ESequenceType SequenceType = ESequenceType::Default;
-	
+protected:	
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	bool bShouldApplyExecute = false;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	bool bShouldExecute = false;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability")
-	FVector HitImpulse = FVector::ZeroVector;
-	
 	UPROPERTY(BlueprintReadOnly)
 	bool bHasHitTarget = false;
 
 	UPROPERTY(BlueprintReadOnly)
 	bool bExecuteSuccessful = false;
-	
-	UPROPERTY(BlueprintReadOnly)
-	bool bShouldAddImpulseOnHit = false;
 
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<AActor> HitActor = nullptr;
@@ -97,9 +87,6 @@ protected:
 	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability")
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
-
-	UPROPERTY(EditDefaultsOnly, Category="Ability", meta=(Categories="Damage"))
-	FGameplayTag DamageType;
 
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Status Effect")
 	float StatusEffectChance = 20.f;

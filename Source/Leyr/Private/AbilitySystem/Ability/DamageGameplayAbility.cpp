@@ -122,10 +122,11 @@ void UDamageGameplayAbility::SetCurrentSequence()
 	TaggedMontage = ICombatInterface::Execute_GetTaggedMontageByTag(GetAvatarActorFromActorInfo(), MontageTag, SequenceType);
 	SelectedMontage = TaggedMontage.Montage;
 
-	if (const UItemData* Asset = Cast<UItemData>(GetSourceObjectFromAbilitySpec()))
+	if (AbilityItemData)
 	{
-		WeaponTaggedMontage = Asset->FindSequenceInfoForTag(MontageTag);
+		WeaponTaggedMontage = AbilityItemData->FindSequenceInfoForTag(MontageTag);
 		SelectedWeaponMontage = WeaponTaggedMontage.Montage;
+		HitImpulse = WeaponTaggedMontage.HitImpulse;
 	}
 }
 
@@ -134,11 +135,10 @@ void UDamageGameplayAbility::SelectMontageTagFromCombatState()
 	const FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
 	const FGameplayTagContainer OwnedTags = GetAbilitySystemComponentFromActorInfo()->GetOwnedGameplayTags();
 	MontageTag = GameplayTags.Montage_Attack_1;
-	bShouldAddImpulseOnHit = false; 
 	
 	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Condition_Falling ))
 	{
-		if (OwnedTags.HasTagExact(GameplayTags.CombatState_Directional_Downward )) { MontageTag = GameplayTags.Montage_Falling_Attack; bShouldAddImpulseOnHit = true; return; }
+		if (OwnedTags.HasTagExact(GameplayTags.CombatState_Directional_Downward )) { MontageTag = GameplayTags.Montage_Falling_Attack; return; }
 		if (OwnedTags.HasTagExact(GameplayTags.CombatState_Directional_ForwardUp )) { MontageTag = GameplayTags.Montage_JumpForwardUp_Attack; return; }
 		if (OwnedTags.HasTagExact(GameplayTags.CombatState_Directional_ForwardDown )) { MontageTag = GameplayTags.Montage_JumpForwardDown_Attack; return; }
 		if (OwnedTags.HasTagExact(GameplayTags.CombatState_Directional_Upward )) { MontageTag = GameplayTags.Montage_JumpUpward_Attack; return; }

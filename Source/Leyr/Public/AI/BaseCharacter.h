@@ -10,6 +10,7 @@
 #include "Leyr/Leyr.h"
 #include "BaseCharacter.generated.h"
 
+class UItemData;
 class UAttackSequenceInfo;
 class UGameplayAbility;
 class UGameplayEffect;
@@ -111,6 +112,7 @@ protected:
 
 	//~ Combat Interface
 	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
+	virtual UItemData* LoadAndGetDefaultAttackData_Implementation() override;
 	virtual UPaperZDAnimSequence* GetHitReactSequence_Implementation() override { return HitReactSequence; }
 	virtual UPaperZDAnimInstance* GetPaperAnimInstance_Implementation() override { return AnimationComponent->GetAnimInstance(); }
 	virtual UPaperZDAnimInstance* GetWeaponAnimInstance_Implementation() override { return WeaponComponent->GetAnimInstance(); }
@@ -177,10 +179,13 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	TObjectPtr<UAttackSequenceInfo> AttackSequenceInfo;
 	
+	UPROPERTY(EditAnywhere, Category="Character|Combat")
+	TSoftObjectPtr<UItemData> DefaultAttackData;
+	
 	/* Minions */
 	int32 MinionCount = 0;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Combat")
 	ECharacterClass CharacterClass = ECharacterClass::Warrior;
 
 	/*

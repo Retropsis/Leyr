@@ -81,6 +81,12 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	float Weight = 0.f;
+
+	/*
+	 * Abilities
+	 */
+	UPROPERTY(EditDefaultsOnly, Category="Item", meta=(Categories="Damage"))
+	FGameplayTag DamageType;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
 	TArray<FTaggedMontage> DefaultSequences;

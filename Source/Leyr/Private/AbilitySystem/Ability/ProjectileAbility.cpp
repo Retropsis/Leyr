@@ -4,9 +4,10 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/Actor/Projectile.h"
+#include "Data/ItemData.h"
+#include "Game/BaseGameplayTags.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Kismet/KismetSystemLibrary.h"
 
 void UProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
@@ -37,5 +38,6 @@ void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 	
 	Projectile->AdditionalEffectParams = MakeAdditionalEffectParamsFromClassDefaults();
+	Projectile->AdditionalEffectParams.DamageType = DamageType;
 	Projectile->FinishSpawning(SpawnTransform);
 }

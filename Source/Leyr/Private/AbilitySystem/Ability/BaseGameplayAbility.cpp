@@ -14,19 +14,36 @@
 
 void UBaseGameplayAbility::InitAbility()
 {
+	if (!GetAvatarActorFromActorInfo()->Implements<UCombatInterface>()) return;
+	
 	PaperAnimInstance = ICombatInterface::Execute_GetPaperAnimInstance(GetAvatarActorFromActorInfo());
 	WeaponAnimInstance = ICombatInterface::Execute_GetWeaponAnimInstance(GetAvatarActorFromActorInfo());
 	WeaponAnimInstance->StopAllAnimationOverrides();
-	
-	if (const UItemData* Asset = Cast<UItemData>(GetSourceObjectFromAbilitySpec()))
+
+	/*
+	 * Initialize from Data asset
+	 */
+	if (AbilityItemData = Cast<UItemData>(GetSourceObjectFromAbilitySpec()); AbilityItemData)
 	{
-		if (Asset->AnimationInstance)
+		if (AbilityItemData->AnimationInstance)
 		{
 			if (const ABaseCharacter* Character = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo()))
 			{
-				WeaponAnimInstance = Character->SetWeaponAnimInstance(Asset->AnimationInstance);
+				WeaponAnimInstance = Character->SetWeaponAnimInstance(AbilityItemData->AnimationInstance);
 			}
 		}
+		SequenceType = AbilityItemData->SequenceType;
+		DamageType = AbilityItemData->DamageType;
+	}
+	else if (AbilityItemData = ICombatInterface::Execute_LoadAndGetDefaultAttackData(GetAvatarActorFromActorInfo()); AbilityItemData)
+	{
+		SequenceType = AbilityItemData->SequenceType;
+		DamageType = AbilityItemData->DamageType;
+	}
+	else
+	{
+		SequenceType = ESequenceType::Default;
+		DamageType = FBaseGameplayTags::Get().Damage_Physical;
 	}
 	
 	const float PoiseChance = GetAbilitySystemComponentFromActorInfo()->GetNumericAttribute(UBaseAttributeSet::GetPoiseAttribute());

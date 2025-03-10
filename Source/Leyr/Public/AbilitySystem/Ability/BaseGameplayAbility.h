@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
+#include "AbilitySystem/Data/AttackSequenceInfo.h"
 #include "Data/CombatData.h"
 #include "Leyr/Leyr.h"
 #include "BaseGameplayAbility.generated.h"
@@ -58,9 +59,15 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UPaperZDAnimInstance> WeaponAnimInstance = nullptr;
+	
+	UPROPERTY(BlueprintReadOnly)
+	FVector HitImpulse = FVector::ZeroVector;
 
+	ESequenceType SequenceType = ESequenceType::Default;
+	FGameplayTag DamageType;
 	FTaggedMontage TaggedMontage;
 	FTaggedMontage WeaponTaggedMontage;
+	TObjectPtr<UItemData> AbilityItemData = nullptr;
 
 private:
 	FActiveGameplayEffectHandle ActiveSourceObjectEffectHandle;

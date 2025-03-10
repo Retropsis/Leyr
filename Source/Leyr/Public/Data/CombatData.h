@@ -44,6 +44,12 @@ struct FTaggedMontage
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float HitStopDuration = 0.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Poise = 0.f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FVector HitImpulse = FVector::ZeroVector;
 };
 
 USTRUCT(BlueprintType)
