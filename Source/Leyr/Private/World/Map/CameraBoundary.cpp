@@ -23,6 +23,12 @@ ACameraBoundary::ACameraBoundary()
 	EnteringBoundary->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	EnteringBoundary->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
 	
+	NavigationBoundary = CreateDefaultSubobject<UBoxComponent>("Navigation Boundary");
+	NavigationBoundary->InitBoxExtent(FVector(50.f));
+	NavigationBoundary->SetupAttachment(GetRootComponent());
+	NavigationBoundary->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	NavigationBoundary->SetCollisionResponseToAllChannels(ECR_Ignore);
+	
 	CameraBoundary = CreateDefaultSubobject<UBoxComponent>("Camera Extents");
 	CameraBoundary->InitBoxExtent(FVector(50.f));
 	CameraBoundary->SetupAttachment(GetRootComponent());
@@ -67,6 +73,7 @@ void ACameraBoundary::InitializeCameraExtent()
 		SetActorLocation(TileMap->GetRenderComponent()->Bounds.Origin);
 		const FBoxSphereBounds Bounds = TileMap->GetRenderComponent()->Bounds;
 		EnteringBoundary->SetBoxExtent(FVector{ Bounds.BoxExtent.X - 18.f, Bounds.BoxExtent.Y, Bounds.BoxExtent.Z - 54.f });
+		NavigationBoundary->SetBoxExtent(FVector{ Bounds.BoxExtent.X - 128.f, Bounds.BoxExtent.Y, Bounds.BoxExtent.Z - 128.f });
 		BoundaryVisualizer->SetWorldScale3D(FVector{ Bounds.BoxExtent.X / 50.f, Bounds.BoxExtent.Y / 50.f, Bounds.BoxExtent.Z / 50.f });
 		CameraBoundary->SetBoxExtent(FVector{ bConstrainX ? FMath::Max(0.f, Bounds.BoxExtent.X - 640.f) : Bounds.BoxExtent.X, 0.f, bConstrainZ ? FMath::Max(0.f, Bounds.BoxExtent.Z - 384.f) : Bounds.BoxExtent.Z });
 	}

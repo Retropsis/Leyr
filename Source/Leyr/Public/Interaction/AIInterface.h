@@ -70,5 +70,11 @@ public:
 	FBoundLocations GetArenaBounds();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FBoxSphereBounds GetEnteringBounds();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool IsWithinBounds(const FVector& Location);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool IsTargetWithinEnteringBounds(const FVector& Location);
 };

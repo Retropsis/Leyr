@@ -33,6 +33,7 @@ class LEYR_API AAICharacter : public ABaseCharacter, public IEnemyInterface, pub
 public:
 	AAICharacter();
 	virtual void Tick(float DeltaSeconds) override;
+	void InitializeNavigationBounds();
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 	void HandleBehaviourState(EBehaviourState NewState);
@@ -67,7 +68,11 @@ public:
 	FBoundLocations CalculateBoundsAtActorZ() const;
 	virtual FBoundLocations GetArenaBounds_Implementation() override;
 	virtual bool IsWithinBounds_Implementation(const FVector& Location) override;
+	virtual FBoxSphereBounds GetEnteringBounds_Implementation() override;
+	virtual bool IsTargetWithinEnteringBounds_Implementation(const FVector& Location) override;
 	/** end AI Interface */
+	
+	bool IsTargetWithinEnteringBounds(const FVector& TargetLocation) const;
 
 	/** Enemy Interface */
 	virtual void SetShouldAttack_Implementation(bool InShouldAttack) override;
@@ -168,6 +173,8 @@ protected:
 	FValueRange AbilityPower;
 	FGameplayTag DamageType;
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
+	FBoxSphereBounds EnteringBounds{};
+	FBoxSphereBounds NavigationBounds{};
 
 private:
 	void ShouldAttack(bool InShouldAttack);

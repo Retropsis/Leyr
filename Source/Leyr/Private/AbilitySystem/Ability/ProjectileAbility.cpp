@@ -4,8 +4,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/Actor/Projectile.h"
-#include "Data/ItemData.h"
-#include "Game/BaseGameplayTags.h"
+#include "Components/SphereComponent.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -14,7 +13,7 @@ void UProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag, bool bOverridePitch, float PitchOverride)
+void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag, bool bIgnoreStatic, bool bOverridePitch, float PitchOverride)
 {
 	if (!GetAvatarActorFromActorInfo()->HasAuthority()) return;
 
@@ -39,5 +38,6 @@ void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation
 	
 	Projectile->AdditionalEffectParams = MakeAdditionalEffectParamsFromClassDefaults();
 	Projectile->AdditionalEffectParams.DamageType = DamageType;
+	Projectile->Sphere->SetCollisionResponseToChannel(ECC_WorldStatic, bIgnoreStatic ? ECR_Ignore : ECR_Block);
 	Projectile->FinishSpawning(SpawnTransform);
 }

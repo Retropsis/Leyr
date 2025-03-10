@@ -25,6 +25,7 @@ AProjectile::AProjectile()
 	Sphere->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
 	Sphere->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Overlap);
 	Sphere->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	Sphere->SetCollisionResponseToChannel(ECC_Player, ECR_Ignore);
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovement");
 	ProjectileMovement->SetPlaneConstraintEnabled(true);
@@ -86,9 +87,9 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 			Destroy();
 		}
 			
-		if(OtherActor && OtherActor->ActorHasTag("HitInteraction"))
+		if(OtherActor && OtherActor->Implements<UInteractionInterface>())
 		{
-			IInteractionInterface::Execute_Interact(OtherActor, SourceAvatarActor);
+			IInteractionInterface::Execute_InteractHit(OtherActor, SourceAvatarActor);
 		}
 		bool bActorOverlappingProjectiles = OtherActor && OtherActor->ActorHasTag("OverlapProjectiles");
 		bool bInteractiveActorBlockingProjectile = OtherActor && OtherActor->Implements<UInteractionInterface>() && IInteractionInterface::Execute_ShouldBlockProjectile(OtherActor);

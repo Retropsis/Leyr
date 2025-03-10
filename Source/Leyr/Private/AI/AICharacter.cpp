@@ -132,11 +132,32 @@ void AAICharacter::PossessedBy(AController* NewController)
 	case EBehaviourType::Airborne:
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		GetCharacterMovement()->DefaultLandMovementMode = MOVE_Flying;
+		InitializeNavigationBounds();
 		break;
 	case EBehaviourType::Aquatic:
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		GetCharacterMovement()->DefaultLandMovementMode = MOVE_Flying;
 		break;
+	}
+}
+
+void AAICharacter::InitializeNavigationBounds()
+{
+	const FVector Start = GetActorLocation();
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery2);
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	TArray<AActor*> OutActors;
+	UKismetSystemLibrary::CapsuleOverlapActors(this, Start, GetCapsuleComponent()->GetScaledCapsuleRadius(), GetCapsuleComponent()->GetScaledCapsuleHalfHeight(),
+											   ObjectTypes, ACameraBoundary::StaticClass(), ActorsToIgnore, OutActors);
+	if (OutActors.Num() > 0)
+	{
+		if (const ACameraBoundary* CameraBoundary = Cast<ACameraBoundary>(OutActors[0]))
+		{
+			EnteringBounds = CameraBoundary->GetEnteringBounds(); 
+			NavigationBounds = CameraBoundary->GetNavigationBounds(); 
+		}
 	}
 }
 
@@ -357,6 +378,11 @@ FVector AAICharacter::FindRandomLocation_Implementation()
 	while (Index < 10)
 	{
 		FVector TargetLocation = GetActorLocation() + FVector(FMath::RandRange(-PatrolTickRadius, PatrolTickRadius), 0.f, FMath::RandRange(-PatrolTickRadius, PatrolTickRadius));
+		TargetLocation = FVector{
+			FMath::Clamp(TargetLocation.X, NavigationBounds.Origin.X - NavigationBounds.BoxExtent.X, NavigationBounds.Origin.X + NavigationBounds.BoxExtent.X),
+			0.f,
+			FMath::Clamp(TargetLocation.Z, NavigationBounds.Origin.Z - NavigationBounds.BoxExtent.Z, NavigationBounds.Origin.Z + NavigationBounds.BoxExtent.Z) };
+		
 		if (FMath::Abs((StartLocation - TargetLocation).Size()) > PatrolRadius)
 		{
 			Index++;
@@ -382,8 +408,17 @@ bool AAICharacter::MoveToLocation_Implementation(FVector TargetLocation, float T
 	return true;
 }
 
-bool AAICharacter::ChaseTarget_Implementation(AActor* TargetToChase)
+bool AAICharacter::IsTargetWithinEnteringBounds(const FVector& TargetLocation) const
 {
+	const float Left = EnteringBounds.Origin.X - EnteringBounds.BoxExtent.X;
+	const float Right = EnteringBounds.Origin.X + EnteringBounds.BoxExtent.X;
+	const float Top = EnteringBounds.Origin.Z + EnteringBounds.BoxExtent.Z;
+	const float Bottom = EnteringBounds.Origin.Z - EnteringBounds.BoxExtent.Z;	
+	return FMath::IsWithin(TargetLocation.X, Left, Right) && FMath::IsWithin(TargetLocation.Z, Bottom, Top);
+}
+
+bool AAICharacter::ChaseTarget_Implementation(AActor* TargetToChase)
+{		
 	switch (ChasingState) {
 	case EChasingState::Chasing:
 		if (GetDistanceTo(TargetToChase) > AttackRange)
@@ -570,14 +605,17 @@ FBoundLocations AAICharacter::GetArenaBounds_Implementation()
 	return FBoundLocations();
 }
 
+bool AAICharacter::IsTargetWithinEnteringBounds_Implementation(const FVector& Location)
+{
+	return IsTargetWithinEnteringBounds(Location);
+}
+
 bool AAICharacter::IsWithinBounds_Implementation(const FVector& Location)
 {
 	if(Arena == nullptr) return false;
 	
 	const FBoundLocations BoundLocations = CalculateBoundsAtActorZ();
 	const FVector Extent = FVector{ GetCapsuleComponent()->GetScaledCapsuleRadius() * 2.f, 0.f, 200.f };
-	UKismetSystemLibrary::DrawDebugBox(this, FVector{ BoundLocations.Left.X + Extent.X / 2.f, 0.f, BoundLocations.Left.Z }, Extent, FLinearColor::Blue, FRotator::ZeroRotator, 5.f);
-	UKismetSystemLibrary::DrawDebugBox(this, FVector{ BoundLocations.Right.X - Extent.X / 2.f, 0.f, BoundLocations.Right.Z }, Extent, FLinearColor::Red, FRotator::ZeroRotator, 5.f);
 	
 	if (GetActorForwardVector().X < 0.f)
 	{
@@ -588,4 +626,9 @@ bool AAICharacter::IsWithinBounds_Implementation(const FVector& Location)
 		return FVector::Distance(Location, BoundLocations.Left) > Extent.X * 2.f;
 	}
 	return false;
+}
+
+FBoxSphereBounds AAICharacter::GetEnteringBounds_Implementation()
+{
+	return EnteringBounds;
 }

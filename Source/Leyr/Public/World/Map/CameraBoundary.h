@@ -41,6 +41,8 @@ public:
 	void SetTargetActor(AActor* InTargetActor) { TargetActor = InTargetActor; }
 	AActor* GetTargetActor() { return TargetActor; }
 	FBoxSphereBounds GetBounds() const { return CameraBoundary->Bounds; }
+	FBoxSphereBounds GetEnteringBounds() const { return EnteringBoundary->Bounds; }
+	FBoxSphereBounds GetNavigationBounds() const { return NavigationBoundary->Bounds; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -59,6 +61,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBoxComponent> EnteringBoundary;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UBoxComponent> NavigationBoundary;
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBoxComponent> CameraBoundary;
