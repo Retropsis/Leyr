@@ -149,6 +149,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_Summon = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Summon"), FString("Ability Summon"));
 	
 	GameplayTags.Abilities_ClimbingRope = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.ClimbingRope"), FString("Ability ClimbingRope"));
+	GameplayTags.Abilities_SwimImpulse = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.SwimImpulse"), FString("Ability SwimImpulse"));
 	
 	GameplayTags.Abilities_Fire_FireBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Fire.FireBolt"), FString("Fire Element Ability FireBolt"));
 	GameplayTags.Abilities_Fire_FireBlast = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Fire.FireBlast"), FString("Fire Element Ability FireBlast"));
@@ -249,6 +250,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_Combo_Window_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Combo.Window.2"), FString("Abilities Combo Window 2"));
 	GameplayTags.Abilities_Combo_Window_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Combo.Window.3"), FString("Abilities Combo Window 3"));
 	GameplayTags.Abilities_Combo_Window_Begin = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Combo.Window.Begin"), FString("Abilities Combo Window Begin"));
+	GameplayTags.Abilities_Combo_Window_Cue = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Combo.Window.Cue"), FString("Abilities Combo Window Cue"));
 	GameplayTags.Abilities_Combo_Window_End = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Combo.Window.End"), FString("Abilities Combo Window End"));
 	GameplayTags.Abilities_Combo_Window_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Combo.Window.Execute"), FString("Abilities Combo Window Execute"));
 
@@ -363,6 +365,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Cooldown_Item_Average = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Item.Average"), FString("Cooldown Item Average"));
 	GameplayTags.Cooldown_Item_Long = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Item.Long"), FString("Cooldown Item Long"));
 	GameplayTags.Cooldown_Item_VeryLong = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Item.VeryLong"), FString("Cooldown Item VeryLong"));
+	GameplayTags.Cooldown_SwimImpulse = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.SwimImpulse"), FString("Cooldown SwimImpulse"));
 	
 	/*
 	 * Side Effects

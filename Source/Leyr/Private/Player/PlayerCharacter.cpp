@@ -99,15 +99,6 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 void APlayerCharacter::ForceMove(float DeltaSeconds)
 {
 	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-	// if(CombatState == ECombatState::ClimbingRope)
-	// {
-	// 	SetActorLocation(FMath::VInterpTo(GetActorLocation(), MovementTarget, DeltaSeconds, MovementSpeed));
-	// 	if (FMath::IsNearlyZero(UKismetMathLibrary::Vector_Distance(GetActorLocation(), MovementTarget), 5.f))
-	// 	{
-	// 		HandleCombatState(ECombatState::Unoccupied);
-	// 		GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(GameplayTags.CombatDirections);
-	// 	}
-	// }
 	if(CombatState == ECombatState::HoppingLedge)
 	{
 		SetActorLocation(FMath::VInterpTo(GetActorLocation(), MovementTarget, DeltaSeconds, 8.f));
@@ -117,14 +108,6 @@ void APlayerCharacter::ForceMove(float DeltaSeconds)
 			GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(GameplayTags.CombatDirections);
 		}
 	}
-	// if(CombatState == ECombatState::Dodging)
-	// {
-	// 	AddMovementInput(FVector(1.f, 0.f, 0.f), -GetActorForwardVector().X);
-	// }
-	// if(CombatState == ECombatState::Rolling)
-	// {
-	// 	AddMovementInput(FVector(1.f, 0.f, 0.f), GetActorForwardVector().X);
-	// }
 }
 
 void APlayerCharacter::HandleCharacterMovementUpdated(float DeltaSeconds, FVector OldLocation, FVector OldVelocity)
@@ -600,7 +583,31 @@ void APlayerCharacter::HandleCrouching(bool bShouldCrouch)
 		return;
 	}
 	if((bShouldCrouch && bIsCrouched) || CombatState >= ECombatState::HangingLedge) return;
-	if(bShouldCrouch && !bIsCrouched && CombatState == ECombatState::Unoccupied) HandleCombatState(ECombatState::Crouching);
+	if(bShouldCrouch && !bIsCrouched && CombatState == ECombatState::Unoccupied)
+	{
+		// if (TryDescendLadder()) return;
+		TryDescendLadder();
+		HandleCombatState(ECombatState::Crouching);
+	}
+}
+
+bool APlayerCharacter::TryDescendLadder()
+{
+	const FVector Start = GetActorLocation() + FVector::DownVector * GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	const FVector End = Start + FVector::DownVector * 15.f;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(EOT_OneWayPlatform);
+	TArray<AActor*> ActorsToIgnore;
+	FHitResult Hit;
+	UKismetSystemLibrary::LineTraceSingleForObjects(
+		this, Start, End, ObjectTypes,
+		false, TArray<AActor*>(), EDrawDebugTrace::ForDuration, Hit, true, FLinearColor::Yellow);
+	if (Hit.bBlockingHit && Hit.GetActor() && Hit.GetActor()->Implements<UInteractionInterface>())
+	{
+		IInteractionInterface::Execute_InteractBottom(Hit.GetActor(), this);
+		return true;
+	}
+	return false;
 }
 
 void APlayerCharacter::JumpButtonPressed()
@@ -613,7 +620,7 @@ void APlayerCharacter::JumpButtonPressed()
 	}
 	if(CombatState == ECombatState::Swimming)
 	{
-		GetCharacterMovement()->AddImpulse(GetActorForwardVector() * 375.f + FVector::UpVector * 75.f, true);
+		AbilitySystemComponent->TryActivateAbilitiesByTag(FBaseGameplayTags::Get().Abilities_SwimImpulse.GetSingleTagContainer());
 		return;
 	}
 	if(CombatState >= ECombatState::HangingLedge)

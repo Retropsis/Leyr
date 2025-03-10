@@ -59,5 +59,15 @@ void APulley::InteractHit_Implementation(AActor* InteractingActor)
 	{
 		PhysicsConstraint->BreakConstraint();
 		WeightHitBox->SetSimulatePhysics(true);
+		WeightHitBox->OnComponentHit.AddDynamic(this, &APulley::OnHit);
+		WeightHitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
+		WeightHitBox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	}
+}
+
+void APulley::OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	WeightHitBox->OnComponentHit.Clear();
+	// WeightHitBox->SetSimulatePhysics(false);
+	// WeightHitBox->SetEnableGravity(false);
 }

@@ -30,5 +30,8 @@ public:
 	void InteractHit(AActor* InteractingActor);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void InteractBottom(AActor* InteractingActor);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool ShouldBlockProjectile();
 };

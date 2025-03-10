@@ -154,6 +154,7 @@ FGameplayTag Abilities_Cosmos_Meteor_1;
 FGameplayTag Abilities_Noxious_Bio_1;
  
 FGameplayTag Abilities_ClimbingRope;
+FGameplayTag Abilities_SwimImpulse;
 
 FGameplayTag Abilities_Cure_1;
 FGameplayTag Abilities_Cure_2;
@@ -226,6 +227,7 @@ FGameplayTag Abilities_Combo_Window_2;
 FGameplayTag Abilities_Combo_Window_3;
 FGameplayTag Abilities_Combo_Window_Execute;
 FGameplayTag Abilities_Combo_Window_Begin;
+FGameplayTag Abilities_Combo_Window_Cue;
 FGameplayTag Abilities_Combo_Window_End;
  
 FGameplayTag Abilities_Throw_1;
@@ -320,6 +322,8 @@ FGameplayTag Cooldown_Item_Short;
 FGameplayTag Cooldown_Item_Average;
 FGameplayTag Cooldown_Item_Long;
 FGameplayTag Cooldown_Item_VeryLong;
+ 
+FGameplayTag Cooldown_SwimImpulse;
  
  /*
   * Inventory Cost Tags

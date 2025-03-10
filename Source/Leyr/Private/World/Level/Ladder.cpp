@@ -12,6 +12,16 @@ ALadder::ALadder()
 	HangingCollision->SetCollisionObjectType(ECC_Interaction);
 	HangingCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	HangingCollision->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
+
+	LadderTop = CreateDefaultSubobject<UBoxComponent>("LadderTop");
+	LadderTop->SetupAttachment(GetRootComponent());
+	LadderTop->SetBoxExtent(FVector{ 32.f, 100.f, 8.f });
+	LadderTop->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	LadderTop->SetCollisionObjectType(ECC_Interaction);
+	LadderTop->SetCollisionResponseToAllChannels(ECR_Ignore);
+	LadderTop->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
+	LadderTop->SetCollisionResponseToChannel(ECC_Player, ECR_Block);
+	LadderTop->SetCollisionResponseToChannel(ECC_Enemy, ECR_Block);
 }
 
 void ALadder::BeginPlay()
@@ -27,6 +37,16 @@ void ALadder::BeginPlay()
 void ALadder::Interact_Implementation(AActor* InteractingActor)
 {
 	ICombatInterface::Execute_SetCombatStateToHandle(InteractingActor, ECombatState::HangingLadder);
+}
+
+void ALadder::InteractBottom_Implementation(AActor* InteractingActor)
+{
+	if (!InteractingActor->Implements<UPlayerInterface>()) return;
+	
+	LadderTop->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	LadderTop->SetCollisionResponseToChannel(ECC_Player, ECR_Ignore);
+	const FVector Location{ HangingCollision->GetComponentLocation().X, 0.f, LadderTop->GetComponentLocation().Z };
+	IPlayerInterface::Execute_HandleHangingOnLadder(InteractingActor, Location, false);
 }
 
 void ALadder::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -45,6 +65,9 @@ void ALadder::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 		HangingCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 		if (const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(IgnoreCollisionTimer, this, &ALadder::HandleIgnoreCollisionEnd, IgnoreCollisionTime);
 		IPlayerInterface::Execute_HandleHangingOnLadder(OtherActor, FVector::ZeroVector, true);
+		
+		LadderTop->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
+		LadderTop->SetCollisionResponseToChannel(ECC_Player, ECR_Block);
 	}
 }
 

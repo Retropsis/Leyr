@@ -187,6 +187,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		DamageTypeValue *= ( 100.f - Resistance ) / 100.f;
 		Damage += DamageTypeValue;
 	}
+	GEngine->AddOnScreenDebugMessage(123456, 30.f, FColor::Cyan, FString::Printf(TEXT("Raw Damage: %f"), Damage));
 
 	float PhysicalAttackMastery = ApplyMasteryEffects(ExecutionParams);
 	const FActiveGameplayEffectHandle ActiveSourceObjectEffectHandle = ApplyEquipmentEffects(ExecutionParams);
@@ -201,6 +202,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	// const float EffectivePhysicalAttackCoefficient = EffectivePhysicalAttackCurve->Eval(TargetCharacterLevel);
 	// GEngine->AddOnScreenDebugMessage(445577, 5.f, FColor::Cyan, FString::Printf(TEXT("EffectivePAtk: [%f]"), EffectivePhysicalAttack));
 	Damage += Damage * EffectivePhysicalAttack * PhysicalAttackMastery;
+	GEngine->AddOnScreenDebugMessage(123457, 30.f, FColor::Cyan, FString::Printf(TEXT("Damage: %f including [P.Atk %f - P.Atk Mastery %f]"), Damage, SourcePhysicalAttack, PhysicalAttackMastery));
 	
 	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
 	
@@ -232,7 +234,10 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	const float EffectivePhysicalDefenseCoefficient = EffectivePhysicalDefenseCurve->Eval(TargetCharacterLevel);
 	
 	// Armor ignores a percentage of incoming Damage.
-	Damage *= ( 100 - EffectivePhysicalDefense * EffectivePhysicalDefenseCoefficient ) / 100.f;	float SourceCriticalHitChance = 0.f;
+	Damage *= ( 100 - EffectivePhysicalDefense * EffectivePhysicalDefenseCoefficient ) / 100.f;
+	GEngine->AddOnScreenDebugMessage(123458, 30.f, FColor::Cyan, FString::Printf(TEXT("Damage reduction: %f [P.Def %f]"), EffectivePhysicalDefense * EffectivePhysicalDefenseCoefficient, EffectivePhysicalDefense));
+	
+	float SourceCriticalHitChance = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().CriticalHitChanceDef, EvaluationParameters, SourceCriticalHitChance);
 	SourceCriticalHitChance = FMath::Max<float>(SourceCriticalHitChance, 0.f);
 

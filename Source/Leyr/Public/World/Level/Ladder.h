@@ -19,7 +19,11 @@ public:
 
 	//~ Interact Interface
 	virtual void Interact_Implementation(AActor* InteractingActor) override;
+	virtual void InteractBottom_Implementation(AActor* InteractingActor) override;
 	//~ Interact Interface
+
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UBoxComponent> LadderTop;
 	
 protected:
 	virtual void BeginPlay() override;

@@ -26,4 +26,7 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite)
 	bool bShouldEndAbility = true;
+	
+	UPROPERTY(BlueprintReadWrite)
+	bool bCueCombo = false;
 };

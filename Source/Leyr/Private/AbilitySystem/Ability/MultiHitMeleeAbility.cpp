@@ -17,22 +17,26 @@ void UMultiHitMeleeAbility::SelectMontageTagCombo()
 		{
 			MontageTag = GameplayTags.Montage_Attack_2;
 			UAbilitySystemBlueprintLibrary::RemoveLooseGameplayTags(GetAvatarActorFromActorInfo(), FGameplayTagContainer{ FBaseGameplayTags::Get().Abilities_Combo_Attack_1 });
-			UAbilitySystemBlueprintLibrary::AddLooseGameplayTags(GetAvatarActorFromActorInfo(), FGameplayTagContainer{ FBaseGameplayTags::Get().Abilities_Combo_Attack_2 });
-			return;
+			// UAbilitySystemBlueprintLibrary::AddLooseGameplayTags(GetAvatarActorFromActorInfo(), FGameplayTagContainer{ FBaseGameplayTags::Get().Abilities_Combo_Attack_2 });
 		}
-		if (OwnedTags.HasTagExact(GameplayTags.Abilities_Combo_Attack_2 ))
+		else
 		{
-			MontageTag = GameplayTags.Montage_Attack_3;
-			UAbilitySystemBlueprintLibrary::RemoveLooseGameplayTags(GetAvatarActorFromActorInfo(), FGameplayTagContainer{ FBaseGameplayTags::Get().Abilities_Combo_Attack_2 });
-			UAbilitySystemBlueprintLibrary::AddLooseGameplayTags(GetAvatarActorFromActorInfo(), FGameplayTagContainer{ FBaseGameplayTags::Get().Abilities_Combo_Attack_3 });
-			return;
+			MontageTag = GameplayTags.Montage_Attack_1;
+			UAbilitySystemBlueprintLibrary::AddLooseGameplayTags(GetAvatarActorFromActorInfo(), FGameplayTagContainer{ FBaseGameplayTags::Get().Abilities_Combo_Attack_1 });
 		}
-		if (OwnedTags.HasTagExact(GameplayTags.Abilities_Combo_Attack_3 ))
-		{
-			MontageTag = GameplayTags.Montage_Attack_4;
-			UAbilitySystemBlueprintLibrary::RemoveLooseGameplayTags(GetAvatarActorFromActorInfo(), FGameplayTagContainer{ FBaseGameplayTags::Get().Abilities_Combo_Attack_3 });
-			bShouldEndAbility = true;
-		}
+		// if (OwnedTags.HasTagExact(GameplayTags.Abilities_Combo_Attack_2 ))
+		// {
+		// 	MontageTag = GameplayTags.Montage_Attack_3;
+		// 	UAbilitySystemBlueprintLibrary::RemoveLooseGameplayTags(GetAvatarActorFromActorInfo(), FGameplayTagContainer{ FBaseGameplayTags::Get().Abilities_Combo_Attack_2 });
+		// 	UAbilitySystemBlueprintLibrary::AddLooseGameplayTags(GetAvatarActorFromActorInfo(), FGameplayTagContainer{ FBaseGameplayTags::Get().Abilities_Combo_Attack_3 });
+		// 	return;
+		// }
+		// if (OwnedTags.HasTagExact(GameplayTags.Abilities_Combo_Attack_3 ))
+		// {
+		// 	MontageTag = GameplayTags.Montage_Attack_4;
+		// 	UAbilitySystemBlueprintLibrary::RemoveLooseGameplayTags(GetAvatarActorFromActorInfo(), FGameplayTagContainer{ FBaseGameplayTags::Get().Abilities_Combo_Attack_3 });
+		// 	bShouldEndAbility = true;
+		// }
 	}
 	else
 	{
@@ -41,7 +45,6 @@ void UMultiHitMeleeAbility::SelectMontageTagCombo()
 		UAbilitySystemBlueprintLibrary::RemoveLooseGameplayTags(GetAvatarActorFromActorInfo(), FGameplayTagContainer{ FBaseGameplayTags::Get().Abilities_Combo_Attack_2 });
 		UAbilitySystemBlueprintLibrary::RemoveLooseGameplayTags(GetAvatarActorFromActorInfo(), FGameplayTagContainer{ FBaseGameplayTags::Get().Abilities_Combo_Attack_3 });
 	}
-	
 }
 
 void UMultiHitMeleeAbility::OnComboWindowBegin()
