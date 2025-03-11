@@ -48,7 +48,7 @@ public:
 	void UpdateFacingTarget(const FVector& Target);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	UItemData* LoadAndGetDefaultAttackData();
+	UAbilityData* LoadAndGetDefaultAbilityData();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UPaperZDAnimSequence* GetHitReactSequence();

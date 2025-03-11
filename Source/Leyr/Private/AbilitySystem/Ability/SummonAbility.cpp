@@ -1,7 +1,20 @@
 // @ Retropsis 2024-2025.
 
 #include "AbilitySystem/Ability/SummonAbility.h"
-#include "Kismet/KismetSystemLibrary.h"
+
+void USummonAbility::InitAbility()
+{
+	Super::InitAbility();
+	
+	// if (AbilityData)
+	// {
+	// 	NumMinions = 5;
+	// 	MinionClasses;
+	// 	MinSpawnDistance = 50.f;
+	// 	MaxSpawnDistance = 250.f;
+	// 	SpawnSpread = 90.f;
+	// }
+}
 
 TArray<FVector> USummonAbility::GetSpawnLocations()
 {

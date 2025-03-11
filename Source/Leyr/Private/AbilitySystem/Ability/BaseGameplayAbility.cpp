@@ -6,6 +6,7 @@
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AI/BaseCharacter.h"
+#include "Data/AbilityData.h"
 #include "Data/ItemData.h"
 #include "Game/BaseGameplayTags.h"
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
@@ -13,15 +14,33 @@
 #include "Interaction/PlayerInterface.h"
 
 void UBaseGameplayAbility::InitAbility()
-{	
+{
 	if (!GetAvatarActorFromActorInfo()->Implements<UCombatInterface>()) return;
 	
 	PaperAnimInstance = ICombatInterface::Execute_GetPaperAnimInstance(GetAvatarActorFromActorInfo());
 	WeaponAnimInstance = ICombatInterface::Execute_GetWeaponAnimInstance(GetAvatarActorFromActorInfo());
 	WeaponAnimInstance->StopAllAnimationOverrides();
+	
+	DamageType = FBaseGameplayTags::Get().Damage_Physical;
+	
+	/*
+	 * Initialize from Default Ability Data asset
+	 */
+	if (AbilityData)
+	{
+		// AbilityPower = AbilityData->AbilityPower;
+		AbilityPoise = AbilityData->AbilityPoise;
+		SequenceType = AbilityData->SequenceType;
+		DamageType = AbilityData->DamageType;
+	} 
+	else if (AbilityData = ICombatInterface::Execute_LoadAndGetDefaultAbilityData(GetAvatarActorFromActorInfo()); AbilityData)
+	{
+		SequenceType = AbilityData->SequenceType;
+		DamageType = AbilityData->DamageType;
+	}
 
 	/*
-	 * Initialize from Data asset
+	 * Initialize from Item Data asset
 	 */
 	if (AbilityItemData = Cast<UItemData>(GetSourceObjectFromAbilitySpec()); AbilityItemData)
 	{
@@ -34,16 +53,6 @@ void UBaseGameplayAbility::InitAbility()
 		}
 		SequenceType = AbilityItemData->SequenceType;
 		DamageType = AbilityItemData->DamageType;
-	}
-	else if (AbilityItemData = ICombatInterface::Execute_LoadAndGetDefaultAttackData(GetAvatarActorFromActorInfo()); AbilityItemData)
-	{
-		SequenceType = AbilityItemData->SequenceType;
-		DamageType = AbilityItemData->DamageType;
-	}
-	else
-	{
-		SequenceType = ESequenceType::Default;
-		DamageType = FBaseGameplayTags::Get().Damage_Physical;
 	}
 	
 	const float PoiseChance = GetAbilitySystemComponentFromActorInfo()->GetNumericAttribute(UBaseAttributeSet::GetPoiseAttribute());

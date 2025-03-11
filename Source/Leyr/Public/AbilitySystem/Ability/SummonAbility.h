@@ -21,6 +21,8 @@ public:
 	UFUNCTION(BlueprintPure, Category="Summoning")
 	TSubclassOf<APawn> GetRandomMinionClass();
 
+	virtual void InitAbility() override;
+
 	/*
 	 * Summon Ability Data
 	 */

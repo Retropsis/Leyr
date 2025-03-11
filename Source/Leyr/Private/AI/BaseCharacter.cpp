@@ -11,8 +11,8 @@
 #include "AbilitySystem/Effect/StatusEffectNiagaraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Data/AbilityData.h"
 #include "Data/ItemData.h"
-#include "Engine/AssetManager.h"
 #include "Game/BaseGameplayTags.h"
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -177,9 +177,9 @@ FVector ABaseCharacter::GetCombatSocketLocation_Implementation(const FGameplayTa
 	return WeaponSocket->GetComponentLocation();
 }
 
-UItemData* ABaseCharacter::LoadAndGetDefaultAttackData_Implementation()
+UAbilityData* ABaseCharacter::LoadAndGetDefaultAbilityData_Implementation()
 {
-	return DefaultAttackData.LoadSynchronous();
+	return DefaultAbilityData.LoadSynchronous();
 }
 
 void ABaseCharacter::GetAttackAnimationData_Implementation(FVector& InBoxTraceStart, FVector& InBoxTraceEnd)

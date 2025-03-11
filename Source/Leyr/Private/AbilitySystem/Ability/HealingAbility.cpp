@@ -4,6 +4,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "Data/AbilityData.h"
 #include "Game/BaseGameplayTags.h"
 
 void UHealingAbility::CauseHealing(UAbilitySystemComponent* TargetASC)
@@ -20,4 +21,15 @@ void UHealingAbility::CauseHealing(UAbilitySystemComponent* TargetASC)
 	// if(bShouldApplyExecute) MakeAndApplyExecuteEffectToTarget(FBaseGameplayTags::Get().Indicator_Execute, TargetASC);
 	
 	GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), TargetASC);
+}
+
+void UHealingAbility::InitAbility()
+{
+	Super::InitAbility();
+	
+	if (AbilityData)
+	{
+		HealingEffectClass = AbilityData->MainEffectClass;
+		HealingType = AbilityData->DamageType;
+	}
 }

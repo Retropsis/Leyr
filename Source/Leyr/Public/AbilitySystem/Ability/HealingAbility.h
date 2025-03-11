@@ -18,6 +18,8 @@ class LEYR_API UHealingAbility : public UBaseGameplayAbility
 	void CauseHealing(UAbilitySystemComponent* TargetASC);
 
 protected:
+	virtual void InitAbility() override;
+
 	/*
 	 * Healing Ability Data
 	 */

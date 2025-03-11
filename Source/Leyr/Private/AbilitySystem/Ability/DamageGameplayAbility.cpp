@@ -5,6 +5,7 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AI/BaseCharacter.h"
+#include "Data/AbilityData.h"
 #include "Data/ItemData.h"
 #include "Game/BaseGameplayTags.h"
 #include "Interaction/InteractionInterface.h"
@@ -15,6 +16,13 @@ void UDamageGameplayAbility::InitAbility()
 	Super::InitAbility();
 	bHasHitTarget = false;
 	ICombatInterface::Execute_SetMovementEnabled(GetAvatarActorFromActorInfo(), false);
+	
+	if (AbilityData)
+	{
+		DamageEffectClass = AbilityData->MainEffectClass;
+		// bShouldApplyExecute = AbilityData->bShouldApplyExecute;
+		// bShouldExecute = AbilityData->bShouldExecute;
+	}
 }
 
 void UDamageGameplayAbility::PrepareToEndAbility()

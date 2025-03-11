@@ -5,8 +5,19 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/Actor/Projectile.h"
 #include "Components/SphereComponent.h"
+#include "Data/AbilityData.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/KismetMathLibrary.h"
+
+void UProjectileAbility::InitAbility()
+{
+	Super::InitAbility();
+	
+	if (AbilityData)
+	{
+		ProjectileClass = AbilityData->ProjectileClass;
+	}
+}
 
 void UProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
