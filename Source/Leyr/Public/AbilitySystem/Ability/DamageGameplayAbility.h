@@ -51,13 +51,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	FAdditionalEffectParams MakeAdditionalEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
 	
-protected:	
-	UPROPERTY(EditDefaultsOnly, Category="Ability")
-	bool bShouldApplyExecute = false;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Ability")
-	bool bShouldExecute = false;
-	
+protected:		
 	UPROPERTY(BlueprintReadOnly)
 	bool bHasHitTarget = false;
 
@@ -83,11 +77,20 @@ protected:
 	FGameplayTag MontageTag = FGameplayTag();
 
 	/*
-	 * Damage
+	 * Damage Ability Data
 	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability")
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Ability")
+	bool bShouldApplyExecute = false;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Ability")
+	bool bShouldExecute = false;
 
+	/*
+	 * Status Effect
+	 */
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Status Effect")
 	float StatusEffectChance = 20.f;
 

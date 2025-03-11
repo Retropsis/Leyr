@@ -9,6 +9,7 @@
 #include "Leyr/Leyr.h"
 #include "BaseGameplayAbility.generated.h"
 
+class UAbilityData;
 class UPaperZDAnimInstance;
 class UItemData;
 /**
@@ -44,12 +45,6 @@ protected:
 	
 	float GetManaCost(float InLevel = 1.f) const;
 	float GetCooldown(float InLevel = 1.f) const;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability")
-	FValueRange AbilityPower;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability")
-	float AbilityPoise = 0.f;
 
 	UPROPERTY(BlueprintReadWrite)
 	FVector CursorHitLocation;
@@ -63,11 +58,24 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	FVector HitImpulse = FVector::ZeroVector;
 
-	ESequenceType SequenceType = ESequenceType::Default;
-	FGameplayTag DamageType;
 	FTaggedMontage TaggedMontage;
 	FTaggedMontage WeaponTaggedMontage;
 	TObjectPtr<UItemData> AbilityItemData = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category="Ability")
+	TObjectPtr<UAbilityData> AbilityData;
+
+	/*
+	 * Base Ability Data
+	 */
+	FGameplayTag DamageType;
+	ESequenceType SequenceType = ESequenceType::Default;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability")
+	FValueRange AbilityPower;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability")
+	float AbilityPoise = 0.f;
 
 private:
 	FActiveGameplayEffectHandle ActiveSourceObjectEffectHandle;

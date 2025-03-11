@@ -19,7 +19,7 @@ class LEYR_API UHealingAbility : public UBaseGameplayAbility
 
 protected:
 	/*
-	 * Healing
+	 * Healing Ability Data
 	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability|Healing")
 	TSubclassOf<UGameplayEffect> HealingEffectClass;

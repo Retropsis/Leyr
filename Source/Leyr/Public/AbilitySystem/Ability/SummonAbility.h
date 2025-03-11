@@ -21,6 +21,9 @@ public:
 	UFUNCTION(BlueprintPure, Category="Summoning")
 	TSubclassOf<APawn> GetRandomMinionClass();
 
+	/*
+	 * Summon Ability Data
+	 */
 	UPROPERTY(EditDefaultsOnly, Category = "Summoning")
 	int32 NumMinions = 5;
 

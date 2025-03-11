@@ -13,7 +13,7 @@
 #include "Interaction/PlayerInterface.h"
 
 void UBaseGameplayAbility::InitAbility()
-{
+{	
 	if (!GetAvatarActorFromActorInfo()->Implements<UCombatInterface>()) return;
 	
 	PaperAnimInstance = ICombatInterface::Execute_GetPaperAnimInstance(GetAvatarActorFromActorInfo());

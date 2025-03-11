@@ -22,9 +22,12 @@ protected:
 	UFUNCTION(BlueprintCallable, Category="Projectile")
 	void SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag, bool bIgnoreStatic = false, bool bOverridePitch = false, float PitchOverride = 0.f);
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ability")
-	TSubclassOf<AProjectile> ProjectileClass;
-	
 	UPROPERTY(EditDefaultsOnly)
 	int32 NumProjectiles = 5;
+
+	/*
+	 * Projectile Ability Data
+	*/	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ability")
+	TSubclassOf<AProjectile> ProjectileClass;
 };
