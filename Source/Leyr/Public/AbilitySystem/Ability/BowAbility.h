@@ -13,7 +13,6 @@ UCLASS()
 class LEYR_API UBowAbility : public UProjectileAbility
 {
 	GENERATED_BODY()
-	
 
 public:
 	virtual FString GetDescription(int32 Level) override;

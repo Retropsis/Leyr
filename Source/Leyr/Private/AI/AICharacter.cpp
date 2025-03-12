@@ -62,7 +62,7 @@ void AAICharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 		SplineComponentActor->Destroy();
 		SplineComponentActor = nullptr;
 	}
-	if(MovementType == EMovementType::NavMesh && !NavMeshBoundsVolume && bShouldBuildNavMesh)
+	if(!NavMeshBoundsVolume && bShouldBuildNavMesh)
 	{
 		FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
 		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -73,9 +73,10 @@ void AAICharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 		// GetWorld()->GetNavigationSystem()->OnNavigationBoundsUpdated(NavMeshBoundsVolume);
 
 		NavMeshBoundsVolume->GetRootComponent()->Bounds = FBox(FVector(100.f), FVector(200.f));
+		NavMeshBoundsVolume->SetActorLocation(FVector{ GetActorLocation().X, 50.f, GetActorLocation().Z });
 		// GetWorld()->GetNavigationSystem()->OnNavAreaRegisteredDelegate(NavMeshBoundsVolume);
 	}
-	if((MovementType != EMovementType::NavMesh || !bShouldBuildNavMesh) && NavMeshBoundsVolume)
+	if(!bShouldBuildNavMesh && NavMeshBoundsVolume)
 	{
 		NavMeshBoundsVolume->Destroy();
 		NavMeshBoundsVolume = nullptr;
@@ -119,6 +120,7 @@ void AAICharacter::PossessedBy(AController* NewController)
 		GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBeginOverlap);
 	}
 	SineMoveHeight = GetActorLocation().Z;
+	InitializeNavigationBounds();
 	
 	switch (BehaviourType) {
 	case EBehaviourType::Patrol:
@@ -132,7 +134,6 @@ void AAICharacter::PossessedBy(AController* NewController)
 	case EBehaviourType::Airborne:
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		GetCharacterMovement()->DefaultLandMovementMode = MOVE_Flying;
-		InitializeNavigationBounds();
 		break;
 	case EBehaviourType::Aquatic:
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
@@ -448,6 +449,18 @@ void AAICharacter::SineMove_Implementation()
 {
 	const float SineValue = FMath::Sin(GetActorLocation().X / 100.f);
 	AddMovementInput(GetActorForwardVector() + FVector::UpVector * SineValue, 1.f, true);
+}
+
+void AAICharacter::FaceTarget_Implementation()
+{
+	if (CombatTarget)
+	{
+		if (CombatTarget->GetActorLocation().X < GetActorLocation().X && FMath::Sign(CombatTarget->GetActorForwardVector().X) < 0 ||
+			CombatTarget->GetActorLocation().X > GetActorLocation().X && FMath::Sign(CombatTarget->GetActorForwardVector().X) > 0)
+		{
+			ChangeDirections();
+		}
+	}
 }
 
 bool AAICharacter::FollowSpline_Implementation(const int32 SplineIndex)

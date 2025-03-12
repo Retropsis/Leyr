@@ -120,6 +120,9 @@ class LEYR_API UEncounterInfo : public UDataAsset
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Encounter Defaults")
 	TMap<EEncounterName, FEncounterDefaultInfo> EncounterInformation;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Encounter Defaults")
+	TMap<FGameplayTag, FEncounterDefaultInfo> EncounterInformationMap;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Encounter Defaults")
 	TSubclassOf<UGameplayEffect> SecondaryAttributes;

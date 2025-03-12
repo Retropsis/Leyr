@@ -70,11 +70,7 @@ protected:
 	 */
 	FGameplayTag DamageType;
 	ESequenceType SequenceType = ESequenceType::Default;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability")
-	FValueRange AbilityPower;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability")
+	FScalableFloat AbilityPower;
 	float AbilityPoise = 0.f;
 
 private:

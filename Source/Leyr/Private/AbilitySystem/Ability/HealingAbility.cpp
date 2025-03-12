@@ -1,16 +1,16 @@
 // @ Retropsis 2024-2025.
 
 #include "AbilitySystem/Ability/HealingAbility.h"
-
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Data/AbilityData.h"
+#include "Data/ItemData.h"
 #include "Game/BaseGameplayTags.h"
 
 void UHealingAbility::CauseHealing(UAbilitySystemComponent* TargetASC)
 {
 	FGameplayEffectSpecHandle DamageSpecHandle = MakeOutgoingGameplayEffectSpec(HealingEffectClass, GetAbilityLevel());
-	const float ScaledDamage =AbilityPower.GetRandomFloatFromScalableRange(GetAbilityLevel());
+	const float ScaledDamage =AbilityPower.GetValueAtLevel(GetAbilityLevel());
 	
 	if (TargetASC->HasMatchingGameplayTag(FBaseGameplayTags::Get().Indicator_Execute))
 	{
@@ -30,6 +30,6 @@ void UHealingAbility::InitAbility()
 	if (AbilityData)
 	{
 		HealingEffectClass = AbilityData->MainEffectClass;
-		HealingType = AbilityData->DamageType;
+		HealingType = AbilityData->HealingType;
 	}
 }

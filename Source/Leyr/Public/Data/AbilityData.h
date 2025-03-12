@@ -22,17 +22,26 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	TSubclassOf<UGameplayEffect> MainEffectClass = nullptr;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Ability")
+	UPROPERTY(EditDefaultsOnly, Category="Ability", meta=(Categories=Damage))
 	FGameplayTag DamageType = FGameplayTag();
+	
+	UPROPERTY(EditDefaultsOnly, Category="Ability", meta=(Categories=Healing))
+	FGameplayTag HealingType = FGameplayTag();
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	ESequenceType SequenceType = ESequenceType::Default;
 
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
-	float AbilityPower = 0.f;
+	FScalableFloat AbilityPower;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	float AbilityPoise = 0.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Ability")
+	bool bShouldApplyExecute = false;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Ability")
+	bool bShouldExecute = false;
 
 	/*
 	 * Projectile

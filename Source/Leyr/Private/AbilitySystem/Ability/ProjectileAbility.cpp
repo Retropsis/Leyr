@@ -16,6 +16,9 @@ void UProjectileAbility::InitAbility()
 	if (AbilityData)
 	{
 		ProjectileClass = AbilityData->ProjectileClass;
+		bIgnoreStatic = AbilityData->bIgnoreStatic;
+		bOverridePitch = AbilityData->bOverridePitch;
+		PitchOverride = AbilityData->PitchOverride;
 	}
 }
 
@@ -24,16 +27,16 @@ void UProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag, bool bIgnoreStatic, bool bOverridePitch, float PitchOverride)
+void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag, bool InIgnoreStatic, bool InOverridePitch, float InPitchOverride)
 {
 	if (!GetAvatarActorFromActorInfo()->HasAuthority()) return;
 
 	const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), SocketTag);
 	FRotator Rotation = UKismetMathLibrary::FindLookAtRotation(SocketLocation, ProjectileTargetLocation);
 	// FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
-	if (bOverridePitch)
+	if (InOverridePitch)
 	{
-		Rotation.Pitch = PitchOverride;
+		Rotation.Pitch = InPitchOverride;
 	}
 
 	FTransform SpawnTransform;
@@ -49,6 +52,6 @@ void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation
 	
 	Projectile->AdditionalEffectParams = MakeAdditionalEffectParamsFromClassDefaults();
 	Projectile->AdditionalEffectParams.DamageType = DamageType;
-	Projectile->Sphere->SetCollisionResponseToChannel(ECC_WorldStatic, bIgnoreStatic ? ECR_Ignore : ECR_Block);
+	Projectile->Sphere->SetCollisionResponseToChannel(ECC_WorldStatic, InIgnoreStatic ? ECR_Ignore : ECR_Block);
 	Projectile->FinishSpawning(SpawnTransform);
 }

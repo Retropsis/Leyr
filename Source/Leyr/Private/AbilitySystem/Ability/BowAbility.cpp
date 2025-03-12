@@ -4,8 +4,7 @@
 
 FString UBowAbility::GetDescription(int32 Level)
 {
-	const int32 MinDamage = AbilityPower.ValueMin.GetValueAtLevel(Level);
-	const int32 MaxDamage = AbilityPower.ValueMax.GetValueAtLevel(Level);
+	const int32 Damage = AbilityPower.GetValueAtLevel(Level);
 	const float ManaCost = FMath::Abs(GetManaCost(Level));
 	const float Cooldown = GetCooldown(Level);
 	if(Level == 1)
@@ -17,9 +16,9 @@ FString UBowAbility::GetDescription(int32 Level)
 			"<Small>CD: </><Cooldown>%.1f</>\n"
 			
 			"<Default>Draws and shoot an arrow, exploding on impact and dealing: </>"
-			"<Damage>%d-%d</>"
+			"<Damage>%d</>"
 			"<Default> piercing damage with a chance to burn.</>\n\n"
-			), Level, ManaCost, Cooldown, MinDamage, MaxDamage);
+			), Level, ManaCost, Cooldown, Damage);
 	}
 	return FString::Printf(TEXT(
 		"<Title>FIRE BOLT: </>"
@@ -28,15 +27,14 @@ FString UBowAbility::GetDescription(int32 Level)
 		"<Small>CD: </><Cooldown>%.1f</>\n"
 		
 		"<Default>Shoots %d arrows, exploding on impact and dealing: </>"
-		"<Damage>%d-%d</>"
+		"<Damage>%d</>"
 		"<Default> piercing damage with a chance to burn.</>\n\n"
-		), Level, ManaCost, Cooldown, FMath::Min(Level, NumProjectiles), MinDamage, MaxDamage);
+		), Level, ManaCost, Cooldown, FMath::Min(Level, NumProjectiles), Damage);
 }
 
 FString UBowAbility::GetNextLevelDescription(int32 Level)
 {
-	const int32 MinDamage = AbilityPower.ValueMin.GetValueAtLevel(Level);
-	const int32 MaxDamage = AbilityPower.ValueMax.GetValueAtLevel(Level);
+	const int32 Damage = AbilityPower.GetValueAtLevel(Level);
 	const float ManaCost = FMath::Abs(GetManaCost(Level));
 	const float Cooldown = GetCooldown(Level);
 	
@@ -47,7 +45,7 @@ FString UBowAbility::GetNextLevelDescription(int32 Level)
 		"<Small>CD: </><Cooldown>%.1f</>\n"
 			
 		"<Default>Shoots %d arrows, exploding on impact and dealing: </>"
-		"<Damage>%d-%d</>"
+		"<Damage>%d</>"
 		"<Default> piercing damage with a chance to burn.</>\n\n"
-		), Level, ManaCost, Cooldown, FMath::Min(Level, NumProjectiles), MinDamage, MaxDamage);
+		), Level, ManaCost, Cooldown, FMath::Min(Level, NumProjectiles), Damage);
 }

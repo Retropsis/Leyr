@@ -10,6 +10,7 @@
 #include "Engine/DataAsset.h"
 #include "ItemData.generated.h"
 
+class UAbilityData;
 class UPaperZDAnimInstance;
 class UPaperFlipbook;
 class UGameplayEffect;
@@ -85,8 +86,8 @@ public:
 	/*
 	 * Abilities
 	 */
-	UPROPERTY(EditDefaultsOnly, Category="Item", meta=(Categories="Damage"))
-	FGameplayTag DamageType;
+	UPROPERTY(EditDefaultsOnly, Category="Ability")
+	UAbilityData* AbilityData;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
 	TArray<FTaggedMontage> DefaultSequences;

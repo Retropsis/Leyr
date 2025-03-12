@@ -17,8 +17,7 @@ FString UMasteryAbility::GetDescription(int32 Level)
 		CurrentLevel.Appendf(TEXT("<Default>%s</><Damage>%.2f</>\n\n"), *Info.CustomValueText, 1.f + Info.CustomValue * Level);
 	}
 	
-	const int32 MinDamage = AbilityPower.ValueMin.GetValueAtLevel(Level);
-	const int32 MaxDamage = AbilityPower.ValueMax.GetValueAtLevel(Level);
+	const int32 Damage = AbilityPower.GetValueAtLevel(Level);
 	const float ManaCost = FMath::Abs(GetManaCost(Level));
 	const float Cooldown = GetCooldown(Level);
 	
@@ -39,8 +38,7 @@ FString UMasteryAbility::GetNextLevelDescription(int32 Level)
 		CurrentLevel.Appendf(TEXT("<Default>%s</><Damage>%.2f</>\n\n"), *Info.CustomValueText, 1.f + Info.CustomValue * Level);
 	}
 	
-	const int32 MinDamage = AbilityPower.ValueMin.GetValueAtLevel(Level);
-	const int32 MaxDamage = AbilityPower.ValueMax.GetValueAtLevel(Level);
+	const int32 Damage = AbilityPower.GetValueAtLevel(Level);
 	const float ManaCost = FMath::Abs(GetManaCost(Level));
 	const float Cooldown = GetCooldown(Level);
 	

@@ -59,3 +59,10 @@ void UMultiHitMeleeAbility::OnComboWindowEnd()
 	UAbilitySystemBlueprintLibrary::RemoveLooseGameplayTags(GetAvatarActorFromActorInfo(), FGameplayTagContainer{ FBaseGameplayTags::Get().Abilities_Combo_Attack_2 });
 	UAbilitySystemBlueprintLibrary::RemoveLooseGameplayTags(GetAvatarActorFromActorInfo(), FGameplayTagContainer{ FBaseGameplayTags::Get().Abilities_Combo_Attack_3 });
 }
+
+void UMultiHitMeleeAbility::RestartCombo()
+{
+	bHasHitTarget = false;
+	HitLocation = FVector::ZeroVector;
+	HitActor = nullptr;
+}

@@ -24,6 +24,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void OnComboWindowEnd();
 	
+	UFUNCTION(BlueprintCallable)
+	void RestartCombo();
+	
 	UPROPERTY(BlueprintReadWrite)
 	bool bShouldEndAbility = true;
 	

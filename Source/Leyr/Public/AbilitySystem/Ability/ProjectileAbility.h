@@ -31,6 +31,8 @@ protected:
 	/*
 	 * Projectile Ability Data
 	*/	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Ability")
 	TSubclassOf<AProjectile> ProjectileClass;
+	bool bIgnoreStatic = false;
+	bool bOverridePitch = false;
+	float PitchOverride = 0.f;
 };

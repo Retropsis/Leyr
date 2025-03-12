@@ -79,13 +79,8 @@ protected:
 	/*
 	 * Damage Ability Data
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability")
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	bool bShouldApplyExecute = false;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	bool bShouldExecute = false;
 
 	/*

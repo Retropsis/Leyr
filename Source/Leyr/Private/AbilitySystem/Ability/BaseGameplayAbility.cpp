@@ -28,7 +28,7 @@ void UBaseGameplayAbility::InitAbility()
 	 */
 	if (AbilityData)
 	{
-		// AbilityPower = AbilityData->AbilityPower;
+		AbilityPower = AbilityData->AbilityPower.GetValueAtLevel(GetAbilityLevel());
 		AbilityPoise = AbilityData->AbilityPoise;
 		SequenceType = AbilityData->SequenceType;
 		DamageType = AbilityData->DamageType;
@@ -51,8 +51,15 @@ void UBaseGameplayAbility::InitAbility()
 				WeaponAnimInstance = Character->SetWeaponAnimInstance(AbilityItemData->AnimationInstance);
 			}
 		}
-		SequenceType = AbilityItemData->SequenceType;
-		DamageType = AbilityItemData->DamageType;
+		if (AbilityItemData->AbilityData)
+		{
+			AbilityData = AbilityItemData->AbilityData;
+			
+			AbilityPower = AbilityData->AbilityPower.GetValueAtLevel(GetAbilityLevel());
+			AbilityPoise = AbilityData->AbilityPoise;
+			SequenceType = AbilityData->SequenceType;
+			DamageType = AbilityData->DamageType;
+		}
 	}
 	
 	const float PoiseChance = GetAbilitySystemComponentFromActorInfo()->GetNumericAttribute(UBaseAttributeSet::GetPoiseAttribute());

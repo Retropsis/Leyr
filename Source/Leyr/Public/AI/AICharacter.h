@@ -58,6 +58,7 @@ public:
 	virtual bool MoveToLocation_Implementation(FVector TargetLocation, float Threshold) override;
 	virtual bool ChaseTarget_Implementation(AActor* TargetToChase) override;
 	virtual void SineMove_Implementation() override;
+	virtual void FaceTarget_Implementation() override;
 	virtual bool FollowSpline_Implementation(int32 SplineIndex) override;
 	virtual FVector GetNextLocation_Implementation(int32 SplineIndex) override;
 	virtual void StartSplineMovement_Implementation() override;
@@ -78,6 +79,9 @@ public:
 	virtual void SetShouldAttack_Implementation(bool InShouldAttack) override;
 	virtual bool ShouldAttack_Implementation() const override { return bShouldAttack; }
 	/** Enemy Interface */
+
+	void SetEncounterClass(const ECharacterClass NewClass) { CharacterClass = NewClass; }
+	void SetEncounterLevel(const int32 InLevel) { Level = InLevel; }
 	
 	UPROPERTY(BlueprintReadWrite, Category = "Combat")
 	TObjectPtr<AActor> CombatTarget;

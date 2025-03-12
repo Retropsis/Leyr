@@ -234,13 +234,15 @@ void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 		PreferredCameraLocation = GetActorLocation();
 		PreferredCameraLocation.Z += bIsCrouched ? GetCapsuleComponent()->GetScaledCapsuleHalfHeight() : 0.f;
 		
-		bClampFirst = false;
 		const FRealCurve* InterpSpeedCurve = ScalableInterpSpeedCurve->FindCurve(FName("InterpSpeedCurve"), FString());
 		InterpSpeed = InterpSpeedCurve->Eval((PreferredCameraLocation - CameraLocation).Size());
 		
+		bClampFirst = false;
 		if (ActorToInterp &&  GetDistanceTo(ActorToInterp) <= ActorToFollowMaxDistance)
 		{
 			PreferredCameraLocation = FVector{ (ActorToInterp->GetActorLocation() + GetActorLocation()) / 2.f };
+			InterpSpeed = FollowingInterpSpeed;
+			bClampFirst = true;
 		}
 		break;
 	}
@@ -1078,7 +1080,7 @@ void APlayerCharacter::TraceForPlatforms() const
 	FHitResult Hit;
 	UKismetSystemLibrary::LineTraceSingleForObjects(
 		this, Start, End, ObjectTypes, false, TArray<AActor*>(),
-		EDrawDebugTrace::None, Hit, true);
+		EDrawDebugTrace::ForOneFrame, Hit, true);
 		
 	if(Hit.bBlockingHit)
 	{

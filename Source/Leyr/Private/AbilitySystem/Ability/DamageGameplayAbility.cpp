@@ -20,8 +20,8 @@ void UDamageGameplayAbility::InitAbility()
 	if (AbilityData)
 	{
 		DamageEffectClass = AbilityData->MainEffectClass;
-		// bShouldApplyExecute = AbilityData->bShouldApplyExecute;
-		// bShouldExecute = AbilityData->bShouldExecute;
+		bShouldApplyExecute = AbilityData->bShouldApplyExecute;
+		bShouldExecute = AbilityData->bShouldExecute;
 	}
 }
 
@@ -60,7 +60,7 @@ void UDamageGameplayAbility::CauseDamage(UAbilitySystemComponent* TargetASC)
 {
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 	FGameplayEffectSpecHandle DamageSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass, GetAbilityLevel());
-	const float ScaledDamage =AbilityPower.GetRandomFloatFromScalableRange(GetAbilityLevel());
+	const float ScaledDamage =AbilityPower.GetValueAtLevel(GetAbilityLevel());
 	
 	if (TargetASC->HasMatchingGameplayTag(GameplayTags.Execute) && bShouldExecute)
 	{
@@ -184,7 +184,7 @@ FAdditionalEffectParams UDamageGameplayAbility::MakeAdditionalEffectParamsFromCl
 	Params.SourceObject = GetSourceObject(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo());
 	Params.SourceAbilitySystemComponent = GetAbilitySystemComponentFromActorInfo();
 	Params.TargetAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
-	Params.AbilityPower = AbilityPower.GetRandomFloatFromScalableRange(GetAbilityLevel());
+	Params.AbilityPower = AbilityPower.GetValueAtLevel(GetAbilityLevel());
 	Params.AbilityLevel = GetAbilityLevel();
 	Params.DamageType = DamageType;
 	Params.StatusEffectChance = StatusEffectChance;

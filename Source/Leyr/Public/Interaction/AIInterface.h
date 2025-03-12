@@ -44,6 +44,9 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SineMove();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void FaceTarget();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool FollowSpline(int32 SplineIndex);
