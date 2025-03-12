@@ -15,11 +15,12 @@ class UBehaviourData;
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType)
 class LEYR_API UEncounterData : public UDataAsset
 {
 	GENERATED_BODY()
-	
+
+public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UGameplayEffect> PrimaryAttributes;
 

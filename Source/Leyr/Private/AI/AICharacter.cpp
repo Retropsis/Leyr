@@ -6,7 +6,6 @@
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
-#include "AbilitySystem/Data/EncounterInfo.h"
 #include "AI/AICharacterAnimInstance.h"
 #include "AI/BaseAIController.h"
 #include "AI/SplineComponentActor.h"
@@ -15,8 +14,9 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SplineComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Data/BehaviourData.h"
+#include "Data/EncounterData.h"
 #include "Game/BaseGameplayTags.h"
-#include "Game/LeyrGameMode.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Interaction/PlayerInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -276,33 +276,39 @@ void AAICharacter::InitializeCharacterInfo()
 {
 	if(!HasAuthority()) return;
 	
-	const ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this));
-	if (LeyrGameMode == nullptr || EncounterName == EEncounterName::Default) return;
+	// const ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this));
+	// if (LeyrGameMode == nullptr || EncounterName == EEncounterName::Default) return;
+	//
+	// const FBehaviourDefaultInfo Info = LeyrGameMode->EncounterInfo->GetEncounterDefaultInfo(EncounterName).BehaviourDefaultInfo;
 
-	const FBehaviourDefaultInfo Info = LeyrGameMode->EncounterInfo->GetEncounterDefaultInfo(EncounterName).BehaviourDefaultInfo;
-	BehaviorTree = Info.BehaviorTree;
-	BehaviourType = Info.BehaviourType;
-	EncounterSize = Info.EncounterSize;
-	SineMoveHeight = Info.SineMoveHeight;
-	PatrolRadius = Info.PatrolRadius;
-	PatrolTickRadius = Info.PatrolTickRadius;
-	AttackRange = Info.AttackRange;
-	AttackCooldown = Info.AttackCooldown;
-	CloseRange = Info.CloseRange;
-	ChasingSpeed = Info.ChasingSpeed;
-	ChasingHeightOffset = Info.ChasingHeightOffset;
-	DivingSpeed = Info.DivingSpeed;
-	bCollisionCauseDamage = Info.bCollisionCauseDamage;
-	ImpactEffect = Info.ImpactEffect;
-	DefeatedSound = Info.DeathSound;
-	HitReactSequence = Info.HitReactSequence;
-	AttackSequenceInfo = Info.AttackSequenceInfo;
+	checkf(EncounterData, TEXT("Please add EncounterData to %s"), *GetName());
+	checkf(EncounterData->DefaultBehaviourData, TEXT("Please add DefaultBehaviourData to %s"), *EncounterData->GetName());
+	
+	EncounterSize = EncounterData->EncounterSize;
+	ImpactEffect = EncounterData->ImpactEffect;
+	DefeatedSound = EncounterData->DeathSound;
+	HitReactSequence = EncounterData->HitReactSequence;
+	AttackSequenceInfo = EncounterData->AttackSequenceInfo;
+	
+	BehaviorTree = EncounterData->DefaultBehaviourData->BehaviorTree;
+	BehaviourType = EncounterData->DefaultBehaviourData->BehaviourType;
+	SineMoveHeight = EncounterData->DefaultBehaviourData->SineMoveHeight;
+	PatrolRadius = EncounterData->DefaultBehaviourData->PatrolRadius;
+	PatrolTickRadius = EncounterData->DefaultBehaviourData->PatrolTickRadius;
+	AttackRange = EncounterData->DefaultBehaviourData->AttackRange;
+	AttackCooldown = EncounterData->DefaultBehaviourData->AttackCooldown;
+	CloseRange = EncounterData->DefaultBehaviourData->CloseRange;
+	ChasingSpeed = EncounterData->DefaultBehaviourData->ChasingSpeed;
+	ChasingHeightOffset = EncounterData->DefaultBehaviourData->ChasingHeightOffset;
+	DivingSpeed = EncounterData->DefaultBehaviourData->DivingSpeed;
+	
+	bCollisionCauseDamage = EncounterData->DefaultBehaviourData->bCollisionCauseDamage;
 	if(bCollisionCauseDamage)
 	{
-		bShouldApplyInvincibility = Info.bShouldApplyInvincibility;	
-		AbilityPower = Info.AbilityPower;
-		DamageEffectClass = Info.DamageEffectClass;
-		DamageType = Info.DamageType;
+		bShouldApplyInvincibility = EncounterData->DefaultBehaviourData->bShouldApplyInvincibility;	
+		AbilityPower = EncounterData->DefaultBehaviourData->AbilityPower.GetValueAtLevel(Level);
+		DamageEffectClass = EncounterData->DefaultBehaviourData->DamageEffectClass;
+		DamageType = EncounterData->DefaultBehaviourData->DamageType;
 	}
 }
 
@@ -553,8 +559,7 @@ void AAICharacter::CauseDamage(AActor* TargetActor)
 	if(TargetASC && TargetASC->HasMatchingGameplayTag(FBaseGameplayTags::Get().Invincibility)) return;
 	
 	const FGameplayEffectSpecHandle DamageSpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, Level, SourceASC->MakeEffectContext());	
-	const float ScaledDamage = AbilityPower.GetRandomFloatFromScalableRange(Level);
-	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, DamageType, ScaledDamage);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, DamageType, AbilityPower);
 	SourceASC->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), TargetASC);
 
 	if (bShouldApplyInvincibility) ULeyrAbilitySystemLibrary::ApplyInvincibilityToTarget(TargetASC, 1.25f);

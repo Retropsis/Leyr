@@ -11,6 +11,7 @@
 #include "UI/Controller/OverlayWidgetController.h"
 #include "AICharacter.generated.h"
 
+class UEncounterData;
 class AArena;
 class ANavMeshBoundsVolume;
 enum class EEncounterName : uint8;
@@ -161,6 +162,9 @@ protected:
 	/*
 	 * AI Data
 	*/
+	UPROPERTY(EditDefaultsOnly, Category="AI")
+	TObjectPtr<UEncounterData> EncounterData;
+	
 	EBehaviourType BehaviourType = EBehaviourType::Patrol;
 	EEncounterSize EncounterSize = EEncounterSize::Default;
 	float SineMoveHeight = 0.f;
@@ -173,10 +177,12 @@ protected:
 	float DivingSpeed = 750.f;
 	float ChasingHeightOffset = 75.f;
 	bool bCollisionCauseDamage = false;
-	bool bShouldApplyInvincibility = false;	
-	FValueRange AbilityPower;
+	bool bShouldApplyInvincibility = false;
+	//~ Collision Damage
+	float AbilityPower;
 	FGameplayTag DamageType;
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
+	//~ Bounds
 	FBoxSphereBounds EnteringBounds{};
 	FBoxSphereBounds NavigationBounds{};
 

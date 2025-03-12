@@ -11,7 +11,7 @@ class UEncounterData;
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType)
 class LEYR_API UEncounterSpawnData : public UDataAsset
 {
 	GENERATED_BODY()

@@ -13,11 +13,12 @@ enum class EBehaviourType : uint8;
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType)
 class LEYR_API UBehaviourData : public UDataAsset
 {
 	GENERATED_BODY()
-	
+
+public:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UBehaviorTree> BehaviorTree = nullptr;
 	
