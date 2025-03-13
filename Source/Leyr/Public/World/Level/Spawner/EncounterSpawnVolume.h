@@ -7,6 +7,8 @@
 #include "Interaction/SaveInterface.h"
 #include "EncounterSpawnVolume.generated.h"
 
+class UEncounterSpawnData;
+
 UENUM(BlueprintType)
 enum class ESpawnerType : uint8
 {
@@ -26,10 +28,15 @@ class LEYR_API AEncounterSpawnVolume : public AActor, public ISaveInterface
 public:	
 	AEncounterSpawnVolume();
 	void DisableVolume() const;
+	void EnableVolume() const;
 
 	//~ Save Interface
 	virtual void LoadActor_Implementation() override;
 	//~ Save Interface
+
+	UFUNCTION(CallInEditor)
+	void InitializeSpawnPoints();
+	void BindOnPlayerLeaving();
 
 protected:
 	virtual void BeginPlay() override;
@@ -37,11 +44,14 @@ protected:
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-	UPROPERTY(EditAnywhere, Category="Spawner")
-	TArray<AEncounterSpawnPoint*> SpawnPoints;
+	UFUNCTION()
+	void HandlePlayerLeaving();
 
 	UPROPERTY(EditAnywhere, Category="Spawner")
-	ESpawnerType SpawnerType = ESpawnerType::Once;
+	TObjectPtr<UEncounterSpawnData> EncounterSpawnData;
+	
+	UPROPERTY(EditAnywhere, Category="Spawner")
+	TArray<AEncounterSpawnPoint*> SpawnPoints;
 	
 private:
 	UPROPERTY(VisibleAnywhere)
@@ -52,4 +62,7 @@ private:
 	
 	UPROPERTY(SaveGame)
 	bool bActivated = false;
+	
+	UPROPERTY() bool bRandomizeLocation;
+	UPROPERTY() ESpawnerType SpawnerType = ESpawnerType::Once;
 };

@@ -9,6 +9,8 @@
 #include "Leyr/Leyr.h"
 #include "BaseGameplayAbility.generated.h"
 
+class UNiagaraSystem;
+class UGameplayCueDefinition;
 class UAbilityData;
 class UPaperZDAnimInstance;
 class UItemData;
@@ -28,6 +30,15 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UObject* GetSourceObjectFromAbilitySpec();
+
+	UFUNCTION(BlueprintPure)
+	ESequenceType GetSequenceType() const { return SequenceType; }
+	
+	UFUNCTION(BlueprintCallable)
+	void SetGCDImpactSound(UObject* Object) const;
+	
+	UFUNCTION(BlueprintPure)
+	TSoftObjectPtr<USoundBase> GetImpactSoundAsset() const;
 	
 	UFUNCTION(BlueprintCallable)
 	bool CommitInventoryCost(bool bIsSelfCost = true);
@@ -35,6 +46,8 @@ public:
 	virtual FString GetDescription(int32 Level);
 	virtual FString GetNextLevelDescription(int32 Level);
 	static FString GetLockedDescription(int32 Level);
+
+	UGameplayCueDefinition* GetGameplayCueDefinition() const { return GameplayCueDefinition; }
 
 protected:
 	UFUNCTION(BlueprintCallable)
@@ -45,6 +58,9 @@ protected:
 	
 	float GetManaCost(float InLevel = 1.f) const;
 	float GetCooldown(float InLevel = 1.f) const;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Montage"), Category="Ability")
+	FGameplayTag MontageTag = FGameplayTag();
 
 	UPROPERTY(BlueprintReadWrite)
 	FVector CursorHitLocation;
@@ -61,6 +77,7 @@ protected:
 	FTaggedMontage TaggedMontage;
 	FTaggedMontage WeaponTaggedMontage;
 	TObjectPtr<UItemData> AbilityItemData = nullptr;
+	TObjectPtr<UGameplayCueDefinition> GameplayCueDefinition;
 
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	TObjectPtr<UAbilityData> AbilityData;

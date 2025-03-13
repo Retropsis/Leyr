@@ -45,7 +45,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SelectMontageTagFromCombatState();
 	
-	UFUNCTION(BlueprintCallable, meta = (GameplayTagFilter = "GameplayCue"))
+	UFUNCTION(BlueprintCallable, meta=(GameplayTagFilter="GameplayCue"))
 	void ExecuteDamageGameplayCue(FGameplayTag GameplayCueTag);
 	
 	UFUNCTION(BlueprintPure)
@@ -72,9 +72,6 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UPaperZDAnimSequence> SelectedWeaponMontage = nullptr;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Montage"), Category="Ability")
-	FGameplayTag MontageTag = FGameplayTag();
 
 	/*
 	 * Damage Ability Data

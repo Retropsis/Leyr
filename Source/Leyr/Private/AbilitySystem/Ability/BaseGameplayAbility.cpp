@@ -5,6 +5,7 @@
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
+#include "AbilitySystem/Cue/GameplayCueDefinition.h"
 #include "AI/BaseCharacter.h"
 #include "Data/AbilityData.h"
 #include "Data/ItemData.h"
@@ -16,6 +17,8 @@
 void UBaseGameplayAbility::InitAbility()
 {
 	if (!GetAvatarActorFromActorInfo()->Implements<UCombatInterface>()) return;
+	
+	GameplayCueDefinition = NewObject<UGameplayCueDefinition>();
 	
 	PaperAnimInstance = ICombatInterface::Execute_GetPaperAnimInstance(GetAvatarActorFromActorInfo());
 	WeaponAnimInstance = ICombatInterface::Execute_GetWeaponAnimInstance(GetAvatarActorFromActorInfo());
@@ -123,6 +126,20 @@ UObject* UBaseGameplayAbility::GetSourceObjectFromAbilitySpec()
 {
 	FGameplayAbilitySpec* AbilitySpec = GetCurrentAbilitySpec();
 	return AbilitySpec->SourceObject.Get();
+}
+
+void UBaseGameplayAbility::SetGCDImpactSound(UObject* Object) const
+{
+	if (GameplayCueDefinition) GameplayCueDefinition->ImpactSound = Cast<USoundBase>(Object);
+}
+
+TSoftObjectPtr<USoundBase> UBaseGameplayAbility::GetImpactSoundAsset() const
+{
+	if (GetAvatarActorFromActorInfo()->Implements<UCombatInterface>())
+	{
+		return ICombatInterface::Execute_ImpactSoundFromTag(GetAvatarActorFromActorInfo(), MontageTag, SequenceType);
+	}
+	return nullptr;
 }
 
 bool UBaseGameplayAbility::CommitInventoryCost(bool bIsSelfCost)

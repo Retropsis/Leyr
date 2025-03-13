@@ -3,6 +3,7 @@
 #include "AI/AICharacter.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "GameplayTagsManager.h"
+#include "NiagaraSystem.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
@@ -16,12 +17,15 @@
 #include "Components/WidgetComponent.h"
 #include "Data/BehaviourData.h"
 #include "Data/EncounterData.h"
+#include "Engine/AssetManager.h"
+#include "Engine/StreamableManager.h"
 #include "Game/BaseGameplayTags.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Interaction/PlayerInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
+#include "World/Data/CameraData.h"
 #include "World/Level/Zone/Arena.h"
 
 AAICharacter::AAICharacter()
@@ -275,41 +279,44 @@ void AAICharacter::HandleBehaviourState(EBehaviourState NewState)
 void AAICharacter::InitializeCharacterInfo()
 {
 	if(!HasAuthority()) return;
-	
-	// const ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this));
-	// if (LeyrGameMode == nullptr || EncounterName == EEncounterName::Default) return;
-	//
-	// const FBehaviourDefaultInfo Info = LeyrGameMode->EncounterInfo->GetEncounterDefaultInfo(EncounterName).BehaviourDefaultInfo;
 
 	checkf(EncounterData, TEXT("Please add EncounterData to %s"), *GetName());
-	checkf(EncounterData->DefaultBehaviourData, TEXT("Please add DefaultBehaviourData to %s"), *EncounterData->GetName());
+	checkf(EncounterData->BehaviourData, TEXT("Please add DefaultBehaviourData to %s"), *EncounterData->GetName());
 	
 	EncounterSize = EncounterData->EncounterSize;
-	ImpactEffect = EncounterData->ImpactEffect;
+	CharacterClass = EncounterData->CharacterClass;
+	
 	DefeatedSound = EncounterData->DeathSound;
 	HitReactSequence = EncounterData->HitReactSequence;
 	AttackSequenceInfo = EncounterData->AttackSequenceInfo;
 	
-	BehaviorTree = EncounterData->DefaultBehaviourData->BehaviorTree;
-	BehaviourType = EncounterData->DefaultBehaviourData->BehaviourType;
-	SineMoveHeight = EncounterData->DefaultBehaviourData->SineMoveHeight;
-	PatrolRadius = EncounterData->DefaultBehaviourData->PatrolRadius;
-	PatrolTickRadius = EncounterData->DefaultBehaviourData->PatrolTickRadius;
-	AttackRange = EncounterData->DefaultBehaviourData->AttackRange;
-	AttackCooldown = EncounterData->DefaultBehaviourData->AttackCooldown;
-	CloseRange = EncounterData->DefaultBehaviourData->CloseRange;
-	ChasingSpeed = EncounterData->DefaultBehaviourData->ChasingSpeed;
-	ChasingHeightOffset = EncounterData->DefaultBehaviourData->ChasingHeightOffset;
-	DivingSpeed = EncounterData->DefaultBehaviourData->DivingSpeed;
+	BehaviorTree = EncounterData->BehaviourData->BehaviorTree;
+	BehaviourType = EncounterData->BehaviourData->BehaviourType;
+	SineMoveHeight = EncounterData->BehaviourData->SineMoveHeight;
+	PatrolRadius = EncounterData->BehaviourData->PatrolRadius;
+	PatrolTickRadius = EncounterData->BehaviourData->PatrolTickRadius;
+	AttackRange = EncounterData->BehaviourData->AttackRange;
+	AttackCooldown = EncounterData->BehaviourData->AttackCooldown;
+	CloseRange = EncounterData->BehaviourData->CloseRange;
+	ChasingSpeed = EncounterData->BehaviourData->ChasingSpeed;
+	ChasingHeightOffset = EncounterData->BehaviourData->ChasingHeightOffset;
+	DivingSpeed = EncounterData->BehaviourData->DivingSpeed;
 	
-	bCollisionCauseDamage = EncounterData->DefaultBehaviourData->bCollisionCauseDamage;
+	bCollisionCauseDamage = EncounterData->BehaviourData->bCollisionCauseDamage;
 	if(bCollisionCauseDamage)
 	{
-		bShouldApplyInvincibility = EncounterData->DefaultBehaviourData->bShouldApplyInvincibility;	
-		AbilityPower = EncounterData->DefaultBehaviourData->AbilityPower.GetValueAtLevel(Level);
-		DamageEffectClass = EncounterData->DefaultBehaviourData->DamageEffectClass;
-		DamageType = EncounterData->DefaultBehaviourData->DamageType;
+		bShouldApplyInvincibility = EncounterData->BehaviourData->bShouldApplyInvincibility;	
+		AbilityPower = EncounterData->BehaviourData->AbilityPower.GetValueAtLevel(Level);
+		DamageEffectClass = EncounterData->BehaviourData->DamageEffectClass;
+		DamageType = EncounterData->BehaviourData->DamageType;
 	}
+	UAssetManager::GetStreamableManager().RequestAsyncLoad(EncounterData->ImpactEffect.ToSoftObjectPath(), [this] () {
+		UNiagaraSystem* LoadedAsset = EncounterData->ImpactEffect.Get();
+		if (IsValid(LoadedAsset))
+		{
+			ImpactEffect = LoadedAsset;
+		}
+	}, FStreamableManager::AsyncLoadHighPriority);
 }
 
 void AAICharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

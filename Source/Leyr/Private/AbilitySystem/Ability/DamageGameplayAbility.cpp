@@ -4,6 +4,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
+#include "AbilitySystem/Cue/GameplayCueDefinition.h"
 #include "AI/BaseCharacter.h"
 #include "Data/AbilityData.h"
 #include "Data/ItemData.h"
@@ -164,10 +165,12 @@ void UDamageGameplayAbility::SelectMontageTagFromCombatState()
 
 void UDamageGameplayAbility::ExecuteDamageGameplayCue(FGameplayTag GameplayCueTag)
 {
+	if (HitActor->Implements<UCombatInterface>()) GameplayCueDefinition->ImpactEffect = ICombatInterface::Execute_GetImpactEffect(HitActor);
+		
 	FGameplayCueParameters GameplayCueParameters;
 	GameplayCueParameters.Location = HitLocation;
 	GameplayCueParameters.EffectCauser = GetAvatarActorFromActorInfo();
-	GameplayCueParameters.SourceObject = HitActor;
+	GameplayCueParameters.SourceObject = GameplayCueDefinition;
 	GameplayCueParameters.AggregatedSourceTags = MontageTag.GetSingleTagContainer();
 	
 	UAbilitySystemComponent* const AbilitySystemComponent = GetAbilitySystemComponentFromActorInfo_Checked();

@@ -28,7 +28,7 @@ struct FTaggedMontage
 	UPaperZDAnimSequence* Montage = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	USoundBase* ImpactSound = nullptr;
+	TSoftObjectPtr<USoundBase> ImpactSound = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FVector BoxTraceStart = FVector::ZeroVector;

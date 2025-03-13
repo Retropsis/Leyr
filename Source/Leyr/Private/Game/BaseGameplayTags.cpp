@@ -346,6 +346,12 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.GameplayCue_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Execute"), FString("GameplayCue Execute"));
 	
 	/*
+	 * Asset Cues
+	*/
+	GameplayTags.AssetCue_ImpactEffect = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AssetCue.ImpactEffect"), FString("Gameplay Cue ImpactEffect"));
+	GameplayTags.AssetCue_ImpactSound = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AssetCue.ImpactSound"), FString("GameplayCue ImpactSound"));
+	
+	/*
 	 * Abilities Cooldown
 	 */
 	GameplayTags.Cooldown_Throw_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Throw.1"), FString("Cooldown Throw 1"));

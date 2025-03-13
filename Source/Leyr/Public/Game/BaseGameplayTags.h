@@ -299,6 +299,12 @@ FGameplayTag GameplayCue_Weapon_Sword_Slash;
 FGameplayTag GameplayCue_Execute;
  
 FGameplayTag GameplayCue_Alteration_Berserk_1;
+ 
+ /*
+ * Asset Cues
+ */
+ FGameplayTag AssetCue_ImpactSound;
+ FGameplayTag AssetCue_ImpactEffect;
 
  /*
   * Abilities Cooldowns

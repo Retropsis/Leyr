@@ -51,7 +51,19 @@ public:
 	UAbilityData* LoadAndGetDefaultAbilityData();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	UPaperZDAnimSequence* GetHitReactSequence();
+	TSoftObjectPtr<UPaperZDAnimSequence> GetHitReactSequence();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UNiagaraSystem* GetImpactEffect();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	TSoftObjectPtr<USoundBase> ImpactSoundFromTag(const FGameplayTag& MontageTag, ESequenceType SequenceType);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetImpactSoundLoaded(USoundBase* ImpactSound);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	USoundBase* GetImpactSoundLoaded();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UPaperZDAnimInstance* GetPaperAnimInstance();
@@ -79,9 +91,6 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FTaggedMontage GetTaggedMontageByIndex(int32 Index);
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	UNiagaraSystem* GetImpactEffect();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	int32 GetMinionCount();

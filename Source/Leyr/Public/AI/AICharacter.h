@@ -83,6 +83,7 @@ public:
 
 	void SetEncounterClass(const ECharacterClass NewClass) { CharacterClass = NewClass; }
 	void SetEncounterLevel(const int32 InLevel) { Level = InLevel; }
+	void SetEncounterData(UEncounterData* Data) { EncounterData = Data; }
 	
 	UPROPERTY(BlueprintReadWrite, Category = "Combat")
 	TObjectPtr<AActor> CombatTarget;
@@ -117,6 +118,7 @@ public:
 	UPROPERTY(EditInstanceOnly, Category = "Character|AI")
 	TObjectPtr<AArena> Arena = nullptr;
 
+	// TODO: Add this to Data
 	UPROPERTY(EditDefaultsOnly, Category = "Character|AI")
 	TArray<FGameplayTag> BehaviourPatterns;
 

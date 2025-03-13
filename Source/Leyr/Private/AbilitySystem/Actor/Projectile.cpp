@@ -62,6 +62,8 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	SetLifeSpan(5.f);
 
 	AActor* SourceAvatarActor = AdditionalEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
+	if (!IsValid(SourceAvatarActor)) Destroy();
+	
 	if (SourceAvatarActor == OtherActor) return;
 	if (!ULeyrAbilitySystemLibrary::IsHostile(SourceAvatarActor, OtherActor)) return;
 	if (!bHit) OnHit();

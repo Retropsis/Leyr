@@ -111,16 +111,20 @@ protected:
 	bool bHitReacting = false;
 
 	//~ Combat Interface
-	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
 	virtual UAbilityData* LoadAndGetDefaultAbilityData_Implementation() override;
-	virtual UPaperZDAnimSequence* GetHitReactSequence_Implementation() override { return HitReactSequence; }
+	virtual TSoftObjectPtr<UPaperZDAnimSequence> GetHitReactSequence_Implementation() override { return HitReactSequence; }
+	virtual TSoftObjectPtr<USoundBase> ImpactSoundFromTag_Implementation(const FGameplayTag& MontageTag, ESequenceType SequenceType) override;
+	virtual UNiagaraSystem* GetImpactEffect_Implementation() override { return ImpactEffect; }
+	virtual void SetImpactSoundLoaded_Implementation(USoundBase* ImpactSound) override { ImpactSoundLoaded = ImpactSound; }
+	virtual USoundBase* GetImpactSoundLoaded_Implementation() override { return ImpactSoundLoaded; }
+	
+	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
 	virtual UPaperZDAnimInstance* GetPaperAnimInstance_Implementation() override { return AnimationComponent->GetAnimInstance(); }
 	virtual UPaperZDAnimInstance* GetWeaponAnimInstance_Implementation() override { return WeaponComponent->GetAnimInstance(); }
 	virtual void GetAttackAnimationData_Implementation(FVector& InBoxTraceStart, FVector& InBoxTraceEnd) override;
 	virtual FBoxTraceData GetBoxTraceDataByTag_Implementation(FGameplayTag MontageTag, ESequenceType SequenceType) override;
 	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation(ESequenceType SequenceType) override;
 	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag, ESequenceType SequenceType) override;
-	virtual UNiagaraSystem* GetImpactEffect_Implementation() override { return ImpactEffect; }
 	virtual int32 GetMinionCount_Implementation() override { return MinionCount; }
 	virtual void IncrementMinionCount_Implementation(const int32 Amount) override { MinionCount += Amount; }
 	virtual EObjectTypeQuery GetTraceObjectType_Implementation() override { return EOT_EnemyCapsule; }
@@ -171,10 +175,9 @@ protected:
 	virtual void InitializeCharacterInfo() {}
 
 	UPROPERTY() TObjectPtr<UNiagaraSystem> ImpactEffect;
-	UPROPERTY() TObjectPtr<USoundBase> DefeatedSound;
-	
-	UPROPERTY(EditAnywhere, Category="Character|Combat")
-	TObjectPtr<UPaperZDAnimSequence> HitReactSequence;
+	UPROPERTY() TObjectPtr<USoundBase> ImpactSoundLoaded;
+	UPROPERTY() TSoftObjectPtr<USoundBase> DefeatedSound;
+	UPROPERTY() TSoftObjectPtr<UPaperZDAnimSequence> HitReactSequence;
 
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	TObjectPtr<UAttackSequenceInfo> AttackSequenceInfo;
