@@ -56,7 +56,11 @@ public:
 	
 	/** AI Interface */
 	virtual FVector FindRandomLocation_Implementation() override;
-	virtual bool MoveToLocation_Implementation(FVector TargetLocation, float Threshold) override;
+	virtual bool MoveToLocation_Implementation(FVector TargetLocation, float Threshold, bool bBackward = false) override;
+	virtual FVector FindTargetLocation_Implementation(AActor* TargetActor, float DistanceToKeep) override;
+	virtual bool CheckForObstacle_Implementation(float TraceDistance = 50.f, bool bBackward = false) override;
+	virtual bool CheckForGround_Implementation(float TraceDistance = 175.f, bool bBackward = false) override;
+	virtual bool RequestJump_Implementation() override;
 	virtual bool ChaseTarget_Implementation(AActor* TargetToChase) override;
 	virtual void SineMove_Implementation() override;
 	virtual void FaceTarget_Implementation() override;

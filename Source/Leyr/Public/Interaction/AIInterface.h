@@ -37,9 +37,6 @@ public:
 	FVector FindRandomLocation();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	bool MoveToLocation(FVector TargetLocation, float Threshold);
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool ChaseTarget(AActor* TargetToChase);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
@@ -77,7 +74,25 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool IsWithinBounds(const FVector& Location);
-	
+
+	/*
+	 * Behaviour Tasks
+	*/
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool IsTargetWithinEnteringBounds(const FVector& Location);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool MoveToLocation(FVector TargetLocation, float Threshold, bool bBackward = false);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FVector FindTargetLocation(AActor* TargetActor, float DistanceToKeep);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool CheckForObstacle(float TraceDistance, bool bBackward = false);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool CheckForGround(float TraceDistance, bool bBackward = false);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool RequestJump();
 };

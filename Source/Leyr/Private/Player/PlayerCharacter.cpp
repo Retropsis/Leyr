@@ -603,7 +603,7 @@ bool APlayerCharacter::TryDescendLadder()
 	FHitResult Hit;
 	UKismetSystemLibrary::LineTraceSingleForObjects(
 		this, Start, End, ObjectTypes,
-		false, TArray<AActor*>(), EDrawDebugTrace::ForDuration, Hit, true, FLinearColor::Yellow);
+		false, TArray<AActor*>(), EDrawDebugTrace::None, Hit, true, FLinearColor::Yellow);
 	if (Hit.bBlockingHit && Hit.GetActor() && Hit.GetActor()->Implements<UInteractionInterface>())
 	{
 		IInteractionInterface::Execute_InteractBottom(Hit.GetActor(), this);
@@ -1080,7 +1080,7 @@ void APlayerCharacter::TraceForPlatforms() const
 	FHitResult Hit;
 	UKismetSystemLibrary::LineTraceSingleForObjects(
 		this, Start, End, ObjectTypes, false, TArray<AActor*>(),
-		EDrawDebugTrace::ForOneFrame, Hit, true);
+		EDrawDebugTrace::None, Hit, true);
 		
 	if(Hit.bBlockingHit)
 	{

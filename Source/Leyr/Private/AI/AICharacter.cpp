@@ -409,17 +409,58 @@ FVector AAICharacter::FindRandomLocation_Implementation()
 	return StartLocation;
 }
 
-bool AAICharacter::MoveToLocation_Implementation(FVector TargetLocation, float Threshold)
+bool AAICharacter::MoveToLocation_Implementation(FVector TargetLocation, float Threshold, bool bBackward)
 {
 	if ((GetActorLocation() - TargetLocation).Size() > Threshold)
 	{
 		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetLocation.X, GetActorLocation().Y, TargetLocation.Z));
 		const FRotator WorldDirection = FRotator(LookAtRotation.Pitch, 0.f, 0.f);
 		AddMovementInput(LookAtRotation.Vector(), 1.f, true);
-		if(FVector::DotProduct(LookAtRotation.Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
+		if(!bBackward && FVector::DotProduct(LookAtRotation.Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
 		return false;
 	}
 	return true;
+}
+
+FVector AAICharacter::FindTargetLocation_Implementation(AActor* TargetActor, float DistanceToKeep)
+{
+	if (TargetActor == nullptr) return FVector::ZeroVector;
+	const FVector Direction = UKismetMathLibrary::GetDirectionUnitVector(TargetActor->GetActorLocation(), GetActorLocation());
+	return TargetActor->GetActorLocation() + FVector{ Direction.X * DistanceToKeep, 0.f, 0.f };
+}
+
+bool AAICharacter::CheckForObstacle_Implementation(float TraceDistance, bool bBackward)
+{
+	const float Direction = bBackward ? -1.f : 1.f;
+	const FVector Start = GetActorLocation();
+	const FVector End = Start + GetActorForwardVector() * TraceDistance * Direction;
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(CombatTarget);
+	FHitResult Hit;
+	UKismetSystemLibrary::LineTraceSingle(this, Start, End, TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::None, Hit, true);
+	return Hit.bBlockingHit;
+}
+
+bool AAICharacter::CheckForGround_Implementation(float TraceDistance, bool bBackward)
+{
+	const float Direction = bBackward ? -1.f : 1.f;
+	const FVector Start = GetActorLocation() + GetActorForwardVector() * GetCapsuleComponent()->GetScaledCapsuleRadius() * Direction + FVector::DownVector * GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	const FVector End = Start + FVector::DownVector * TraceDistance;
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(CombatTarget);
+	FHitResult Hit;
+	UKismetSystemLibrary::LineTraceSingle(this, Start, End, TraceTypeQuery1, false, ActorsToIgnore, EDrawDebugTrace::None, Hit, true);
+	return Hit.bBlockingHit;
+}
+
+bool AAICharacter::RequestJump_Implementation()
+{
+	if (CanJump())
+	{
+		Jump();
+		return true;
+	}
+	return false;
 }
 
 bool AAICharacter::IsTargetWithinEnteringBounds(const FVector& TargetLocation) const
@@ -468,8 +509,8 @@ void AAICharacter::FaceTarget_Implementation()
 {
 	if (CombatTarget)
 	{
-		if (CombatTarget->GetActorLocation().X < GetActorLocation().X && FMath::Sign(CombatTarget->GetActorForwardVector().X) < 0 ||
-			CombatTarget->GetActorLocation().X > GetActorLocation().X && FMath::Sign(CombatTarget->GetActorForwardVector().X) > 0)
+		if (CombatTarget->GetActorLocation().X < GetActorLocation().X && FMath::Sign(GetActorForwardVector().X) > 0 ||
+			CombatTarget->GetActorLocation().X > GetActorLocation().X && FMath::Sign(GetActorForwardVector().X) < 0)
 		{
 			ChangeDirections();
 		}

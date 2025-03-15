@@ -19,7 +19,8 @@
 				"AIModule",
 				"Niagara",
 				"ModelViewViewModel",
-				"CommonUI"
+				"CommonUI",
+				"GameplayTasks"
 			]
 		}
 	],
