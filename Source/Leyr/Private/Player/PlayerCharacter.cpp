@@ -102,7 +102,9 @@ void APlayerCharacter::ForceMove(float DeltaSeconds)
 	if(CombatState == ECombatState::HoppingLedge)
 	{
 		SetActorLocation(FMath::VInterpTo(GetActorLocation(), MovementTarget, DeltaSeconds, 8.f));
-		if (FMath::IsNearlyZero(UKismetMathLibrary::Vector_Distance(GetActorLocation(), MovementTarget), 5.f))
+		UKismetSystemLibrary::DrawDebugSphere(this, GetActorLocation(), 5.f, 12, FLinearColor::White, 5.f);
+		UKismetSystemLibrary::DrawDebugSphere(this, MovementTarget, 20.f, 12, FLinearColor::Green, 5.f);
+		if (FMath::IsNearlyZero(UKismetMathLibrary::Vector_Distance(GetActorLocation(), MovementTarget), 20.f))
 		{
 			HandleCombatState(ECombatState::Unoccupied);
 			GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(GameplayTags.CombatDirections);
@@ -713,7 +715,6 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Ladder);
 		break;
 	case ECombatState::OnElevator:
-		// GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Elevator);
 		break;
 	case ECombatState::OnGroundSlope:
@@ -742,6 +743,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 	case ECombatState::HoppingLedge:
 		MovementSpeed = ClimbingWalkSpeed;
 		MovementTarget = GetActorLocation() + FVector(GetActorForwardVector().X * 50.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 15.f);
+		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Ledge);
 		break;
 	case ECombatState::Climbing:
@@ -782,6 +784,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		MakeAndApplyEffectToSelf(FBaseGameplayTags::Get().CombatState_Defeated);
 		break;
 	}
+	UE_LOG(LogTemp, Warning, TEXT("CombatState: %s"), *UEnum::GetValueAsString(CombatState));
 }
 
 void APlayerCharacter::HandleHangingOnLadder_Implementation(FVector HangingTarget, bool bEndOverlap)
