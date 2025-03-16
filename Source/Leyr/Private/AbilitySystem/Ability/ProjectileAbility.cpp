@@ -6,6 +6,8 @@
 #include "AbilitySystem/Actor/Projectile.h"
 #include "Components/SphereComponent.h"
 #include "Data/AbilityData.h"
+#include "Data/ProjectileData.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -15,8 +17,6 @@ void UProjectileAbility::InitAbility()
 	
 	if (AbilityData)
 	{
-		ProjectileClass = AbilityData->ProjectileClass;
-		bIgnoreStatic = AbilityData->bIgnoreStatic;
 		bOverridePitch = AbilityData->bOverridePitch;
 		PitchOverride = AbilityData->PitchOverride;
 	}
@@ -27,31 +27,47 @@ void UProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag, bool InIgnoreStatic, bool InOverridePitch, float InPitchOverride)
+void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag)
 {
 	if (!GetAvatarActorFromActorInfo()->HasAuthority()) return;
 
 	const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), SocketTag);
 	FRotator Rotation = UKismetMathLibrary::FindLookAtRotation(SocketLocation, ProjectileTargetLocation);
 	// FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
-	if (InOverridePitch)
+	if (bOverridePitch)
 	{
-		Rotation.Pitch = InPitchOverride;
+		Rotation.Pitch = PitchOverride;
 	}
 
 	FTransform SpawnTransform;
 	SpawnTransform.SetLocation(SocketLocation);
 	SpawnTransform.SetRotation(Rotation.Quaternion());
-
-	AProjectile* Projectile = GetWorld()->SpawnActorDeferred<AProjectile>(
-		ProjectileClass,
-		SpawnTransform,
-		GetOwningActorFromActorInfo(),
-		Cast<APawn>(GetOwningActorFromActorInfo()),
-		ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 	
-	Projectile->AdditionalEffectParams = MakeAdditionalEffectParamsFromClassDefaults();
-	Projectile->AdditionalEffectParams.DamageType = DamageType;
-	Projectile->Sphere->SetCollisionResponseToChannel(ECC_WorldStatic, InIgnoreStatic ? ECR_Ignore : ECR_Block);
-	Projectile->FinishSpawning(SpawnTransform);
+	if(AbilityData->ProjectileData)
+	{		
+		AProjectile* Projectile = GetWorld()->SpawnActorDeferred<AProjectile>(
+			AbilityData->ProjectileData->ProjectileClass,
+			SpawnTransform,
+			GetOwningActorFromActorInfo(),
+			Cast<APawn>(GetOwningActorFromActorInfo()),
+			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	
+		Projectile->AdditionalEffectParams = MakeAdditionalEffectParamsFromClassDefaults();
+		Projectile->AdditionalEffectParams.DamageType = AbilityData->ProjectileData->DamageType;
+		Projectile->Sphere->SetCollisionResponseToChannel(ECC_WorldStatic, AbilityData->ProjectileData->bIgnoreStatic ? ECR_Ignore : ECR_Overlap);
+		Projectile->ProjectileMovement->ProjectileGravityScale = AbilityData->ProjectileData->ProjectileGravityScale;
+		Projectile->ProjectileMovement->InitialSpeed = AbilityData->ProjectileData->InitialSpeed;
+		Projectile->ProjectileMovement->MaxSpeed = AbilityData->ProjectileData->MaxSpeed;
+		Projectile->SetImpactEffect(AbilityData->ProjectileData->ImpactEffect);
+		Projectile->SetImpactSound(AbilityData->ProjectileData->ImpactSound);
+		Projectile->SetLoopingSound(AbilityData->ProjectileData->LoopingSound);
+		
+		Projectile->FinishSpawning(SpawnTransform);
+	}
+}
+
+void UProjectileAbility::SetPitchOverride(bool bShouldOverride, const float Pitch)
+{
+	bOverridePitch = bShouldOverride;
+	PitchOverride = Pitch;
 }

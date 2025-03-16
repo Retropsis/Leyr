@@ -18,6 +18,9 @@ class LEYR_API AProjectile : public AActor
 	
 public:	
 	AProjectile();
+	void SetImpactEffect(UNiagaraSystem* Effect) { ImpactEffect = Effect; }
+	void SetImpactSound(USoundBase* Sound) { ImpactSound = Sound; }
+	void SetLoopingSound(USoundBase* Sound) { LoopingSound = Sound; }
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
@@ -43,15 +46,8 @@ private:
 
 	bool bHit = false;
 	
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UNiagaraSystem> ImpactEffect;
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<USoundBase> ImpactSound;
-
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<USoundBase> LoopingSound;
-
-	UPROPERTY()
-	TObjectPtr<UAudioComponent> LoopingSoundComponent;
+	UPROPERTY() TObjectPtr<UNiagaraSystem> ImpactEffect;
+	UPROPERTY() TObjectPtr<USoundBase> ImpactSound;
+	UPROPERTY() TObjectPtr<USoundBase> LoopingSound;
+	UPROPERTY() TObjectPtr<UAudioComponent> LoopingSoundComponent;
 };

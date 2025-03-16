@@ -92,8 +92,6 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	TraceForSlope();
 	ForceMove(DeltaSeconds);
 	InterpCameraAdditiveOffset(DeltaSeconds);
-
-	GEngine->AddOnScreenDebugMessage(77898798, 1.f, FColor::Magenta, UEnum::GetValueAsString(GetCharacterMovement()->MovementMode));
 }
 
 void APlayerCharacter::ForceMove(float DeltaSeconds)
@@ -102,8 +100,8 @@ void APlayerCharacter::ForceMove(float DeltaSeconds)
 	if(CombatState == ECombatState::HoppingLedge)
 	{
 		SetActorLocation(FMath::VInterpTo(GetActorLocation(), MovementTarget, DeltaSeconds, 8.f));
-		UKismetSystemLibrary::DrawDebugSphere(this, GetActorLocation(), 5.f, 12, FLinearColor::White, 5.f);
-		UKismetSystemLibrary::DrawDebugSphere(this, MovementTarget, 20.f, 12, FLinearColor::Green, 5.f);
+		// UKismetSystemLibrary::DrawDebugSphere(this, GetActorLocation(), 5.f, 12, FLinearColor::White, 5.f);
+		// UKismetSystemLibrary::DrawDebugSphere(this, MovementTarget, 20.f, 12, FLinearColor::Green, 5.f);
 		if (FMath::IsNearlyZero(UKismetMathLibrary::Vector_Distance(GetActorLocation(), MovementTarget), 20.f))
 		{
 			HandleCombatState(ECombatState::Unoccupied);

@@ -58,13 +58,18 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	// if (!DamageEffectSpecHandle.Data.IsValid() || DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor) return;
 	// if (!ULeyrAbilitySystemLibrary::IsHostile(DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser(), OtherActor)) return;
 
-	Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SetLifeSpan(5.f);
-
 	AActor* SourceAvatarActor = AdditionalEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
 	if (!IsValid(SourceAvatarActor)) Destroy();
-	
 	if (SourceAvatarActor == OtherActor) return;
+
+	if (OtherComp && OtherComp->GetCollisionObjectType() == ECC_WorldStatic)
+	{
+		ProjectileMovement->StopMovementImmediately();
+		Sphere->OnComponentBeginOverlap.Clear();
+		SetLifeSpan(5.f);
+		return;
+	}
+	
 	if (!ULeyrAbilitySystemLibrary::IsHostile(SourceAvatarActor, OtherActor)) return;
 	if (!bHit) OnHit();
 

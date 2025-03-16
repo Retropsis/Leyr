@@ -8,6 +8,7 @@
 #include "Engine/DataAsset.h"
 #include "AbilityData.generated.h"
 
+class UProjectileData;
 class UGameplayEffect;
 class AProjectile;
 /**
@@ -42,19 +43,13 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	bool bShouldExecute = false;
-
-	/*
-	 * Projectile
-	*/
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Projectile")
-	TSubclassOf<AProjectile> ProjectileClass = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Projectile")
 	bool bOverridePitch = false;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Projectile")
 	float PitchOverride = 0.f;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Projectile")
-	bool bIgnoreStatic = false;
+
+	UPROPERTY(EditDefaultsOnly, Category="Ability")
+	TObjectPtr<UProjectileData> ProjectileData = nullptr;
 };
