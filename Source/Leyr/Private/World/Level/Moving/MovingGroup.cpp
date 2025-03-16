@@ -85,3 +85,4 @@ void AMovingGroup::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 	}
 }
 
+FBoxSphereBounds AMovingGroup::GetNavigationBounds() const { return OverlapBox->Bounds; }

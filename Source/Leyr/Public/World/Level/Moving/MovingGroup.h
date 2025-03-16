@@ -25,6 +25,7 @@ class LEYR_API AMovingGroup : public AActor
 public:	
 	AMovingGroup();
 	virtual void Tick(float DeltaSeconds) override;
+	FBoxSphereBounds GetNavigationBounds() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -37,7 +38,7 @@ protected:
 	UFUNCTION()
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
-	UPROPERTY(EditDefaultsOnly, Category="Platform")
+	UPROPERTY(EditDefaultsOnly, Category="Moving")
 	TObjectPtr<UBoxComponent> OverlapBox;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Moving")

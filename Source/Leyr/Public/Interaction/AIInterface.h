@@ -35,9 +35,6 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FVector FindRandomLocation();
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	bool ChaseTarget(AActor* TargetToChase);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SineMove();
@@ -77,7 +74,13 @@ public:
 
 	/*
 	 * Behaviour Tasks
-	*/
+	*/	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool ChaseTarget(AActor* TargetToChase);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool ChaseTargetWithinWater(AActor* TargetToChase);
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool IsTargetWithinEnteringBounds(const FVector& Location);
 	

@@ -62,6 +62,7 @@ public:
 	virtual bool CheckForGround_Implementation(float TraceDistance = 175.f, bool bBackward = false) override;
 	virtual bool RequestJump_Implementation() override;
 	virtual bool ChaseTarget_Implementation(AActor* TargetToChase) override;
+	virtual bool ChaseTargetWithinWater_Implementation(AActor* TargetToChase) override;
 	virtual void SineMove_Implementation() override;
 	virtual void FaceTarget_Implementation() override;
 	virtual bool FollowSpline_Implementation(int32 SplineIndex) override;
@@ -79,6 +80,7 @@ public:
 	/** end AI Interface */
 	
 	bool IsTargetWithinEnteringBounds(const FVector& TargetLocation) const;
+	bool IsTargetWithinNavigationBounds(const FVector& TargetLocation) const;
 
 	/** Enemy Interface */
 	virtual void SetShouldAttack_Implementation(bool InShouldAttack) override;

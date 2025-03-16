@@ -26,6 +26,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
 #include "World/Data/CameraData.h"
+#include "World/Level/Moving/WaterGroup.h"
 #include "World/Level/Zone/Arena.h"
 
 AAICharacter::AAICharacter()
@@ -154,14 +155,34 @@ void AAICharacter::InitializeNavigationBounds()
 	TArray<AActor*> ActorsToIgnore;
 	ActorsToIgnore.Add(this);
 	TArray<AActor*> OutActors;
+	
+	if (BehaviourType == EBehaviourType::Aquatic)
+	{
+		UKismetSystemLibrary::CapsuleOverlapActors(this, Start, GetCapsuleComponent()->GetScaledCapsuleRadius(), GetCapsuleComponent()->GetScaledCapsuleHalfHeight(),
+		ObjectTypes, AWaterGroup::StaticClass(), ActorsToIgnore, OutActors);
+		if (OutActors.Num() > 0)
+		{
+			for (AActor* OverlapActor : OutActors)
+			{
+				if (const AWaterGroup* WaterGroup = Cast<AWaterGroup>(OverlapActor))
+				{
+					NavigationBounds = WaterGroup->GetNavigationBounds();
+				}
+			}
+		}
+	}
+	OutActors.Empty();
 	UKismetSystemLibrary::CapsuleOverlapActors(this, Start, GetCapsuleComponent()->GetScaledCapsuleRadius(), GetCapsuleComponent()->GetScaledCapsuleHalfHeight(),
-											   ObjectTypes, ACameraBoundary::StaticClass(), ActorsToIgnore, OutActors);
+	ObjectTypes, ACameraBoundary::StaticClass(), ActorsToIgnore, OutActors);
 	if (OutActors.Num() > 0)
 	{
-		if (const ACameraBoundary* CameraBoundary = Cast<ACameraBoundary>(OutActors[0]))
+		for (AActor* OverlapActor : OutActors)
 		{
-			EnteringBounds = CameraBoundary->GetEnteringBounds(); 
-			NavigationBounds = CameraBoundary->GetNavigationBounds(); 
+			if (const ACameraBoundary* CameraBoundary = Cast<ACameraBoundary>(OverlapActor))
+			{
+				EnteringBounds = CameraBoundary->GetEnteringBounds(); 
+				if (BehaviourType != EBehaviourType::Aquatic) NavigationBounds = CameraBoundary->GetNavigationBounds();
+			}
 		}
 	}
 }
@@ -472,29 +493,74 @@ bool AAICharacter::IsTargetWithinEnteringBounds(const FVector& TargetLocation) c
 	return FMath::IsWithin(TargetLocation.X, Left, Right) && FMath::IsWithin(TargetLocation.Z, Bottom, Top);
 }
 
+bool AAICharacter::IsTargetWithinNavigationBounds(const FVector& TargetLocation) const
+{
+	const float Left = NavigationBounds.Origin.X - NavigationBounds.BoxExtent.X;
+	const float Right = NavigationBounds.Origin.X + NavigationBounds.BoxExtent.X;
+	const float Top = NavigationBounds.Origin.Z + NavigationBounds.BoxExtent.Z;
+	const float Bottom = NavigationBounds.Origin.Z - NavigationBounds.BoxExtent.Z;	
+	UKismetSystemLibrary::DrawDebugBox(this, NavigationBounds.Origin, NavigationBounds.BoxExtent, FLinearColor::White, FRotator::ZeroRotator, 5.f);
+	return FMath::IsWithin(TargetLocation.X, Left, Right) && FMath::IsWithin(TargetLocation.Z, Bottom, Top);
+}
+
 bool AAICharacter::ChaseTarget_Implementation(AActor* TargetToChase)
-{		
-	switch (ChasingState) {
-	case EChasingState::Chasing:
-		if (GetDistanceTo(TargetToChase) > AttackRange)
+{
+	if (!IsValid(TargetToChase)) return true;
+	
+	if (GetDistanceTo(TargetToChase) > AttackRange)
+	{
+		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetToChase->GetActorLocation().X, 0.f, TargetToChase->GetActorLocation().Z + ChasingHeightOffset));
+		AddMovementInput(LookAtRotation.Vector(), 1.f, true);
+		if(FVector::DotProduct(LookAtRotation.Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
+		return false;
+	}
+	if (GetDistanceTo(TargetToChase) < CloseRange)
+	{
+		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetToChase->GetActorLocation().X, 0.f, TargetToChase->GetActorLocation().Z + ChasingHeightOffset));
+		AddMovementInput(LookAtRotation.Vector(), -.33f, true);
+		if(FVector::DotProduct(LookAtRotation.Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
+		return false;
+	}
+	return true;
+}
+
+bool AAICharacter::ChaseTargetWithinWater_Implementation(AActor* TargetToChase)
+{
+	if (!IsValid(TargetToChase)) return true;
+	
+	if (GetDistanceTo(TargetToChase) > AttackRange)
+	{
+		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetToChase->GetActorLocation().X, 0.f, TargetToChase->GetActorLocation().Z + ChasingHeightOffset));
+		const FVector TargetLocation = GetActorLocation() + LookAtRotation.Vector().GetSafeNormal() * 128.f;
+		if (IsTargetWithinNavigationBounds(TargetLocation))
 		{
-			const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetToChase->GetActorLocation().X, GetActorLocation().Y, TargetToChase->GetActorLocation().Z + ChasingHeightOffset));
+			UKismetSystemLibrary::DrawDebugSphere(this, TargetLocation, 15.f, 12, FLinearColor::Green);
 			AddMovementInput(LookAtRotation.Vector(), 1.f, true);
 			if(FVector::DotProduct(LookAtRotation.Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
 			return false;
 		}
-		if (GetDistanceTo(TargetToChase) < CloseRange)
+		else
 		{
-			const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetToChase->GetActorLocation().X, GetActorLocation().Y, TargetToChase->GetActorLocation().Z + ChasingHeightOffset));
+			UKismetSystemLibrary::DrawDebugSphere(this, TargetLocation, 15.f, 12, FLinearColor::Red);
+		}
+		return true;
+	}
+	if (GetDistanceTo(TargetToChase) < CloseRange)
+	{
+		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetToChase->GetActorLocation().X, 0.f, TargetToChase->GetActorLocation().Z + ChasingHeightOffset));
+		const FVector TargetLocation = GetActorLocation() - LookAtRotation.Vector().GetSafeNormal() * 128.f;
+		if (IsTargetWithinNavigationBounds(TargetLocation))
+		{
+			UKismetSystemLibrary::DrawDebugSphere(this, TargetLocation, 15.f, 12, FLinearColor::Blue);
 			AddMovementInput(LookAtRotation.Vector(), -.33f, true);
 			if(FVector::DotProduct(LookAtRotation.Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
 			return false;
 		}
-		break;
-	case EChasingState::HitReacting:
-		break;
-	case EChasingState::Defeat:
-		break;
+		else
+		{
+			UKismetSystemLibrary::DrawDebugSphere(this, TargetLocation, 15.f, 12, FLinearColor::Red);
+		}
+		return true;
 	}
 	return true;
 }
