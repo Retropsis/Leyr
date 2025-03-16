@@ -43,13 +43,13 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	bool bShouldExecute = false;
+
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Range")
+	TObjectPtr<UProjectileData> ProjectileData = nullptr;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Projectile")
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Range")
 	bool bOverridePitch = false;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Projectile")
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Range")
 	float PitchOverride = 0.f;
-
-	UPROPERTY(EditDefaultsOnly, Category="Ability")
-	TObjectPtr<UProjectileData> ProjectileData = nullptr;
 };

@@ -49,21 +49,24 @@ void AWaterGroup::HandleActiveActors(float DeltaSeconds)
 			const bool bSinkFaster = Actor->GetActorLocation().Z > SurfaceZ;
 			
 			FHitResult Hit;
-			UKismetSystemLibrary::LineTraceSingle(
-				Actor, Actor->GetActorLocation(), Actor->GetActorLocation() - Actor->GetActorUpVector() * 100.f,
-				TraceTypeQuery1, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, Hit, true);
+			FVector Start = Actor->GetActorLocation();
+			const FVector End = Start + FVector::DownVector * 55.f;
+			UKismetSystemLibrary::SphereTraceSingle(Actor, Start, End, 18.f, TraceTypeQuery1, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, Hit, true);
 			
-			FVector CurrentBottom = Hit.bBlockingHit ? Hit.ImpactPoint : FVector(Actor->GetActorLocation().X, 0.f, InterpTarget.Z);
-			UKismetSystemLibrary::DrawDebugPoint(this, InterpTarget, 15.f, FLinearColor::Green);
+			FVector CurrentBottom = Hit.bBlockingHit ? Hit.ImpactPoint : FVector(Start.X, 0.f, InterpTarget.Z);
+			UKismetSystemLibrary::DrawDebugPoint(this, InterpTarget, 15.f, FLinearColor::Red);
+
+			if (Hit.bBlockingHit) return;
 			
 			switch (MovingDirection) {
 			case EMovingDirection::Sink:
-				Actor->SetActorLocation(FMath::VInterpConstantTo(Actor->GetActorLocation(), CurrentBottom, DeltaSeconds, 10.f));
+				Actor->SetActorLocation(FMath::VInterpConstantTo(Start, CurrentBottom, DeltaSeconds, 10.f));
+				UKismetSystemLibrary::DrawDebugPoint(this, CurrentBottom, 15.f, FLinearColor::Yellow);
 				// Actor->SetActorLocation(FMath::VInterpTo(Actor->GetActorLocation(), CurrentBottom, DeltaSeconds, bSinkFaster ? 10.f : InterpolationSpeed));
 				break;
 			case EMovingDirection::Vector:
 				UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), GetActorLocation() + InterpTarget.GetSafeNormal(), 2.f, FLinearColor::Green);
-				Actor->SetActorLocation(FMath::VInterpTo(Actor->GetActorLocation(), InterpTarget, DeltaSeconds, FlowingInterpSpeed));
+				Actor->SetActorLocation(FMath::VInterpTo(Start, InterpTarget, DeltaSeconds, FlowingInterpSpeed));
 				break;
 			case EMovingDirection::Still:
 				break;
