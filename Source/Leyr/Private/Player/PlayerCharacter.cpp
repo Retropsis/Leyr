@@ -632,7 +632,16 @@ void APlayerCharacter::JumpButtonPressed()
 		GetWorld()->GetTimerManager().SetTimer(OffLedgeTimer, FTimerDelegate::CreateLambda([this] () { bCanGrabLedge = true; }), OffLedgeTime, false);
 		if(GetAttachParentActor()) DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	}
-	bIsCrouched ? TryVaultingDown() : Jump();
+	if (bIsCrouched)
+	{
+		if (!TryVaultingDown())
+		{
+			if (AbilitySystemComponent->TryActivateAbilitiesByTag(FBaseGameplayTags::Get().Abilities_Roll.GetSingleTagContainer()))
+			{
+				HandleCombatState(ECombatState::Rolling);
+			}
+		}
+	} else Jump();
 }
 
 void APlayerCharacter::SetCombatStateToHandle_Implementation(ECombatState NewState)
@@ -760,19 +769,22 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		break;
 	case ECombatState::Rolling:
 		Crouch();
+		GetSprite()->SetRelativeLocation(FVector(0.f, 0.f, 44.f));
+		
 		GetCharacterMovement()->MaxWalkSpeedCrouched = RollingSpeed;
 		GetCharacterMovement()->MaxAcceleration = RollingMaxAcceleration;
 		GetCharacterMovement()->BrakingFrictionFactor = RollingBrakeFrictionFactor;
-		GetSprite()->SetRelativeLocation(FVector(0.f, 0.f, 44.f));
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Rolling);
 		break;
 	case ECombatState::RollingEnd:
 		UnCrouch();
 		GetSprite()->SetRelativeLocation(FVector::ZeroVector);
+		
 		CombatState = ECombatState::Unoccupied;
 		GetCharacterMovement()->MaxWalkSpeedCrouched = BaseWalkSpeedCrouched;
 		GetCharacterMovement()->MaxAcceleration = 2048.f;
 		GetCharacterMovement()->BrakingFrictionFactor = 2.f;
+		GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(GameplayTags.CombatState_Directional_Downward.GetSingleTagContainer());
 		break;
 	case ECombatState::Aiming:
 		GetCharacterMovement()->MaxWalkSpeed = AimingWalkSpeed;
@@ -1157,9 +1169,9 @@ void APlayerCharacter::TraceForLedge()
 	}
 }
 
-void APlayerCharacter::TryVaultingDown()
+bool APlayerCharacter::TryVaultingDown()
 {
-	if(GetCharacterMovement()->IsFalling() || GetVelocity().Z < 0.f) return;
+	if(GetCharacterMovement()->IsFalling() || GetVelocity().Z < 0.f) return false;
 	
 	const FVector Start = GetActorLocation() /*+ FVector::DownVector * GetCapsuleComponent()->GetScaledCapsuleRadius()*/;
 	const FVector End = Start + FVector::DownVector * (GetCapsuleComponent()->GetScaledCapsuleRadius() + 60.f);
@@ -1180,7 +1192,9 @@ void APlayerCharacter::TryVaultingDown()
 		{
 			PlayerCharacterAnimInstance->PlayVaultDownSequence();
 		}
+		return true;
 	}
+	return false;
 }
 
 void APlayerCharacter::TraceForSlope()

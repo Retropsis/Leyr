@@ -48,7 +48,7 @@ public:
 	bool TryDescendLadder();
 	void HandleCrouching(bool bShouldCrouch);
 	void JumpButtonPressed();
-	void TryVaultingDown();
+	bool TryVaultingDown();
 
 	UFUNCTION()
 	void HandleCharacterMovementUpdated(float DeltaSeconds, FVector OldLocation, FVector OldVelocity);

@@ -21,8 +21,8 @@ void UDamageGameplayAbility::InitAbility()
 	if (AbilityData)
 	{
 		DamageEffectClass = AbilityData->MainEffectClass;
-		bShouldApplyExecute = AbilityData->bShouldApplyExecute;
-		bShouldExecute = AbilityData->bShouldExecute;
+		// bShouldApplyExecute = AbilityData->bShouldApplyExecute;
+		// bShouldExecute = AbilityData->bShouldExecute;
 	}
 }
 
@@ -60,13 +60,21 @@ TArray<FHitResult> UDamageGameplayAbility::BoxTrace(bool bDebug)
 void UDamageGameplayAbility::CauseDamage(UAbilitySystemComponent* TargetASC)
 {
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-	FGameplayEffectSpecHandle DamageSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass, GetAbilityLevel());
+	const FGameplayEffectSpecHandle DamageSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass, GetAbilityLevel());
 	const float ScaledDamage =AbilityPower.GetValueAtLevel(GetAbilityLevel());
 	
-	if (TargetASC->HasMatchingGameplayTag(GameplayTags.Execute) && bShouldExecute)
+	if (bShouldExecute)
 	{
-		DamageType = GameplayTags.Damage_Execute;
-		bExecuteSuccessful = true;
+		if (TargetASC->HasMatchingGameplayTag(GameplayTags.Execute))
+		{
+			DamageType = GameplayTags.Damage_Execute;
+			bExecuteSuccessful = true;
+		}
+		else
+		{
+			// Weaker hit
+			return;
+		}
 	}
 	
 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, DamageType, ScaledDamage);
