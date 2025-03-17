@@ -122,10 +122,10 @@ void AEncounterSpawnVolume::BindOnPlayerLeaving()
 
 void AEncounterSpawnVolume::HandlePlayerLeaving()
 {
+	EnableVolume();
 	for (AEncounterSpawnPoint* SpawnPoint : SpawnPoints)
 	{
 		if (SpawnPoint) SpawnPoint->DespawnEncounter();
-		EnableVolume();
 	}
 }
 

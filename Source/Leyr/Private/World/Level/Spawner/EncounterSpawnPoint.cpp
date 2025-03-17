@@ -7,6 +7,7 @@
 
 void AEncounterSpawnPoint::SpawnEncounter()
 {
+	GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Red, "Respawning");
 	if (EncounterData->EncounterClass)
 	{
 		UAssetManager::GetStreamableManager().RequestAsyncLoad(EncounterData->EncounterClass.ToSoftObjectPath(), [this] ()
@@ -41,7 +42,6 @@ void AEncounterSpawnPoint::SpawnEncounter()
 
 void AEncounterSpawnPoint::Respawn(AActor* DefeatedEncounter)
 {
-	FTimerHandle RespawnTimer;
 	GetWorldTimerManager().SetTimer(RespawnTimer, [this] (){ SpawnEncounter(); }, RespawnTime, false);
 }
 
@@ -52,4 +52,6 @@ void AEncounterSpawnPoint::DespawnEncounter()
 		CurrentSpawn->Destroy();
 		CurrentSpawn = nullptr;
 	}
+	GetWorldTimerManager().ClearTimer(RespawnTimer);
+	RespawnTimer.Invalidate();
 }

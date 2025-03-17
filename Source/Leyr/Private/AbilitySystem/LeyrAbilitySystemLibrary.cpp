@@ -307,15 +307,15 @@ void ULeyrAbilitySystemLibrary::UpdateAbilities(const UObject* WorldContextObjec
 				{
 					if (InputTag.MatchesTagExact(GameplayTags.InputTag_LMB))
 					{
-						FoundAbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.InputTag_Execute_LMB);
+						FoundAbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.InputTag_Shoulder_Right);
 					}
 					if (InputTag.MatchesTagExact(GameplayTags.InputTag_RMB))
 					{
-						FoundAbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.InputTag_Execute_RMB);
+						FoundAbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.InputTag_Shoulder_Right);
 					}
 					if (InputTag.MatchesTagExact(GameplayTags.InputTag_1))
 					{
-						FoundAbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.InputTag_Execute_1);
+						FoundAbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.InputTag_Shoulder_Right);
 					}					
 				}
 				else
@@ -333,15 +333,15 @@ void ULeyrAbilitySystemLibrary::UpdateAbilities(const UObject* WorldContextObjec
 				{
 					if (InputTag.MatchesTagExact(GameplayTags.InputTag_LMB))
 					{
-						AbilitySpec.DynamicAbilityTags.AddTag(GameplayTags.InputTag_Execute_LMB);
+						AbilitySpec.DynamicAbilityTags.AddTag(GameplayTags.InputTag_Shoulder_Right);
 					}
 					if (InputTag.MatchesTagExact(GameplayTags.InputTag_RMB))
 					{
-						AbilitySpec.DynamicAbilityTags.AddTag(GameplayTags.InputTag_Execute_RMB);
+						AbilitySpec.DynamicAbilityTags.AddTag(GameplayTags.InputTag_Shoulder_Right);
 					}
 					if (InputTag.MatchesTagExact(GameplayTags.InputTag_1))
 					{
-						AbilitySpec.DynamicAbilityTags.AddTag(GameplayTags.InputTag_Execute_1);
+						AbilitySpec.DynamicAbilityTags.AddTag(GameplayTags.InputTag_Shoulder_Right);
 					}					
 				}
 				else

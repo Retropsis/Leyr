@@ -49,4 +49,5 @@ public:
 private:
 	UPROPERTY()
 	TObjectPtr<AActor> CurrentSpawn = nullptr;
+	FTimerHandle RespawnTimer;
 };
