@@ -28,6 +28,7 @@ enum class EEncounterName : uint8
 	Crocodile UMETA(DisplayName="Crocodile"),
 	Shark UMETA(DisplayName="Shark"),
 	Pterodactyl UMETA(DisplayName="Pterodactyl"),
+	Zombie UMETA(DisplayName="Zombie"),
 
 	// Bosses
 	TheScourge UMETA(DisplayName="TheScourge"),

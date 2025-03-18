@@ -123,6 +123,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Encounter Defaults")
 	TMap<FGameplayTag, FEncounterDefaultInfo> EncounterInformationMap;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Encounter Defaults")
+	TSubclassOf<UGameplayEffect> PrimaryAttributes;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Encounter Defaults")
 	TSubclassOf<UGameplayEffect> SecondaryAttributes;

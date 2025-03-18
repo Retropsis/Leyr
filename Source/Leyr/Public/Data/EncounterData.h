@@ -50,6 +50,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UBehaviourData> BehaviourData = nullptr;
+
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag WeaponSocketTag = FGameplayTag();
 	
 	UPROPERTY(EditDefaultsOnly, Category="Asset")
 	TSoftObjectPtr<UNiagaraSystem> ImpactEffect;
@@ -59,7 +62,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Asset")
 	TSoftObjectPtr<UPaperZDAnimSequence> HitReactSequence;
-
+	
 	UPROPERTY(EditDefaultsOnly, Category="Asset")
 	TObjectPtr<UAttackSequenceInfo> AttackSequenceInfo;
 };

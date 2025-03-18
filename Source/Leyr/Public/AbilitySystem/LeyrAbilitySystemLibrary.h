@@ -7,6 +7,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "LeyrAbilitySystemLibrary.generated.h"
 
+class UGameplayAbility;
 class ULoadMenuSaveGame;
 class UInventoryCostData;
 class UEquipmentWidgetController;
@@ -91,10 +92,10 @@ public:
 	 * Encounters
 	*/
 	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|EncounterInfo", meta=(WorldContext="WorldContextObject"))
-	static void InitializeEncounterAttributes(const UObject* WorldContextObject, EEncounterName EncounterName, float Level, UAbilitySystemComponent* ASC);
+	static void InitializeEncounterAttributes(const UObject* WorldContextObject, float Level, UAbilitySystemComponent* ASC);
 	
 	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|CharacterClassDefaults", meta=(WorldContext="WorldContextObject"))
-	static void GiveEncounterAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, EEncounterName EncounterName);
+	static void GiveEncounterAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, TArray<TSubclassOf<UGameplayAbility>> AbilitiesToGive);
 	
 	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|EncounterInfo", meta=(WorldContext="WorldContextObject"))
 	static UEncounterInfo* GetEncounterInfo(const UObject* WorldContextObject);

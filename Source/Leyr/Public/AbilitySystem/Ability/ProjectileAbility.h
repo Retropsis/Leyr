@@ -21,12 +21,15 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void SetPitchOverride(bool bShouldOverride, const float Pitch);
+
+	UPROPERTY(BlueprintReadWrite)
+	FVector TargetLocation = FVector::ZeroVector;
 	
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
 	UFUNCTION(BlueprintCallable, Category="Projectile", meta=(AdvancedDisplay=2))
-	void SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag);
+	void SpawnProjectile(const FGameplayTag& SocketTag, bool bHasTarget, const FVector& ProjectileTargetLocation);
 
 	UPROPERTY(EditDefaultsOnly)
 	int32 NumProjectiles = 5;

@@ -10,6 +10,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 void UProjectileAbility::InitAbility()
 {
@@ -27,12 +28,13 @@ void UProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation, const FGameplayTag& SocketTag)
+void UProjectileAbility::SpawnProjectile(const FGameplayTag& SocketTag, bool bHasTarget, const FVector& ProjectileTargetLocation)
 {
 	if (!GetAvatarActorFromActorInfo()->HasAuthority()) return;
 
 	const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), SocketTag);
-	FRotator Rotation = UKismetMathLibrary::FindLookAtRotation(SocketLocation, ProjectileTargetLocation);
+	FRotator Rotation = bHasTarget ? UKismetMathLibrary::FindLookAtRotation(SocketLocation, ProjectileTargetLocation) : GetAvatarActorFromActorInfo()->GetActorForwardVector().Rotation();
+	UKismetSystemLibrary::DrawDebugArrow(this, SocketLocation, SocketLocation + Rotation.Vector() * 100.f, 5.f, FLinearColor::Green, 5.f);
 	// FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
 	if (bOverridePitch)
 	{
@@ -41,6 +43,7 @@ void UProjectileAbility::SpawnProjectile(const FVector& ProjectileTargetLocation
 
 	FTransform SpawnTransform;
 	SpawnTransform.SetLocation(SocketLocation);
+	UKismetSystemLibrary::DrawDebugSphere(this, SocketLocation, 5.f, 5.f, FLinearColor::Green, 5.f);
 	SpawnTransform.SetRotation(Rotation.Quaternion());
 	
 	if(AbilityData->ProjectileData)

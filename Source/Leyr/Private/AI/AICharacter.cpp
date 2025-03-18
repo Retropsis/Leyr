@@ -259,15 +259,15 @@ void AAICharacter::InitializeDefaultAttributes() const
 {
 	if(HasAuthority())
 	{
-		ULeyrAbilitySystemLibrary::InitializeEncounterAttributes(this, EncounterName, Level, AbilitySystemComponent);
+		ULeyrAbilitySystemLibrary::InitializeEncounterAttributes(this, Level, AbilitySystemComponent);
 	}
 }
 
 void AAICharacter::AddAICharacterAbilities() const
 {
-	if (HasAuthority())
+	if (HasAuthority() && EncounterData)
 	{
-		ULeyrAbilitySystemLibrary::GiveEncounterAbilities(this, AbilitySystemComponent, EncounterName);
+		ULeyrAbilitySystemLibrary::GiveEncounterAbilities(this, AbilitySystemComponent, EncounterData->Abilities);
 	}
 }
 
@@ -306,6 +306,7 @@ void AAICharacter::InitializeCharacterInfo()
 	
 	EncounterSize = EncounterData->EncounterSize;
 	CharacterClass = EncounterData->CharacterClass;
+	WeaponSocketName = EncounterData->WeaponSocketTag.GetTagName();
 	
 	DefeatedSound = EncounterData->DeathSound;
 	HitReactSequence = EncounterData->HitReactSequence;

@@ -152,30 +152,29 @@ void ULeyrAbilitySystemLibrary::InitializeCharacterAttributesFromSaveData(const 
 	ASC->ApplyGameplayEffectSpecToSelf(*VitalAttributesSpecHandle.Data.Get());
 }
 
-void ULeyrAbilitySystemLibrary::InitializeEncounterAttributes(const UObject* WorldContextObject, EEncounterName EncounterName, float Level, UAbilitySystemComponent* ASC)
-{
+void ULeyrAbilitySystemLibrary::InitializeEncounterAttributes(const UObject* WorldContextObject, float Level, UAbilitySystemComponent* ASC)
+{	
 	const AActor* AvatarActor = ASC->GetAvatarActor();
 
 	UEncounterInfo* EncounterInfo = GetEncounterInfo(WorldContextObject);
-	const FEncounterDefaultInfo EncounterDefaultInfo = EncounterInfo->GetEncounterDefaultInfo(EncounterName);
 
 	FGameplayEffectContextHandle PrimaryAttributesContextHandle = ASC->MakeEffectContext();
 	PrimaryAttributesContextHandle.AddSourceObject(AvatarActor);
-	const FGameplayEffectSpecHandle PrimaryAttributesSpecHandle = ASC->MakeOutgoingSpec(EncounterDefaultInfo.PrimaryAttributes, Level, PrimaryAttributesContextHandle);
+	const FGameplayEffectSpecHandle PrimaryAttributesSpecHandle = ASC->MakeOutgoingSpec(EncounterInfo->PrimaryAttributes, Level, PrimaryAttributesContextHandle);
 	ASC->ApplyGameplayEffectSpecToSelf(*PrimaryAttributesSpecHandle.Data.Get());
 
 	FGameplayEffectContextHandle SecondaryAttributesContextHandle = ASC->MakeEffectContext();
 	SecondaryAttributesContextHandle.AddSourceObject(AvatarActor);
-	const FGameplayEffectSpecHandle SecondaryAttributesSpecHandle = ASC->MakeOutgoingSpec(EncounterDefaultInfo.SecondaryAttributes, Level, SecondaryAttributesContextHandle);
+	const FGameplayEffectSpecHandle SecondaryAttributesSpecHandle = ASC->MakeOutgoingSpec(EncounterInfo->SecondaryAttributes, Level, SecondaryAttributesContextHandle);
 	ASC->ApplyGameplayEffectSpecToSelf(*SecondaryAttributesSpecHandle.Data.Get());
 
 	FGameplayEffectContextHandle VitalAttributesContextHandle = ASC->MakeEffectContext();
 	VitalAttributesContextHandle.AddSourceObject(AvatarActor);
-	const FGameplayEffectSpecHandle VitalAttributesSpecHandle = ASC->MakeOutgoingSpec(EncounterDefaultInfo.VitalAttributes, Level, VitalAttributesContextHandle);
+	const FGameplayEffectSpecHandle VitalAttributesSpecHandle = ASC->MakeOutgoingSpec(EncounterInfo->VitalAttributes, Level, VitalAttributesContextHandle);
 	ASC->ApplyGameplayEffectSpecToSelf(*VitalAttributesSpecHandle.Data.Get());
 }
 
-void ULeyrAbilitySystemLibrary::GiveEncounterAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, EEncounterName EncounterName)
+void ULeyrAbilitySystemLibrary::GiveEncounterAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, TArray<TSubclassOf<UGameplayAbility>> AbilitiesToGive)
 {
 	UEncounterInfo* EncounterInfo = GetEncounterInfo(WorldContextObject);
 	if(EncounterInfo == nullptr) return;
@@ -185,8 +184,7 @@ void ULeyrAbilitySystemLibrary::GiveEncounterAbilities(const UObject* WorldConte
 		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
 		ASC->GiveAbility(AbilitySpec);
 	}
-	const FEncounterDefaultInfo& DefaultInfo = EncounterInfo->GetEncounterDefaultInfo(EncounterName);
-	for (TSubclassOf<UGameplayAbility> AbilityClass : DefaultInfo.EncounterAbilities)
+	for (TSubclassOf<UGameplayAbility> AbilityClass : AbilitiesToGive)
 	{
 		if (ASC->GetAvatarActor()->Implements<UCombatInterface>())
 		{
