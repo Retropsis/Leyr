@@ -91,7 +91,7 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	TraceForPlatforms();
 	TraceForLedge();
 	TraceForSlope();
-	ForceMove(DeltaSeconds);
+	// ForceMove(DeltaSeconds);
 	InterpCameraAdditiveOffset(DeltaSeconds);
 }
 
@@ -752,14 +752,15 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Swimming);
 		break;
 	case ECombatState::ClimbingRope:
-		AbilitySystemComponent->TryActivateAbilitiesByTag(GameplayTags.Abilities_ClimbingRope.GetSingleTagContainer());
+		AbilitySystemComponent->TryActivateAbilitiesByTag(GameplayTags.Abilities_RootMotion.GetSingleTagContainer());
 		// UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, GameplayTags.Abilities_ClimbingRope, FGameplayEventData{});
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Rope);
 		break;
 	case ECombatState::HoppingLedge:
-		MovementSpeed = ClimbingWalkSpeed;
-		MovementTarget = GetActorLocation() + FVector(GetActorForwardVector().X * 50.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 15.f);
-		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		// MovementSpeed = ClimbingWalkSpeed;
+		// MovementTarget = GetActorLocation() + FVector(GetActorForwardVector().X * 50.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 15.f);
+		// GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		AbilitySystemComponent->TryActivateAbilitiesByTag(GameplayTags.Abilities_RootMotion.GetSingleTagContainer());
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Ledge);
 		break;
 	case ECombatState::Climbing:
@@ -804,6 +805,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		break;
 	}
 	UE_LOG(LogTemp, Warning, TEXT("CombatState: %s"), *UEnum::GetValueAsString(CombatState));
+	UE_LOG(LogTemp, Warning, TEXT("MovementMode: %s"), *UEnum::GetValueAsString(GetCharacterMovement()->MovementMode));
 }
 
 void APlayerCharacter::HandleHangingOnLadder_Implementation(FVector HangingTarget, bool bEndOverlap)

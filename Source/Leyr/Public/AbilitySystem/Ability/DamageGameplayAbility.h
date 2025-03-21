@@ -66,9 +66,6 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly)
 	FVector HitLocation = FVector::ZeroVector;
-
-	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<UPaperZDAnimSequence> SelectedMontage = nullptr;
 	
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UPaperZDAnimSequence> SelectedWeaponMontage = nullptr;

@@ -71,6 +71,9 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UPaperZDAnimInstance> WeaponAnimInstance = nullptr;
+
+	UPROPERTY(BlueprintReadWrite)
+	TObjectPtr<UPaperZDAnimSequence> SelectedMontage = nullptr;
 	
 	UPROPERTY(BlueprintReadOnly)
 	FVector HitImpulse = FVector::ZeroVector;

@@ -168,6 +168,7 @@ FGameplayTag Abilities_Noxious_Bio_1;
  
 FGameplayTag Abilities_ClimbingRope;
 FGameplayTag Abilities_SwimImpulse;
+FGameplayTag Abilities_RootMotion;
 
 FGameplayTag Abilities_Cure_1;
 FGameplayTag Abilities_Cure_2;

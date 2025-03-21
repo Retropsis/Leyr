@@ -163,6 +163,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	
 	GameplayTags.Abilities_ClimbingRope = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.ClimbingRope"), FString("Ability ClimbingRope"));
 	GameplayTags.Abilities_SwimImpulse = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.SwimImpulse"), FString("Ability SwimImpulse"));
+	GameplayTags.Abilities_RootMotion = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.RootMotion"), FString("Ability RootMotion"));
 	
 	GameplayTags.Abilities_Fire_FireBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Fire.FireBolt"), FString("Fire Element Ability FireBolt"));
 	GameplayTags.Abilities_Fire_FireBlast = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Fire.FireBlast"), FString("Fire Element Ability FireBlast"));
