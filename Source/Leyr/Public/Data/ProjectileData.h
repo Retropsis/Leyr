@@ -7,6 +7,14 @@
 #include "Engine/DataAsset.h"
 #include "ProjectileData.generated.h"
 
+UENUM(BlueprintType)
+enum class EResponseToStatic : uint8
+{
+	Ignore,
+	Destroy,
+	Stop,
+};
+
 class UNiagaraSystem;
 class AProjectile;
 /**
@@ -25,7 +33,7 @@ public:
 	FGameplayTag DamageType = FGameplayTag();
 	
 	UPROPERTY(EditDefaultsOnly, Category="Projectile")
-	bool bIgnoreStatic = false;
+	EResponseToStatic ResponseToStatic = EResponseToStatic::Destroy;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Projectile")
 	float ProjectileGravityScale = 0.f;

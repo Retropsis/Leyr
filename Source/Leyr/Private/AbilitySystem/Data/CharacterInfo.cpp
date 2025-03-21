@@ -2,7 +2,7 @@
 
 #include "AbilitySystem/Data/CharacterInfo.h"
 
-FCharacterDefaultInfo UCharacterInfo::GetCharacterDefaultInfo(ECharacterName CharacterName)
+FCharacterDefaultInfo UCharacterInfo::GetCharacterDefaultInfo(FGameplayTag CharacterTag)
 {
-	return CharacterInformation.FindChecked(CharacterName);
+	return CharacterInformation.FindChecked(CharacterTag);
 }

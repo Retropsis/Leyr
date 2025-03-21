@@ -32,6 +32,7 @@
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AbilitySystem/Data/AbilityInfo.h"
 #include "AbilitySystem/Data/CharacterInfo.h"
+#include "Data/AbilitySet.h"
 #include "Data/InventoryCostData.h"
 #include "Game/LeyrGameMode.h"
 #include "Game/LoadMenuSaveGame.h"
@@ -140,7 +141,7 @@ void APlayerCharacter::PossessedBy(AController* NewController)
 	InitializeCharacterInfo();
 	LoadProgress();
 	
-	if (ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this)))
+	if (const ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this)))
 	{
 		LeyrGameMode->LoadWorldState(GetWorld());
 	}
@@ -166,6 +167,7 @@ void APlayerCharacter::InitializeParallaxController()
 	ParallaxController = GetWorld()->SpawnActor<AParallaxController>(AParallaxController::StaticClass(), GetActorLocation(), FRotator::ZeroRotator, SpawnParameters);
 	if(ParallaxController)
 	{
+		//TODO: Here should be pulled from data asset and not hard coded
 		ParallaxController->CurrentMapName = FName("Dorn");
 		ParallaxController->InitializeMapParallax(this);
 		ParallaxController->AttachToComponent(FollowCamera, FAttachmentTransformRules::KeepWorldTransform);
@@ -356,21 +358,28 @@ void APlayerCharacter::InitAbilityActorInfo()
 
 	//TODO: Move this to some other (PlayerState, BeginPlay)
 	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::HitReactTagChanged);
-	if (Invincibility) AbilitySystemComponent->AddLooseGameplayTag(FBaseGameplayTags::Get().Invincibility);
 }
 
 void APlayerCharacter::InitializeCharacterInfo()
 {
 	if(!HasAuthority()) return;
-	//
-	// const ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this));
-	// if (LeyrGameMode == nullptr || EncounterName == EEncounterName::Default) return;
-	//
-	const FCharacterDefaultInfo Info = CharacterInfo->GetCharacterDefaultInfo(CharacterName);
+	
+	const FCharacterDefaultInfo Info = CharacterInfo->GetCharacterDefaultInfo(CharacterTag);
 	ImpactEffect = Info.ImpactEffect;
 	DefeatedSound = Info.DeathSound;
 	HitReactSequence = Info.HitReactSequence;
 	AttackSequenceInfo = Info.AttackSequenceInfo;
+}
+
+void APlayerCharacter::AddCharacterAbilities()
+{
+	if (!HasAuthority()) return;
+	
+	checkf(CharacterInfo, TEXT("CharacterInfo is missing on [%s]"), *GetName());
+	checkf(CharacterInfo->AbilitySet, TEXT("AbilitySet is missing on [%s]"), *CharacterInfo->GetName());
+
+	UBaseAbilitySystemComponent* BaseASC = CastChecked<UBaseAbilitySystemComponent>(AbilitySystemComponent);
+	CharacterInfo->AbilitySet->GiveToAbilitySystem(BaseASC, &GrantedHandles, GetPlayerLevel(), BaseASC);
 }
 
 // TODO: Need a less hardcoded way to do, here we suppose first 3 indices are the 3 combos
@@ -1047,7 +1056,7 @@ void APlayerCharacter::SaveProgress_Implementation(const FName& SavePointTag)
 	}
 }
 
-void APlayerCharacter::LoadProgress() const
+void APlayerCharacter::LoadProgress()
 {
 	if (const ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this)))
 	{
@@ -1057,7 +1066,7 @@ void APlayerCharacter::LoadProgress() const
 		
 		if (SaveData->bFirstTimeLoadIn)
 		{
-			InitializeDefaultAttributes();
+			// InitializeDefaultAttributes(); // Done along AbilitySet->GiveToAbilitySystem
 			AddCharacterAbilities();
 		}
 		else
@@ -1463,6 +1472,13 @@ int32 APlayerCharacter::GetSkillPoints_Implementation() const
  * Combat Interface
  */
 int32 APlayerCharacter::GetCharacterLevel_Implementation()
+{
+	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	return PlayerCharacterState->GetCharacterLevel();
+}
+
+int32 APlayerCharacter::GetPlayerLevel() const
 {
 	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
 	check(PlayerCharacterState);

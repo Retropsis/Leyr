@@ -18,6 +18,19 @@ public:
 	static void InitializeNativeGameplayTags();
  
  /*
+  * Unique States
+  */
+ FGameplayTag Player;
+ FGameplayTag Player_First;
+ FGameplayTag Player_Second;
+ FGameplayTag Invincibility;
+ FGameplayTag Peaceful;
+ FGameplayTag Shackled;
+ FGameplayTag Defeated;
+ FGameplayTag Poise;
+ FGameplayTag Execute;
+ 
+ /*
   * Vital Attributes
  */
  FGameplayTag Attributes_Vital_Health;
@@ -275,16 +288,6 @@ FGameplayTag CombatState_Directional_ForwardDown;
  
  FGameplayTagContainer CombatStates;
  FGameplayTagContainer CombatDirections;
- 
- /*
-  * Unique States
-  */
- FGameplayTag Invincibility;
- FGameplayTag Peaceful;
- FGameplayTag Shackled;
- FGameplayTag Defeated;
- FGameplayTag Poise;
- FGameplayTag Execute;
 
  /*
   * Gameplay Cues

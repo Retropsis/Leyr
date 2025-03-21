@@ -147,53 +147,17 @@ void AAICharacter::PossessedBy(AController* NewController)
 	}
 }
 
-void AAICharacter::InitializeNavigationBounds()
-{
-	const FVector Start = GetActorLocation();
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery2);
-	TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add(this);
-	TArray<AActor*> OutActors;
-	
-	if (BehaviourType == EBehaviourType::Aquatic)
-	{
-		UKismetSystemLibrary::CapsuleOverlapActors(this, Start, GetCapsuleComponent()->GetScaledCapsuleRadius(), GetCapsuleComponent()->GetScaledCapsuleHalfHeight(),
-		ObjectTypes, AWaterGroup::StaticClass(), ActorsToIgnore, OutActors);
-		if (OutActors.Num() > 0)
-		{
-			for (AActor* OverlapActor : OutActors)
-			{
-				if (const AWaterGroup* WaterGroup = Cast<AWaterGroup>(OverlapActor))
-				{
-					NavigationBounds = WaterGroup->GetNavigationBounds();
-				}
-			}
-		}
-	}
-	OutActors.Empty();
-	UKismetSystemLibrary::CapsuleOverlapActors(this, Start, GetCapsuleComponent()->GetScaledCapsuleRadius(), GetCapsuleComponent()->GetScaledCapsuleHalfHeight(),
-	ObjectTypes, ACameraBoundary::StaticClass(), ActorsToIgnore, OutActors);
-	if (OutActors.Num() > 0)
-	{
-		for (AActor* OverlapActor : OutActors)
-		{
-			if (const ACameraBoundary* CameraBoundary = Cast<ACameraBoundary>(OverlapActor))
-			{
-				EnteringBounds = CameraBoundary->GetEnteringBounds(); 
-				if (BehaviourType != EBehaviourType::Aquatic) NavigationBounds = CameraBoundary->GetNavigationBounds();
-			}
-		}
-	}
-}
-
 void AAICharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	checkf(EncounterData, TEXT("CharacterInfo is missing on [%s]"), *GetName());
+	checkf(EncounterData->AbilitySet, TEXT("AbilitySet is missing on [%s]"), *EncounterData->GetName());
+	
 	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 	GetCharacterMovement()->GravityScale = BaseGravityScale;
 	InitAbilityActorInfo();
-	AddAICharacterAbilities();
+	AddCharacterAbilities();
 	
 	if (UBaseUserWidget* BaseUserWidget = Cast<UBaseUserWidget>(HealthBar->GetUserWidgetObject()))
 	{
@@ -251,50 +215,8 @@ void AAICharacter::InitAbilityActorInfo()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
-	InitializeDefaultAttributes();
+	// InitializeDefaultAttributes(); // Done along AbilitySet->GiveToAbilitySystem
 	OnASCRegistered.Broadcast(AbilitySystemComponent);
-}
-
-void AAICharacter::InitializeDefaultAttributes() const
-{
-	if(HasAuthority())
-	{
-		ULeyrAbilitySystemLibrary::InitializeEncounterAttributes(this, Level, AbilitySystemComponent);
-	}
-}
-
-void AAICharacter::AddAICharacterAbilities() const
-{
-	if (HasAuthority() && EncounterData)
-	{
-		ULeyrAbilitySystemLibrary::GiveEncounterAbilities(this, AbilitySystemComponent, EncounterData->Abilities);
-	}
-}
-
-void AAICharacter::HandleBehaviourState(EBehaviourState NewState)
-{
-	BehaviourState = NewState;
-	
-	switch (BehaviourState)
-	{
-	case EBehaviourState::Patrol:
-		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
-		GetCharacterMovement()->MaxFlySpeed = BaseFlySpeed;
-		break;
-	case EBehaviourState::Search:
-		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
-		GetCharacterMovement()->MaxFlySpeed = BaseFlySpeed;
-		break;
-	case EBehaviourState::Chase:
-		GetCharacterMovement()->MaxWalkSpeed = ChasingSpeed;
-		GetCharacterMovement()->MaxFlySpeed = ChasingSpeed;
-		break;
-	case EBehaviourState::Fall:
-		break;
-	case EBehaviourState::Dive:
-		GetCharacterMovement()->MaxFlySpeed = DivingSpeed;
-		break;
-	}
 }
 
 void AAICharacter::InitializeCharacterInfo()
@@ -338,7 +260,79 @@ void AAICharacter::InitializeCharacterInfo()
 		{
 			ImpactEffect = LoadedAsset;
 		}
-	}, FStreamableManager::AsyncLoadHighPriority);
+	}, FStreamableManager::DefaultAsyncLoadPriority);
+}
+
+void AAICharacter::AddCharacterAbilities()
+{	
+	UBaseAbilitySystemComponent* BaseASC = CastChecked<UBaseAbilitySystemComponent>(AbilitySystemComponent);
+	EncounterData->AbilitySet->GiveToAbilitySystem(BaseASC, &GrantedHandles, Level, BaseASC);
+}
+
+void AAICharacter::InitializeNavigationBounds()
+{
+	const FVector Start = GetActorLocation();
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery2);
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	TArray<AActor*> OutActors;
+	
+	if (BehaviourType == EBehaviourType::Aquatic)
+	{
+		UKismetSystemLibrary::CapsuleOverlapActors(this, Start, GetCapsuleComponent()->GetScaledCapsuleRadius(), GetCapsuleComponent()->GetScaledCapsuleHalfHeight(),
+		ObjectTypes, AWaterGroup::StaticClass(), ActorsToIgnore, OutActors);
+		if (OutActors.Num() > 0)
+		{
+			for (AActor* OverlapActor : OutActors)
+			{
+				if (const AWaterGroup* WaterGroup = Cast<AWaterGroup>(OverlapActor))
+				{
+					NavigationBounds = WaterGroup->GetNavigationBounds();
+				}
+			}
+		}
+	}
+	OutActors.Empty();
+	UKismetSystemLibrary::CapsuleOverlapActors(this, Start, GetCapsuleComponent()->GetScaledCapsuleRadius(), GetCapsuleComponent()->GetScaledCapsuleHalfHeight(),
+	ObjectTypes, ACameraBoundary::StaticClass(), ActorsToIgnore, OutActors);
+	if (OutActors.Num() > 0)
+	{
+		for (AActor* OverlapActor : OutActors)
+		{
+			if (const ACameraBoundary* CameraBoundary = Cast<ACameraBoundary>(OverlapActor))
+			{
+				EnteringBounds = CameraBoundary->GetEnteringBounds(); 
+				if (BehaviourType != EBehaviourType::Aquatic) NavigationBounds = CameraBoundary->GetNavigationBounds();
+			}
+		}
+	}
+}
+
+void AAICharacter::HandleBehaviourState(EBehaviourState NewState)
+{
+	BehaviourState = NewState;
+	
+	switch (BehaviourState)
+	{
+	case EBehaviourState::Patrol:
+		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+		GetCharacterMovement()->MaxFlySpeed = BaseFlySpeed;
+		break;
+	case EBehaviourState::Search:
+		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+		GetCharacterMovement()->MaxFlySpeed = BaseFlySpeed;
+		break;
+	case EBehaviourState::Chase:
+		GetCharacterMovement()->MaxWalkSpeed = ChasingSpeed;
+		GetCharacterMovement()->MaxFlySpeed = ChasingSpeed;
+		break;
+	case EBehaviourState::Fall:
+		break;
+	case EBehaviourState::Dive:
+		GetCharacterMovement()->MaxFlySpeed = DivingSpeed;
+		break;
+	}
 }
 
 void AAICharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -759,9 +753,4 @@ bool AAICharacter::IsWithinBounds_Implementation(const FVector& Location)
 		return FVector::Distance(Location, BoundLocations.Left) > Extent.X * 2.f;
 	}
 	return false;
-}
-
-FBoxSphereBounds AAICharacter::GetEnteringBounds_Implementation()
-{
-	return EnteringBounds;
 }

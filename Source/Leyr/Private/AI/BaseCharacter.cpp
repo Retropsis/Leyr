@@ -5,7 +5,6 @@
 #include "GameplayEffectTypes.h"
 #include "PaperFlipbookComponent.h"
 #include "PaperZDAnimInstance.h"
-#include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AbilitySystem/Data/AttackSequenceInfo.h"
 #include "AbilitySystem/Effect/StatusEffectNiagaraComponent.h"
@@ -66,13 +65,6 @@ ABaseCharacter::ABaseCharacter()
 /*
  * Ability System
  */
-void ABaseCharacter::InitializeDefaultAttributes() const
-{
-	ApplyEffectToSelf(DefaultPrimaryAttributes, 1.f);
-	ApplyEffectToSelf(DefaultSecondaryAttributes, 1.f);
-	ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
-}
-
 void ABaseCharacter::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, const float Level) const
 {
 	check(IsValid(GetAbilitySystemComponent()));
@@ -81,17 +73,6 @@ void ABaseCharacter::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& Gamep
 	ContextHandle.AddSourceObject(this);
 	const FGameplayEffectSpecHandle SpecHandle = GetAbilitySystemComponent()->MakeOutgoingSpec(GameplayEffectClass, Level, ContextHandle);
 	GetAbilitySystemComponent()->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), GetAbilitySystemComponent());
-}
-
-void ABaseCharacter::AddCharacterAbilities() const
-{
-	UBaseAbilitySystemComponent* BaseASC = CastChecked<UBaseAbilitySystemComponent>(AbilitySystemComponent);
-	if (!HasAuthority()) return;
-
-	BaseASC->AddCharacterAbilities(StartupAbilities);
-	BaseASC->AddCharacterPassiveAbilities(StartupPassiveAbilities);
-	BaseASC->AddCharacterCommonAbilities(CommonAbilities);
-	// ULeyrAbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent, CharacterClass);
 }
 
 void ABaseCharacter::MakeAndApplyEffectToSelf(const FGameplayTag Tag, float Level) const

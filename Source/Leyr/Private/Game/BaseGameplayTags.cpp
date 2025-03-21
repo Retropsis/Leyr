@@ -8,6 +8,19 @@ FBaseGameplayTags FBaseGameplayTags::GameplayTags;
 void FBaseGameplayTags::InitializeNativeGameplayTags()
 {
 	/*
+	 * Unique States
+	 */
+	GameplayTags.Player = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Player"), FString("Player"));
+	GameplayTags.Player_First = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Player.First"), FString("Player First"));
+	GameplayTags.Player_Second = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Player.Second"), FString("Player Second"));
+	GameplayTags.Invincibility = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Invincibility"), FString("Invincibility"));
+	GameplayTags.Shackled = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Shackled"), FString("Shackled"));
+	GameplayTags.Defeated = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Defeated"), FString("Defeated"));
+	GameplayTags.Peaceful = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Peaceful"), FString("Peaceful"));
+	GameplayTags.Poise = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Poise"), FString("Poise"));
+	GameplayTags.Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Execute"), FString("Execute"));
+	
+	/*
 	 * Vital Attributes
 	*/
 	GameplayTags.Attributes_Vital_Health = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Attributes.Vital.Health"), FString("Attributes Vital Health"));
@@ -321,16 +334,6 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatDirections.AddTag(GameplayTags.CombatState_Directional_Forward);
 	GameplayTags.CombatDirections.AddTag(GameplayTags.CombatState_Directional_ForwardUp);
 	GameplayTags.CombatDirections.AddTag(GameplayTags.CombatState_Directional_ForwardDown);
-
-	/*
-	 * Unique States
-	 */
-	GameplayTags.Invincibility = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Invincibility"), FString("Invincibility"));
-	GameplayTags.Shackled = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Shackled"), FString("Shackled"));
-	GameplayTags.Defeated = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Defeated"), FString("Defeated"));
-	GameplayTags.Peaceful = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Peaceful"), FString("Peaceful"));
-	GameplayTags.Poise = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Poise"), FString("Poise"));
-	GameplayTags.Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Execute"), FString("Execute"));
 	
 	/*
 	 * Gameplay Cues

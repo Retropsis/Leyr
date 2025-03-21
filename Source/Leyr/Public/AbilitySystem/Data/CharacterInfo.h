@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
 #include "CharacterInfo.generated.h"
 
+class UAbilitySet;
 class UAttackSequenceInfo;
 class UPaperZDAnimSequence;
 class UNiagaraSystem;
@@ -15,14 +17,6 @@ class UGameplayEffect;
 /**
  * 
 */
-
-UENUM(BlueprintType)
-enum class ECharacterName : uint8
-{
-	FirstCharacter,
-	SecondCharacter,
-};
-
 USTRUCT(BlueprintType)
 struct FCharacterDefaultInfo
 {
@@ -46,18 +40,12 @@ class LEYR_API UCharacterInfo : public UDataAsset
 {
 	GENERATED_BODY()
 
-public:
-	UPROPERTY(EditDefaultsOnly, Category = "Character Defaults")
-	TMap<ECharacterName, FCharacterDefaultInfo> CharacterInformation;
+public:	
+	UPROPERTY(EditDefaultsOnly, Category = "Character Defaults", meta=(TitleProperty=Key, Categories=Player))
+	TMap<FGameplayTag, FCharacterDefaultInfo> CharacterInformation;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Character Defaults")
-	TSubclassOf<UGameplayEffect> SecondaryAttributes;
+	TObjectPtr<UAbilitySet> AbilitySet;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Character Defaults")
-	TSubclassOf<UGameplayEffect> VitalAttributes;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Character Defaults")
-	TArray<TSubclassOf<UGameplayAbility>> CommonAbilities;
-
-	FCharacterDefaultInfo GetCharacterDefaultInfo(ECharacterName CharacterName);
+	FCharacterDefaultInfo GetCharacterDefaultInfo(FGameplayTag CharacterTag);
 };

@@ -8,6 +8,7 @@
 #include "GameplayTagContainer.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "Interaction/BaseUserWidgetInterface.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Player/Input/BaseInputComponent.h"
 #include "UI/Controller/InventoryWidgetController.h"
 #include "UI/Widget/BaseUserWidget.h"
@@ -185,7 +186,7 @@ void APlayerCharacterController::ClientShowDamageNumber_Implementation(const FUI
 		DamageText->AttachToComponent(MessageData.TargetActor->GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 		DamageText->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 		FVector Root = MessageData.TargetActor->GetActorLocation();
-		DamageText->SetRelativeLocation(FVector{ FMath::RandRange(Root.X - 50.f, Root.X + 50.f), 0.f,  FMath::RandRange(Root.Z - 50.f, Root.Z + 50.f) });
+		DamageText->SetRelativeLocation(FVector{ FMath::RandRange(Root.X - 50.f, Root.X + 50.f), 50.f,  FMath::RandRange(Root.Z - 50.f, Root.Z + 50.f) });
 		DamageText->SetDamageText(MessageData);
 	}
 }

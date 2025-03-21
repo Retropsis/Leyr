@@ -7,7 +7,6 @@
 
 void AEncounterSpawnPoint::SpawnEncounter()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Red, "Respawning");
 	if (EncounterData->EncounterClass)
 	{
 		UAssetManager::GetStreamableManager().RequestAsyncLoad(EncounterData->EncounterClass.ToSoftObjectPath(), [this] ()

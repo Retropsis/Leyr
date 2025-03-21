@@ -6,6 +6,7 @@
 #include "PaperCharacter.h"
 #include "PaperZD/Public/PaperZDAnimationComponent.h"
 #include "AbilitySystemInterface.h"
+#include "Data/AbilitySet.h"
 #include "Interaction/CombatInterface.h"
 #include "Leyr/Leyr.h"
 #include "BaseCharacter.generated.h"
@@ -43,28 +44,22 @@ protected:
 	 * Ability System
 	 */
 	virtual void InitAbilityActorInfo() {}
-	virtual void InitializeDefaultAttributes() const;
-	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, float Level) const;
-	void AddCharacterAbilities() const;
+	virtual void AddCharacterAbilities() {}
+	virtual void InitializeDefaultAttributes() const {}
+	virtual void InitializeCharacterInfo() {}
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) {}
+	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, float Level) const;
 	void MakeAndApplyEffectToSelf(const FGameplayTag Tag, float Level = 1.f) const;
 	
 	FOnASCRegistered OnASCRegistered;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Character|Attributes")
-	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes;
-	
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Character|Attributes")
-	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes;
-
-	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category="Character|Attributes")
-	TSubclassOf<UGameplayEffect> DefaultVitalAttributes;
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
+
+	FAbilitySet_GrantedHandles GrantedHandles;
 
 	/*
 	 * Attacking
@@ -90,7 +85,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	FName WeaponSocketName;
 	
-	TEnumAsByte<EObjectTypeQuery> TraceObjectType = EObjectTypeQuery::ObjectTypeQuery3;
+	TEnumAsByte<EObjectTypeQuery> TraceObjectType = ObjectTypeQuery3;
 
 	/*
 	 * Movement
@@ -172,8 +167,6 @@ protected:
 	/*
 	 * Data Asset
 	 */
-	virtual void InitializeCharacterInfo() {}
-
 	UPROPERTY() TObjectPtr<UNiagaraSystem> ImpactEffect;
 	UPROPERTY() TObjectPtr<USoundBase> ImpactSoundLoaded;
 	UPROPERTY() TSoftObjectPtr<USoundBase> DefeatedSound;
@@ -196,14 +189,4 @@ protected:
 	 */ 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStatusEffectNiagaraComponent> BurnStatusEffectComponent;
-	
-private:	
-	UPROPERTY(EditAnywhere, Category="Character|Abilities")
-	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities;
-	
-	UPROPERTY(EditAnywhere, Category = "Character|Abilities")
-	TArray<TSubclassOf<UGameplayAbility>> StartupPassiveAbilities;
-	
-	UPROPERTY(EditAnywhere, Category = "Character|Abilities")
-	TArray<TSubclassOf<UGameplayAbility>> CommonAbilities;
 };

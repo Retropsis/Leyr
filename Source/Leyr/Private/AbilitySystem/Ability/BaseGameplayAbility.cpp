@@ -72,6 +72,7 @@ void UBaseGameplayAbility::InitAbility()
 	{
 		GetAbilitySystemComponentFromActorInfo()->AddLooseGameplayTag(FBaseGameplayTags::Get().Poise);
 		bPoiseWasApplied = true;
+		GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Magenta, FString::Printf(TEXT("%s has applied poised with : %f"), *GetAvatarActorFromActorInfo()->GetName(), EffectivePoiseChance));
 	}
 }
 
@@ -202,4 +203,16 @@ float UBaseGameplayAbility::GetCooldown(float InLevel) const
 		CooldownEffect->DurationMagnitude.GetStaticMagnitudeIfPossible(InLevel, Cooldown);
 	}
 	return Cooldown;
+}
+
+void UBaseGameplayAbility::SetAbilityData(UAbilityData* Data)
+{
+	if (IsValid(Data))
+	{
+		AbilityData = Data;
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Attempted to set a nullptr Data in [%s]"), *GetNameSafe(this))
+	}
 }

@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "AI/BaseCharacter.h"
 #include "AIData.h"
-#include "AbilitySystem/Data/EncounterInfo.h"
 #include "Interaction/AIInterface.h"
 #include "Interaction/EnemyInterface.h"
 #include "UI/Controller/OverlayWidgetController.h"
@@ -14,7 +13,6 @@
 class UEncounterData;
 class AArena;
 class ANavMeshBoundsVolume;
-enum class EEncounterName : uint8;
 enum class EBehaviourType : uint8;
 class ASplineComponentActor;
 class ASplineMeshActor;
@@ -34,9 +32,9 @@ class LEYR_API AAICharacter : public ABaseCharacter, public IEnemyInterface, pub
 public:
 	AAICharacter();
 	virtual void Tick(float DeltaSeconds) override;
-	void InitializeNavigationBounds();
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
+	void InitializeNavigationBounds();
 	void HandleBehaviourState(EBehaviourState NewState);
 	void HandlePlayerOverlappingArena(AActor* Player, bool bIsEntering);
 
@@ -75,7 +73,8 @@ public:
 	FBoundLocations CalculateBoundsAtActorZ() const;
 	virtual FBoundLocations GetArenaBounds_Implementation() override;
 	virtual bool IsWithinBounds_Implementation(const FVector& Location) override;
-	virtual FBoxSphereBounds GetEnteringBounds_Implementation() override;
+	virtual FBoxSphereBounds GetEnteringBounds_Implementation() override { return EnteringBounds; }
+	virtual FBoxSphereBounds GetNavigationBounds_Implementation() override { return NavigationBounds; }
 	virtual bool IsTargetWithinEnteringBounds_Implementation(const FVector& Location) override;
 	/** end AI Interface */
 	
@@ -131,9 +130,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;
-	virtual void InitializeDefaultAttributes() const override;
+	virtual void InitializeDefaultAttributes() const override {}
 	virtual void InitializeCharacterInfo() override;
-	void AddAICharacterAbilities() const;
+	virtual void AddCharacterAbilities() override;
 	
 	UFUNCTION(BlueprintCallable)
 	void CauseDamage(AActor* TargetActor);
@@ -143,10 +142,7 @@ protected:
 	
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Encounter Defaults")
-	EEncounterName EncounterName = EEncounterName::Default;
-	
+		
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Encounter Defaults")
 	int32 Level = 1;
 	

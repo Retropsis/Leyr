@@ -37,6 +37,7 @@ ACameraBoundary::ACameraBoundary()
 	BoundaryVisualizer->SetupAttachment(GetRootComponent());
 	BoundaryVisualizer->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	BoundaryVisualizer->SetHiddenInGame(true);
+	BoundaryVisualizer->bCastDynamicShadow = false;
 }
 
 void ACameraBoundary::BeginPlay()
@@ -64,6 +65,7 @@ void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>())
 	{
 		HandleOnBeginOverlap(OtherActor);
+		GEngine->AddOnScreenDebugMessage(98798778, 8.f, FColor::Magenta, FString::Printf(TEXT("Entering: %s"), *GetName()));
 	}
 }
 

@@ -48,6 +48,7 @@ public:
 	static FString GetLockedDescription(int32 Level);
 
 	UGameplayCueDefinition* GetGameplayCueDefinition() const { return GameplayCueDefinition; }
+	void SetAbilityData(UAbilityData* Data);
 
 protected:
 	UFUNCTION(BlueprintCallable)

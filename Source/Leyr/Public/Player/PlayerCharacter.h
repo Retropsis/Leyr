@@ -110,6 +110,8 @@ public:
 	virtual float GetOverridePitch_Implementation() override { return OverridePitch; }
 	/** end Combat Interface */
 	
+	int32 GetPlayerLevel() const;
+	
 	/** Inventory Interface */
 	virtual UInventoryComponent* GetInventoryComponent_Implementation() override { return PlayerInventory; }
 	/** end Inventory Interface */
@@ -170,25 +172,23 @@ public:
 
 	virtual void SaveProgress_Implementation(const FName& SavePointTag) override;
 	/** end Player Interface */
-	void LoadProgress() const;
+	void LoadProgress();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UNiagaraComponent> LevelUpNiagaraComponent;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Debug")
-	bool Invincibility = false;
 
 protected:
 	virtual void InitAbilityActorInfo() override;
 	virtual void InitializeCharacterInfo() override;
+	virtual void AddCharacterAbilities() override;
 	void HandleCombatState(ECombatState NewState);
 	void HandleHangingOnLedge(const FVector& HangingTarget);
 	void InitializeCameraBoundary();
 	void ClampToCameraBounds(FVector& PreferredCameraLocation) const;
 	virtual void BeginPlay() override;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Player")
-	ECharacterName CharacterName = ECharacterName::FirstCharacter;
+	UPROPERTY(EditDefaultsOnly, Category="Player", meta=(Categories=Player))
+	FGameplayTag CharacterTag = FGameplayTag();
 	
 	UPROPERTY(EditDefaultsOnly, Category="Player")
 	TObjectPtr<UCharacterInfo> CharacterInfo = nullptr;

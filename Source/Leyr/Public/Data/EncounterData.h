@@ -10,6 +10,7 @@
 #include "EncounterData.generated.h"
 
 enum class ECharacterClass : uint8;
+class UAbilitySet;
 class AAICharacter;
 class UPaperZDAnimSequence;
 class UNiagaraSystem;
@@ -26,18 +27,12 @@ class LEYR_API UEncounterData : public UDataAsset
 public:
 	UPROPERTY(EditDefaultsOnly)
 	TSoftClassPtr<AAICharacter> EncounterClass = nullptr;
-		
-	UPROPERTY(EditDefaultsOnly, Category="Attributes")
-	TSubclassOf<UGameplayEffect> PrimaryAttributes;
-
-	UPROPERTY(EditDefaultsOnly, Category="Attributes")
-	TSubclassOf<UGameplayEffect> SecondaryAttributes;
-
-	UPROPERTY(EditDefaultsOnly, Category="Attributes")
-	TSubclassOf<UGameplayEffect> VitalAttributes;
 
 	UPROPERTY(EditDefaultsOnly)
-	TArray<TSubclassOf<UGameplayAbility>> Abilities;
+	TObjectPtr<UAbilitySet> AbilitySet;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UBehaviourData> BehaviourData = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly) // Encounter Size for Max Health and other purposes ?
 	EEncounterSize EncounterSize = EEncounterSize::Default;
@@ -47,9 +42,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	FScalableFloat XPReward = FScalableFloat();
-
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UBehaviourData> BehaviourData = nullptr;
 
 	UPROPERTY(EditDefaultsOnly)
 	FGameplayTag WeaponSocketTag = FGameplayTag();

@@ -34,7 +34,6 @@ void UProjectileAbility::SpawnProjectile(const FGameplayTag& SocketTag, bool bHa
 
 	const FVector SocketLocation = ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), SocketTag);
 	FRotator Rotation = bHasTarget ? UKismetMathLibrary::FindLookAtRotation(SocketLocation, ProjectileTargetLocation) : GetAvatarActorFromActorInfo()->GetActorForwardVector().Rotation();
-	UKismetSystemLibrary::DrawDebugArrow(this, SocketLocation, SocketLocation + Rotation.Vector() * 100.f, 5.f, FLinearColor::Green, 5.f);
 	// FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
 	if (bOverridePitch)
 	{
@@ -43,7 +42,6 @@ void UProjectileAbility::SpawnProjectile(const FGameplayTag& SocketTag, bool bHa
 
 	FTransform SpawnTransform;
 	SpawnTransform.SetLocation(SocketLocation);
-	UKismetSystemLibrary::DrawDebugSphere(this, SocketLocation, 5.f, 5.f, FLinearColor::Green, 5.f);
 	SpawnTransform.SetRotation(Rotation.Quaternion());
 	
 	if(AbilityData->ProjectileData)
@@ -57,7 +55,8 @@ void UProjectileAbility::SpawnProjectile(const FGameplayTag& SocketTag, bool bHa
 	
 		Projectile->AdditionalEffectParams = MakeAdditionalEffectParamsFromClassDefaults();
 		Projectile->AdditionalEffectParams.DamageType = AbilityData->ProjectileData->DamageType;
-		Projectile->Sphere->SetCollisionResponseToChannel(ECC_WorldStatic, AbilityData->ProjectileData->bIgnoreStatic ? ECR_Ignore : ECR_Overlap);
+		Projectile->Sphere->SetCollisionResponseToChannel(ECC_WorldStatic, AbilityData->ProjectileData->ResponseToStatic == EResponseToStatic::Ignore ? ECR_Ignore : ECR_Overlap);
+		Projectile->ResponseToStatic = AbilityData->ProjectileData->ResponseToStatic;
 		Projectile->ProjectileMovement->ProjectileGravityScale = AbilityData->ProjectileData->ProjectileGravityScale;
 		Projectile->ProjectileMovement->InitialSpeed = AbilityData->ProjectileData->InitialSpeed;
 		Projectile->ProjectileMovement->MaxSpeed = AbilityData->ProjectileData->MaxSpeed;

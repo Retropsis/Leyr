@@ -64,10 +64,18 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 
 	if (OtherComp && OtherComp->GetCollisionObjectType() == ECC_WorldStatic)
 	{
-		ProjectileMovement->StopMovementImmediately();
-		Sphere->OnComponentBeginOverlap.Clear();
-		SetLifeSpan(5.f);
-		return;
+		if (ResponseToStatic == EResponseToStatic::Destroy)
+		{
+			Destroy();
+			return;
+		}
+		if (ResponseToStatic == EResponseToStatic::Stop)
+		{
+			ProjectileMovement->StopMovementImmediately();
+			Sphere->OnComponentBeginOverlap.Clear();
+			SetLifeSpan(5.f);
+			return;
+		}
 	}
 	
 	if (!ULeyrAbilitySystemLibrary::IsHostile(SourceAvatarActor, OtherActor)) return;

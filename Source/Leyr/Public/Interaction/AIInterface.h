@@ -70,6 +70,9 @@ public:
 	FBoxSphereBounds GetEnteringBounds();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FBoxSphereBounds GetNavigationBounds();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool IsWithinBounds(const FVector& Location);
 
 	/*

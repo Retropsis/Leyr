@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilityTypes.h"
+#include "Data/ProjectileData.h"
 #include "GameFramework/Actor.h"
 #include "Projectile.generated.h"
 
@@ -21,6 +22,7 @@ public:
 	void SetImpactEffect(UNiagaraSystem* Effect) { ImpactEffect = Effect; }
 	void SetImpactSound(USoundBase* Sound) { ImpactSound = Sound; }
 	void SetLoopingSound(USoundBase* Sound) { LoopingSound = Sound; }
+	EResponseToStatic ResponseToStatic = EResponseToStatic::Destroy;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;

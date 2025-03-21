@@ -29,6 +29,7 @@ AArena::AArena()
 	LeavingBoundaryVisualizer->SetupAttachment(GetRootComponent());
 	LeavingBoundaryVisualizer->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	LeavingBoundaryVisualizer->SetHiddenInGame(true);
+	LeavingBoundaryVisualizer->bCastDynamicShadow = false;
 
 	BoundaryRule = EBoundaryRule::Arena;
 }
