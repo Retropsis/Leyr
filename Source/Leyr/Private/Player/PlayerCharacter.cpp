@@ -91,24 +91,7 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	TraceForPlatforms();
 	TraceForLedge();
 	TraceForSlope();
-	// ForceMove(DeltaSeconds);
 	InterpCameraAdditiveOffset(DeltaSeconds);
-}
-
-void APlayerCharacter::ForceMove(float DeltaSeconds)
-{
-	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-	if(CombatState == ECombatState::HoppingLedge)
-	{
-		SetActorLocation(FMath::VInterpTo(GetActorLocation(), MovementTarget, DeltaSeconds, 8.f));
-		// UKismetSystemLibrary::DrawDebugSphere(this, GetActorLocation(), 5.f, 12, FLinearColor::White, 5.f);
-		// UKismetSystemLibrary::DrawDebugSphere(this, MovementTarget, 20.f, 12, FLinearColor::Green, 5.f);
-		if (FMath::IsNearlyZero(UKismetMathLibrary::Vector_Distance(GetActorLocation(), MovementTarget), 20.f))
-		{
-			HandleCombatState(ECombatState::Unoccupied);
-			GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(GameplayTags.CombatDirections);
-		}
-	}
 }
 
 void APlayerCharacter::HandleCharacterMovementUpdated(float DeltaSeconds, FVector OldLocation, FVector OldVelocity)
@@ -753,13 +736,9 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		break;
 	case ECombatState::ClimbingRope:
 		AbilitySystemComponent->TryActivateAbilitiesByTag(GameplayTags.Abilities_RootMotion.GetSingleTagContainer());
-		// UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, GameplayTags.Abilities_ClimbingRope, FGameplayEventData{});
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Rope);
 		break;
 	case ECombatState::HoppingLedge:
-		// MovementSpeed = ClimbingWalkSpeed;
-		// MovementTarget = GetActorLocation() + FVector(GetActorForwardVector().X * 50.f, 0.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + 15.f);
-		// GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		AbilitySystemComponent->TryActivateAbilitiesByTag(GameplayTags.Abilities_RootMotion.GetSingleTagContainer());
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Ledge);
 		break;

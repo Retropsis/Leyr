@@ -164,15 +164,17 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_ClimbingRope = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.ClimbingRope"), FString("Ability ClimbingRope"));
 	GameplayTags.Abilities_SwimImpulse = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.SwimImpulse"), FString("Ability SwimImpulse"));
 	GameplayTags.Abilities_RootMotion = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.RootMotion"), FString("Ability RootMotion"));
+	GameplayTags.Abilities_Leap = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Leap"), FString("Ability Leap"));
 	
 	GameplayTags.Abilities_Fire_FireBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Fire.FireBolt"), FString("Fire Element Ability FireBolt"));
 	GameplayTags.Abilities_Fire_FireBlast = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Fire.FireBlast"), FString("Fire Element Ability FireBlast"));
-	GameplayTags.Abilities_Fire_FlameThrower = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Fire.FlameThrower"), FString("Fire Element Ability FlameThrower"));
+	GameplayTags.Abilities_Fire_FireBreath = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Fire.FireBreath"), FString("Fire Element Ability FireBreath"));
 	GameplayTags.Abilities_Lightning_Electrocute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Lightning.Electrocute"), FString("Lightning Element Electrocute Ability"));
 	GameplayTags.Abilities_Lightning_Bolt_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Lightning.Bolt.1"), FString("Abilities Lightning Bolt 1"));
 	GameplayTags.Abilities_Noxious_Bio_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Noxious.Bio.1"), FString("Abilities Noxious Bio 1"));
 	GameplayTags.Abilities_Cosmos_Meteor_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Cosmos.Meteor.1"), FString("Abilities Cosmos Meteor 1"));
 	GameplayTags.Abilities_Arcane_ArcaneShards = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Arcane.ArcaneShards"), FString("Arcane Element Shards Ability"));
+	GameplayTags.Abilities_Sorcery = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Sorcery"), FString("Sorcery Ability"));
 
 	GameplayTags.Abilities_Cure_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Cure.1"), FString("Abilities Cure 1"));
 	GameplayTags.Abilities_Cure_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Cure.2"), FString("Abilities Cure 2"));

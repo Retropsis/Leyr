@@ -43,7 +43,6 @@ public:
 	
 	void Move(const FVector2D MovementVector);
 	void Pitch(float InPitch);
-	void ForceMove(float DeltaSeconds);
 	void RotateController() const;
 	bool TryDescendLadder();
 	void HandleCrouching(bool bShouldCrouch);

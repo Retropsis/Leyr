@@ -33,6 +33,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UBehaviourData> BehaviourData = nullptr;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool bShouldDespawn = true;
 	
 	UPROPERTY(EditDefaultsOnly) // Encounter Size for Max Health and other purposes ?
 	EEncounterSize EncounterSize = EEncounterSize::Default;

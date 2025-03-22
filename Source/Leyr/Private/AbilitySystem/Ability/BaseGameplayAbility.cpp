@@ -136,7 +136,7 @@ void UBaseGameplayAbility::SetGCDImpactSound(UObject* Object) const
 
 TSoftObjectPtr<USoundBase> UBaseGameplayAbility::GetImpactSoundAsset() const
 {
-	if (GetAvatarActorFromActorInfo()->Implements<UCombatInterface>())
+	if (GetAvatarActorFromActorInfo() && GetAvatarActorFromActorInfo()->Implements<UCombatInterface>())
 	{
 		return ICombatInterface::Execute_ImpactSoundFromTag(GetAvatarActorFromActorInfo(), MontageTag, SequenceType);
 	}

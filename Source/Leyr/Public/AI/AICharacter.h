@@ -76,6 +76,7 @@ public:
 	virtual FBoxSphereBounds GetEnteringBounds_Implementation() override { return EnteringBounds; }
 	virtual FBoxSphereBounds GetNavigationBounds_Implementation() override { return NavigationBounds; }
 	virtual bool IsTargetWithinEnteringBounds_Implementation(const FVector& Location) override;
+	virtual bool ShouldDespawn_Implementation() override { return bShouldDespawn; }
 	/** end AI Interface */
 	
 	bool IsTargetWithinEnteringBounds(const FVector& TargetLocation) const;
@@ -189,6 +190,7 @@ protected:
 	//~ Bounds
 	FBoxSphereBounds EnteringBounds{};
 	FBoxSphereBounds NavigationBounds{};
+	bool bShouldDespawn = false;
 
 private:
 	void ShouldAttack(bool InShouldAttack);

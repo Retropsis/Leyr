@@ -226,6 +226,7 @@ void AAICharacter::InitializeCharacterInfo()
 	checkf(EncounterData, TEXT("Please add EncounterData to %s"), *GetName());
 	checkf(EncounterData->BehaviourData, TEXT("Please add DefaultBehaviourData to %s"), *EncounterData->GetName());
 	
+	bShouldDespawn = EncounterData->bShouldDespawn;
 	EncounterSize = EncounterData->EncounterSize;
 	CharacterClass = EncounterData->CharacterClass;
 	WeaponSocketName = EncounterData->WeaponSocketTag.GetTagName();
@@ -494,7 +495,6 @@ bool AAICharacter::IsTargetWithinNavigationBounds(const FVector& TargetLocation)
 	const float Right = NavigationBounds.Origin.X + NavigationBounds.BoxExtent.X;
 	const float Top = NavigationBounds.Origin.Z + NavigationBounds.BoxExtent.Z;
 	const float Bottom = NavigationBounds.Origin.Z - NavigationBounds.BoxExtent.Z;	
-	UKismetSystemLibrary::DrawDebugBox(this, NavigationBounds.Origin, NavigationBounds.BoxExtent, FLinearColor::White, FRotator::ZeroRotator, 5.f);
 	return FMath::IsWithin(TargetLocation.X, Left, Right) && FMath::IsWithin(TargetLocation.Z, Bottom, Top);
 }
 

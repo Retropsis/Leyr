@@ -74,6 +74,9 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool IsWithinBounds(const FVector& Location);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool ShouldDespawn();
 
 	/*
 	 * Behaviour Tasks

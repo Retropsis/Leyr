@@ -4,6 +4,8 @@
 #include "Components/BoxComponent.h"
 #include "Interaction/PlayerInterface.h"
 #include "PaperTileMapComponent.h"
+#include "AI/AICharacter.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "World/Data/CameraData.h"
 
 ACameraBoundary::ACameraBoundary()
@@ -65,15 +67,27 @@ void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>())
 	{
 		HandleOnBeginOverlap(OtherActor);
-		GEngine->AddOnScreenDebugMessage(98798778, 8.f, FColor::Magenta, FString::Printf(TEXT("Entering: %s"), *GetName()));
 	}
 }
 
 void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if(OtherActor && OtherActor->Implements<UPlayerInterface>())
+	if(OtherActor && OtherActor->Implements<UPlayerInterface>() && OtherActor->Implements<UCombatInterface>() && ICombatInterface::Execute_GetDefeatState(OtherActor) == EDefeatState::None)
 	{
 		OnPlayerLeaving.Broadcast();
+
+		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+		ObjectTypes.Add(EOT_EnemyCapsule);
+		TArray<AActor*> ActorsToIgnore;
+		TArray<AActor*> OutActors;
+		UKismetSystemLibrary::BoxOverlapActors(this, GetActorLocation(), EnteringBoundary->GetScaledBoxExtent(), ObjectTypes, AAICharacter::StaticClass(), ActorsToIgnore, OutActors);
+		for (AActor* OverlapActor : OutActors)
+		{
+			if (IsValid(OverlapActor) && OverlapActor->Implements<UAIInterface>() && IAIInterface::Execute_ShouldDespawn(OverlapActor))
+			{
+				OverlapActor->Destroy();
+			}
+		}
 	}
 }
 

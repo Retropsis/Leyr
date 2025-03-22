@@ -49,8 +49,8 @@ void AEncounterSpawnPoint::DespawnEncounter()
 	if (IsValid(CurrentSpawn))
 	{
 		CurrentSpawn->Destroy();
-		CurrentSpawn = nullptr;
 	}
+	CurrentSpawn = nullptr;
 	GetWorldTimerManager().ClearTimer(RespawnTimer);
 	RespawnTimer.Invalidate();
 }

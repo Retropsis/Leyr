@@ -180,9 +180,11 @@ void UDamageGameplayAbility::ExecuteDamageGameplayCue(FGameplayTag GameplayCueTa
 	GameplayCueParameters.EffectCauser = GetAvatarActorFromActorInfo();
 	GameplayCueParameters.SourceObject = GameplayCueDefinition;
 	GameplayCueParameters.AggregatedSourceTags = MontageTag.GetSingleTagContainer();
-	
-	UAbilitySystemComponent* const AbilitySystemComponent = GetAbilitySystemComponentFromActorInfo_Checked();
-	AbilitySystemComponent->ExecuteGameplayCue(GameplayCueTag, GameplayCueParameters);
+
+	if (UAbilitySystemComponent* const AbilitySystemComponent = GetAbilitySystemComponentFromActorInfo())
+	{
+		AbilitySystemComponent->ExecuteGameplayCue(GameplayCueTag, GameplayCueParameters);
+	}
 }
 
 FAdditionalEffectParams UDamageGameplayAbility::MakeAdditionalEffectParamsFromClassDefaults(AActor* TargetActor) const
