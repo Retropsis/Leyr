@@ -61,6 +61,8 @@ public:
 	virtual bool RequestJump_Implementation() override;
 	virtual bool ChaseTarget_Implementation(AActor* TargetToChase) override;
 	virtual bool ChaseTargetWithinWater_Implementation(AActor* TargetToChase) override;
+	virtual void SetupFlyAroundTarget_Implementation(FVector TargetLocation, float Radius = 225.f) override;
+	virtual void FlyAroundTarget_Implementation() override;
 	virtual void SineMove_Implementation() override;
 	virtual void FaceTarget_Implementation() override;
 	virtual bool FollowSpline_Implementation(int32 SplineIndex) override;
@@ -163,6 +165,11 @@ protected:
 	EBehaviourState BehaviourState = EBehaviourState::Patrol;
 	EChasingState ChasingState = EChasingState::Chasing;
 	bool bShouldAttack = true;
+
+	// Fly Around Target
+	FVector FlyAroundTargetLocation = FVector::ZeroVector;
+	float FlyAroundRadius = 0.f;
+	float FlyAroundDeltaTimeStart = 0.f;
 	
 	/*
 	 * AI Data

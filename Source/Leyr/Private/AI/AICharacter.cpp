@@ -501,19 +501,28 @@ bool AAICharacter::IsTargetWithinNavigationBounds(const FVector& TargetLocation)
 bool AAICharacter::ChaseTarget_Implementation(AActor* TargetToChase)
 {
 	if (!IsValid(TargetToChase)) return true;
+
+	const float IdealRange = (AttackRange + CloseRange) / 2.f;
+	const float Side = FMath::Sign(GetActorLocation().X - TargetToChase->GetActorLocation().X);
 	
 	if (GetDistanceTo(TargetToChase) > AttackRange)
 	{
-		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetToChase->GetActorLocation().X, 0.f, TargetToChase->GetActorLocation().Z + ChasingHeightOffset));
+		const FVector PreferredLocation = TargetToChase->GetActorLocation() + FVector{ Side * FMath::Sqrt(IdealRange * IdealRange - ChasingHeightOffset * ChasingHeightOffset), 0.f, ChasingHeightOffset };
+		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), PreferredLocation);
+		UKismetSystemLibrary::DrawDebugSphere(this, PreferredLocation, 5.f, 12, FLinearColor::Green, 1.f);
+		
 		AddMovementInput(LookAtRotation.Vector(), 1.f, true);
-		if(FVector::DotProduct(LookAtRotation.Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
+		if(FVector::DotProduct( UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetToChase->GetActorLocation()).Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
 		return false;
 	}
 	if (GetDistanceTo(TargetToChase) < CloseRange)
 	{
-		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetToChase->GetActorLocation().X, 0.f, TargetToChase->GetActorLocation().Z + ChasingHeightOffset));
-		AddMovementInput(LookAtRotation.Vector(), -.33f, true);
-		if(FVector::DotProduct(LookAtRotation.Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
+		const FVector PreferredLocation = TargetToChase->GetActorLocation() + FVector{ Side * FMath::Sqrt(IdealRange * IdealRange - ChasingHeightOffset * ChasingHeightOffset), 0.f, ChasingHeightOffset };
+		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), PreferredLocation);
+		UKismetSystemLibrary::DrawDebugSphere(this, PreferredLocation, 5.f, 12, FLinearColor::Yellow, 1.f);
+		
+		AddMovementInput(LookAtRotation.Vector(), .33f, true);
+		if(FVector::DotProduct( UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetToChase->GetActorLocation()).Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
 		return false;
 	}
 	return true;
@@ -558,6 +567,59 @@ bool AAICharacter::ChaseTargetWithinWater_Implementation(AActor* TargetToChase)
 		return true;
 	}
 	return true;
+}
+
+void AAICharacter::SetupFlyAroundTarget_Implementation(FVector TargetLocation, float Radius)
+{
+	FlyAroundTargetLocation = TargetLocation;
+	FlyAroundRadius = Radius;
+	FlyAroundDeltaTimeStart = GetWorld()->GetTimeSeconds();
+}
+
+void AAICharacter::FlyAroundTarget_Implementation()
+{
+	UKismetSystemLibrary::DrawDebugSphere(this, FlyAroundTargetLocation, 15.f, 12, FLinearColor::White);
+	const FVector ActorLocation = GetActorLocation();
+	const float DeltaTime = GetWorld()->GetTimeSeconds() - FlyAroundDeltaTimeStart;
+
+	float FactorX = 1.f;
+	
+	GEngine->AddOnScreenDebugMessage(778899, 5.f, FColor::Cyan, FString::Printf(TEXT("%f"), FMath::Cos(DeltaTime)));
+
+	FactorX *= FMath::Sin(DeltaTime * 2.f) * 200.f;
+	
+	if (FlyAroundTargetLocation.X < ActorLocation.X)
+	{
+		if (FlyAroundTargetLocation.Z < ActorLocation.Z)
+		{
+		
+		}
+		else
+		{
+			
+		}
+	}
+	else
+	{
+		if (FlyAroundTargetLocation.Z < ActorLocation.Z)
+		{
+			
+		}
+		else
+		{
+			
+		}
+	}
+	
+	GEngine->AddOnScreenDebugMessage(778898, 5.f, FColor::Red, FString::Printf(TEXT("Factor X: %f"), FactorX));
+	UKismetSystemLibrary::DrawDebugSphere(this, FlyAroundTargetLocation + FVector(FactorX, 0.f, 0.f), 15.f, 12, FLinearColor::Green);
+
+	const FVector Movement{ FMath::Cos(DeltaTime * 1.5f), 0.f, FMath::Sin(DeltaTime * 1.5f) };
+	const float CurrentDistance = FMath::FInterpTo((FlyAroundTargetLocation - ActorLocation).Length(), FlyAroundRadius, DeltaTime, 5.f);
+
+	const FVector NewTargetLocation = FVector{ FlyAroundTargetLocation.X + FactorX + Movement.X * FlyAroundRadius, 0.f, FlyAroundTargetLocation.Z + Movement.Z * FlyAroundRadius };
+	UKismetSystemLibrary::DrawDebugSphere(this, NewTargetLocation, 15.f, 12, FLinearColor::Yellow);
+	SetActorLocation(FMath::VInterpConstantTo(ActorLocation, NewTargetLocation, DeltaTime, 2.f));
 }
 
 void AAICharacter::SineMove_Implementation()

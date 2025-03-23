@@ -82,6 +82,12 @@ public:
 	 * Behaviour Tasks
 	*/	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetupFlyAroundTarget(FVector TargetLocation, float Radius);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void FlyAroundTarget();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool ChaseTarget(AActor* TargetToChase);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
