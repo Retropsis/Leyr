@@ -139,10 +139,12 @@ void AAICharacter::PossessedBy(AController* NewController)
 	case EBehaviourType::Airborne:
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		GetCharacterMovement()->DefaultLandMovementMode = MOVE_Flying;
+		GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Overlap);
 		break;
 	case EBehaviourType::Aquatic:
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		GetCharacterMovement()->DefaultLandMovementMode = MOVE_Flying;
+		GetCharacterMovement()->BrakingDecelerationFlying = 200.f;
 		break;
 	}
 }
@@ -531,38 +533,47 @@ bool AAICharacter::ChaseTarget_Implementation(AActor* TargetToChase)
 bool AAICharacter::ChaseTargetWithinWater_Implementation(AActor* TargetToChase)
 {
 	if (!IsValid(TargetToChase)) return true;
+
+	const float IdealRange = (AttackRange + CloseRange) / 2.f;
+	const float Side = FMath::Sign(GetActorLocation().X - TargetToChase->GetActorLocation().X);
 	
 	if (GetDistanceTo(TargetToChase) > AttackRange)
 	{
-		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetToChase->GetActorLocation().X, 0.f, TargetToChase->GetActorLocation().Z + ChasingHeightOffset));
-		const FVector TargetLocation = GetActorLocation() + LookAtRotation.Vector().GetSafeNormal() * 128.f;
-		if (IsTargetWithinNavigationBounds(TargetLocation))
+		const FVector PreferredLocation = TargetToChase->GetActorLocation() + FVector{ Side * IdealRange, 0.f, 0.f };
+		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), PreferredLocation);
+		// const FVector TargetLocation = GetActorLocation() + LookAtRotation.Vector().GetSafeNormal() * 128.f;
+		if (IsTargetWithinNavigationBounds(PreferredLocation))
 		{
-			UKismetSystemLibrary::DrawDebugSphere(this, TargetLocation, 15.f, 12, FLinearColor::Green);
+			UKismetSystemLibrary::DrawDebugSphere(this, PreferredLocation, 15.f, 12, FLinearColor::Green);
 			AddMovementInput(LookAtRotation.Vector(), 1.f, true);
-			if(FVector::DotProduct(LookAtRotation.Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
+			if(FVector::DotProduct(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetToChase->GetActorLocation()).Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
 			return false;
 		}
 		else
 		{
-			UKismetSystemLibrary::DrawDebugSphere(this, TargetLocation, 15.f, 12, FLinearColor::Red);
+			UKismetSystemLibrary::DrawDebugSphere(this, PreferredLocation, 15.f, 12, FLinearColor::Red);
+			GetCharacterMovement()->StopMovementImmediately();
 		}
 		return true;
 	}
 	if (GetDistanceTo(TargetToChase) < CloseRange)
 	{
-		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetToChase->GetActorLocation().X, 0.f, TargetToChase->GetActorLocation().Z + ChasingHeightOffset));
-		const FVector TargetLocation = GetActorLocation() - LookAtRotation.Vector().GetSafeNormal() * 128.f;
-		if (IsTargetWithinNavigationBounds(TargetLocation))
+		const FVector PreferredLocation = TargetToChase->GetActorLocation() + FVector{ Side * IdealRange, 0.f, 0.f };
+		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), PreferredLocation);
+		// const FVector TargetLocation = GetActorLocation() - LookAtRotation.Vector().GetSafeNormal() * 128.f;
+		if (IsTargetWithinNavigationBounds(PreferredLocation))
 		{
-			UKismetSystemLibrary::DrawDebugSphere(this, TargetLocation, 15.f, 12, FLinearColor::Blue);
-			AddMovementInput(LookAtRotation.Vector(), -.33f, true);
-			if(FVector::DotProduct(LookAtRotation.Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
+			UKismetSystemLibrary::DrawDebugSphere(this, PreferredLocation, 15.f, 12, FLinearColor::Blue);
+			const float ScaleValue = FMath::Max(1.f - (GetActorLocation() - TargetToChase->GetActorLocation()).Length() / IdealRange, .33f);
+			GEngine->AddOnScreenDebugMessage(1122334, 5.f, FColor::Magenta, FString::Printf(TEXT("SacelValue: %f"), ScaleValue));
+			AddMovementInput(LookAtRotation.Vector(), ScaleValue, true);
+			if(FVector::DotProduct(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetToChase->GetActorLocation()).Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
 			return false;
 		}
 		else
 		{
-			UKismetSystemLibrary::DrawDebugSphere(this, TargetLocation, 15.f, 12, FLinearColor::Red);
+			UKismetSystemLibrary::DrawDebugSphere(this, PreferredLocation, 15.f, 12, FLinearColor::Red);
+			GetCharacterMovement()->StopMovementImmediately();
 		}
 		return true;
 	}
