@@ -10,6 +10,7 @@
 #include "Engine/DataAsset.h"
 #include "ItemData.generated.h"
 
+class UAbilitySet;
 class UAbilityData;
 class UPaperZDAnimInstance;
 class UPaperFlipbook;
@@ -64,7 +65,19 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	EItemType ItemType = EItemType::Misc;
-
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
+	float Weight = 0.f;
+	
+	/*
+	 * Abilities
+	*/
+	UPROPERTY(EditDefaultsOnly, Category="Ability")
+	TObjectPtr<UAbilitySet> AbilitySet;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Ability")
+	UAbilityData* AbilityData;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Item", meta=(Categories="Abilities"))
 	TArray<FGameplayTag> Abilities;
 
@@ -80,15 +93,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item", meta=(Categories="Cost"))
 	FGameplayTag CostTag = FGameplayTag();
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
-	float Weight = 0.f;
-
-	/*
-	 * Abilities
-	 */
-	UPROPERTY(EditDefaultsOnly, Category="Ability")
-	UAbilityData* AbilityData;
-	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
 	TArray<FTaggedMontage> DefaultSequences;
 
@@ -97,6 +101,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Animation")
 	TSubclassOf<UPaperZDAnimInstance> AnimationInstance = nullptr;
+	/*
+	 *
+	 */
 
 	UFUNCTION()
 	FTaggedMontage FindSequenceInfoForTag(const FGameplayTag& MontageTag, bool bLogNotFound = false) const;

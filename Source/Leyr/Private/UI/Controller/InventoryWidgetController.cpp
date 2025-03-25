@@ -7,6 +7,7 @@
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AbilitySystem/Data/LevelUpInfo.h"
+#include "Data/AbilitySet.h"
 #include "Data/InventoryCostData.h"
 #include "Engine/AssetManager.h"
 #include "Game/BaseGameplayTags.h"
@@ -131,7 +132,6 @@ void UInventoryWidgetController::Assign(const FGameplayTag InputToAssign, const 
 	if(const UItemData* Asset = ItemToEquip.ItemData.Asset.LoadSynchronous())
 	{
 		ItemToEquip.Modifiers = Asset->Modifiers;
-		ItemToEquip.Abilities = Asset->Abilities;
 	}
 	EquippedItems.Add(SlotToEquip, ItemToEquip);
 }
@@ -341,40 +341,33 @@ void UInventoryWidgetController::UpdateItemAbilities()
 {
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 	const FScopedAbilityListLock ScopedLock = FScopedAbilityListLock(*AbilitySystemComponent);
-	TArray<FGameplayTag> RequiredItemAbilities;
-	
-	for (TTuple<FGameplayTag, FEquippedItem> NewlyEquippedItem : EquippedItems)
-	{
-		if(NewlyEquippedItem.Key.MatchesTag(GameplayTags.Equipment_ActionSlot))
-		{
-			for (FGameplayTag AbilityTag : NewlyEquippedItem.Value.Abilities)
-			{
-				RequiredItemAbilities.AddUnique(AbilityTag);
-			}
-		}
-	}
 	
 	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : PreviouslyEquippedItems)
 	{
 		if(EquippedItem.Key.MatchesTag(GameplayTags.Equipment_ActionSlot))
 		{
+			// Item hasn't changed
+			
 			// Was it replaced ?
 			if (FEquippedItem* FoundItem = EquippedItems.Find(EquippedItem.Key))
 			{
 				if(EquippedItem.Value.ItemData.Asset.Get() != FoundItem->ItemData.Asset.Get())
 				{
-					AsyncUpdateAbilities(FoundItem->ItemData.Asset, GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key], FoundItem->Abilities);
+					AsyncUpdateAbilities(FoundItem->ItemData.Asset, &FoundItem->OutGrantedHandles, GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key]);
 				}
 			}
 			// Did it move ?
 			bool bItemFound = false;
-			for (TTuple<FGameplayTag, FEquippedItem> NewlyEquippedItem : EquippedItems)
+			for (TTuple<FGameplayTag, FEquippedItem>& NewlyEquippedItem : EquippedItems)
 			{
 				if(NewlyEquippedItem.Key.MatchesTag(GameplayTags.Equipment_ActionSlot))
 				{
 					if(EquippedItem.Value.ItemData.Asset.Get() == NewlyEquippedItem.Value.ItemData.Asset.Get())
 					{
-						AsyncUpdateAbilities(NewlyEquippedItem.Value.ItemData.Asset, GameplayTags.EquipmentSlotToInputTags[NewlyEquippedItem.Key], NewlyEquippedItem.Value.Abilities);						
+						if(!NewlyEquippedItem.Key.MatchesTag(EquippedItem.Key))
+						{
+							EquippedItem.Value.OutGrantedHandles.ReplaceInputTag(AbilitySystemComponent, GameplayTags.EquipmentSlotToInputTags[NewlyEquippedItem.Key]);
+						}
 						bItemFound = true;
 						break;
 					}
@@ -383,44 +376,51 @@ void UInventoryWidgetController::UpdateItemAbilities()
 			if(bItemFound) continue;
 			
 			// Clear
-			if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent))
-			{
-				for (FGameplayTag AbilityTag : EquippedItem.Value.Abilities)
-				{
-					if (RequiredItemAbilities.Contains(AbilityTag)) continue;
-					
-					FGameplayAbilitySpec* AbilitySpec = BaseASC->GetSpecFromAbilityTag(AbilityTag);
-					AbilitySystemComponent->ClearAbility(AbilitySpec->Handle);
-					AbilitySystemComponent->MarkAbilitySpecDirty(*AbilitySpec);
-				}
-			}
+			EquippedItem.Value.OutGrantedHandles.TakeFromAbilitySystem(AbilitySystemComponent);
 		}
 	}
 
-	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : EquippedItems)
+	for (TTuple<FGameplayTag, FEquippedItem>& EquippedItem : EquippedItems)
 	{
 		if(EquippedItem.Key.MatchesTag(GameplayTags.Equipment_ActionSlot))
 		{
 			if (!PreviouslyEquippedItems.Contains(EquippedItem.Key))
 			{
 				// Add
-				AsyncUpdateAbilities(EquippedItem.Value.ItemData.Asset, GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key], EquippedItem.Value.Abilities);
+				AsyncUpdateAbilities(EquippedItem.Value.ItemData.Asset, &EquippedItem.Value.OutGrantedHandles, GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key]);
 			}
 		}
 	}
 }
 
-void UInventoryWidgetController::AsyncUpdateAbilities(TSoftObjectPtr<UItemData> AssetToLoad, FGameplayTag InputTag, TArray<FGameplayTag> Abilities) const
+void UInventoryWidgetController::AsyncUpdateAbilities(TSoftObjectPtr<UItemData> AssetToLoad, FAbilitySet_GrantedHandles* OutGrantedHandles, FGameplayTag InputTag)
 {
-	// TArray<FSoftObjectPath> TargetsToStream;
-	// TargetsToStream.Add(EquippedItem.Value.ItemData.Asset.ToSoftObjectPath());
-	UAssetManager::GetStreamableManager().RequestAsyncLoad(AssetToLoad.ToSoftObjectPath(), [this, AssetToLoad, InputTag, Abilities] () {
+	UAssetManager::GetStreamableManager().RequestAsyncLoad(AssetToLoad.ToSoftObjectPath(), [this, AssetToLoad, OutGrantedHandles, InputTag] () {
 		UItemData* LoadedAsset = AssetToLoad.Get();
 		if (IsValid(LoadedAsset))
 		{
-			ULeyrAbilitySystemLibrary::UpdateAbilities(this, AbilitySystemComponent, LoadedAsset, InputTag, Abilities);
+			if (IsValid(LoadedAsset->AbilitySet))
+			{
+				const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+				LoadedAsset->AbilitySet->GiveToAbilitySystem(AbilitySystemComponent, OutGrantedHandles, InputTag, 1.f, LoadedAsset);
+				GetBaseASC()->ClientEquipAbility(LoadedAsset->AbilitySet->AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
+			}
 		}
 	}, FStreamableManager::AsyncLoadHighPriority);
+}
+
+TArray<FEquippedItem> UInventoryWidgetController::GetEquippedActionSlots(TMap<FGameplayTag, FEquippedItem> Items)
+{
+	if (Items.Num() == 0) return TArray<FEquippedItem>();
+	
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	
+	TArray<FEquippedItem> ActionSlotItems;
+	for (TTuple<FGameplayTag, FEquippedItem> ActionSlotItem : Items)
+	{
+		if (ActionSlotItem.Key.MatchesTag(GameplayTags.Equipment_ActionSlot)) ActionSlotItems.Add(ActionSlotItem.Value);
+	}
+	return ActionSlotItems;
 }
 
 void UInventoryWidgetController::UpdateAmmunitionCounter(FGameplayTag Slot, FEquippedItem EquippedItem) const
@@ -432,7 +432,7 @@ void UInventoryWidgetController::UpdateAmmunitionCounter(FGameplayTag Slot, FEqu
 		{
 			FInventoryItemData CompatibleAmmunition;
 			int32 Quantity = HasCompatibleItemCostInInventory(EquippedItem.ItemData.Asset.Get()->CostTag, CompatibleAmmunition) ? CompatibleAmmunition.Quantity : 0;
-			BaseASC->AbilityCostCommitted.Broadcast(EquippedItem.Abilities[0], EquippedItem.ItemData.Asset.Get()->CostTag, Quantity);
+			BaseASC->AbilityCostCommitted.Broadcast(EquippedItem.ItemData.Asset.Get()->AbilitySet->AbilityTag, EquippedItem.ItemData.Asset.Get()->CostTag, Quantity);
 		}
 		else
 		{

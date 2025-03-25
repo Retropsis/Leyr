@@ -362,7 +362,7 @@ void APlayerCharacter::AddCharacterAbilities()
 	checkf(CharacterInfo->AbilitySet, TEXT("AbilitySet is missing on [%s]"), *CharacterInfo->GetName());
 
 	UBaseAbilitySystemComponent* BaseASC = CastChecked<UBaseAbilitySystemComponent>(AbilitySystemComponent);
-	CharacterInfo->AbilitySet->GiveToAbilitySystem(BaseASC, &GrantedHandles, GetPlayerLevel(), BaseASC);
+	CharacterInfo->AbilitySet->GiveToAbilitySystem(BaseASC, &GrantedHandles, FGameplayTag(), GetPlayerLevel(), BaseASC);
 }
 
 // TODO: Need a less hardcoded way to do, here we suppose first 3 indices are the 3 combos

@@ -271,18 +271,17 @@ void ULeyrAbilitySystemLibrary::UpdateMonkAbilities(const UObject* WorldContextO
 		for (const FGameplayTag AbilityTag : CharacterClassInfo->MonkAbilities)
 		{
 			if(FGameplayAbilitySpec* AbilitySpec = BaseASC->GetSpecFromAbilityTag(AbilityTag))
-			{				
-				const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();				
+			{							
 				AbilitySpec->DynamicAbilityTags.Reset();
 				AbilitySpec->DynamicAbilityTags.AppendTags(InputTags);
 				
-				for (FGameplayTag InputTag : AbilitySpec->DynamicAbilityTags)
-				{
-					BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
-				}
-				
 				ASC->MarkAbilitySpecDirty(*AbilitySpec);
 			}
+		}				
+		const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();	
+		for (FGameplayTag InputTag : InputTags)
+		{
+			BaseASC->ClientEquipAbility(GameplayTags.Abilities_Weapon_Monk, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
 		}
 	}
 }

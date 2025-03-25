@@ -51,7 +51,33 @@ void FAbilitySet_GrantedHandles::TakeFromAbilitySystem(UAbilitySystemComponent* 
 	GameplayEffectHandles.Reset();
 }
 
-void UAbilitySet::GiveToAbilitySystem(UAbilitySystemComponent* ASC, FAbilitySet_GrantedHandles* OutGrantedHandles, float Level, UObject* SourceObject) const
+void FAbilitySet_GrantedHandles::ReplaceInputTag(UAbilitySystemComponent* ASC, FGameplayTag InputTag)
+{
+	check(ASC);
+
+	if (!ASC->IsOwnerActorAuthoritative())
+	{
+		// Must be authoritative to give or take ability sets.
+		return;
+	}
+
+	for (const FGameplayAbilitySpecHandle& Handle : AbilitySpecHandles)
+	{
+		if (Handle.IsValid())
+		{
+			FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromHandle(Handle);
+			Spec->DynamicAbilityTags.Reset();
+			// if(Spec->AbilityTag.ToString().Contains("Execute"))
+			// {
+			// 	
+			// }
+			Spec->DynamicAbilityTags.AddTag(InputTag);
+		}
+	}
+	AbilitySpecHandles.Reset();
+}
+
+void UAbilitySet::GiveToAbilitySystem(UAbilitySystemComponent* ASC, FAbilitySet_GrantedHandles* OutGrantedHandles, FGameplayTag InputTag, float Level, UObject* SourceObject) const
 {
 	check(ASC);
 
@@ -77,7 +103,7 @@ void UAbilitySet::GiveToAbilitySystem(UAbilitySystemComponent* ASC, FAbilitySet_
 
 		FGameplayAbilitySpec AbilitySpec(AbilityCDO, AbilityToGrant.Level);
 		AbilitySpec.SourceObject = SourceObject;
-		AbilitySpec.DynamicAbilityTags.AddTag(AbilityToGrant.InputTag);
+		AbilitySpec.DynamicAbilityTags.AddTag(AbilityToGrant.InputTag.IsValid() ? AbilityToGrant.InputTag : InputTag);
 
 		const FGameplayAbilitySpecHandle AbilitySpecHandle = ASC->GiveAbility(AbilitySpec);
 

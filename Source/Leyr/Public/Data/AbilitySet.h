@@ -96,6 +96,7 @@ public:
 	void AddAbilitySpecHandle(const FGameplayAbilitySpecHandle& Handle);
 	void AddGameplayEffectHandle(const FActiveGameplayEffectHandle& Handle);
 	void TakeFromAbilitySystem(UAbilitySystemComponent* ASC);
+	void ReplaceInputTag(UAbilitySystemComponent* ASC, FGameplayTag InputTag);
 
 protected:
 	UPROPERTY()
@@ -113,7 +114,10 @@ class LEYR_API UAbilitySet : public UDataAsset
 	GENERATED_BODY()
 
 public:
-	void GiveToAbilitySystem(UAbilitySystemComponent* ASC, FAbilitySet_GrantedHandles* OutGrantedHandles, float Level = 1.f, UObject* SourceObject = nullptr) const;
+	void GiveToAbilitySystem(UAbilitySystemComponent* ASC, FAbilitySet_GrantedHandles* OutGrantedHandles, FGameplayTag InputTag = FGameplayTag(), float Level = 1.f, UObject* SourceObject = nullptr) const;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Gameplay Abilities", meta=(Categories="Abilities"))
+	FGameplayTag AbilityTag = FGameplayTag();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Abilities", meta=(TitleProperty=Ability))

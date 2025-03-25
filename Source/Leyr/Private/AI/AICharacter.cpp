@@ -269,7 +269,7 @@ void AAICharacter::InitializeCharacterInfo()
 void AAICharacter::AddCharacterAbilities()
 {	
 	UBaseAbilitySystemComponent* BaseASC = CastChecked<UBaseAbilitySystemComponent>(AbilitySystemComponent);
-	EncounterData->AbilitySet->GiveToAbilitySystem(BaseASC, &GrantedHandles, Level, BaseASC);
+	EncounterData->AbilitySet->GiveToAbilitySystem(BaseASC, &GrantedHandles, FGameplayTag(), Level, BaseASC);
 }
 
 void AAICharacter::InitializeNavigationBounds()

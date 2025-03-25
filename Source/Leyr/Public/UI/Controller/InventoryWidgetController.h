@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ActiveGameplayEffectHandle.h"
 #include "GameplayTagContainer.h"
+#include "Data/AbilitySet.h"
 #include "Inventory/InventoryComponent.h"
 #include "UI/Controller/WidgetController.h"
 #include "InventoryWidgetController.generated.h"
@@ -27,12 +28,14 @@ struct FEquippedItem
 
 	UPROPERTY()
 	FInventoryItemData ItemData = FInventoryItemData();
-	
-	UPROPERTY()
-	TArray<FGameplayTag> Abilities;
+
+	FAbilitySet_GrantedHandles OutGrantedHandles = FAbilitySet_GrantedHandles();
 	
 	UPROPERTY()
 	TArray<FGameplayModifierInfo> Modifiers;
+
+	UPROPERTY()
+	bool bDirty = false;
 };
 
 class UItemAbilityInfo;
@@ -111,7 +114,8 @@ private:
 	void UpdateAmmunitionCounter(FGameplayTag Slot, FEquippedItem EquippedItem) const;
 	void UpdateItemAbilities();
 	void OnXPChanged(int32 NewXP);
-	void AsyncUpdateAbilities(TSoftObjectPtr<UItemData> AssetToLoad, FGameplayTag InputTag, TArray<FGameplayTag> Abilities) const;
+	void AsyncUpdateAbilities(TSoftObjectPtr<UItemData> AssetToLoad, FAbilitySet_GrantedHandles* OutGrantedHandles, FGameplayTag InputTag);
+	TArray<FEquippedItem> GetEquippedActionSlots(TMap<FGameplayTag, FEquippedItem> Items);
 	
 	TMap<FGameplayTag, FEquippedItem> EquippedItems;
 	TMap<FGameplayTag, FEquippedItem> PreviouslyEquippedItems;
