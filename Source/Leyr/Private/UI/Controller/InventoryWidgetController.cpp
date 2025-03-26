@@ -135,23 +135,24 @@ void UInventoryWidgetController::AssignButtonPressed(const FInventoryItemData It
 	}
 }
 
-void UInventoryWidgetController::Assign(const FGameplayTag InputToAssign, const FGameplayTag SlotToEquip, FEquippedItem& ItemToEquip)
+void UInventoryWidgetController::AsyncUpdateAbilities(FEquippedItem& ItemToEquip, FGameplayTag InputTag)
 {
-	OnInputAssigned.Broadcast(ItemToEquip.ItemData, InputToAssign);
-	OnItemEquipped.Broadcast(SlotToEquip, ItemToEquip.ItemData);
-
-	if(const UItemData* Asset = ItemToEquip.ItemData.Asset.LoadSynchronous())
-	{
-		ItemToEquip.Modifiers = Asset->Modifiers;
-	}
-	EquippedItems.Add(SlotToEquip, ItemToEquip);
-}
-
-void UInventoryWidgetController::Clear(const FGameplayTag InputToClear, const FGameplayTag SlotToUnequip)
-{
-	OnInputRemoved.Broadcast(InputToClear);
-	OnItemUnequipped.Broadcast(SlotToUnequip, EquippedItems[SlotToUnequip].ItemData.Asset);
-	EquippedItems.Remove(SlotToUnequip);
+	TSoftObjectPtr<UItemData> AssetToLoad = ItemToEquip.ItemData.Asset;
+	UAssetManager::GetStreamableManager().RequestAsyncLoad(AssetToLoad.ToSoftObjectPath(), [this, AssetToLoad, InputTag, ItemToEquip] () {
+		UItemData* LoadedAsset = AssetToLoad.Get();
+		if (IsValid(LoadedAsset))
+		{
+			if (IsValid(LoadedAsset->AbilitySet))
+			{
+				const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+				FEquippedItem NewlyEquippedItem = ItemToEquip;
+				LoadedAsset->AbilitySet->GiveToAbilitySystem(AbilitySystemComponent, &NewlyEquippedItem.OutGrantedHandles, InputTag, 1.f, LoadedAsset);
+				EquippedItems.Add(GameplayTags.EquipmentSlotToInputTags[InputTag], NewlyEquippedItem);
+				GetBaseASC()->ClientEquipAbility(LoadedAsset->AbilitySet->AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
+				OnInputAssigned.Broadcast(ItemToEquip.ItemData, InputTag);
+			}
+		}
+	}, FStreamableManager::AsyncLoadHighPriority);
 }
 
 /*
@@ -233,11 +234,6 @@ bool UInventoryWidgetController::HasCompatibleItemCostInInventory(const FGamepla
 	return false;
 }
 
-void UInventoryWidgetController::SetupEquippedItems(const TMap<FGameplayTag, FEquippedItem>& ItemsToEquip)
-{
-	EquippedItems = ItemsToEquip;
-}
-
 void UInventoryWidgetController::UpdateInventorySlots() const
 {
 	InventoryComponent->UpdateInventorySlots();
@@ -273,33 +269,6 @@ void UInventoryWidgetController::BroadcastEquippedItems()
 }
 
 /*
- * Container
-*/
-void UInventoryWidgetController::LootButtonPressed(int32 SourceSlotIndex) const
-{
-	if(!bContainerIsOpen) return;
-	if(UInventoryComponent* ContainerComponent = ULeyrAbilitySystemLibrary::GetContainerComponent(this))
-	{
-		ContainerComponent->TransferItemToEmptySlot(InventoryComponent, SourceSlotIndex);
-	}
-}
-
-void UInventoryWidgetController::LootAllButtonPressed() const
-{
-	if(!bContainerIsOpen) return;
-	if(UInventoryComponent* ContainerComponent = ULeyrAbilitySystemLibrary::GetContainerComponent(this))
-	{
-		for (int i = 0; i < ContainerComponent->Items.Num(); ++i)
-		{
-			if(ContainerComponent->Items[i].ID != 0)
-			{
-				ContainerComponent->TransferItemToEmptySlot(InventoryComponent, i);
-			}
-		}
-	}
-}
-
-/*
  * Gameplay Effects
  */
 void UInventoryWidgetController::UpdateEquipmentEffect()
@@ -328,87 +297,6 @@ void UInventoryWidgetController::UpdateEquipmentEffect()
 	{
 		ActiveEquipmentEffectHandle = AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*MutableSpec, AbilitySystemComponent);
 	}
-}
-
-void UInventoryWidgetController::UpdateMonkAbilityTag(FGameplayTag InputTag)
-{
-	
-}
-
-void UInventoryWidgetController::UpdateItemAbilities()
-{
-	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-	const FScopedAbilityListLock ScopedLock = FScopedAbilityListLock(*AbilitySystemComponent);
-	
-	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : PreviouslyEquippedItems)
-	{
-		if(EquippedItem.Key.MatchesTag(GameplayTags.Equipment_ActionSlot))
-		{
-			// Item hasn't changed
-			
-			// Was it replaced ?
-			if (FEquippedItem* FoundItem = EquippedItems.Find(EquippedItem.Key))
-			{
-				if(EquippedItem.Value.ItemData.Asset.Get() != FoundItem->ItemData.Asset.Get())
-				{
-					AsyncUpdateAbilities(*FoundItem, GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key]);
-				}
-			}
-			// Did it move ?
-			bool bItemFound = false;
-			for (TTuple<FGameplayTag, FEquippedItem>& NewlyEquippedItem : EquippedItems)
-			{
-				if(NewlyEquippedItem.Key.MatchesTag(GameplayTags.Equipment_ActionSlot))
-				{
-					if(EquippedItem.Value.ItemData.Asset.Get() == NewlyEquippedItem.Value.ItemData.Asset.Get())
-					{
-						if(!NewlyEquippedItem.Key.MatchesTag(EquippedItem.Key))
-						{
-							EquippedItem.Value.OutGrantedHandles.UpdateInputTags(AbilitySystemComponent, GameplayTags.EquipmentSlotToInputTags[NewlyEquippedItem.Key].GetSingleTagContainer());
-						}
-						bItemFound = true;
-						break;
-					}
-				}
-			}
-			if(bItemFound) continue;
-			
-			// Clear
-			EquippedItem.Value.OutGrantedHandles.TakeFromAbilitySystem(AbilitySystemComponent);
-		}
-	}
-
-	for (TTuple<FGameplayTag, FEquippedItem>& EquippedItem : EquippedItems)
-	{
-		if(EquippedItem.Key.MatchesTag(GameplayTags.Equipment_ActionSlot))
-		{
-			if (!PreviouslyEquippedItems.Contains(EquippedItem.Key))
-			{
-				// Add
-				AsyncUpdateAbilities(EquippedItem.Value, GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key]);
-			}
-		}
-	}
-}
-
-void UInventoryWidgetController::AsyncUpdateAbilities(FEquippedItem& ItemToEquip, FGameplayTag InputTag)
-{
-	TSoftObjectPtr<UItemData> AssetToLoad = ItemToEquip.ItemData.Asset;
-	UAssetManager::GetStreamableManager().RequestAsyncLoad(AssetToLoad.ToSoftObjectPath(), [this, AssetToLoad, InputTag, ItemToEquip] () {
-		UItemData* LoadedAsset = AssetToLoad.Get();
-		if (IsValid(LoadedAsset))
-		{
-			if (IsValid(LoadedAsset->AbilitySet))
-			{
-				const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-				FEquippedItem NewlyEquippedItem = ItemToEquip;
-				LoadedAsset->AbilitySet->GiveToAbilitySystem(AbilitySystemComponent, &NewlyEquippedItem.OutGrantedHandles, InputTag, 1.f, LoadedAsset);
-				EquippedItems.Add(GameplayTags.EquipmentSlotToInputTags[InputTag], NewlyEquippedItem);
-				GetBaseASC()->ClientEquipAbility(LoadedAsset->AbilitySet->AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
-				OnInputAssigned.Broadcast(ItemToEquip.ItemData, InputTag);
-			}
-		}
-	}, FStreamableManager::AsyncLoadHighPriority);
 }
 
 void UInventoryWidgetController::UpdateAmmunitionCounter(FGameplayTag Slot, FEquippedItem EquippedItem) const
@@ -459,6 +347,36 @@ TMap<FGameplayTag, FEquippedItem> UInventoryWidgetController::GetEquipmentSlots(
 	return EquipmentSlotItems;
 }
 
+/*
+ * Container
+*/
+void UInventoryWidgetController::LootButtonPressed(int32 SourceSlotIndex) const
+{
+	if(!bContainerIsOpen) return;
+	if(UInventoryComponent* ContainerComponent = ULeyrAbilitySystemLibrary::GetContainerComponent(this))
+	{
+		ContainerComponent->TransferItemToEmptySlot(InventoryComponent, SourceSlotIndex);
+	}
+}
+
+void UInventoryWidgetController::LootAllButtonPressed() const
+{
+	if(!bContainerIsOpen) return;
+	if(UInventoryComponent* ContainerComponent = ULeyrAbilitySystemLibrary::GetContainerComponent(this))
+	{
+		for (int i = 0; i < ContainerComponent->Items.Num(); ++i)
+		{
+			if(ContainerComponent->Items[i].ID != 0)
+			{
+				ContainerComponent->TransferItemToEmptySlot(InventoryComponent, i);
+			}
+		}
+	}
+}
+
+/*
+ * Experience Points
+ */
 void UInventoryWidgetController::OnXPChanged(int32 NewXP)
 {
 	const ULevelUpInfo* LevelUpInfo = GetBasePS()->LevelUpInfo;

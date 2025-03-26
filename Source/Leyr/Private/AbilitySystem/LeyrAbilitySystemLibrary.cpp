@@ -174,26 +174,6 @@ void ULeyrAbilitySystemLibrary::InitializeEncounterAttributes(const UObject* Wor
 	ASC->ApplyGameplayEffectSpecToSelf(*VitalAttributesSpecHandle.Data.Get());
 }
 
-void ULeyrAbilitySystemLibrary::GiveEncounterAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, TArray<TSubclassOf<UGameplayAbility>> AbilitiesToGive)
-{
-	UEncounterInfo* EncounterInfo = GetEncounterInfo(WorldContextObject);
-	if(EncounterInfo == nullptr) return;
-	
-	for (const TSubclassOf<UGameplayAbility> AbilityClass : EncounterInfo->CommonAbilities)
-	{
-		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
-		ASC->GiveAbility(AbilitySpec);
-	}
-	for (TSubclassOf<UGameplayAbility> AbilityClass : AbilitiesToGive)
-	{
-		if (ASC->GetAvatarActor()->Implements<UCombatInterface>())
-		{
-			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, ICombatInterface::Execute_GetCharacterLevel(ASC->GetAvatarActor()));
-			ASC->GiveAbility(AbilitySpec);
-		}
-	}
-}
-
 void ULeyrAbilitySystemLibrary::InitializeActorAttributes(const UObject* WorldContextObject, EActorClass ActorClass, float Level, UAbilitySystemComponent* ASC)
 {
 	const AActor* AvatarActor = ASC->GetAvatarActor();
@@ -210,27 +190,6 @@ void ULeyrAbilitySystemLibrary::InitializeActorAttributes(const UObject* WorldCo
 	VitalAttributesContextHandle.AddSourceObject(AvatarActor);
 	const FGameplayEffectSpecHandle VitalAttributesSpecHandle = ASC->MakeOutgoingSpec(ClassDefaultInfo.VitalAttributes, Level, VitalAttributesContextHandle);
 	ASC->ApplyGameplayEffectSpecToSelf(*VitalAttributesSpecHandle.Data.Get());
-}
-
-void ULeyrAbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, ECharacterClass CharacterClass)
-{
-	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);
-	if(CharacterClassInfo == nullptr) return;
-	
-	for (const TSubclassOf<UGameplayAbility> AbilityClass : CharacterClassInfo->CommonAbilities)
-	{
-		FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, 1);
-		ASC->GiveAbility(AbilitySpec);
-	}
-	const FCharacterClassDefaultInfo& DefaultInfo = CharacterClassInfo->GetClassDefaultInfo(CharacterClass);
-	for (TSubclassOf<UGameplayAbility> AbilityClass : DefaultInfo.StartupAbilities)
-	{
-		if (ASC->GetAvatarActor()->Implements<UCombatInterface>())
-		{
-			FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(AbilityClass, ICombatInterface::Execute_GetCharacterLevel(ASC->GetAvatarActor()));
-			ASC->GiveAbility(AbilitySpec);
-		}
-	}
 }
 
 UCharacterClassInfo* ULeyrAbilitySystemLibrary::GetCharacterClassInfo(const UObject* WorldContextObject)
@@ -261,119 +220,73 @@ UAbilityInfo* ULeyrAbilitySystemLibrary::GetAbilityInfo(const UObject* WorldCont
 	return LeyrGameMode->AbilityInfo;
 }
 
-void ULeyrAbilitySystemLibrary::UpdateMonkAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, const FGameplayTagContainer InputTags)
-{
-	UCharacterClassInfo* CharacterClassInfo = GetCharacterClassInfo(WorldContextObject);
-	if(CharacterClassInfo == nullptr) return;
-	
-	if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
-	{
-		for (const FGameplayTag AbilityTag : CharacterClassInfo->MonkAbilities)
-		{
-			if(FGameplayAbilitySpec* AbilitySpec = BaseASC->GetSpecFromAbilityTag(AbilityTag))
-			{							
-				AbilitySpec->DynamicAbilityTags.Reset();
-				AbilitySpec->DynamicAbilityTags.AppendTags(InputTags);
-				
-				ASC->MarkAbilitySpecDirty(*AbilitySpec);
-			}
-		}				
-		const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();	
-		for (FGameplayTag InputTag : InputTags)
-		{
-			BaseASC->ClientEquipAbility(GameplayTags.Abilities_Weapon_Monk, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
-		}
-	}
-}
-
-void ULeyrAbilitySystemLibrary::UpdateAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, UObject* SourceObject, FGameplayTag InputTag, TArray<FGameplayTag> Abilities)
-{
-	UAbilityInfo* AbilityInfo = GetAbilityInfo(WorldContextObject);
-	if(AbilityInfo == nullptr) return;
-	
-	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-	
-	if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
-	{
-		for (FGameplayTag AbilityTag : Abilities)
-		{
-			if(FGameplayAbilitySpec* FoundAbilitySpec = BaseASC->GetSpecFromAbilityTag(AbilityTag))
-			{				
-				FoundAbilitySpec->DynamicAbilityTags.Reset();
-				if(AbilityTag.ToString().Contains("Execute"))
-				{
-					if (InputTag.MatchesTagExact(GameplayTags.InputTag_LMB))
-					{
-						FoundAbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.InputTag_Shoulder_Right);
-					}
-					if (InputTag.MatchesTagExact(GameplayTags.InputTag_RMB))
-					{
-						FoundAbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.InputTag_Shoulder_Right);
-					}
-					if (InputTag.MatchesTagExact(GameplayTags.InputTag_1))
-					{
-						FoundAbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.InputTag_Shoulder_Right);
-					}					
-				}
-				else
-				{
-					FoundAbilitySpec->DynamicAbilityTags.AddTag(InputTag);
-				}
-				ASC->MarkAbilitySpecDirty(*FoundAbilitySpec);
-				BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
-			}
-			else
-			{
-				const FBaseAbilityInfo BaseAbilityInfo = AbilityInfo->FindAbilityInfoForTag(AbilityTag);
-				FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(BaseAbilityInfo.Ability, 1);
-				if(AbilityTag.ToString().Contains("Execute"))
-				{
-					if (InputTag.MatchesTagExact(GameplayTags.InputTag_LMB))
-					{
-						AbilitySpec.DynamicAbilityTags.AddTag(GameplayTags.InputTag_Shoulder_Right);
-					}
-					if (InputTag.MatchesTagExact(GameplayTags.InputTag_RMB))
-					{
-						AbilitySpec.DynamicAbilityTags.AddTag(GameplayTags.InputTag_Shoulder_Right);
-					}
-					if (InputTag.MatchesTagExact(GameplayTags.InputTag_1))
-					{
-						AbilitySpec.DynamicAbilityTags.AddTag(GameplayTags.InputTag_Shoulder_Right);
-					}					
-				}
-				else
-				{
-					AbilitySpec.DynamicAbilityTags.AddTag(InputTag);
-				}
-				AbilitySpec.SourceObject = SourceObject;
-				ASC->GiveAbility(AbilitySpec);
-				ASC->MarkAbilitySpecDirty(AbilitySpec);
-				BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
-			}
-		}
-	}
-}
-
-void ULeyrAbilitySystemLibrary::ReplaceAbilityInputTag(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, FInventoryItemData ItemData, FGameplayTag InputTag, FGameplayTag TagToRemove)
-{
-	UItemData* Asset = ItemData.Asset.LoadSynchronous();
-	if(Asset == nullptr) return;
-	
-	if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
-	{
-		for (FGameplayTag AbilityTag : Asset->Abilities)
-		{
-			if(FGameplayAbilitySpec* AbilitySpec = BaseASC->GetSpecFromAbilityTag(AbilityTag))
-			{
-				AbilitySpec->DynamicAbilityTags.RemoveTag(TagToRemove);
-				AbilitySpec->DynamicAbilityTags.AddTag(InputTag);
-						
-				const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-				BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, TagToRemove);
-			}
-		}
-	}
-}
+// void ULeyrAbilitySystemLibrary::UpdateAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, UObject* SourceObject, FGameplayTag InputTag, TArray<FGameplayTag> Abilities)
+// {
+// 	UAbilityInfo* AbilityInfo = GetAbilityInfo(WorldContextObject);
+// 	if(AbilityInfo == nullptr) return;
+// 	
+// 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+// 	
+// 	if(UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(ASC))
+// 	{
+// 		for (FGameplayTag AbilityTag : Abilities)
+// 		{
+// 			if(FGameplayAbilitySpec* FoundAbilitySpec = BaseASC->GetSpecFromAbilityTag(AbilityTag))
+// 			{				
+// 				FoundAbilitySpec->DynamicAbilityTags.Reset();
+// 				if(AbilityTag.ToString().Contains("Execute"))
+// 				{
+// 					if (InputTag.MatchesTagExact(GameplayTags.InputTag_LMB))
+// 					{
+// 						FoundAbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.InputTag_Shoulder_Right);
+// 					}
+// 					if (InputTag.MatchesTagExact(GameplayTags.InputTag_RMB))
+// 					{
+// 						FoundAbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.InputTag_Shoulder_Right);
+// 					}
+// 					if (InputTag.MatchesTagExact(GameplayTags.InputTag_1))
+// 					{
+// 						FoundAbilitySpec->DynamicAbilityTags.AddTag(GameplayTags.InputTag_Shoulder_Right);
+// 					}					
+// 				}
+// 				else
+// 				{
+// 					FoundAbilitySpec->DynamicAbilityTags.AddTag(InputTag);
+// 				}
+// 				ASC->MarkAbilitySpecDirty(*FoundAbilitySpec);
+// 				BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
+// 			}
+// 			else
+// 			{
+// 				const FBaseAbilityInfo BaseAbilityInfo = AbilityInfo->FindAbilityInfoForTag(AbilityTag);
+// 				FGameplayAbilitySpec AbilitySpec = FGameplayAbilitySpec(BaseAbilityInfo.Ability, 1);
+// 				if(AbilityTag.ToString().Contains("Execute"))
+// 				{
+// 					if (InputTag.MatchesTagExact(GameplayTags.InputTag_LMB))
+// 					{
+// 						AbilitySpec.DynamicAbilityTags.AddTag(GameplayTags.InputTag_Shoulder_Right);
+// 					}
+// 					if (InputTag.MatchesTagExact(GameplayTags.InputTag_RMB))
+// 					{
+// 						AbilitySpec.DynamicAbilityTags.AddTag(GameplayTags.InputTag_Shoulder_Right);
+// 					}
+// 					if (InputTag.MatchesTagExact(GameplayTags.InputTag_1))
+// 					{
+// 						AbilitySpec.DynamicAbilityTags.AddTag(GameplayTags.InputTag_Shoulder_Right);
+// 					}					
+// 				}
+// 				else
+// 				{
+// 					AbilitySpec.DynamicAbilityTags.AddTag(InputTag);
+// 				}
+// 				AbilitySpec.SourceObject = SourceObject;
+// 				ASC->GiveAbility(AbilitySpec);
+// 				ASC->MarkAbilitySpecDirty(AbilitySpec);
+// 				BaseASC->ClientEquipAbility(AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
+// 			}
+// 		}
+// 	}
+// }
 
 bool ULeyrAbilitySystemLibrary::IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)
 {

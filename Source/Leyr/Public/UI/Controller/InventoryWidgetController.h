@@ -51,12 +51,9 @@ class LEYR_API UInventoryWidgetController : public UWidgetController
 public:
 	void BroadcastEquippedItems();
 	virtual void BindCallbacksToDependencies() override;
-	void Clear(FGameplayTag InputToClear, FGameplayTag SlotToUnequip);
-	void Assign(FGameplayTag InputToAssign, FGameplayTag SlotToEquip, FEquippedItem& ItemToEquip);
 	UItemData* HasCompatibleItemCostInAmmunitionSlot(const FGameplayTag CostTag);
 	bool HasCompatibleItemCostInInventory(const FGameplayTag CostTag, FInventoryItemData& OutItem) const;
 	TMap<FGameplayTag, FEquippedItem> GetEquippedItems() { return EquippedItems; }
-	void SetupEquippedItems(const TMap<FGameplayTag, FEquippedItem>& ItemsToEquip);
 
 	void UpdateInventorySlots() const;
 	
@@ -113,16 +110,13 @@ public:
 
 private:
 	void UpdateEquipmentEffect();
-	void UpdateMonkAbilityTag(FGameplayTag InputTag);
 	void UpdateAmmunitionCounter(FGameplayTag Slot, FEquippedItem EquippedItem) const;
-	void UpdateItemAbilities();
 	void OnXPChanged(int32 NewXP);
 	void AsyncUpdateAbilities(FEquippedItem& ItemToEquip, FGameplayTag InputTag);
 	TMap<FGameplayTag, FEquippedItem> GetActionSlots();
 	TMap<FGameplayTag, FEquippedItem> GetEquipmentSlots();
 	
 	TMap<FGameplayTag, FEquippedItem> EquippedItems;
-	TMap<FGameplayTag, FEquippedItem> PreviouslyEquippedItems;
 	FActiveGameplayEffectHandle ActiveEquipmentEffectHandle;
 	bool bContainerIsOpen = false;
 	bool bRequestUpdateInventorySlots = true;
