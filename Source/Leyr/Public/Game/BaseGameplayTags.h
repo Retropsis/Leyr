@@ -427,7 +427,9 @@ FGameplayTag Montage_Window_Execute;
  /*
   * Equipment Tags
   */
+ FGameplayTag Equipment;
  FGameplayTag Equipment_ActionSlot;
+ FGameplayTag Equipment_ActionSlot_0;
  FGameplayTag Equipment_ActionSlot_1;
  FGameplayTag Equipment_ActionSlot_2;
  FGameplayTag Equipment_ActionSlot_3;

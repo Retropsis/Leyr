@@ -82,6 +82,15 @@ public:
 	float Level = 1.0f;
 };
 
+UENUM()
+enum class ETagOperation
+{
+	Reset,
+	Add,
+	Remove,
+	Replace,
+};
+
 /**
  * FAbilitySet_GrantedHandles
  *
@@ -96,7 +105,7 @@ public:
 	void AddAbilitySpecHandle(const FGameplayAbilitySpecHandle& Handle);
 	void AddGameplayEffectHandle(const FActiveGameplayEffectHandle& Handle);
 	void TakeFromAbilitySystem(UAbilitySystemComponent* ASC);
-	void ReplaceInputTag(UAbilitySystemComponent* ASC, FGameplayTag InputTag);
+	void UpdateInputTags(const UAbilitySystemComponent* ASC, const FGameplayTagContainer& InputTags, ETagOperation TagOperation = ETagOperation::Replace);
 
 protected:
 	UPROPERTY()

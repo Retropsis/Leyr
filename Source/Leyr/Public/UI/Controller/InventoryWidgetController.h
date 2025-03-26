@@ -108,14 +108,18 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")
 	TObjectPtr<UInventoryComponent> InventoryComponent;
 
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UAbilitySet> MonkSet;
+
 private:
 	void UpdateEquipmentEffect();
-	void UpdateMonkAbility();
+	void UpdateMonkAbilityTag(FGameplayTag InputTag);
 	void UpdateAmmunitionCounter(FGameplayTag Slot, FEquippedItem EquippedItem) const;
 	void UpdateItemAbilities();
 	void OnXPChanged(int32 NewXP);
-	void AsyncUpdateAbilities(TSoftObjectPtr<UItemData> AssetToLoad, FAbilitySet_GrantedHandles* OutGrantedHandles, FGameplayTag InputTag);
-	TArray<FEquippedItem> GetEquippedActionSlots(TMap<FGameplayTag, FEquippedItem> Items);
+	void AsyncUpdateAbilities(FEquippedItem& ItemToEquip, FGameplayTag InputTag);
+	TMap<FGameplayTag, FEquippedItem> GetActionSlots();
+	TMap<FGameplayTag, FEquippedItem> GetEquipmentSlots();
 	
 	TMap<FGameplayTag, FEquippedItem> EquippedItems;
 	TMap<FGameplayTag, FEquippedItem> PreviouslyEquippedItems;

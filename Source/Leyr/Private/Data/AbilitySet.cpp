@@ -51,7 +51,7 @@ void FAbilitySet_GrantedHandles::TakeFromAbilitySystem(UAbilitySystemComponent* 
 	GameplayEffectHandles.Reset();
 }
 
-void FAbilitySet_GrantedHandles::ReplaceInputTag(UAbilitySystemComponent* ASC, FGameplayTag InputTag)
+void FAbilitySet_GrantedHandles::UpdateInputTags(const UAbilitySystemComponent* ASC, const FGameplayTagContainer& InputTags, ETagOperation TagOperation)
 {
 	check(ASC);
 
@@ -66,15 +66,27 @@ void FAbilitySet_GrantedHandles::ReplaceInputTag(UAbilitySystemComponent* ASC, F
 		if (Handle.IsValid())
 		{
 			FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromHandle(Handle);
-			Spec->DynamicAbilityTags.Reset();
 			// if(Spec->AbilityTag.ToString().Contains("Execute"))
 			// {
 			// 	
 			// }
-			Spec->DynamicAbilityTags.AddTag(InputTag);
+			switch (TagOperation) {
+			case ETagOperation::Reset:
+				Spec->DynamicAbilityTags.Reset();
+				break;
+			case ETagOperation::Add:
+				Spec->DynamicAbilityTags.AppendTags(InputTags);
+				break;
+			case ETagOperation::Remove:
+				Spec->DynamicAbilityTags.RemoveTags(InputTags);
+				break;
+			case ETagOperation::Replace:
+				Spec->DynamicAbilityTags.Reset();
+				Spec->DynamicAbilityTags.AppendTags(InputTags);
+				break;
+			}
 		}
 	}
-	AbilitySpecHandles.Reset();
 }
 
 void UAbilitySet::GiveToAbilitySystem(UAbilitySystemComponent* ASC, FAbilitySet_GrantedHandles* OutGrantedHandles, FGameplayTag InputTag, float Level, UObject* SourceObject) const

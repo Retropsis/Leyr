@@ -459,7 +459,9 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	/*
 	 * Equipment Tags
 	 */
+	GameplayTags.Equipment = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment"), FString("Equipment"));
 	GameplayTags.Equipment_ActionSlot = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.ActionSlot"), FString("Equipment ActionSlot"));
+	GameplayTags.Equipment_ActionSlot_0 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.ActionSlot.0"), FString("Equipment ActionSlot 0"));
 	GameplayTags.Equipment_ActionSlot_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.ActionSlot.1"), FString("Equipment ActionSlot 1"));
 	GameplayTags.Equipment_ActionSlot_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.ActionSlot.2"), FString("Equipment ActionSlot 2"));
 	GameplayTags.Equipment_ActionSlot_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.ActionSlot.3"), FString("Equipment ActionSlot 3"));
