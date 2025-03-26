@@ -2,6 +2,12 @@
 
 #include "AbilitySystem/Ability/BowAbility.h"
 
+void UBowAbility::PrepareToEndAbility()
+{
+	Super::PrepareToEndAbility();
+	ICombatInterface::Execute_SetMovementEnabled(GetAvatarActorFromActorInfo(), true);
+}
+
 FString UBowAbility::GetDescription(int32 Level)
 {
 	const int32 Damage = AbilityPower.GetValueAtLevel(Level);

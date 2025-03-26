@@ -44,6 +44,9 @@ struct FBaseAbilityInfo
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	int32 LevelRequirement = 1;
+	
+	UPROPERTY(EditDefaultsOnly)
+	bool bSerialize = false;
 };
 
 /**
@@ -55,7 +58,7 @@ class LEYR_API UAbilityInfo : public UDataAsset
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AbilityInformation")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AbilityInformation", meta=(TitleProperty="AbilityTag"))
 	TArray<FBaseAbilityInfo> AbilityInformation;
 
 	FBaseAbilityInfo FindAbilityInfoForTag(const FGameplayTag& AbilityTag, bool bLogNotFound = false) const;

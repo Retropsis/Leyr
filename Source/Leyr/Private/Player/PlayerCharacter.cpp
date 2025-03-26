@@ -1,7 +1,6 @@
 // @ Retropsis 2024-2025.
 
 #include "Player/PlayerCharacter.h"
-
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Player/PlayerCharacterAnimInstance.h"
 #include "Player/PlayerCharacterController.h"
@@ -24,7 +23,6 @@
 #include "GameFramework/PhysicsVolume.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "NiagaraComponent.h"
 #include "PaperFlipbookComponent.h"
@@ -1021,6 +1019,8 @@ void APlayerCharacter::SaveProgress_Implementation(const FName& SavePointTag)
 			const UAbilityInfo* AbilityInfo = ULeyrAbilitySystemLibrary::GetAbilityInfo(this);
 			const FBaseAbilityInfo Info = AbilityInfo->FindAbilityInfoForTag(AbilityTag);
 			
+			if (!Info.bSerialize) return;
+			
 			FAbilitySaveData AbilitySaveData;
 			AbilitySaveData.GameplayAbility = Info.Ability;
 			AbilitySaveData.AbilityLevel = AbilitySpec.Level;
@@ -1045,12 +1045,9 @@ void APlayerCharacter::LoadProgress()
 		if(SaveData == nullptr) return;
 
 		
-		if (SaveData->bFirstTimeLoadIn)
-		{
-			// InitializeDefaultAttributes(); // Done along AbilitySet->GiveToAbilitySystem
-			AddCharacterAbilities();
-		}
-		else
+		// InitializeDefaultAttributes(); // Done along AbilitySet->GiveToAbilitySystem
+		AddCharacterAbilities();
+		if (!SaveData->bFirstTimeLoadIn)
 		{
 			if (UBaseAbilitySystemComponent* BaseASC = Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent))
 			{
@@ -1189,7 +1186,7 @@ bool APlayerCharacter::TryVaultingDown()
 
 void APlayerCharacter::TraceForSlope()
 {
-	if(CombatState == ECombatState::OnElevator || CombatState == ECombatState::WalkingPeaceful) return;
+	if(CombatState == ECombatState::OnElevator || CombatState == ECombatState::WalkingPeaceful || CombatState == ECombatState::Attacking) return;
 	
 	if(!GetCharacterMovement()->IsFalling() && CombatState == ECombatState::OnGroundSlope) HandleCombatState(ECombatState::Unoccupied);
 	
