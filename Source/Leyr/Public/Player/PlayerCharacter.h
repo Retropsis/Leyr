@@ -339,6 +339,8 @@ private:
 	
 	FOnKeyItemUsed OnKeyItemUsed;
 
+	bool bWantsToUncrouch = false;
+
 public:
 	FORCEINLINE bool IsAirborne() const { return bAirborne; }
 	FORCEINLINE bool IsAccelerating() const { return bIsAccelerating; }
