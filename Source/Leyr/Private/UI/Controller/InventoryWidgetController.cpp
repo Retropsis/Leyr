@@ -62,7 +62,7 @@ void UInventoryWidgetController::BindCallbacksToDependencies()
 	FEquippedItem MonkAbility = FEquippedItem{};
 	MonkSet->GiveToAbilitySystem(AbilitySystemComponent, &MonkAbility.OutGrantedHandles, FGameplayTag());
 	
-	EquippedItems.FindOrAdd(GameplayTags.Equipment_ActionSlot_0, MonkAbility);
+	EquippedItems.Add(GameplayTags.Equipment_ActionSlot_0, MonkAbility);
 	EquippedItems.FindOrAdd(GameplayTags.Equipment_ActionSlot_1, FEquippedItem{});
 	EquippedItems.FindOrAdd(GameplayTags.Equipment_ActionSlot_2, FEquippedItem{});
 	EquippedItems.FindOrAdd(GameplayTags.Equipment_ActionSlot_3, FEquippedItem{});
@@ -82,7 +82,6 @@ void UInventoryWidgetController::BindCallbacksToDependencies()
 		}
 	}
 	MonkAbility.OutGrantedHandles.UpdateInputTags(AbilitySystemComponent, MonkInputTags);
-	
 	UpdateEquipmentEffect();
 }
 
@@ -106,9 +105,10 @@ void UInventoryWidgetController::AssignButtonPressed(const FInventoryItemData It
 			EquippedItem.Value.OutGrantedHandles.TakeFromAbilitySystem(AbilitySystemComponent);
 			EquippedItems.Add(EquippedItem.Key, FEquippedItem{});
 			OnInputRemoved.Broadcast(InputTag);
+			OnItemUnequipped.Broadcast(EquippedItem.Key, ItemData.Asset);
 			
 			EquippedItems[GameplayTags.Equipment_ActionSlot_0].OutGrantedHandles.UpdateInputTags(AbilitySystemComponent, GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key].GetSingleTagContainer(), ETagOperation::Add);
-			GetBaseASC()->ClientEquipAbility(GameplayTags.Abilities_Weapon_Monk, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
+			GetBaseASC()->ClientEquipAbility(GameplayTags.Abilities_Weapon_Monk, GameplayTags.Abilities_Status_Equipped, GameplayTags.EquipmentSlotToInputTags[EquippedItem.Key], FGameplayTag());
 		}
 		// Slot that was required to be assigned
 		if (EquippedItem.Key.MatchesTagExact(SlotTag))
@@ -117,6 +117,7 @@ void UInventoryWidgetController::AssignButtonPressed(const FInventoryItemData It
 			EquippedItem.Value.OutGrantedHandles.TakeFromAbilitySystem(AbilitySystemComponent);
 			EquippedItems.Add(EquippedItem.Key, FEquippedItem{});
 			OnInputRemoved.Broadcast(InputTag);
+			OnItemUnequipped.Broadcast(EquippedItem.Key, ItemData.Asset);
 			
 			// Add the new one if not the same
 			if (ItemData.Asset.Get() != EquippedItem.Value.ItemData.Asset.Get())
@@ -149,7 +150,8 @@ void UInventoryWidgetController::AsyncUpdateAbilities(FEquippedItem& ItemToEquip
 				LoadedAsset->AbilitySet->GiveToAbilitySystem(AbilitySystemComponent, &NewlyEquippedItem.OutGrantedHandles, InputTag, 1.f, LoadedAsset);
 				EquippedItems.Add(GameplayTags.EquipmentSlotToInputTags[InputTag], NewlyEquippedItem);
 				GetBaseASC()->ClientEquipAbility(LoadedAsset->AbilitySet->AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
-				OnInputAssigned.Broadcast(ItemToEquip.ItemData, InputTag);
+				OnInputAssigned.Broadcast(ItemToEquip.ItemData, InputTag, !bIsLoading);
+				OnItemEquipped.Broadcast(GameplayTags.EquipmentSlotToInputTags[InputTag] , ItemToEquip.ItemData);
 			}
 		}
 	}, FStreamableManager::AsyncLoadHighPriority);
@@ -246,6 +248,8 @@ void UInventoryWidgetController::RequestUpdateInventorySlotsOnce()
 		InventoryComponent->UpdateInventorySlots();
 		BroadcastEquippedItems();
 		bRequestUpdateInventorySlots = false;
+		FTimerHandle InitTimer;
+		GetWorld()->GetTimerManager().SetTimer(InitTimer, FTimerDelegate::CreateLambda([this] () { bIsLoading = false; }), 1.f, false);
 	}
 }
 
@@ -256,7 +260,7 @@ void UInventoryWidgetController::BroadcastEquippedItems()
 	{
 		if (Item.Value.ItemData.Asset.ToSoftObjectPath().IsValid())
 		{
-			OnInputAssigned.Broadcast(Item.Value.ItemData, GameplayTags.EquipmentSlotToInputTags[Item.Key]);
+			OnInputAssigned.Broadcast(Item.Value.ItemData, GameplayTags.EquipmentSlotToInputTags[Item.Key],  !bIsLoading);
 		}
 	}
 	for (TTuple<FGameplayTag, FEquippedItem> Item : GetEquipmentSlots())

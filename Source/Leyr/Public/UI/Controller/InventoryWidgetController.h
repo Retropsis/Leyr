@@ -10,8 +10,9 @@
 #include "UI/Controller/WidgetController.h"
 #include "InventoryWidgetController.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnInputAssignedSignature, FInventoryItemData, ItemData, FGameplayTag, InputTag);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnInputAssignedSignature, FInventoryItemData, ItemData, FGameplayTag, InputTag, bool, bPlaySound);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInputRemovedSignature, FGameplayTag, InputTag);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemEquippedSignature, FGameplayTag, SlotTag, FInventoryItemData, ItemData);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnItemUnequippedSignature, FGameplayTag, SlotTag, TSoftObjectPtr<UItemData>, Asset);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnEquipmentSlotQuantityUpdatedSignature, FGameplayTag, SlotTag, const FInventoryItemData&, ItemData);
@@ -120,4 +121,5 @@ private:
 	FActiveGameplayEffectHandle ActiveEquipmentEffectHandle;
 	bool bContainerIsOpen = false;
 	bool bRequestUpdateInventorySlots = true;
+	bool bIsLoading = true;
 };
