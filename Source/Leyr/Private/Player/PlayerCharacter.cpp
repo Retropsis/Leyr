@@ -390,12 +390,14 @@ void APlayerCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 
 void APlayerCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
 {
 	Super::OnStartCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+	GEngine->AddOnScreenDebugMessage(123456978, 5.f, FColor::Emerald, "OnStartCrouch");
 	// HandleCombatState(ECombatState::Crouching);
 }
 
 void APlayerCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
 {
 	Super::OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
+	GEngine->AddOnScreenDebugMessage(123456977, 5.f, FColor::Orange, "OnStartCrouch");
 	if (CombatState != ECombatState::Rolling)
 	{
 		GetSprite()->SetRelativeLocation(FVector::ZeroVector);
@@ -853,8 +855,11 @@ void APlayerCharacter::SetMovementEnabled_Implementation(bool Enabled)
 	
 	if (Enabled)
 	{
-		if(CombatState == ECombatState::Attacking) HandleCombatState(PreviousCombatState);
-		HandleCrouching(bCrouchButtonHeld);
+		if(CombatState == ECombatState::Attacking)
+		{
+			HandleCombatState(PreviousCombatState);
+		}
+		HandleCrouching(PreviousCombatState == ECombatState::Crouching && bCrouchButtonHeld);
 	}
 	else
 	{
