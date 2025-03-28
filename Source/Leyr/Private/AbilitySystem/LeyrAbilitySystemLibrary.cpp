@@ -5,7 +5,6 @@
 #include "AbilitySystemComponent.h"
 #include "AbilityTypes.h"
 #include "GameplayEffectTypes.h"
-#include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/Data/AbilityInfo.h"
 #include "AbilitySystem/Data/ActorClassInfo.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
@@ -206,6 +205,13 @@ UActorClassInfo* ULeyrAbilitySystemLibrary::GetActorClassInfo(const UObject* Wor
 	return LeyrGameMode->ActorClassInfo;
 }
 
+UAbilityInfo* ULeyrAbilitySystemLibrary::GetAbilityInfo(const UObject* WorldContextObject)
+{
+	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+	if (LeyrGameMode == nullptr) return nullptr;
+	return LeyrGameMode->AbilityInfo;
+}
+
 UEncounterInfo* ULeyrAbilitySystemLibrary::GetEncounterInfo(const UObject* WorldContextObject)
 {
 	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
@@ -213,11 +219,11 @@ UEncounterInfo* ULeyrAbilitySystemLibrary::GetEncounterInfo(const UObject* World
 	return LeyrGameMode->EncounterInfo;
 }
 
-UAbilityInfo* ULeyrAbilitySystemLibrary::GetAbilityInfo(const UObject* WorldContextObject)
+ULootDataSet* ULeyrAbilitySystemLibrary::GetLootDataSet(const UObject* WorldContextObject)
 {
 	ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
 	if (LeyrGameMode == nullptr) return nullptr;
-	return LeyrGameMode->AbilityInfo;
+	return LeyrGameMode->LootDataSet;
 }
 
 // void ULeyrAbilitySystemLibrary::UpdateAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* ASC, UObject* SourceObject, FGameplayTag InputTag, TArray<FGameplayTag> Abilities)
@@ -381,6 +387,48 @@ void ULeyrAbilitySystemLibrary::GetLivePlayersWithinRadius(const UObject* WorldC
 			}
 		}
 	}
+}
+
+TArray<FRotator> ULeyrAbilitySystemLibrary::EvenlySpacedRotators(const FVector& Forward, const FVector& Axis, float Spread, int32 NumRotators)
+{
+	TArray<FRotator> Rotators;
+ 	
+	const FVector LeftOfSpread = Forward.RotateAngleAxis(-Spread / 2.f, Axis);
+	if (NumRotators > 1)
+	{
+		const float DeltaSpread = Spread / NumRotators;
+		for (int32 i = 0; i < NumRotators; i++)
+		{
+			const FVector Direction = LeftOfSpread.RotateAngleAxis(DeltaSpread * i, Axis);
+			Rotators.Add(Direction.Rotation());
+		}
+	}
+	else
+	{
+		Rotators.Add(Forward.Rotation());
+	}
+	return Rotators;
+}
+
+TArray<FVector> ULeyrAbilitySystemLibrary::EvenlyRotatedVectors(const FVector& Forward, const FVector& Axis, float Spread, int32 NumVectors)
+{
+ 	TArray<FVector> Vectors;
+ 	
+ 	const FVector LeftOfSpread = Forward.RotateAngleAxis(-Spread / 2.f, Axis);
+ 	if (NumVectors > 1)
+ 	{
+ 		const float DeltaSpread = Spread / NumVectors;
+ 		for (int32 i = 0; i < NumVectors; i++)
+ 		{
+ 			const FVector Direction = LeftOfSpread.RotateAngleAxis(DeltaSpread * i, FVector::UpVector);
+ 			Vectors.Add(Direction);
+ 		}
+ 	}
+ 	else
+ 	{
+ 		Vectors.Add(Forward);
+ 	}
+ 	return Vectors;
 }
 
 bool ULeyrAbilitySystemLibrary::IsHostile(const AActor* FirstActor, const AActor* SecondActor)

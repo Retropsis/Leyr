@@ -7,6 +7,7 @@
 #include "Inventory/InventoryComponent.h"
 #include "LeyrGameMode.generated.h"
 
+class ULootDataSet;
 class ULoadMenuSaveGame;
 class USaveGame;
 class UMVVM_LoadSlot;
@@ -39,6 +40,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Ability Info")
 	TObjectPtr<UAbilityInfo> AbilityInfo;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Loot Info")
+	TObjectPtr<ULootDataSet> LootDataSet;
 	
 	/* Maps */
 	UPROPERTY(EditDefaultsOnly, Category = "Map Info")

@@ -232,6 +232,8 @@ void AAICharacter::InitializeCharacterInfo()
 	EncounterSize = EncounterData->EncounterSize;
 	CharacterClass = EncounterData->CharacterClass;
 	WeaponSocketName = EncounterData->WeaponSocketTag.GetTagName();
+
+	LootData = EncounterData->LootData;
 	
 	DefeatedSound = EncounterData->DeathSound;
 	HitReactSequence = EncounterData->HitReactSequence;
@@ -378,6 +380,7 @@ void AAICharacter::Die(const FVector& DeathImpulse, bool bExecute)
 		IPlayerInterface::Execute_SetCameraInterpolation(CombatTarget, Arena, ECameraInterpState::Following);
 	}
 	
+	SpawnLoot();
 	Super::Die(DeathImpulse, bExecute);
 }
 

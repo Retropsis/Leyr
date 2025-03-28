@@ -82,6 +82,12 @@ void UInventoryWidgetController::BindCallbacksToDependencies()
 		}
 	}
 	MonkAbility.OutGrantedHandles.UpdateInputTags(AbilitySystemComponent, MonkInputTags);
+
+	// Init Equipment
+	for (TTuple<FGameplayTag, FEquippedItem> EquipmentSlot : GetEquipmentSlots())
+	{
+		OnItemEquipped.Broadcast(EquipmentSlot.Key, EquipmentSlot.Value.ItemData);
+	}
 	UpdateEquipmentEffect();
 }
 
@@ -192,7 +198,6 @@ void UInventoryWidgetController::Equip(const FInventoryItemData& ItemData)
 			
 			FEquippedItem ItemToEquip{ItemData };	
 			ItemToEquip.Modifiers = LoadedAsset->Modifiers;
-			
 			OnItemEquipped.Broadcast(Slot, ItemData);
 			EquippedItems.Add(Slot, ItemToEquip);
 			UpdateEquipmentEffect();

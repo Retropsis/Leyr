@@ -9,6 +9,7 @@
 #include "Engine/DataAsset.h"
 #include "EncounterData.generated.h"
 
+class ULootDataSet;
 enum class ECharacterClass : uint8;
 class UAbilitySet;
 class AAICharacter;
@@ -33,6 +34,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UBehaviourData> BehaviourData = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<ULootDataSet> LootData = nullptr;
 
 	UPROPERTY(EditDefaultsOnly)
 	bool bShouldDespawn = true;

@@ -7,6 +7,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "LeyrAbilitySystemLibrary.generated.h"
 
+class ULootDataSet;
 class UGameplayAbility;
 class ULoadMenuSaveGame;
 class UInventoryCostData;
@@ -84,6 +85,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|EncounterInfo", meta=(WorldContext="WorldContextObject"))
 	static UEncounterInfo* GetEncounterInfo(const UObject* WorldContextObject);
+	
+	UFUNCTION(BlueprintCallable, Category="LeyrAbilitySystemLibrary|CharacterClassDefaults", meta=(WorldContext="WorldContextObject"))
+	static ULootDataSet* GetLootDataSet(const UObject* WorldContextObject);
 
 	/*
 	 * Actors
@@ -123,6 +127,12 @@ public:
 	 */
 	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayMechanics", meta=(WorldContext="WorldContextObject"))
 	static void GetLivePlayersWithinRadius(const UObject* WorldContextObject, TArray<AActor*>& OutOverlappingActors, const TArray<AActor*>& ActorsToIgnore, float Radius, const FVector& SphereOrigin);
+	
+	UFUNCTION(BlueprintPure, Category = "LeyrAbilitySystemLibrary|GameplayMechanics")
+	static TArray<FRotator> EvenlySpacedRotators(const FVector& Forward, const FVector& Axis, float Spread, int32 NumRotators);
+ 
+	UFUNCTION(BlueprintPure, Category = "LeyrAbilitySystemLibrary|GameplayMechanics")
+	static TArray<FVector> EvenlyRotatedVectors(const FVector& Forward, const FVector& Axis, float Spread, int32 NumVectors);
 
 	UFUNCTION(BlueprintPure, Category = "LeyrAbilitySystemLibrary|GameplayMechanics")
 	static bool IsHostile(const AActor* FirstActor, const AActor* SecondActor);

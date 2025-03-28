@@ -11,6 +11,7 @@
 #include "Inventory/InventoryComponent.h"
 #include "Item.generated.h"
 
+struct FItemDataRow;
 class UGameplayAbility;
 class UPaperSprite;
 class USphereComponent;
@@ -22,7 +23,11 @@ class LEYR_API AItem : public APaperFlipbookActor, public IInteractionInterface,
 	
 public:	
 	AItem();
-	
+	virtual void Tick(float DeltaSeconds) override;
+
+	UFUNCTION(BlueprintCallable)
+	void InitializeItemFromDataTable(const FName& RowName);
+
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 #endif
@@ -53,6 +58,39 @@ public:
 
 	UFUNCTION()
 	TArray<FGameplayTag> GetAbilities() { return Abilities; }
+
+	/*
+	 * Cosmetic Pick Up Effects
+	*/
+	UFUNCTION(BlueprintCallable)
+	void StartSinusoidalMovement();
+ 
+	UFUNCTION(BlueprintCallable)
+	void StartRotation();
+	
+	UPROPERTY(BlueprintReadWrite)
+	FVector CalculatedLocation;
+ 
+	UPROPERTY(BlueprintReadWrite)
+	FRotator CalculatedRotation;
+ 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup Movement")
+	bool bRotates = false;
+ 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup Movement")
+	float RotationRate = 45.f;
+ 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup Movement")
+	bool bSinusoidalMovement = false;
+ 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup Movement")
+	float SineAmplitude = 1.f;
+ 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup Movement")
+	float SinePeriodConstant = 1.f; 
+ 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup Movement")
+	FVector InitialLocation;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -63,4 +101,7 @@ protected:
 private:
 	UPROPERTY() TObjectPtr<AActor> OverlappingActor;
 	UPROPERTY(SaveGame) bool bPickedUp = false;
+	
+	void ItemMovement(float DeltaTime);
+	float RunningTime = 0.f;
 };

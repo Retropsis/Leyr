@@ -10,6 +10,7 @@
 #include "UI/Controller/OverlayWidgetController.h"
 #include "AICharacter.generated.h"
 
+class ULootDataSet;
 class UEncounterData;
 class AArena;
 class ANavMeshBoundsVolume;
@@ -143,6 +144,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void ResetShouldAttack();
 	
+	UFUNCTION(BlueprintImplementableEvent)
+	void SpawnLoot();
+	
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 		
@@ -198,6 +202,9 @@ protected:
 	FBoxSphereBounds EnteringBounds{};
 	FBoxSphereBounds NavigationBounds{};
 	bool bShouldDespawn = false;
+	//~ LootData
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<ULootDataSet> LootData = nullptr;
 
 private:
 	void ShouldAttack(bool InShouldAttack);
