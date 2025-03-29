@@ -92,12 +92,18 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FTaggedMontage GetTaggedMontageByIndex(int32 Index);
 
+	/*
+	 * Spells
+	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	int32 GetMinionCount();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void IncrementMinionCount(int32 Amount);
-	
+
+	/*
+	 *
+	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	EObjectTypeQuery GetTraceObjectType();
 	

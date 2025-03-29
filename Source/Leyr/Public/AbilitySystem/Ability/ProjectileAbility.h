@@ -33,8 +33,7 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly)
 	int32 NumProjectiles = 5;
-
-private:
+	
 	bool bOverridePitch = false;
 	float PitchOverride = 0.f;
 };

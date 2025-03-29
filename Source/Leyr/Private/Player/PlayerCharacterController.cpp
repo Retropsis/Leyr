@@ -7,8 +7,8 @@
 #include "EnhancedInputComponent.h"
 #include "GameplayTagContainer.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
+#include "Game/BaseGameplayTags.h"
 #include "Interaction/BaseUserWidgetInterface.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "Player/Input/BaseInputComponent.h"
 #include "UI/Controller/InventoryWidgetController.h"
 #include "UI/Widget/BaseUserWidget.h"
@@ -59,16 +59,28 @@ void APlayerCharacterController::SetupInputComponent()
 
 void APlayerCharacterController::AbilityInputTagPressed(FGameplayTag InputTag)
 {
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FBaseGameplayTags::Get().Player_Block_InputPressed))
+	{
+		return;
+	}
 	if (GetASC()) GetASC()->AbilityInputTagPressed(InputTag);
 }
 
 void APlayerCharacterController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FBaseGameplayTags::Get().Player_Block_InputReleased))
+	{
+		return;
+	}
 	if (GetASC()) GetASC()->AbilityInputTagReleased(InputTag);
 }
 
 void APlayerCharacterController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
+	if (GetASC() && GetASC()->HasMatchingGameplayTag(FBaseGameplayTags::Get().Player_Block_InputHeld))
+	{
+		return;
+	}
 	if (GetASC()) GetASC()->AbilityInputTagHeld(InputTag);
 }
 

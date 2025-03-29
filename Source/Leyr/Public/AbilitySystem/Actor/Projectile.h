@@ -32,6 +32,9 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USphereComponent> Sphere;
+
+	UPROPERTY()
+	TObjectPtr<USceneComponent> HomingTargetComponent;
 	
 protected:
 	virtual void BeginPlay() override;

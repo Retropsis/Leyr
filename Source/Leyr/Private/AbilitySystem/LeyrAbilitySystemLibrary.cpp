@@ -392,7 +392,6 @@ void ULeyrAbilitySystemLibrary::GetLivePlayersWithinRadius(const UObject* WorldC
 TArray<FRotator> ULeyrAbilitySystemLibrary::EvenlySpacedRotators(const FVector& Forward, const FVector& Axis, float Spread, int32 NumRotators)
 {
 	TArray<FRotator> Rotators;
- 	
 	const FVector LeftOfSpread = Forward.RotateAngleAxis(-Spread / 2.f, Axis);
 	if (NumRotators > 1)
 	{
@@ -413,7 +412,6 @@ TArray<FRotator> ULeyrAbilitySystemLibrary::EvenlySpacedRotators(const FVector& 
 TArray<FVector> ULeyrAbilitySystemLibrary::EvenlyRotatedVectors(const FVector& Forward, const FVector& Axis, float Spread, int32 NumVectors)
 {
  	TArray<FVector> Vectors;
- 	
  	const FVector LeftOfSpread = Forward.RotateAngleAxis(-Spread / 2.f, Axis);
  	if (NumVectors > 1)
  	{

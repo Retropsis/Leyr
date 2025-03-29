@@ -387,6 +387,7 @@ FGameplayTag CombatSocket_RightFeet;
   * Montage / Gameplay Events
   */
 FGameplayTag Event_Montage_FireBolt;
+FGameplayTag Event_Montage_Electrocute;
 FGameplayTag Event_Montage_Bow_Draw;
 FGameplayTag Event_Montage_Bow_Shot;
  
