@@ -296,6 +296,8 @@ FGameplayTag CombatState_Directional_ForwardDown;
   * Gameplay Cues
   */
 FGameplayTag GameplayCue_FireBlast;
+FGameplayTag GameplayCue_Electrocute;
+FGameplayTag GameplayCue_Electrocute_Loop;
 FGameplayTag GameplayCue_Healing_Cure_1;
 FGameplayTag GameplayCue_Healing_Cure_2;
 FGameplayTag GameplayCue_Lightning_Bolt_1;

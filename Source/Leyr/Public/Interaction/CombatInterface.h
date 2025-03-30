@@ -32,23 +32,32 @@ class LEYR_API ICombatInterface
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
-public:
-	UFUNCTION(BlueprintNativeEvent)
-	int32 GetCharacterLevel();
-	
+public:	
 	virtual void Die(const FVector& DeathImpulse, bool bExecute) = 0;
 	virtual FOnASCRegistered& GetOnASCRegistered() = 0;
 	virtual FOnDeath& GetOnDeath() = 0;
 	// virtual FOnTakeDamage& GetOnTakeDamage() = 0;
 	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	FVector GetCombatSocketLocation(const FGameplayTag& MontageTag);
-	
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void UpdateFacingTarget(const FVector& Target);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void AdjustDirection();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UAbilityData* LoadAndGetDefaultAbilityData();
+
+	/*
+	 * Getter - Setter
+	*/
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetCharacterLevel();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FVector GetCombatSocketLocation(const FGameplayTag& MontageTag);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	USceneComponent* GetWeaponComponent();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	TSoftObjectPtr<UPaperZDAnimSequence> GetHitReactSequence();
@@ -70,9 +79,6 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UPaperZDAnimInstance* GetWeaponAnimInstance();
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void AdjustDirection();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void GetAttackAnimationData(FVector& InBoxTraceStart, FVector& InBoxTraceEnd);

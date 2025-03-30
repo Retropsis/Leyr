@@ -47,6 +47,21 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Range")
 	TObjectPtr<UProjectileData> ProjectileData = nullptr;
 	
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileData != nullptr", EditConditionHides))
+	float ProjectileSpread = 90.f;
+ 
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileData != nullptr", EditConditionHides))
+	int32 MaxNumProjectiles = 5;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileData != nullptr", EditConditionHides))
+	bool bLaunchHomingProjectiles = true;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileData != nullptr", EditConditionHides))
+	float HomingAccelerationMin = 1600.f;
+ 
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileData != nullptr", EditConditionHides))
+	float HomingAccelerationMax = 3200.f;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Range")
 	bool bOverridePitch = false;
 	

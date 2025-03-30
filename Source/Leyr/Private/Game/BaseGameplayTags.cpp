@@ -342,6 +342,8 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	 * Gameplay Cues
 	 */
 	GameplayTags.GameplayCue_FireBlast = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.FireBlast"), FString("Gameplay Cue FireBlast"));
+	GameplayTags.GameplayCue_Electrocute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Electrocute"), FString("Gameplay Cue Electrocute"));
+	GameplayTags.GameplayCue_Electrocute_Loop = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Electrocute.Loop"), FString("Gameplay Cue Electrocute Loop"));
 	GameplayTags.GameplayCue_Healing_Cure_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Healing.Cure.1"), FString("GameplayCue Healing Cure 1"));
 	GameplayTags.GameplayCue_Healing_Cure_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Healing.Cure.2"), FString("GameplayCue Healing Cure 2"));
 	GameplayTags.GameplayCue_Lightning_Bolt_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Lightning.Bolt.1"), FString("GameplayCue Lightning Bolt 1"));

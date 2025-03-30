@@ -133,6 +133,9 @@ public:
  
 	UFUNCTION(BlueprintPure, Category = "LeyrAbilitySystemLibrary|GameplayMechanics")
 	static TArray<FVector> EvenlyRotatedVectors(const FVector& Forward, const FVector& Axis, float Spread, int32 NumVectors);
+	
+	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayMechanics")
+	static void GetClosestTargets(int32 MaxTargets, const TArray<AActor*>& Actors, TArray<AActor*>& OutClosestTargets, const FVector& Origin);
 
 	UFUNCTION(BlueprintPure, Category = "LeyrAbilitySystemLibrary|GameplayMechanics")
 	static bool IsHostile(const AActor* FirstActor, const AActor* SecondActor);

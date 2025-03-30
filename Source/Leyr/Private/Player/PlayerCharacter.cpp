@@ -414,6 +414,7 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
 		break;
 	case ECombatState::Aiming:
+	case ECombatState::Casting:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
 		Pitch(MovementVector.Y);
 		break;
@@ -740,6 +741,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		// CombatState = ECombatState::Unoccupied;
 		break;
 	case ECombatState::Aiming:
+	case ECombatState::Casting:
 		GetCharacterMovement()->MaxWalkSpeed = AimingWalkSpeed;
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Aiming);
 		break;

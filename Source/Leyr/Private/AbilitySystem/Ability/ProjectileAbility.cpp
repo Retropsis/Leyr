@@ -20,6 +20,11 @@ void UProjectileAbility::InitAbility()
 	{
 		bOverridePitch = AbilityData->bOverridePitch;
 		PitchOverride = AbilityData->PitchOverride;
+		ProjectileSpread =AbilityData->ProjectileSpread;
+		MaxNumProjectiles = AbilityData->MaxNumProjectiles;
+		bLaunchHomingProjectiles = AbilityData->bLaunchHomingProjectiles;
+		HomingAccelerationMin = AbilityData->HomingAccelerationMin;
+		HomingAccelerationMax = AbilityData->HomingAccelerationMax;
 	}
 }
 
@@ -28,7 +33,7 @@ void UProjectileAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void UProjectileAbility::SpawnProjectile(const FGameplayTag& SocketTag, bool bHasTarget, const FVector& ProjectileTargetLocation)
+void UProjectileAbility::SpawnProjectile(const FGameplayTag& SocketTag, const FVector& ProjectileTargetLocation)
 {
 	if (!GetAvatarActorFromActorInfo()->HasAuthority()) return;
 

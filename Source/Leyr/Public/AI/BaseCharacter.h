@@ -107,6 +107,8 @@ protected:
 
 	//~ Combat Interface
 	virtual UAbilityData* LoadAndGetDefaultAbilityData_Implementation() override;
+
+	virtual USceneComponent* GetWeaponComponent_Implementation() override { return nullptr; }
 	virtual TSoftObjectPtr<UPaperZDAnimSequence> GetHitReactSequence_Implementation() override { return HitReactSequence; }
 	virtual TSoftObjectPtr<USoundBase> ImpactSoundFromTag_Implementation(const FGameplayTag& MontageTag, ESequenceType SequenceType) override;
 	virtual UNiagaraSystem* GetImpactEffect_Implementation() override { return ImpactEffect; }

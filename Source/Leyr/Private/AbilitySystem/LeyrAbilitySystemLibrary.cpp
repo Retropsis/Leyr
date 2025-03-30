@@ -429,6 +429,51 @@ TArray<FVector> ULeyrAbilitySystemLibrary::EvenlyRotatedVectors(const FVector& F
  	return Vectors;
 }
 
+void ULeyrAbilitySystemLibrary::GetClosestTargets(int32 MaxTargets, const TArray<AActor*>& Actors, TArray<AActor*>& OutClosestTargets, const FVector& Origin)
+{
+	if (Actors.Num() <= MaxTargets)
+	{
+		OutClosestTargets = Actors;
+		return;
+	}
+ 
+	// TArray<AActor*> ActorsToCheck = Actors;
+	// int32 NumTargetsFound = 0;
+	//
+	// while (NumTargetsFound < MaxTargets)
+	// {
+	// 	if (ActorsToCheck.Num() == 0) break;
+	// 	double ClosestDistance = TNumericLimits<double>::Max();
+	// 	AActor* ClosestActor;
+	// 	for (AActor* PotentialTarget : ActorsToCheck)
+	// 	{
+	// 		const double Distance = (PotentialTarget->GetActorLocation() - Origin).Length();
+	// 		if (Distance < ClosestDistance)
+	// 		{
+	// 			ClosestDistance = Distance;
+	// 			ClosestActor = PotentialTarget;
+	// 		}
+	// 	}
+	// 	ActorsToCheck.Remove(ClosestActor);
+	// 	OutClosestTargets.AddUnique(ClosestActor);
+	// 	++NumTargetsFound;
+	// }
+
+	TArray<AActor*> SortedActors = Actors;
+	Algo::Sort(SortedActors, [Origin](const AActor* ActorA, const AActor* ActorB)
+	{
+		const float DistanceA = FVector::DistSquared(ActorA->GetActorLocation(), Origin);
+		const float DistanceB = FVector::DistSquared(ActorB->GetActorLocation(), Origin);
+ 
+		return DistanceA < DistanceB;
+	});
+ 
+	for (int32 i = 0; i < MaxTargets; i++)
+	{
+		OutClosestTargets.Add(SortedActors[i]);
+	}
+}
+
 bool ULeyrAbilitySystemLibrary::IsHostile(const AActor* FirstActor, const AActor* SecondActor)
 {
 	return !(FirstActor->ActorHasTag(FName("Player")) && SecondActor->ActorHasTag(FName("Player"))
