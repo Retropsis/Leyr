@@ -85,7 +85,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	TObjectPtr<UAbilityData> AbilityData;
-
+	
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category="Ability")
+	float MinAbilityTime = 0.5f;
+	
 	/*
 	 * Base Ability Data
 	 */

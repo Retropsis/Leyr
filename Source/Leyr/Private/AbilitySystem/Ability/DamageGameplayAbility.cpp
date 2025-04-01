@@ -23,6 +23,10 @@ void UDamageGameplayAbility::InitAbility()
 		DamageEffectClass = AbilityData->MainEffectClass;
 		// bShouldApplyExecute = AbilityData->bShouldApplyExecute;
 		// bShouldExecute = AbilityData->bShouldExecute;
+			
+		bIsRadialDamage = AbilityData->bIsRadialDamage;
+		RadialDamageInnerRadius = AbilityData->RadialDamageInnerRadius;
+		RadialDamageOuterRadius = AbilityData->RadialDamageOuterRadius;
 	}
 }
 
@@ -30,6 +34,8 @@ void UDamageGameplayAbility::PrepareToEndAbility()
 {
 	Super::PrepareToEndAbility();
 	ICombatInterface::Execute_SetMovementEnabled(GetAvatarActorFromActorInfo(), true);
+	HitActor = nullptr;
+	HitLocation = FVector::ZeroVector;
 }
 
 TArray<FHitResult> UDamageGameplayAbility::BoxTrace(bool bDebug)
@@ -104,6 +110,11 @@ void UDamageGameplayAbility::ForEachHitTryCausingDamage(TArray<FHitResult> HitRe
 			bHasHitTarget = true;
 		}
 	}
+}
+
+float UDamageGameplayAbility::GetAbilityPowerAtLevel() const
+{
+	return AbilityPower.GetValueAtLevel(GetAbilityLevel());
 }
 
 void UDamageGameplayAbility::ApplyHitStop()
@@ -214,6 +225,13 @@ FAdditionalEffectParams UDamageGameplayAbility::MakeAdditionalEffectParamsFromCl
 		const FVector ToTarget = Rotation.Vector();
 		Params.DeathImpulse = ToTarget * DeathImpulseMagnitude;
 		if(FMath::RandRange(1, 100) < Params.AirborneChance) Params.AirborneForce = ToTarget * AirborneForceMagnitude;
+	}
+	if (bIsRadialDamage)
+	{
+		Params.bIsRadialDamage = bIsRadialDamage;
+		Params.RadialDamageOrigin = RadialDamageOrigin;
+		Params.RadialDamageInnerRadius = RadialDamageInnerRadius;
+		Params.RadialDamageOuterRadius = RadialDamageOuterRadius;
 	}
 	return Params;
 }

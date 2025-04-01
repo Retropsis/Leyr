@@ -89,6 +89,7 @@ enum class ECombatState : uint8
 	Dodging UMETA(DisplayName="Dodging"),
 	Rolling UMETA(DisplayName="Rolling"),
 	HitReact UMETA(DisplayName="HitReact"),
+	Stunned UMETA(DisplayName="Stunned"),
 	ClimbingRope UMETA(DisplayName="Climbing Rope"),
 	UnCrouching UMETA(DisplayName="UnCrouching"),
 	RollingEnd UMETA(DisplayName="RollingEnd"),

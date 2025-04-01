@@ -8,6 +8,7 @@
 #include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Interaction/CombatInterface.h"
 #include "Interaction/InteractionInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Leyr/Leyr.h"
@@ -48,6 +49,19 @@ void AProjectile::BeginPlay()
 		LoopingSoundComponent = UGameplayStatics::SpawnSoundAttached(LoopingSound, GetRootComponent());
 		LoopingSoundComponent->bStopWhenOwnerDestroyed = true;
 	}
+	
+	if (HasAuthority() && ProjectileMovement->HomingTargetComponent.IsValid())
+	{
+		if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(ProjectileMovement->HomingTargetComponent->GetOwner()))
+		{
+			CombatInterface->GetOnDeath().AddUniqueDynamic(this, &ThisClass::OnHomingTargetDeath);
+		}
+	}
+}
+
+void AProjectile::OnHomingTargetDeath(AActor* DeadActor)
+{
+	ProjectileMovement->bIsHomingProjectile = false;
 }
 
 void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -58,6 +72,7 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	// if (!DamageEffectSpecHandle.Data.IsValid() || DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor) return;
 	// if (!ULeyrAbilitySystemLibrary::IsHostile(DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser(), OtherActor)) return;
 
+	if (AdditionalEffectParams.SourceAbilitySystemComponent == nullptr) return;
 	AActor* SourceAvatarActor = AdditionalEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
 	if (!IsValid(SourceAvatarActor)) Destroy();
 	if (SourceAvatarActor == OtherActor) return;

@@ -1,22 +1,26 @@
 // @ Retropsis 2024-2025.
 
 #include "Player/PlayerCharacter.h"
-#include "AbilitySystemBlueprintLibrary.h"
 #include "Player/PlayerCharacterAnimInstance.h"
 #include "Player/PlayerCharacterController.h"
 #include "Player/PlayerCharacterState.h"
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/Data/LevelUpInfo.h"
 #include "AbilitySystem/Data/AttackSequenceInfo.h"
+#include "AbilitySystem/BaseAttributeSet.h"
+#include "AbilitySystem/LeyrAbilitySystemLibrary.h"
+#include "AbilitySystem/Data/AbilityInfo.h"
+#include "AbilitySystem/Data/CharacterInfo.h"
+#include "AbilitySystem/Effect/StatusEffectNiagaraComponent.h"
 #include "Inventory/PlayerInventoryComponent.h"
 #include "PaperZDAnimInstance.h"
-#include "Game/BaseGameplayTags.h"
+#include "PaperFlipbookComponent.h"
 #include "Interaction/InteractionInterface.h"
 #include "Interaction/PlatformInterface.h"
 #include "Inventory/HotbarComponent.h"
 #include "Inventory/Container/Container.h"
-#include "UI/PlayerHUD.h"
 #include "Components/BoxComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Camera/CameraComponent.h"
@@ -25,18 +29,15 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "NiagaraComponent.h"
-#include "PaperFlipbookComponent.h"
-#include "AbilitySystem/BaseAttributeSet.h"
-#include "AbilitySystem/LeyrAbilitySystemLibrary.h"
-#include "AbilitySystem/Data/AbilityInfo.h"
-#include "AbilitySystem/Data/CharacterInfo.h"
 #include "Data/AbilitySet.h"
 #include "Data/InventoryCostData.h"
 #include "Game/LeyrGameMode.h"
 #include "Game/LoadMenuSaveGame.h"
+#include "Game/BaseGameplayTags.h"
 #include "Interaction/ElevatorInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/Controller/InventoryWidgetController.h"
+#include "UI/PlayerHUD.h"
 #include "World/Map/CameraBoundary.h"
 #include "World/Map/ParallaxController.h"
 
@@ -339,6 +340,7 @@ void APlayerCharacter::InitAbilityActorInfo()
 
 	//TODO: Move this to some other (PlayerState, BeginPlay)
 	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::HitReactTagChanged);
+ 	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().StatusEffect_Stun, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::StunTagChanged);
 }
 
 void APlayerCharacter::InitializeCharacterInfo()
@@ -459,6 +461,8 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	case ECombatState::RollingEnd:
 	case ECombatState::Defeated:
 		break;
+	case ECombatState::Stunned:
+		break;
 	}
 }
 
@@ -527,6 +531,41 @@ void APlayerCharacter::HandleCombatDirectionTag() const
 	case ECombatDirection::ForwardDown:
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Directional_ForwardDown);
 		break;
+	}
+}
+
+void APlayerCharacter::OnRep_Stunned()
+{
+	if (UBaseAbilitySystemComponent* AuraASC = Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent))
+	{
+		const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+		FGameplayTagContainer BlockedTags;
+		BlockedTags.AddTag(GameplayTags.Player_Block_CursorTrace);
+		BlockedTags.AddTag(GameplayTags.Player_Block_InputHeld);
+		BlockedTags.AddTag(GameplayTags.Player_Block_InputPressed);
+		BlockedTags.AddTag(GameplayTags.Player_Block_InputReleased);
+		if (bIsStunned)
+		{
+			AuraASC->AddLooseGameplayTags(BlockedTags);
+			StunStatusEffectComponent->Activate();
+		}
+		else
+		{
+			AuraASC->RemoveLooseGameplayTags(BlockedTags);
+			StunStatusEffectComponent->Deactivate();
+		}
+	}
+}
+
+void APlayerCharacter::OnRep_Burned()
+{	
+	if (bIsBurned)
+	{
+		BurnStatusEffectComponent->Activate();
+	}
+	else
+	{
+		BurnStatusEffectComponent->Deactivate();
 	}
 }
 
@@ -747,6 +786,8 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		break;
 	case ECombatState::Defeated:
 		MakeAndApplyEffectToSelf(FBaseGameplayTags::Get().CombatState_Defeated);
+		break;
+	case ECombatState::Stunned:
 		break;
 	}
 	UE_LOG(LogTemp, Warning, TEXT("CombatState: %s"), *UEnum::GetValueAsString(CombatState));

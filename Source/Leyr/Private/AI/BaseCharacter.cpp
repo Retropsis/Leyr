@@ -19,6 +19,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Leyr/Leyr.h"
+#include "Net/UnrealNetwork.h"
 
 ABaseCharacter::ABaseCharacter()
 {
@@ -48,6 +49,10 @@ ABaseCharacter::ABaseCharacter()
 	BurnStatusEffectComponent = CreateDefaultSubobject<UStatusEffectNiagaraComponent>("BurnStatusEffectComponent");
 	BurnStatusEffectComponent->SetupAttachment(GetRootComponent());
 	BurnStatusEffectComponent->StatusEffectTag = GameplayTags.StatusEffect_Burn;
+	
+	StunStatusEffectComponent = CreateDefaultSubobject<UStatusEffectNiagaraComponent>("StunStatusEffectComponent");
+	StunStatusEffectComponent->SetupAttachment(GetRootComponent());
+	StunStatusEffectComponent->StatusEffectTag = GameplayTags.StatusEffect_Stun;
 
 	UpperBody = CreateDefaultSubobject<UPaperFlipbookComponent>("UpperBody");
 	UpperBody->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -60,6 +65,15 @@ ABaseCharacter::ABaseCharacter()
 	WeaponFlipbook->SetupAttachment(GetRootComponent());
 
 	WeaponComponent = CreateDefaultSubobject<UPaperZDAnimationComponent>("WeaponComponent");
+}
+
+void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+ 
+	DOREPLIFETIME(ABaseCharacter, bIsStunned);
+	DOREPLIFETIME(ABaseCharacter, bIsBurned);
+	DOREPLIFETIME(ABaseCharacter, bIsElectrocuted);
 }
 
 /*
@@ -112,9 +126,10 @@ void ABaseCharacter::MakeAndApplyEffectToSelf(const FGameplayTag Tag, float Leve
 	}
 }
 
-UAbilitySystemComponent* ABaseCharacter::GetAbilitySystemComponent() const
+void ABaseCharacter::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
-	return AbilitySystemComponent;
+	bIsStunned = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bIsStunned ? 0.f : BaseWalkSpeed;
 }
 
 /*
@@ -158,6 +173,40 @@ FVector ABaseCharacter::GetCombatSocketLocation_Implementation(const FGameplayTa
 	}
 	// return FVector();
 	return WeaponSocket->GetComponentLocation();
+}
+
+FVector ABaseCharacter::GetRelativeCombatSocketLocation_Implementation(const FGameplayTag& MontageTag)
+{
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Weapon) && IsValid(WeaponSocket))
+	{
+		return GetSprite()->GetSocketTransform(WeaponSocketName, RTS_Actor).GetLocation();
+	}
+	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Weapon_UpperBody))
+	{
+		return UpperBody->GetSocketTransform(WeaponSocketName, RTS_Actor).GetLocation();
+	}
+	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_LeftHand))
+	{
+		// return GetMesh()->GetSocketLocation(LeftHandSocketName);
+	}
+	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_RightHand))
+	{
+		// return GetMesh()->GetSocketLocation(RightHandSocketName);
+	}
+	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Tail))
+	{
+		// return GetMesh()->GetSocketLocation(TailSocketName);
+	}
+	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_LeftFeet))
+	{
+		// return GetMesh()->GetSocketLocation(LeftFootSocketName);
+	}
+	if(MontageTag.MatchesTagExact(GameplayTags.CombatSocket_RightFeet))
+	{
+		// return GetMesh()->GetSocketLocation(RightFootSocketName);
+	}
+	return WeaponSocket->GetRelativeLocation();
 }
 
 UAbilityData* ABaseCharacter::LoadAndGetDefaultAbilityData_Implementation()
@@ -247,6 +296,7 @@ void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImp
 	GetAbilitySystemComponent()->AddLooseGameplayTag(FBaseGameplayTags::Get().Defeated);
 	DefeatState = InDefeatState;
 	BurnStatusEffectComponent->Deactivate();
+	StunStatusEffectComponent->Deactivate();
 	OnDeath.Broadcast(this);
 }
 

@@ -29,7 +29,8 @@ class LEYR_API ABaseCharacter : public APaperCharacter, public IAbilitySystemInt
 
 public:
 	ABaseCharacter();
-	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; } 
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	void ChangeDirections();
 	UPaperZDAnimInstance* SetWeaponAnimInstance(const TSubclassOf<UPaperZDAnimInstance>& AnimInstance) const;
@@ -48,6 +49,7 @@ protected:
 	virtual void InitializeDefaultAttributes() const {}
 	virtual void InitializeCharacterInfo() {}
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) {}
+	virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, float Level) const;
 	void MakeAndApplyEffectToSelf(const FGameplayTag Tag, float Level = 1.f) const;
 	
@@ -102,20 +104,41 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Movement")
 	float BaseFlySpeed = 300.f;
 
+	/*
+	 * Status Effects
+	 */
 	UPROPERTY(BlueprintReadOnly, Category="Character|Combat")
 	bool bHitReacting = false;
+	
+	UPROPERTY(ReplicatedUsing=OnRep_Burned, BlueprintReadOnly, Category="Character|Combat")
+	bool bIsBurned = false;
+	
+	UPROPERTY(ReplicatedUsing=OnRep_Stunned, BlueprintReadOnly, Category="Character|Combat")
+	bool bIsStunned = false;
+	
+	UPROPERTY(Replicated, BlueprintReadOnly)
+	bool bIsElectrocuted = false;
+	
+	UFUNCTION()
+	virtual void OnRep_Stunned() {}
+ 
+	UFUNCTION()
+	virtual void OnRep_Burned() {}
 
 	//~ Combat Interface
 	virtual UAbilityData* LoadAndGetDefaultAbilityData_Implementation() override;
 
-	virtual USceneComponent* GetWeaponComponent_Implementation() override { return nullptr; }
 	virtual TSoftObjectPtr<UPaperZDAnimSequence> GetHitReactSequence_Implementation() override { return HitReactSequence; }
 	virtual TSoftObjectPtr<USoundBase> ImpactSoundFromTag_Implementation(const FGameplayTag& MontageTag, ESequenceType SequenceType) override;
 	virtual UNiagaraSystem* GetImpactEffect_Implementation() override { return ImpactEffect; }
 	virtual void SetImpactSoundLoaded_Implementation(USoundBase* ImpactSound) override { ImpactSoundLoaded = ImpactSound; }
 	virtual USoundBase* GetImpactSoundLoaded_Implementation() override { return ImpactSoundLoaded; }
+
+	virtual void SetIsElectrocuted_Implementation(bool InIsElectrocuted) override { bIsElectrocuted = InIsElectrocuted; }
+	virtual bool IsElectrocuted_Implementation() const override { return bIsElectrocuted; }
 	
 	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
+	virtual FVector GetRelativeCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
 	virtual UPaperZDAnimInstance* GetPaperAnimInstance_Implementation() override { return AnimationComponent->GetAnimInstance(); }
 	virtual UPaperZDAnimInstance* GetWeaponAnimInstance_Implementation() override { return WeaponComponent->GetAnimInstance(); }
 	virtual void GetAttackAnimationData_Implementation(FVector& InBoxTraceStart, FVector& InBoxTraceEnd) override;
@@ -131,6 +154,7 @@ protected:
 	virtual FOnDeath& GetOnDeath() override { return OnDeath; }
 	virtual void Die(const FVector& DeathImpulse, bool bExecute) override;
 	virtual EDefeatState GetDefeatState_Implementation() const override { return  DefeatState; }
+	virtual  bool IsDefeated_Implementation() const override { return DefeatState != EDefeatState::None; }
 	virtual void SetGravityScale_Implementation(float GravityValue) override;
 	virtual float GetGravityScale_Implementation() override;
 	virtual void ResetGravityScale_Implementation() override;
@@ -191,4 +215,7 @@ protected:
 	 */ 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStatusEffectNiagaraComponent> BurnStatusEffectComponent;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UStatusEffectNiagaraComponent> StunStatusEffectComponent;
 };

@@ -137,6 +137,10 @@ protected:
 	virtual void InitializeDefaultAttributes() const override {}
 	virtual void InitializeCharacterInfo() override;
 	virtual void AddCharacterAbilities() override;
+	virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
+	
+	virtual void OnRep_Stunned() override;
+	virtual void OnRep_Burned() override;
 	
 	UFUNCTION(BlueprintCallable)
 	void CauseDamage(AActor* TargetActor);

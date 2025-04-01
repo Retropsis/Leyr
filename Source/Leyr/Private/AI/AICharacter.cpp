@@ -102,6 +102,7 @@ void AAICharacter::PossessedBy(AController* NewController)
 	
 	if (!HasAuthority()) return;
 	InitializeCharacterInfo();
+	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().StatusEffect_Stun, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAICharacter::StunTagChanged);
 
 	StartLocation = GetActorLocation();
 	
@@ -272,6 +273,25 @@ void AAICharacter::AddCharacterAbilities()
 {	
 	UBaseAbilitySystemComponent* BaseASC = CastChecked<UBaseAbilitySystemComponent>(AbilitySystemComponent);
 	EncounterData->AbilitySet->GiveToAbilitySystem(BaseASC, &GrantedHandles, FGameplayTag(), Level, BaseASC);
+}
+
+void AAICharacter::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	Super::StunTagChanged(CallbackTag, NewCount);
+	if (BaseAIController && BaseAIController->GetBlackboardComponent())
+	{
+		BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("Stunned"), bIsStunned);
+	}
+}
+
+void AAICharacter::OnRep_Stunned()
+{
+	Super::OnRep_Stunned();
+}
+
+void AAICharacter::OnRep_Burned()
+{
+	Super::OnRep_Burned();
 }
 
 void AAICharacter::InitializeNavigationBounds()

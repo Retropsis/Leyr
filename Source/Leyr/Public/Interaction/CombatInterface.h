@@ -57,7 +57,7 @@ public:
 	FVector GetCombatSocketLocation(const FGameplayTag& MontageTag);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	USceneComponent* GetWeaponComponent();
+	FVector GetRelativeCombatSocketLocation(const FGameplayTag& MontageTag);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	TSoftObjectPtr<UPaperZDAnimSequence> GetHitReactSequence();
@@ -108,6 +108,15 @@ public:
 	void IncrementMinionCount(int32 Amount);
 
 	/*
+	 * Status Effects
+	 */
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool IsElectrocuted() const;
+ 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetIsElectrocuted(bool InIsElectrocuted);
+
+	/*
 	 *
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
@@ -115,6 +124,9 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	EDefeatState GetDefeatState() const;
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool IsDefeated() const;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	AActor* GetAvatar();

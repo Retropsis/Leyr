@@ -52,7 +52,10 @@ public:
  
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileData != nullptr", EditConditionHides))
 	int32 MaxNumProjectiles = 5;
-	
+
+	/*
+	 * Homing
+	 */
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileData != nullptr", EditConditionHides))
 	bool bLaunchHomingProjectiles = true;
 	
@@ -61,10 +64,25 @@ public:
  
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileData != nullptr", EditConditionHides))
 	float HomingAccelerationMax = 3200.f;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Range")
+
+	/*
+	 * Radial
+	 */
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Radial")
+	bool bIsRadialDamage = false;
+ 
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Radial", meta=(EditCondition="bIsRadialDamage", EditConditionHides))
+	float RadialDamageInnerRadius = 0.f;
+ 
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Radial", meta=(EditCondition="bIsRadialDamage", EditConditionHides))
+	float RadialDamageOuterRadius = 0.f;
+
+	/*
+	 * Pitch
+	 */
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileData != nullptr", EditConditionHides))
 	bool bOverridePitch = false;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Range")
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileData != nullptr", EditConditionHides))
 	float PitchOverride = 0.f;
 };

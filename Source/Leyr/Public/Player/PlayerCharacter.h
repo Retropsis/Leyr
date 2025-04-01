@@ -191,7 +191,10 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Player")
 	TObjectPtr<UCharacterInfo> CharacterInfo = nullptr;
-	
+
+	/*
+	 * Movement
+	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
 	float BaseRunSpeed = 450.f;
 
@@ -262,6 +265,9 @@ protected:
 
 	ECombatDirection GetCombatDirectionFromVector2D(FVector2D MovementVector);
 	void HandleCombatDirectionTag() const;
+	
+	virtual void OnRep_Stunned() override;
+	virtual void OnRep_Burned() override;
 
 private:			
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))

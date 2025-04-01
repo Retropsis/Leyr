@@ -217,7 +217,10 @@ void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 		}
 		else
 		{
-			Props.TargetASC->TryActivateAbilitiesByTag(FBaseGameplayTags::Get().Effects_HitReact.GetSingleTagContainer());
+			if (Props.TargetCharacter->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsElectrocuted(Props.TargetCharacter))
+			{
+				Props.TargetASC->TryActivateAbilitiesByTag(FBaseGameplayTags::Get().Effects_HitReact.GetSingleTagContainer());
+			}
 			const FVector& AirborneForce = ULeyrAbilitySystemLibrary::GetAirborneForce(Props.EffectContextHandle);
 			if (!AirborneForce.IsNearlyZero(1.f))
 			{
@@ -307,13 +310,21 @@ void UBaseAttributeSet::HandleStatusEffect(const FEffectProperties& Props)
 	Effect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
 	Effect->Period = StatusEffectFrequency;
 	Effect->DurationMagnitude = FScalableFloat(StatusEffectDuration);
-
-	// Effect->InheritableOwnedTagsContainer.AddTag(GameplayTags.DamageTypesToStatusEffects[DamageType]);
 	
 	UTargetTagsGameplayEffectComponent& AssetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
 	FInheritedTagContainer InheritedTagContainer;
-	InheritedTagContainer.Added.AddTag(GameplayTags.DamageTypesToStatusEffects[DamageType]);
+	const FGameplayTag StatusEffectTag = GameplayTags.DamageTypesToStatusEffects[DamageType];
+	
+	InheritedTagContainer.Added.AddTag(StatusEffectTag);
+	if (StatusEffectTag.MatchesTagExact(GameplayTags.StatusEffect_Stun))
+	{
+		InheritedTagContainer.Added.AddTag(GameplayTags.Player_Block_CursorTrace);
+		InheritedTagContainer.Added.AddTag(GameplayTags.Player_Block_InputHeld);
+		InheritedTagContainer.Added.AddTag(GameplayTags.Player_Block_InputPressed);
+		InheritedTagContainer.Added.AddTag(GameplayTags.Player_Block_InputReleased);
+	}
 	AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
+
 	
 	Effect->StackingType = EGameplayEffectStackingType::AggregateBySource;
 	Effect->StackLimitCount = 1;

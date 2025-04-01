@@ -30,6 +30,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ForEachHitTryCausingDamage(TArray<FHitResult> HitResults);
 	
+	UFUNCTION(BlueprintPure)
+	float GetAbilityPowerAtLevel() const;
+	
 	UFUNCTION(BlueprintCallable)
 	void ApplyHitStop();
 
@@ -80,6 +83,13 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Damage")
 	bool bShouldExecute = false;
+	
+	bool bIsRadialDamage = false;
+	float RadialDamageInnerRadius = 0.f;
+	float RadialDamageOuterRadius = 0.f;
+	
+	UPROPERTY(BlueprintReadWrite)
+	FVector RadialDamageOrigin = FVector::ZeroVector;
 
 	/*
 	 * Status Effect

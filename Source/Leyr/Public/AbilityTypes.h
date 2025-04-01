@@ -30,6 +30,10 @@ struct FAdditionalEffectParams
 	UPROPERTY(BlueprintReadWrite) float AirborneForceMagnitude = 0.f;
 	UPROPERTY(BlueprintReadWrite) float AirborneChance = 0.f;
 	UPROPERTY(BlueprintReadWrite) FVector AirborneForce = FVector::ZeroVector;
+	UPROPERTY(BlueprintReadWrite) bool bIsRadialDamage = false;
+	UPROPERTY(BlueprintReadWrite) float RadialDamageInnerRadius = 0.f;
+	UPROPERTY(BlueprintReadWrite) float RadialDamageOuterRadius = 0.f;
+	UPROPERTY(BlueprintReadWrite) FVector RadialDamageOrigin = FVector::ZeroVector;
 };
 
 USTRUCT(BlueprintType)
@@ -48,6 +52,10 @@ public:
 	TSharedPtr<FGameplayTag> GetDamageType() const { return DamageType; }
 	FVector GetDeathImpulse() const { return DeathImpulse; }
 	FVector GetAirborneForce() const { return AirborneForce; }
+	bool IsRadialDamage() const { return bIsRadialDamage; }
+	float GetRadialDamageInnerRadius() const { return RadialDamageInnerRadius; }
+	float GetRadialDamageOuterRadius() const { return RadialDamageOuterRadius; }
+	FVector GetRadialDamageOrigin() const { return RadialDamageOrigin; }
 	
 	void SetIsCriticalHit(bool bInIsCriticalHit) { bIsCriticalHit = bInIsCriticalHit; }
 	void SetIsBlockedHit(bool bInIsBlockedHit) { bIsBlockedHit = bInIsBlockedHit; }
@@ -59,6 +67,10 @@ public:
 	void SetDamageType(const TSharedPtr<FGameplayTag>& InDamageType) { DamageType = InDamageType; }
 	void SetDeathImpulse(const FVector& InImpulse) { DeathImpulse = InImpulse; }
 	void SetAirborneForce(const FVector& InForce) { AirborneForce = InForce; }
+	void SetIsRadialDamage(bool bInIsRadialDamage) { bIsRadialDamage = bInIsRadialDamage; }
+	void SetRadialDamageInnerRadius(float InRadialDamageInnerRadius) { RadialDamageInnerRadius = InRadialDamageInnerRadius; }
+	void SetRadialDamageOuterRadius(float InRadialDamageOuterRadius) { RadialDamageOuterRadius = InRadialDamageOuterRadius; }
+	void SetRadialDamageOrigin(const FVector& InRadialDamageOrigin) { RadialDamageOrigin = InRadialDamageOrigin; }
 	
 	/** Returns the actual struct used for serialization, subclasses must override this! */
 	virtual UScriptStruct* GetScriptStruct() const
@@ -111,6 +123,18 @@ protected:
 	
 	UPROPERTY()
 	FVector AirborneForce = FVector::ZeroVector;
+	
+	UPROPERTY()
+	bool bIsRadialDamage = false;
+ 
+	UPROPERTY()
+	float RadialDamageInnerRadius = 0.f;
+ 
+	UPROPERTY()
+	float RadialDamageOuterRadius = 0.f;
+ 
+	UPROPERTY()
+	FVector RadialDamageOrigin = FVector::ZeroVector;
 };
 
 template<>
