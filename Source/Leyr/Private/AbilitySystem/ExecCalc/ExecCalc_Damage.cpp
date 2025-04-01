@@ -157,6 +157,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	}
 
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
+	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
 	
 	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
 	const FGameplayTagContainer* TargetTags = Spec.CapturedTargetTags.GetAggregatedTags();
@@ -185,6 +186,17 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		Resistance = FMath::Clamp(Resistance, 0.f, 100.f);
 
 		DamageTypeValue *= ( 100.f - Resistance ) / 100.f;
+
+		if (ULeyrAbilitySystemLibrary::IsRadialDamage(EffectContextHandle))
+		{
+			DamageTypeValue = ULeyrAbilitySystemLibrary::GetRadialDamageWithFalloff(
+			   TargetAvatar, DamageTypeValue, 0.f,
+			   ULeyrAbilitySystemLibrary::GetRadialDamageOrigin(EffectContextHandle),
+			   ULeyrAbilitySystemLibrary::GetRadialDamageInnerRadius(EffectContextHandle),
+			   ULeyrAbilitySystemLibrary::GetRadialDamageOuterRadius(EffectContextHandle),
+			   1.f);
+		}
+		
 		Damage += DamageTypeValue;
 	}
 	GEngine->AddOnScreenDebugMessage(123456, 30.f, FColor::Cyan, FString::Printf(TEXT("Raw Damage: %f"), Damage));
@@ -203,9 +215,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	// GEngine->AddOnScreenDebugMessage(445577, 5.f, FColor::Cyan, FString::Printf(TEXT("EffectivePAtk: [%f]"), EffectivePhysicalAttack));
 	Damage += Damage * EffectivePhysicalAttack * PhysicalAttackMastery;
 	GEngine->AddOnScreenDebugMessage(123457, 30.f, FColor::Cyan, FString::Printf(TEXT("Damage: %f including [P.Atk %f - P.Atk Mastery %f]"), Damage, SourcePhysicalAttack, PhysicalAttackMastery));
-	
-	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
-	
+		
 	// Capture BlockChance on Target, and determine if there was a successful Block
 	float TargetBlockChance = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().BlockChanceDef, EvaluationParameters, TargetBlockChance);

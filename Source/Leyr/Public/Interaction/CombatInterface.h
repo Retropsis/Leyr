@@ -15,7 +15,6 @@ class UPaperZDAnimSequence;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnASCRegistered, UAbilitySystemComponent*);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDeath, AActor*, DeadActor);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnTakeDamage, float /* DamageAmount */);
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)
@@ -36,7 +35,6 @@ public:
 	virtual void Die(const FVector& DeathImpulse, bool bExecute) = 0;
 	virtual FOnASCRegistered& GetOnASCRegistered() = 0;
 	virtual FOnDeath& GetOnDeath() = 0;
-	// virtual FOnTakeDamage& GetOnTakeDamage() = 0;
 	
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void UpdateFacingTarget(const FVector& Target);

@@ -39,6 +39,7 @@ public:
 	void HitStop(float Duration, float Amount = 0.f); 
 	
 	FOnDeath OnDeath;
+	FOnASCRegistered OnASCRegistered;
 
 protected:
 	/*
@@ -52,8 +53,6 @@ protected:
 	virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, float Level) const;
 	void MakeAndApplyEffectToSelf(const FGameplayTag Tag, float Level = 1.f) const;
-	
-	FOnASCRegistered OnASCRegistered;
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
@@ -150,8 +149,10 @@ protected:
 	virtual EObjectTypeQuery GetTraceObjectType_Implementation() override { return EOT_EnemyCapsule; }
 	virtual ECharacterClass GetCharacterClass_Implementation() override { return CharacterClass; }
 	virtual AActor* GetAvatar_Implementation() override { return this; }
+	
 	virtual FOnASCRegistered& GetOnASCRegistered() override { return OnASCRegistered; }
 	virtual FOnDeath& GetOnDeath() override { return OnDeath; }
+	
 	virtual void Die(const FVector& DeathImpulse, bool bExecute) override;
 	virtual EDefeatState GetDefeatState_Implementation() const override { return  DefeatState; }
 	virtual  bool IsDefeated_Implementation() const override { return DefeatState != EDefeatState::None; }

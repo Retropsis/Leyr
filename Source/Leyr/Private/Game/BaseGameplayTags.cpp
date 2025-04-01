@@ -343,8 +343,8 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	 */
 	GameplayTags.GameplayCue_FireBlast = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.FireBlast"), FString("Gameplay Cue FireBlast"));
 	GameplayTags.GameplayCue_Electrocute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Electrocute"), FString("Gameplay Cue Electrocute"));
-	GameplayTags.GameplayCue_Electrocute_Loop = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Earth.Shards"), FString("Gameplay Cue Earth_Shards"));
-	GameplayTags.GameplayCue_Earth_Shards = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Electrocute.Loop"), FString("Gameplay Cue Electrocute Loop"));
+	GameplayTags.GameplayCue_Electrocute_Loop = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Earth.Earthquake"), FString("Gameplay Cue Earth Earthquake"));
+	GameplayTags.GameplayCue_Earth_Earthquake = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Electrocute.Loop"), FString("Gameplay Cue Electrocute Loop"));
 	GameplayTags.GameplayCue_Healing_Cure_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Healing.Cure.1"), FString("GameplayCue Healing Cure 1"));
 	GameplayTags.GameplayCue_Healing_Cure_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Healing.Cure.2"), FString("GameplayCue Healing Cure 2"));
 	GameplayTags.GameplayCue_Lightning_Bolt_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Lightning.Bolt.1"), FString("GameplayCue Lightning Bolt 1"));
@@ -368,7 +368,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Cooldown_Fire_FireBolt = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Fire.FireBolt"), FString("Fire Elemental Ability FireBolt"));
 	GameplayTags.Cooldown_Fire_FireBlast = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Fire.FireBlast"), FString("Fire Elemental Ability FireBlast"));
 	GameplayTags.Cooldown_Lightning_Electrocute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Lightning.Electrocute"), FString("Elemental Ability Lightning Electrocute"));
-	GameplayTags.Cooldown_Earth_Shards = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Earth.Shards"), FString("Elemental Ability Earth Shards"));
+	GameplayTags.Cooldown_Earth_Earthquake = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Earth.Earthquake"), FString("Elemental Ability Earth Earthquake"));
 	GameplayTags.Cooldown_Healing_Cure_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Healing.Cure.1"), FString("Cooldown Healing Cure 1"));
 	GameplayTags.Cooldown_Healing_Cure_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Healing.Cure.2"), FString("Cooldown Healing Cure 2"));
 	GameplayTags.Cooldown_Lightning_Bolt_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Lightning.Bolt.1"), FString("Cooldown Lightning Bolt 1"));

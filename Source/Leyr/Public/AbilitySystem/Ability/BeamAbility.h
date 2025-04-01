@@ -25,7 +25,7 @@ public:
 	void TraceFirstTarget(const FVector& BeamTargetLocation);
 	
 	UFUNCTION(BlueprintCallable)
-	void StoreFirstTarget();
+	bool StoreFirstTarget();
 	
 	UFUNCTION(BlueprintCallable)
 	void StoreAdditionalTargets(TArray<AActor*>& OutAdditionalTargets);

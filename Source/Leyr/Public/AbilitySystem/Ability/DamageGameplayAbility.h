@@ -33,6 +33,12 @@ public:
 	UFUNCTION(BlueprintPure)
 	float GetAbilityPowerAtLevel() const;
 	
+	UFUNCTION(BlueprintPure)
+	float GetRadialDamageInnerRadius() const { return RadialDamageInnerRadius; }
+	
+	UFUNCTION(BlueprintPure)
+	float GetRadialDamageOuterRadius() const { return RadialDamageOuterRadius; }
+	
 	UFUNCTION(BlueprintCallable)
 	void ApplyHitStop();
 

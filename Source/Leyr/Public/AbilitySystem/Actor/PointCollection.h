@@ -24,10 +24,10 @@ protected:
 	float LiveActorRadius = 350.f;
 	
 	UPROPERTY(EditDefaultsOnly)
-	float RaisedLocationZ = 100.f;
+	float RaisedLocationZ = 50.f;
 	
 	UPROPERTY(EditDefaultsOnly)
-	float LoweredLocationZ = 100.f;
+	float LoweredLocationZ = 75.f;
  
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere)
 	TArray<TObjectPtr<USceneComponent>> Points;

@@ -6,7 +6,6 @@
 #include "GameFramework/Character.h"
 #include "Kismet/KismetSystemLibrary.h"
 
-
 void UBeamAbility::StoreMouseDataInfo(const FHitResult& HitResult)
 {
 	if (HitResult.bBlockingHit)
@@ -29,7 +28,7 @@ void UBeamAbility::StoreOwnerVariables()
 	}
 }
 
-void UBeamAbility::StoreFirstTarget()
+bool UBeamAbility::StoreFirstTarget()
 {
 	check(OwnerCharacter);
 	if (OwnerCharacter->Implements<UCombatInterface>())
@@ -52,12 +51,11 @@ void UBeamAbility::StoreFirstTarget()
 			{
 				CombatInterface->GetOnDeath().AddUniqueDynamic(this, &UBeamAbility::PrimaryTargetDied);
 			}
+			return true;
 		}
-		else
-		{
-			HitLocation = HitResult.TraceEnd;
-		}
+		HitLocation = HitResult.TraceEnd;
 	}
+	return false;
 }
 
 void UBeamAbility::TraceFirstTarget(const FVector& BeamTargetLocation)

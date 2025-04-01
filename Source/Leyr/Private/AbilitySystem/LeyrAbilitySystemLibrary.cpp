@@ -10,6 +10,7 @@
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "AbilitySystem/Data/EncounterInfo.h"
 #include "Data/ItemData.h"
+#include "Engine/DamageEvents.h"
 #include "Engine/OverlapResult.h"
 #include "Game/BaseGameplayTags.h"
 #include "Game/LeyrGameMode.h"
@@ -345,6 +346,74 @@ void ULeyrAbilitySystemLibrary::SetIsExecuteHit(FGameplayEffectContextHandle& Ef
 	}
 }
 
+bool ULeyrAbilitySystemLibrary::IsRadialDamage(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FBaseGameplayEffectContext* EffectContext = static_cast<const FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return EffectContext->IsRadialDamage();
+	}
+	return false;
+}
+
+float ULeyrAbilitySystemLibrary::GetRadialDamageInnerRadius(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FBaseGameplayEffectContext* EffectContext = static_cast<const FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return EffectContext->GetRadialDamageInnerRadius();
+	}
+	return 0.f;
+}
+
+float ULeyrAbilitySystemLibrary::GetRadialDamageOuterRadius(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FBaseGameplayEffectContext* EffectContext = static_cast<const FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return EffectContext->GetRadialDamageOuterRadius();
+	}
+	return 0.f;
+}
+
+FVector ULeyrAbilitySystemLibrary::GetRadialDamageOrigin(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FBaseGameplayEffectContext* EffectContext = static_cast<const FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		return EffectContext->GetRadialDamageOrigin();
+	}
+ 	return FVector::ZeroVector;
+}
+
+void ULeyrAbilitySystemLibrary::SetIsRadialDamage(FGameplayEffectContextHandle& EffectContextHandle, bool bInIsRadialDamage)
+{
+	if (FBaseGameplayEffectContext* EffectContext = static_cast<FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		EffectContext->SetIsRadialDamage(bInIsRadialDamage);
+	}
+}
+
+void ULeyrAbilitySystemLibrary::SetRadialDamageInnerRadius(FGameplayEffectContextHandle& EffectContextHandle, float InInnerRadius)
+{
+	if (FBaseGameplayEffectContext* EffectContext = static_cast<FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		EffectContext->SetRadialDamageInnerRadius(InInnerRadius);
+	}
+}
+
+void ULeyrAbilitySystemLibrary::SetRadialDamageOuterRadius(FGameplayEffectContextHandle& EffectContextHandle, float InOuterRadius)
+{
+	if (FBaseGameplayEffectContext* EffectContext = static_cast<FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		EffectContext->SetRadialDamageOuterRadius(InOuterRadius);
+	}
+}
+
+void ULeyrAbilitySystemLibrary::SetRadialDamageOrigin(FGameplayEffectContextHandle& EffectContextHandle, const FVector& InOrigin)
+{
+	if (FBaseGameplayEffectContext* EffectContext = static_cast<FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		EffectContext->SetRadialDamageOrigin(InOrigin);
+	}
+}
+
 FGameplayEffectContextHandle ULeyrAbilitySystemLibrary::ApplyAdditionalEffect(const FAdditionalEffectParams& AdditionalEffectParams)
 {
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
@@ -354,8 +423,13 @@ FGameplayEffectContextHandle ULeyrAbilitySystemLibrary::ApplyAdditionalEffect(co
 	EffectContextHandle.AddSourceObject(AdditionalEffectParams.SourceObject);
 	SetDeathImpulse(EffectContextHandle, AdditionalEffectParams.DeathImpulse);
 	SetAirborneForce(EffectContextHandle, AdditionalEffectParams.AirborneForce);
+	
+	SetIsRadialDamage(EffectContextHandle, AdditionalEffectParams.bIsRadialDamage);
+	SetRadialDamageInnerRadius(EffectContextHandle, AdditionalEffectParams.RadialDamageInnerRadius);
+	SetRadialDamageOuterRadius(EffectContextHandle, AdditionalEffectParams.RadialDamageOuterRadius);
+	SetRadialDamageOrigin(EffectContextHandle, AdditionalEffectParams.RadialDamageOrigin);
+	
 	const FGameplayEffectSpecHandle SpecHandle = AdditionalEffectParams.SourceAbilitySystemComponent->MakeOutgoingSpec(AdditionalEffectParams.AdditionalEffectClass, AdditionalEffectParams.AbilityLevel, EffectContextHandle);
-
 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, AdditionalEffectParams.DamageType, AdditionalEffectParams.AbilityPower);
 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Chance, AdditionalEffectParams.StatusEffectChance);
 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Damage, AdditionalEffectParams.StatusEffectDamage);
@@ -472,6 +546,21 @@ void ULeyrAbilitySystemLibrary::GetClosestTargets(int32 MaxTargets, const TArray
 	{
 		OutClosestTargets.Add(SortedActors[i]);
 	}
+}
+
+float ULeyrAbilitySystemLibrary::GetRadialDamageWithFalloff(const AActor* TargetActor, float BaseDamage,  float MinimumDamage, const FVector& Origin, float DamageInnerRadius, float DamageOuterRadius, float DamageFalloff)
+{
+	if (!TargetActor) return 0.f;
+ 
+	FRadialDamageParams RadialDamageParams;
+	RadialDamageParams.BaseDamage = BaseDamage;
+	RadialDamageParams.DamageFalloff = DamageFalloff;
+	RadialDamageParams.InnerRadius = DamageInnerRadius;
+	RadialDamageParams.OuterRadius = DamageOuterRadius;
+	RadialDamageParams.MinimumDamage = MinimumDamage;
+	const float DamageScale = RadialDamageParams.GetDamageScale((Origin - TargetActor->GetActorLocation()).Length());
+	
+	return BaseDamage * DamageScale;
 }
 
 bool ULeyrAbilitySystemLibrary::IsHostile(const AActor* FirstActor, const AActor* SecondActor)
