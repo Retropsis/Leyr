@@ -439,6 +439,48 @@ FGameplayEffectContextHandle ULeyrAbilitySystemLibrary::ApplyAdditionalEffect(co
 	AdditionalEffectParams.TargetAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
 	return EffectContextHandle;
 }
+	
+/*
+ * Damage Effect Params
+ */
+void ULeyrAbilitySystemLibrary::SetIsRadialDamageEffectParam(FAdditionalEffectParams& DamageEffectParams, bool bIsRadial, float InnerRadius, float OuterRadius, FVector Origin)
+{
+	DamageEffectParams.bIsRadialDamage = bIsRadial;
+	DamageEffectParams.RadialDamageInnerRadius = InnerRadius;
+	DamageEffectParams.RadialDamageOuterRadius = OuterRadius;
+	DamageEffectParams.RadialDamageOrigin = Origin;
+}
+
+void ULeyrAbilitySystemLibrary::SetAirborneDirection(FAdditionalEffectParams& DamageEffectParams, FVector AirborneDirection, float Magnitude)
+{
+	AirborneDirection.Normalize();
+	if (Magnitude == 0.f)
+	{
+		DamageEffectParams.AirborneForce = AirborneDirection * DamageEffectParams.AirborneForceMagnitude;
+	}
+	else
+	{
+		DamageEffectParams.AirborneForce = AirborneDirection * Magnitude;
+	}
+}
+
+void ULeyrAbilitySystemLibrary::SetDeathImpulseDirection(FAdditionalEffectParams& DamageEffectParams, FVector ImpulseDirection, float Magnitude)
+{
+	ImpulseDirection.Normalize();
+	if (Magnitude == 0.f)
+	{
+		DamageEffectParams.DeathImpulse = ImpulseDirection * DamageEffectParams.DeathImpulseMagnitude;
+	}
+	else
+	{
+		DamageEffectParams.DeathImpulse = ImpulseDirection * Magnitude;
+	}
+}
+
+void ULeyrAbilitySystemLibrary::SetTargetEffectParamsASC(FAdditionalEffectParams& DamageEffectParams, UAbilitySystemComponent* InASC)
+{
+ 	DamageEffectParams.TargetAbilitySystemComponent = InASC;
+}
 
 /*
  * Gameplay Mechanics

@@ -64,19 +64,21 @@ void AProjectile::OnHomingTargetDeath(AActor* DeadActor)
 	ProjectileMovement->bIsHomingProjectile = false;
 }
 
+bool AProjectile::IsValidOverlap(AActor* OtherActor)
+{
+	if (AdditionalEffectParams.SourceAbilitySystemComponent == nullptr) return false;
+	const AActor* SourceAvatarActor = AdditionalEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
+	if (!IsValid(SourceAvatarActor)) Destroy();
+	if (SourceAvatarActor == OtherActor) return false;
+	if (!ULeyrAbilitySystemLibrary::IsHostile(SourceAvatarActor, OtherActor)) return false;
+ 
+	return true;
+}
+
 void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// if(!IsValidOverlap(OtherActor)) return;
-    // if (OtherActor == GetInstigator()) return;
+	if(!IsValidOverlap(OtherActor)) return;
 	
-	// if (!DamageEffectSpecHandle.Data.IsValid() || DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser() == OtherActor) return;
-	// if (!ULeyrAbilitySystemLibrary::IsHostile(DamageEffectSpecHandle.Data.Get()->GetContext().GetEffectCauser(), OtherActor)) return;
-
-	if (AdditionalEffectParams.SourceAbilitySystemComponent == nullptr) return;
-	AActor* SourceAvatarActor = AdditionalEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
-	if (!IsValid(SourceAvatarActor)) Destroy();
-	if (SourceAvatarActor == OtherActor) return;
-
 	if (OtherComp && OtherComp->GetCollisionObjectType() == ECC_WorldStatic)
 	{
 		if (ResponseToStatic == EResponseToStatic::Destroy)
@@ -92,8 +94,8 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 			return;
 		}
 	}
-	
-	if (!ULeyrAbilitySystemLibrary::IsHostile(SourceAvatarActor, OtherActor)) return;
+	//
+	// if (!ULeyrAbilitySystemLibrary::IsHostile(SourceAvatarActor, OtherActor)) return;
 	if (!bHit) OnHit();
 
 	if (HasAuthority())
@@ -119,7 +121,7 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 			
 		if(OtherActor && OtherActor->Implements<UInteractionInterface>())
 		{
-			IInteractionInterface::Execute_InteractHit(OtherActor, SourceAvatarActor);
+			IInteractionInterface::Execute_InteractHit(OtherActor, /*SourceAvatarActor*/ GetInstigator());
 		}
 		bool bActorOverlappingProjectiles = OtherActor && OtherActor->ActorHasTag("OverlapProjectiles");
 		bool bInteractiveActorBlockingProjectile = OtherActor && OtherActor->Implements<UInteractionInterface>() && IInteractionInterface::Execute_ShouldBlockProjectile(OtherActor);

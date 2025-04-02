@@ -143,8 +143,23 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects")
 	static void SetRadialDamageOrigin(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const FVector& InOrigin);
 
-	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|AdditionalEffect")
+	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects")
 	static FGameplayEffectContextHandle ApplyAdditionalEffect(const FAdditionalEffectParams& AdditionalEffectParams);
+	
+	/*
+	 * Damage Effect Params
+	 */
+	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects")
+	static void SetIsRadialDamageEffectParam(UPARAM(ref) FAdditionalEffectParams& DamageEffectParams, bool bIsRadial, float InnerRadius, float OuterRadius, FVector Origin);
+ 
+	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects")
+	static void SetAirborneDirection(UPARAM(ref) FAdditionalEffectParams& DamageEffectParams, FVector AirborneDirection, float Magnitude = 0.f);
+ 
+	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects")
+	static void SetDeathImpulseDirection(UPARAM(ref) FAdditionalEffectParams& DamageEffectParams, FVector ImpulseDirection, float Magnitude = 0.f);
+ 
+	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects")
+	static void SetTargetEffectParamsASC(UPARAM(ref) FAdditionalEffectParams& DamageEffectParams, UAbilitySystemComponent* InASC);
 	
 	/*
 	 * Gameplay Mechanics

@@ -22,6 +22,8 @@ public:
 	void SetImpactEffect(UNiagaraSystem* Effect) { ImpactEffect = Effect; }
 	void SetImpactSound(USoundBase* Sound) { ImpactSound = Sound; }
 	void SetLoopingSound(USoundBase* Sound) { LoopingSound = Sound; }
+	bool IsValidOverlap(AActor* OtherActor);
+	
 	EResponseToStatic ResponseToStatic = EResponseToStatic::Destroy;
 
 	UPROPERTY(VisibleAnywhere)
@@ -36,14 +38,17 @@ public:
 	UPROPERTY()
 	TObjectPtr<USceneComponent> HomingTargetComponent;
 	
+	bool bHit = false;
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void Destroyed() override;
 	
+	UFUNCTION(BlueprintCallable)
 	void OnHit();
 
 	UFUNCTION()
-	void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
 private:
 	UFUNCTION()
@@ -51,8 +56,6 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly)
 	float LifeSpan = 15.f;
-
-	bool bHit = false;
 	
 	UPROPERTY() TObjectPtr<UNiagaraSystem> ImpactEffect;
 	UPROPERTY() TObjectPtr<USoundBase> ImpactSound;

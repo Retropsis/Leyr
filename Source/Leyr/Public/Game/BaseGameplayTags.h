@@ -162,7 +162,7 @@ FGameplayTag Abilities_Fire_FireBlast;
 FGameplayTag Abilities_Fire_FireBreath;
 FGameplayTag Abilities_Lightning_Electrocute;
 FGameplayTag Abilities_Lightning_Bolt_1;
-FGameplayTag Abilities_Arcane_ArcaneShards;
+FGameplayTag Abilities_Earth_Earthquake;
 FGameplayTag Abilities_Cosmos_Meteor_1;
 FGameplayTag Abilities_Noxious_Bio_1;
 FGameplayTag Abilities_Sorcery;
