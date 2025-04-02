@@ -140,16 +140,6 @@ void AProjectile::OnHit()
 	bHit = true;
 }
 
-// bool AProjectile::IsValidOverlap(AActor* OtherActor)
-// {
-// 	if(!IsValid(DamageEffectParams.SourceAbilitySystemComponent)) return false;
-// 	AActor* SourceAvatarActor = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
-// 	if(SourceAvatarActor == OtherActor) return false;
-// 	if(!UBaseAbilitySystemLibrary::IsHostile(SourceAvatarActor, OtherActor)) return false;
-//
-// 	return true;
-// }
-
 void AProjectile::Destroyed()
 {
 	if (!bHit && !HasAuthority()) OnHit();
