@@ -82,6 +82,16 @@ APlayerCharacter::APlayerCharacter()
 	TraceObjectType = EOT_EnemyCapsule;
 	
 	CharacterClass = ECharacterClass::Warrior;
+
+	SpecialStates.Add(ECombatState::Entangled);
+	SpecialStates.Add(ECombatState::Swimming);
+	SpecialStates.Add(ECombatState::HangingRope);
+	SpecialStates.Add(ECombatState::HangingLedge);
+	SpecialStates.Add(ECombatState::HangingHook);
+	SpecialStates.Add(ECombatState::HangingLadder);
+	SpecialStates.Add(ECombatState::OnGroundSlope);
+	SpecialStates.Add(ECombatState::OnRopeSlope);
+	SpecialStates.Add(ECombatState::OnElevator);
 }
 
 void APlayerCharacter::Tick(float DeltaSeconds)

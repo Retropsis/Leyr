@@ -187,6 +187,7 @@ FGameplayTag Abilities_Passive_Mastery_GreatSword;
 FGameplayTag Abilities_Passive_Mastery_Bow;
 FGameplayTag Abilities_Passive_Mastery_Crossbow;
 FGameplayTag Abilities_Passive_Mastery_Buckler;
+FGameplayTag Abilities_Passive_Mastery_Sorcery;
  
 FGameplayTag Abilities_Passive_Barrier;
 FGameplayTag Abilities_Passive_HealthDrain;
@@ -405,6 +406,7 @@ FGameplayTag Montage_Attack_2;
 FGameplayTag Montage_Attack_3;
 FGameplayTag Montage_Attack_4;
 FGameplayTag Montage_Casting;
+FGameplayTag Montage_Shielding;
 FGameplayTag Montage_Crouch_Attack;
 FGameplayTag Montage_Jump_Attack;
 FGameplayTag Montage_JumpForwardUp_Attack;

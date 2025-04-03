@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "ScalableFloat.h"
 #include "AbilitySystem/Data/AttackSequenceInfo.h"
 #include "Engine/DataAsset.h"
 #include "AbilityData.generated.h"

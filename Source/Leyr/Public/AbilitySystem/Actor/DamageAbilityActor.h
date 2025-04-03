@@ -20,7 +20,7 @@ public:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="AbilityActor")
-	FValueRange AbilityPower;
+	FScalableFloat AbilityPower;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="AbilityActor")
 	TSubclassOf<UGameplayEffect> DamageEffectClass;

@@ -10,6 +10,8 @@
 #include "UI/Controller/WidgetController.h"
 #include "InventoryWidgetController.generated.h"
 
+class UItemAbilityInfo;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnInputAssignedSignature, FInventoryItemData, ItemData, FGameplayTag, InputTag, bool, bPlaySound);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnInputRemovedSignature, FGameplayTag, InputTag);
 
@@ -34,13 +36,8 @@ struct FEquippedItem
 	
 	UPROPERTY()
 	TArray<FGameplayModifierInfo> Modifiers;
-
-	UPROPERTY()
-	bool bDirty = false;
 };
 
-class UItemAbilityInfo;
-struct FGameplayTag;
 /**
  * 
  */

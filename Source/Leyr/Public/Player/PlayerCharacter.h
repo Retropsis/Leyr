@@ -262,6 +262,7 @@ protected:
 	ECombatState PreviousCombatState = ECombatState::Unoccupied;
 	ECombatDirection CombatDirection = ECombatDirection::None;
 	ECombatDirection PreviousCombatDirection = ECombatDirection::None;
+	TArray<ECombatState> SpecialStates;
 
 	ECombatDirection GetCombatDirectionFromVector2D(FVector2D MovementVector);
 	void HandleCombatDirectionTag() const;

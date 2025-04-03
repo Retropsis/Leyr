@@ -193,6 +193,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_Passive_Mastery_Bow = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery.Bow"), FString("Bow Mastery"));
 	GameplayTags.Abilities_Passive_Mastery_Crossbow = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery.Crossbow"), FString("Crossbow Mastery"));
 	GameplayTags.Abilities_Passive_Mastery_Buckler = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery.Buckler"), FString("Buckler Mastery"));
+	GameplayTags.Abilities_Passive_Mastery_Sorcery = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Mastery.Sorcery"), FString("Sorcery Mastery"));
 	
 	GameplayTags.Abilities_Passive_Barrier = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.Barrier"), FString("Passive Ability Barrier"));
 	GameplayTags.Abilities_Passive_HealthDrain = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Passive.HealthDrain"), FString("Passive Ability Health Drain"));
@@ -437,6 +438,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Montage_Attack_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.3"), FString("Montage Attack 3"));
 	GameplayTags.Montage_Attack_4 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Attack.4"), FString("Montage Attack 4"));
 	GameplayTags.Montage_Casting = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Casting"), FString("Montage Casting"));
+	GameplayTags.Montage_Shielding = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Shielding"), FString("Montage Shielding"));
 	GameplayTags.Montage_Crouch_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Crouch.Attack"), FString("Montage Crouch Attack"));
 	GameplayTags.Montage_Jump_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Jump.Attack"), FString("Montage Jump Attack"));
 	GameplayTags.Montage_JumpForwardUp_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.JumpForwardUp.Attack"), FString("Montage Jump ForwardUp Attack"));

@@ -21,6 +21,7 @@ enum class ESequenceType : uint8
 	Dagger,
 	Piercing,
 	Casting,
+	Shielding,
 };
 
 /**
@@ -58,6 +59,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation", meta=(TitleProperty="MontageTag"))
 	TArray<FTaggedMontage> CastingSequences;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation", meta=(TitleProperty="MontageTag"))
+	TArray<FTaggedMontage> ShieldingSequences;
 
 	FTaggedMontage FindSequenceInfoForTag(const FGameplayTag& MontageTag, ESequenceType SequenceType, bool bLogNotFound = false) const;
 	TArray<FTaggedMontage> GetSequencesByType(ESequenceType SequenceType);

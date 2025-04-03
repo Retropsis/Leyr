@@ -26,6 +26,5 @@ public:
 	int32 MaxNumProjectiles = 10;
 	
 private:
-	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AFireBall> FireBallClass;
 };

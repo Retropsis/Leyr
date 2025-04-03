@@ -13,7 +13,7 @@ void ADamageAbilityActor::CauseDamage(AActor* TargetActor)
 	if(TargetASC && TargetASC->HasMatchingGameplayTag(FBaseGameplayTags::Get().Invincibility)) return;
 	
 	const FGameplayEffectSpecHandle DamageSpecHandle = SourceASC->MakeOutgoingSpec(DamageEffectClass, Level, SourceASC->MakeEffectContext());	
-	const float ScaledDamage = AbilityPower.GetRandomFloatFromScalableRange(Level);
+	const float ScaledDamage = AbilityPower.GetValueAtLevel(Level);
 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(DamageSpecHandle, DamageType, ScaledDamage);
 	SourceASC->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), TargetASC);
 

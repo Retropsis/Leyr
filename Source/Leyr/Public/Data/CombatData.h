@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "Leyr/Leyr.h"
 #include "CombatData.generated.h"
 
 class UPaperZDAnimSequence;
@@ -11,12 +10,6 @@ USTRUCT(BlueprintType)
 struct FTaggedMontage
 {
 	GENERATED_BODY()
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	FValueRange AbilityPower = FValueRange();
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(Categories="Damage"))
-	FGameplayTag DamageType;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(Categories="Montage"))
 	FGameplayTag MontageTag;
