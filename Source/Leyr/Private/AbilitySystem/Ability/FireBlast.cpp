@@ -5,16 +5,6 @@
 #include "AbilitySystem/Actor/FireBall.h"
 #include "Data/AbilityData.h"
 
-void UFireBlast::InitAbility()
-{
-	Super::InitAbility();
-	
-	if (AbilityData && AbilityData->ProjectileData)
-	{
-		FireBallClass = AbilityData->ProjectileData->ProjectileClass;
-	}
-}
-
 TArray<AFireBall*> UFireBlast::SpawnFireBalls()
 {
 	TArray<AFireBall*> FireBalls;
@@ -28,13 +18,14 @@ TArray<AFireBall*> UFireBlast::SpawnFireBalls()
 		SpawnTransform.SetLocation(Location);
 		SpawnTransform.SetRotation(Rotator.Quaternion());
  		
-		AFireBall* FireBall = GetWorld()->SpawnActorDeferred<AFireBall>(FireBallClass, SpawnTransform, GetOwningActorFromActorInfo(),
+		AFireBall* FireBall = GetWorld()->SpawnActorDeferred<AFireBall>(AbilityData->ProjectileClass, SpawnTransform, GetOwningActorFromActorInfo(),
 			CurrentActorInfo->PlayerController->GetPawn(),
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
  		
 		FireBall->AdditionalEffectParams = MakeAdditionalEffectParamsFromClassDefaults(); // Overlapping Damage
 		FireBall->ExplosionDamageParams = MakeAdditionalEffectParamsFromClassDefaults(); // Exploding Damage
 		FireBall->SetOwner(GetAvatarActorFromActorInfo());
+		FireBall->InitProjectileData();
 		FireBalls.Add(FireBall);
 		FireBall->FinishSpawning(SpawnTransform);
 	}

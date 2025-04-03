@@ -9,6 +9,7 @@
 #include "Engine/DataAsset.h"
 #include "AbilityData.generated.h"
 
+class UStatusEffectData;
 class UProjectileData;
 class UGameplayEffect;
 class AProjectile;
@@ -45,25 +46,28 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	bool bShouldExecute = false;
 
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Range")
-	TObjectPtr<UProjectileData> ProjectileData = nullptr;
+	UPROPERTY(EditDefaultsOnly, Category="Ability|StatusEffect")
+	TObjectPtr<UStatusEffectData> StatusEffectData = nullptr;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileData != nullptr", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Range")
+	TSubclassOf<AProjectile> ProjectileClass = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileClass != nullptr", EditConditionHides))
 	float ProjectileSpread = 90.f;
  
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileData != nullptr", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileClass != nullptr", EditConditionHides))
 	int32 MaxNumProjectiles = 5;
 
 	/*
 	 * Homing
 	 */
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileData != nullptr", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileClass != nullptr", EditConditionHides))
 	bool bLaunchHomingProjectiles = true;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileData != nullptr", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileClass != nullptr", EditConditionHides))
 	float HomingAccelerationMin = 1600.f;
  
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileData != nullptr", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileClass != nullptr", EditConditionHides))
 	float HomingAccelerationMax = 3200.f;
 
 	/*
@@ -81,9 +85,9 @@ public:
 	/*
 	 * Pitch
 	 */
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileData != nullptr", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileClass != nullptr", EditConditionHides))
 	bool bOverridePitch = false;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileData != nullptr", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileClass != nullptr", EditConditionHides))
 	float PitchOverride = 0.f;
 };

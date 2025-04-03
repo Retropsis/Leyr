@@ -4,10 +4,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/Actor/Projectile.h"
-#include "Components/SphereComponent.h"
 #include "Data/AbilityData.h"
-#include "Data/ProjectileData.h"
-#include "GameFramework/ProjectileMovementComponent.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -48,28 +45,16 @@ void UProjectileAbility::SpawnProjectile(const FGameplayTag& SocketTag, const FV
 	SpawnTransform.SetLocation(SocketLocation);
 	SpawnTransform.SetRotation(Rotation.Quaternion());
 	
-	if(AbilityData->ProjectileData)
-	{		
-		AProjectile* Projectile = GetWorld()->SpawnActorDeferred<AProjectile>(
-			AbilityData->ProjectileData->ProjectileClass,
+	AProjectile* Projectile = GetWorld()->SpawnActorDeferred<AProjectile>(
+			AbilityData->ProjectileClass,
 			SpawnTransform,
 			GetOwningActorFromActorInfo(),
 			Cast<APawn>(GetOwningActorFromActorInfo()),
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 	
-		Projectile->AdditionalEffectParams = MakeAdditionalEffectParamsFromClassDefaults();
-		Projectile->AdditionalEffectParams.DamageType = AbilityData->ProjectileData->DamageType;
-		Projectile->Sphere->SetCollisionResponseToChannel(ECC_WorldStatic, AbilityData->ProjectileData->ResponseToStatic == EResponseToStatic::Ignore ? ECR_Ignore : ECR_Overlap);
-		Projectile->ResponseToStatic = AbilityData->ProjectileData->ResponseToStatic;
-		Projectile->ProjectileMovement->ProjectileGravityScale = AbilityData->ProjectileData->ProjectileGravityScale;
-		Projectile->ProjectileMovement->InitialSpeed = AbilityData->ProjectileData->InitialSpeed;
-		Projectile->ProjectileMovement->MaxSpeed = AbilityData->ProjectileData->MaxSpeed;
-		Projectile->SetImpactEffect(AbilityData->ProjectileData->ImpactEffect);
-		Projectile->SetImpactSound(AbilityData->ProjectileData->ImpactSound);
-		Projectile->SetLoopingSound(AbilityData->ProjectileData->LoopingSound);
-		
-		Projectile->FinishSpawning(SpawnTransform);
-	}
+	Projectile->AdditionalEffectParams = MakeAdditionalEffectParamsFromClassDefaults();
+	Projectile->InitProjectileData();
+	Projectile->FinishSpawning(SpawnTransform);
 }
 
 void UProjectileAbility::SetPitchOverride(bool bShouldOverride, const float Pitch)

@@ -16,7 +16,6 @@ class LEYR_API UFireBlast : public UDamageGameplayAbility
 	GENERATED_BODY()
 
 public:
-	virtual void InitAbility() override;
 	virtual FString GetDescription(int32 Level) override;
 	virtual FString GetNextLevelDescription(int32 Level) override;
 	

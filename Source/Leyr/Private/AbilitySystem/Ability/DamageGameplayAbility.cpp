@@ -8,6 +8,7 @@
 #include "AI/BaseCharacter.h"
 #include "Data/AbilityData.h"
 #include "Data/ItemData.h"
+#include "Data/StatusEffectData.h"
 #include "Game/BaseGameplayTags.h"
 #include "Interaction/InteractionInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -27,6 +28,17 @@ void UDamageGameplayAbility::InitAbility()
 		bIsRadialDamage = AbilityData->bIsRadialDamage;
 		RadialDamageInnerRadius = AbilityData->RadialDamageInnerRadius;
 		RadialDamageOuterRadius = AbilityData->RadialDamageOuterRadius;
+		
+		if (AbilityData->StatusEffectData)
+		{
+			StatusEffectChance = AbilityData->StatusEffectData->StatusEffectChance;
+			StatusEffectDamage = AbilityData->StatusEffectData->StatusEffectDamage;
+			StatusEffectFrequency = AbilityData->StatusEffectData->StatusEffectFrequency;
+			StatusEffectDuration = AbilityData->StatusEffectData->StatusEffectDuration;
+			DeathImpulseMagnitude = AbilityData->StatusEffectData->DeathImpulseMagnitude;
+			AirborneChance = AbilityData->StatusEffectData->AirborneChance;
+			AirborneForceMagnitude = AbilityData->StatusEffectData->AirborneForceMagnitude;
+		}
 	}
 }
 

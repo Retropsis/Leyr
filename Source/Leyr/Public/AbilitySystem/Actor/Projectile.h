@@ -23,6 +23,10 @@ public:
 	void SetImpactSound(USoundBase* Sound) { ImpactSound = Sound; }
 	void SetLoopingSound(USoundBase* Sound) { LoopingSound = Sound; }
 	bool IsValidOverlap(AActor* OtherActor);
+	virtual bool InitProjectileData();
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UProjectileData> ProjectileData = nullptr;
 	
 	EResponseToStatic ResponseToStatic = EResponseToStatic::Destroy;
 

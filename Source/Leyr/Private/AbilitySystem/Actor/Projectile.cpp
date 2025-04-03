@@ -7,6 +7,7 @@
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
+#include "Data/StatusEffectData.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Interaction/CombatInterface.h"
 #include "Interaction/InteractionInterface.h"
@@ -35,6 +36,32 @@ AProjectile::AProjectile()
 	ProjectileMovement->InitialSpeed = 800.f;
 	ProjectileMovement->MaxSpeed = 800.f;
 	ProjectileMovement->ProjectileGravityScale = 1.f;
+}
+
+bool AProjectile::InitProjectileData()
+{
+	if (ProjectileData)
+	{
+		AdditionalEffectParams.DamageType = ProjectileData->DamageType;
+		Sphere->SetCollisionResponseToChannel(ECC_WorldStatic, ProjectileData->ResponseToStatic == EResponseToStatic::Ignore ? ECR_Ignore : ECR_Overlap);
+		ResponseToStatic = ProjectileData->ResponseToStatic;
+		ProjectileMovement->ProjectileGravityScale = ProjectileData->ProjectileGravityScale;
+		ProjectileMovement->InitialSpeed = ProjectileData->InitialSpeed;
+		ProjectileMovement->MaxSpeed = ProjectileData->MaxSpeed;
+		SetImpactEffect(ProjectileData->ImpactEffect);
+		SetImpactSound(ProjectileData->ImpactSound);
+		SetLoopingSound(ProjectileData->LoopingSound);
+		
+		if (ProjectileData->StatusEffectData)
+		{
+			AdditionalEffectParams.StatusEffectChance = ProjectileData->StatusEffectData->StatusEffectChance;
+			AdditionalEffectParams.StatusEffectDamage = ProjectileData->StatusEffectData->StatusEffectDamage;
+			AdditionalEffectParams.StatusEffectDuration = ProjectileData->StatusEffectData->StatusEffectDuration;
+			AdditionalEffectParams.StatusEffectFrequency = ProjectileData->StatusEffectData->StatusEffectFrequency;
+		}
+		return true;
+	}
+	return false;
 }
 
 void AProjectile::BeginPlay()

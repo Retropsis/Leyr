@@ -3,9 +3,7 @@
 #include "AbilitySystem/Ability/FireBolt.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AbilitySystem/Actor/Projectile.h"
-#include "Components/SphereComponent.h"
 #include "Data/AbilityData.h"
-#include "Data/ProjectileData.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 
 FString UFireBolt::GetDescription(int32 Level)
@@ -76,42 +74,30 @@ void UFireBolt::SpawnProjectiles(const FVector& ProjectileTargetLocation, const 
 		SpawnTransform.SetLocation(SocketLocation);
 		SpawnTransform.SetRotation(Rot.Quaternion());
 	
-		if(AbilityData->ProjectileData)
-		{		
-			AProjectile* Projectile = GetWorld()->SpawnActorDeferred<AProjectile>(
-				AbilityData->ProjectileData->ProjectileClass, SpawnTransform,
+		AProjectile* Projectile = GetWorld()->SpawnActorDeferred<AProjectile>(
+				AbilityData->ProjectileClass, SpawnTransform,
 				GetOwningActorFromActorInfo(), Cast<APawn>(GetOwningActorFromActorInfo()),
 				ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 	
-			Projectile->AdditionalEffectParams = MakeAdditionalEffectParamsFromClassDefaults();
-			Projectile->AdditionalEffectParams.DamageType = AbilityData->ProjectileData->DamageType;
-			Projectile->Sphere->SetCollisionResponseToChannel(ECC_WorldStatic, AbilityData->ProjectileData->ResponseToStatic == EResponseToStatic::Ignore ? ECR_Ignore : ECR_Overlap);
-			Projectile->ResponseToStatic = AbilityData->ProjectileData->ResponseToStatic;
-			Projectile->ProjectileMovement->ProjectileGravityScale = AbilityData->ProjectileData->ProjectileGravityScale;
-			Projectile->ProjectileMovement->InitialSpeed = AbilityData->ProjectileData->InitialSpeed;
-			Projectile->ProjectileMovement->MaxSpeed = AbilityData->ProjectileData->MaxSpeed;
-			Projectile->SetImpactEffect(AbilityData->ProjectileData->ImpactEffect);
-			Projectile->SetImpactSound(AbilityData->ProjectileData->ImpactSound);
-			Projectile->SetLoopingSound(AbilityData->ProjectileData->LoopingSound);
+		Projectile->AdditionalEffectParams = MakeAdditionalEffectParamsFromClassDefaults();
+		Projectile->InitProjectileData();
 
-			if (bLaunchHomingProjectiles)
+		if (bLaunchHomingProjectiles)
+		{
+			Projectile->ProjectileMovement->HomingAccelerationMagnitude = FMath::FRandRange(HomingAccelerationMin, HomingAccelerationMax);
+			Projectile->ProjectileMovement->bIsHomingProjectile = true;
+			if (HomingTarget && HomingTarget->Implements<UCombatInterface>())
 			{
-				Projectile->ProjectileMovement->HomingAccelerationMagnitude = FMath::FRandRange(HomingAccelerationMin, HomingAccelerationMax);
 				Projectile->ProjectileMovement->bIsHomingProjectile = true;
-				if (HomingTarget && HomingTarget->Implements<UCombatInterface>())
-				{
-					Projectile->ProjectileMovement->bIsHomingProjectile = true;
-					Projectile->ProjectileMovement->HomingTargetComponent = HomingTarget->GetRootComponent();
-				}
-				else
-				{
-					Projectile->HomingTargetComponent = NewObject<USceneComponent>(USceneComponent::StaticClass());
-					Projectile->HomingTargetComponent->SetWorldLocation(ProjectileTargetLocation);
-					Projectile->ProjectileMovement->HomingTargetComponent = Projectile->HomingTargetComponent;
-				}
+				Projectile->ProjectileMovement->HomingTargetComponent = HomingTarget->GetRootComponent();
 			}
-		
-			Projectile->FinishSpawning(SpawnTransform);
+			else
+			{
+				Projectile->HomingTargetComponent = NewObject<USceneComponent>(USceneComponent::StaticClass());
+				Projectile->HomingTargetComponent->SetWorldLocation(ProjectileTargetLocation);
+				Projectile->ProjectileMovement->HomingTargetComponent = Projectile->HomingTargetComponent;
+			}
 		}
+		Projectile->FinishSpawning(SpawnTransform);
 	}
 }

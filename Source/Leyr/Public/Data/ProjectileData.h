@@ -7,6 +7,8 @@
 #include "Engine/DataAsset.h"
 #include "ProjectileData.generated.h"
 
+class UStatusEffectData;
+
 UENUM(BlueprintType)
 enum class EResponseToStatic : uint8
 {
@@ -25,12 +27,12 @@ class LEYR_API UProjectileData : public UDataAsset
 {
 	GENERATED_BODY()
 	
-public:
-	UPROPERTY(EditDefaultsOnly, Category="Projectile")
-	TSubclassOf<AProjectile> ProjectileClass = nullptr;
-	
+public:	
 	UPROPERTY(EditDefaultsOnly, Category="Projectile", meta=(Categories="Damage"))
 	FGameplayTag DamageType = FGameplayTag();
+
+	UPROPERTY(EditDefaultsOnly, Category="Projectile")
+	TObjectPtr<UStatusEffectData> StatusEffectData = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Projectile")
 	EResponseToStatic ResponseToStatic = EResponseToStatic::Destroy;

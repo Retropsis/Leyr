@@ -98,27 +98,14 @@ protected:
 	FVector RadialDamageOrigin = FVector::ZeroVector;
 
 	/*
-	 * Status Effect
+	 * Status Effect Data
 	 */
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Status Effect")
 	float StatusEffectChance = 20.f;
-
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Status Effect")
 	float StatusEffectDamage = 5.f;
-
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Status Effect")
 	float StatusEffectFrequency = 1.f;
-
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Status Effect")
 	float StatusEffectDuration = 5.f;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Status Effect")
 	float DeathImpulseMagnitude = 250.f;
-
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Status Effect")
 	float AirborneForceMagnitude = 250.f;
-
-	UPROPERTY(EditDefaultsOnly, Category="Ability|Status Effect")
 	float AirborneChance = 0.f;
 
 	UFUNCTION(BlueprintPure)

@@ -392,7 +392,7 @@ void UExecCalc_Damage::DetermineStatusEffect(const FGameplayEffectCustomExecutio
 		const float TypeDamage = Spec.GetSetByCallerMagnitude(DamageType, false, -1.f);
 		if (TypeDamage > -.5f) // .5 padding for floating point [im]precision
 		{
-			// Determine if there was a successful debuff
+			// Determine if there was a successful status effect
 			const float SourceStatusEffectChance = Spec.GetSetByCallerMagnitude(GameplayTags.StatusEffect_Chance, false, -1.f);
 
 			float TargetStatusEffectResistance = 0.f;
