@@ -82,16 +82,6 @@ APlayerCharacter::APlayerCharacter()
 	TraceObjectType = EOT_EnemyCapsule;
 	
 	CharacterClass = ECharacterClass::Warrior;
-
-	SpecialStates.Add(ECombatState::Entangled);
-	SpecialStates.Add(ECombatState::Swimming);
-	SpecialStates.Add(ECombatState::HangingRope);
-	SpecialStates.Add(ECombatState::HangingLedge);
-	SpecialStates.Add(ECombatState::HangingHook);
-	SpecialStates.Add(ECombatState::HangingLadder);
-	SpecialStates.Add(ECombatState::OnGroundSlope);
-	SpecialStates.Add(ECombatState::OnRopeSlope);
-	SpecialStates.Add(ECombatState::OnElevator);
 }
 
 void APlayerCharacter::Tick(float DeltaSeconds)
@@ -111,7 +101,6 @@ void APlayerCharacter::HandleCharacterMovementUpdated(float DeltaSeconds, FVecto
 	if (GetCharacterMovement()->MovementMode == MOVE_Falling)
 	{
 		MakeAndApplyEffectToSelf(FBaseGameplayTags::Get().CombatState_Condition_Falling);
-		// CombatState = ECombatState::Falling;
 	}
 	else
 	{
@@ -228,8 +217,8 @@ void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 		PreferredCameraLocation = GetActorLocation();
 		PreferredCameraLocation.Z += bIsCrouched ? GetCapsuleComponent()->GetScaledCapsuleHalfHeight() : 0.f;
 		
-		const FRealCurve* InterpSpeedCurve = ScalableInterpSpeedCurve->FindCurve(FName("InterpSpeedCurve"), FString());
-		InterpSpeed = InterpSpeedCurve->Eval((PreferredCameraLocation - CameraLocation).Size());
+		// const FRealCurve* InterpSpeedCurve = ScalableInterpSpeedCurve->FindCurve(FName("InterpSpeedCurve"), FString());
+		// InterpSpeed = InterpSpeedCurve->Eval((PreferredCameraLocation - CameraLocation).Size());
 		
 		bClampFirst = false;
 		if (ActorToInterp &&  GetDistanceTo(ActorToInterp) <= ActorToFollowMaxDistance)
@@ -265,7 +254,7 @@ void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 		// 	UKismetSystemLibrary::DrawDebugSphere(this, FVector{ (ActorToInterp->GetActorLocation() + GetActorLocation()) / 2.f }, 25.f, 12, FLinearColor::White);
 		// 	UKismetSystemLibrary::DrawDebugSphere(this, PreferredCameraLocation, 25.f, 12, FLinearColor::Green);
 		// }
-	
+
 		FollowCamera->ClearAdditiveOffset();
 		Delta = PreferredCameraLocation - CameraLocation;
 		TargetAdditiveOffset = FVector{ 0.f, Delta.X, Delta.Z };
@@ -281,6 +270,9 @@ void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 		
 		if (!CameraBounds.bInitialized) FollowCamera->ClearAdditiveOffset();
 	}
+	UKismetSystemLibrary::DrawDebugSphere(this, FollowCamera->GetComponentLocation(), 25.f, 12, FLinearColor::Green);
+	UE_LOG(LogTemp, Warning, TEXT("TargetAdditiveOffset: [%s] - ClampFirst is [%hhd]"), *TargetAdditiveOffset.ToCompactString(), bClampFirst);
+	UE_LOG(LogTemp, Warning, TEXT("FollowCamera: [%s]"), *FollowCamera->GetComponentLocation().ToCompactString());
 }
 
 void APlayerCharacter::SetCameraInterpolation_Implementation(ACameraBoundary* CameraBoundary, ECameraInterpState NewState)
@@ -419,7 +411,10 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	case ECombatState::Falling:
 	case ECombatState::Crouching:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
-		if (GetCharacterMovement()->MovementMode == MOVE_Falling) MakeAndApplyEffectToSelf(FBaseGameplayTags::Get().CombatState_Condition_Falling);
+		if (GetCharacterMovement()->MovementMode == MOVE_Falling && AbilitySystemComponent->GetTagCount(FBaseGameplayTags::Get().CombatState_Condition_Falling) == 0)
+		{
+			MakeAndApplyEffectToSelf(FBaseGameplayTags::Get().CombatState_Condition_Falling);
+		}
 		break;
 	case ECombatState::Walking:
 	case ECombatState::WalkingPeaceful:
@@ -767,27 +762,13 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 	case ECombatState::Rolling:
 		Crouch();
 		GetSprite()->SetRelativeLocation(FVector(0.f, 0.f, 44.f));
-		
-		// GetCharacterMovement()->MaxWalkSpeedCrouched = RollingSpeed;
-		// GetCharacterMovement()->MaxAcceleration = RollingMaxAcceleration;
-		// GetCharacterMovement()->BrakingFrictionFactor = RollingBrakeFrictionFactor;
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Rolling);
 		break;
 	case ECombatState::RollingEnd:
-		UnCrouch();
 		GetSprite()->SetRelativeLocation(FVector::ZeroVector);
-		// GetCharacterMovement()->MaxWalkSpeedCrouched = BaseWalkSpeedCrouched;
-		// GetCharacterMovement()->MaxAcceleration = 2048.f;
-		// GetCharacterMovement()->BrakingFrictionFactor = 2.f;
-		if (bIsCrouched)
-		{
-			CombatState = ECombatState::Crouching;
-			MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Crouching);
-		}
+		UnCrouch();
 		GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(GameplayTags.CombatState_Directional_Downward.GetSingleTagContainer());
-		// HandleCombatDirectionTag();
-		
-		// CombatState = ECombatState::Unoccupied;
+		HandleCombatState(bIsCrouched ? ECombatState::Crouching : ECombatState::Unoccupied);
 		break;
 	case ECombatState::Aiming:
 	case ECombatState::Casting:
@@ -904,21 +885,43 @@ void APlayerCharacter::HandleHangingOnLedge(const FVector& HangingTarget)
 void APlayerCharacter::SetMovementEnabled_Implementation(bool Enabled)
 {
 	GetCharacterMovement()->MaxWalkSpeed = !Enabled ? 0.f : BaseRunSpeed;
-
-	if(CombatState != ECombatState::Attacking) PreviousCombatState = CombatState;
 	
 	if (Enabled)
 	{
-		if(CombatState == ECombatState::Attacking)
+		if (AbilitySystemComponent->HasAnyMatchingGameplayTags(FBaseGameplayTags::Get().ToPreviousStateFilter))
 		{
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Magenta, FString::Printf(TEXT("ToPreviousStateFilter")));
 			HandleCombatState(PreviousCombatState);
+			HandleCrouching(PreviousCombatState == ECombatState::Crouching && bCrouchButtonHeld);
 		}
-		HandleCrouching(PreviousCombatState == ECombatState::Crouching && bCrouchButtonHeld);
+		else
+		{
+			HandleCombatState(ECombatState::Unoccupied);
+		}
+		if (AbilitySystemComponent->HasAnyMatchingGameplayTags(FBaseGameplayTags::Get().ToUnoccupiedStateFilter))
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("ToUnoccupiedStateFilter")));
+		}
 	}
 	else
 	{
+		PreviousCombatState = CombatState;
 		CombatState = ECombatState::Attacking;
 	}
+	
+	// if(CombatState != ECombatState::Attacking) PreviousCombatState = CombatState;
+	// if (Enabled)
+	// {
+	// 	if(CombatState == ECombatState::Attacking)
+	// 	{
+	// 		HandleCombatState(PreviousCombatState);
+	// 	}
+	// 	HandleCrouching(PreviousCombatState == ECombatState::Crouching && bCrouchButtonHeld);
+	// }
+	// else
+	// {
+	// 	CombatState = ECombatState::Attacking;
+	// }
 }
 
 /*

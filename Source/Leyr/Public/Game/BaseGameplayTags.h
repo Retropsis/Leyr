@@ -292,6 +292,8 @@ FGameplayTag CombatState_Directional_ForwardDown;
  
  FGameplayTagContainer CombatStates;
  FGameplayTagContainer CombatDirections;
+ FGameplayTagContainer ToPreviousStateFilter;
+ FGameplayTagContainer ToUnoccupiedStateFilter;
 
  /*
   * Gameplay Cues

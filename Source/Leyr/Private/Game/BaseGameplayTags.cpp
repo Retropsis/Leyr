@@ -339,6 +339,24 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatDirections.AddTag(GameplayTags.CombatState_Directional_ForwardUp);
 	GameplayTags.CombatDirections.AddTag(GameplayTags.CombatState_Directional_ForwardDown);
 	
+	GameplayTags.ToPreviousStateFilter.AddTag(GameplayTags.CombatState_Elevator);
+	GameplayTags.ToPreviousStateFilter.AddTag(GameplayTags.CombatState_Condition_Ladder);
+	GameplayTags.ToPreviousStateFilter.AddTag(GameplayTags.CombatState_Condition_Rope);
+	GameplayTags.ToPreviousStateFilter.AddTag(GameplayTags.CombatState_Condition_Ledge);
+	GameplayTags.ToPreviousStateFilter.AddTag(GameplayTags.CombatState_Condition_Climbing);
+	GameplayTags.ToPreviousStateFilter.AddTag(GameplayTags.CombatState_Condition_Hook);
+	GameplayTags.ToPreviousStateFilter.AddTag(GameplayTags.CombatState_Condition_Slope);
+	GameplayTags.ToPreviousStateFilter.AddTag(GameplayTags.CombatState_Condition_Entangled);
+	GameplayTags.ToPreviousStateFilter.AddTag(GameplayTags.CombatState_Condition_Swimming);
+	GameplayTags.ToPreviousStateFilter.AddTag(GameplayTags.CombatState_Condition_Crouching);
+	
+	GameplayTags.ToUnoccupiedStateFilter.AddTag(GameplayTags.CombatState_Condition_Falling);
+	GameplayTags.ToUnoccupiedStateFilter.AddTag(GameplayTags.CombatState_Transient_Rope);
+	GameplayTags.ToUnoccupiedStateFilter.AddTag(GameplayTags.CombatState_Transient_Ledge);
+	GameplayTags.ToUnoccupiedStateFilter.AddTag(GameplayTags.CombatState_Transient_Dodging);
+	GameplayTags.ToUnoccupiedStateFilter.AddTag(GameplayTags.CombatState_Transient_Rolling);
+	GameplayTags.ToUnoccupiedStateFilter.AddTag(GameplayTags.CombatState_Transient_Aiming);
+	
 	/*
 	 * Gameplay Cues
 	 */
