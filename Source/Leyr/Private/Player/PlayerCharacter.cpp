@@ -270,7 +270,6 @@ void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 		
 		if (!CameraBounds.bInitialized) FollowCamera->ClearAdditiveOffset();
 	}
-	UKismetSystemLibrary::DrawDebugSphere(this, FollowCamera->GetComponentLocation(), 25.f, 12, FLinearColor::Green);
 	UE_LOG(LogTemp, Warning, TEXT("TargetAdditiveOffset: [%s] - ClampFirst is [%hhd]"), *TargetAdditiveOffset.ToCompactString(), bClampFirst);
 	UE_LOG(LogTemp, Warning, TEXT("FollowCamera: [%s]"), *FollowCamera->GetComponentLocation().ToCompactString());
 }

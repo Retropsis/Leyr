@@ -520,8 +520,8 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	 */
 	GameplayTags.InputTag = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag"), FString("Input Parent Tag"));
 	GameplayTags.InputTag_None = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.None"), FString("No Input"));
-	GameplayTags.InputTag_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.LMB"), FString("Left Mouse Button"));
-	GameplayTags.InputTag_RMB = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.RMB"), FString("Right Mouse Button"));
+	GameplayTags.InputTag_MainHand = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.LMB"), FString("Left Mouse Button"));
+	GameplayTags.InputTag_OffHand = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.RMB"), FString("Right Mouse Button"));
 	GameplayTags.InputTag_Shoulder_Left = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Shoulder.Left"), FString("Left Shoulder Button"));
 	GameplayTags.InputTag_Shoulder_Right = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Shoulder.Right"), FString("Right Shoulder Button"));
 	GameplayTags.InputTag_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.1"), FString("1"));
@@ -545,11 +545,11 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.InputTag_Execute_RMB = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Execute.RMB"), FString("Execute RMB"));
 	GameplayTags.InputTag_Execute_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Execute.1"), FString("Execute 1"));
 
-	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_1, GameplayTags.InputTag_LMB);
-	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_2, GameplayTags.InputTag_RMB);
+	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_1, GameplayTags.InputTag_MainHand);
+	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_2, GameplayTags.InputTag_OffHand);
 	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_3, GameplayTags.InputTag_1);
-	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.InputTag_LMB, GameplayTags.Equipment_ActionSlot_1);
-	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.InputTag_RMB, GameplayTags.Equipment_ActionSlot_2);
+	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.InputTag_MainHand, GameplayTags.Equipment_ActionSlot_1);
+	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.InputTag_OffHand, GameplayTags.Equipment_ActionSlot_2);
 	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.InputTag_1, GameplayTags.Equipment_ActionSlot_3);
 
 	/*
