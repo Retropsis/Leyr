@@ -99,7 +99,7 @@ void UInventoryWidgetController::AssignButtonPressedLocked(FInventoryItemData It
 	if(ItemData.Asset.Get() == nullptr) return;
 	
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-	const FGameplayTag InputTag = GameplayTags.EquipmentSlotToInputTags[ItemData.EquipmentSlot];
+	const FGameplayTag InputTag = GameplayTags.EquipmentSlotToInputTags[ItemData.Asset.Get()->EquipmentSlot];
 	AssignButtonPressed(ItemData, InputTag);
 }
 
@@ -178,9 +178,9 @@ void UInventoryWidgetController::AsyncUpdateAbilities(FEquippedItem& ItemToEquip
 void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData)
 {
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-	if (ItemData.EquipmentSlot.MatchesTag(GameplayTags.Equipment_ActionSlot))
+	if (ItemData.Asset.Get()->EquipmentSlot.MatchesTag(GameplayTags.Equipment_ActionSlot))
 	{
-		const FGameplayTag InputTag = GameplayTags.EquipmentSlotToInputTags[ItemData.EquipmentSlot];
+		const FGameplayTag InputTag = GameplayTags.EquipmentSlotToInputTags[ItemData.Asset.Get()->EquipmentSlot];
 		AssignButtonPressed(ItemData, InputTag);
 	}
 	else
@@ -196,7 +196,7 @@ void UInventoryWidgetController::Equip(const FInventoryItemData& ItemData)
 		UItemData* LoadedAsset = AssetToLoad.Get();
 		if (IsValid(LoadedAsset))
 		{
-			FGameplayTag Slot = ItemData.EquipmentSlot;
+			FGameplayTag Slot = ItemData.Asset.Get()->EquipmentSlot;
 			for (TTuple<FGameplayTag, FEquippedItem>& EquippedItem : GetEquipmentSlots())
 			{
 				// Remove the item already here

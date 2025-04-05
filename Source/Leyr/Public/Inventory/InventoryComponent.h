@@ -34,9 +34,6 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSoftObjectPtr<UItemData> Asset = nullptr;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Equipment"))
-	FGameplayTag EquipmentSlot = FGameplayTag();
 };
 
 UENUM(BlueprintType)

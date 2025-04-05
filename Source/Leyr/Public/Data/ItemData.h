@@ -66,6 +66,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	EItemType ItemType = EItemType::Misc;
 	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Item", meta=(Categories="Equipment"))
+	FGameplayTag EquipmentSlot = FGameplayTag();
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Item")
 	float Weight = 0.f;
 	
