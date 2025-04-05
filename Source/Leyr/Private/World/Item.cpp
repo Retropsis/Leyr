@@ -60,7 +60,7 @@ void AItem::InitializeItemFromDataTable(const FName& RowName)
 			}
 			ItemData = ItemDataRow->ItemData;
 #if WITH_EDITOR
-			SetActorLabel(FString::Printf(TEXT("BP_%s"), *ItemData.Name.ToString()));
+			SetActorLabel(FString::Printf(TEXT("BP_%s"), *ItemData.Asset.GetAssetName()));
 #endif
 		}
 	}

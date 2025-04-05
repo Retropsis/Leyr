@@ -21,9 +21,6 @@ public:
 	int32 ID = 0;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FName Name = FName();
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	int32 Quantity = 0;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
