@@ -21,6 +21,7 @@ void UBaseGameplayAbility::InitAbility()
 	GameplayCueDefinition = NewObject<UGameplayCueDefinition>();
 	
 	PaperAnimInstance = ICombatInterface::Execute_GetPaperAnimInstance(GetAvatarActorFromActorInfo());
+	UpperBodyAnimInstance = ICombatInterface::Execute_GetUpperBodyAnimInstance(GetAvatarActorFromActorInfo());
 	WeaponAnimInstance = ICombatInterface::Execute_GetWeaponAnimInstance(GetAvatarActorFromActorInfo());
 	WeaponAnimInstance->StopAllAnimationOverrides();
 	

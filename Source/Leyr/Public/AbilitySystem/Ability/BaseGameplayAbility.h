@@ -70,6 +70,9 @@ protected:
 	TObjectPtr<UPaperZDAnimInstance> PaperAnimInstance = nullptr;
 	
 	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UPaperZDAnimInstance> UpperBodyAnimInstance = nullptr;
+	
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UPaperZDAnimInstance> WeaponAnimInstance = nullptr;
 
 	UPROPERTY(BlueprintReadWrite)

@@ -241,7 +241,7 @@ void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 	FVector TargetAdditiveOffset = FVector{0.f, Delta.X, Delta.Z};
 	
 	CurrentAdditiveOffset = FMath::VInterpTo(AdditiveOffset.GetLocation(), TargetAdditiveOffset, DeltaTime, InterpSpeed);
-	
+	FVector DeltaOffset = CurrentAdditiveOffset - PreviousAdditiveOffset; 
 	AdditiveOffset.SetLocation(CurrentAdditiveOffset);
 	FollowCamera->AddAdditiveOffset(AdditiveOffset, FOV);
 	ParallaxController->SetActorRelativeLocation(FVector{ 600.f, CurrentAdditiveOffset.Y, CurrentAdditiveOffset.Z });
@@ -270,8 +270,10 @@ void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 		
 		if (!CameraBounds.bInitialized) FollowCamera->ClearAdditiveOffset();
 	}
+	PreviousAdditiveOffset = AdditiveOffset.GetLocation();
 	UE_LOG(LogTemp, Warning, TEXT("TargetAdditiveOffset: [%s] - ClampFirst is [%hhd]"), *TargetAdditiveOffset.ToCompactString(), bClampFirst);
 	UE_LOG(LogTemp, Warning, TEXT("FollowCamera: [%s]"), *FollowCamera->GetComponentLocation().ToCompactString());
+	UE_LOG(LogTemp, Warning, TEXT("DeltaOffset: [%f]"), DeltaOffset.Z);
 }
 
 void APlayerCharacter::SetCameraInterpolation_Implementation(ACameraBoundary* CameraBoundary, ECameraInterpState NewState)

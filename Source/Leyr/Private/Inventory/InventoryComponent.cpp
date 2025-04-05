@@ -24,6 +24,10 @@ void UInventoryComponent::ServerAddItem_Implementation(FInventoryItemData ItemTo
 	AddItem(ItemToAdd);
 }
 
+// Asset->GetPrimaryAssetId().PrimaryAssetName = name of the data asset.
+// Asset->GetPrimaryAssetId().PrimaryAssetType = name of the  data asset class.
+// Asset->GetPrimaryAssetId() = name of the data asset class . name of the asset.
+
 // bItemStackWasSplit is for splitting a stack, set it to true to skip stacking and add the new split in a new slot
 void UInventoryComponent::AddItem(FInventoryItemData& ItemToAdd, const bool bItemStackWasSplit)
 {

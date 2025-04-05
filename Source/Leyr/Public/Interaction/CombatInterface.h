@@ -76,6 +76,9 @@ public:
 	UPaperZDAnimInstance* GetPaperAnimInstance();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UPaperZDAnimInstance* GetUpperBodyAnimInstance();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UPaperZDAnimInstance* GetWeaponAnimInstance();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)

@@ -338,7 +338,7 @@ void UBaseAttributeSet::HandleStatusEffect(const FEffectProperties& Props)
 
 	ModifierInfo.ModifierMagnitude = FScalableFloat(StatusEffectDamage);
 	ModifierInfo.ModifierOp = EGameplayModOp::Additive;
-	ModifierInfo.Attribute = UBaseAttributeSet::GetIncomingDamageAttribute();
+	ModifierInfo.Attribute = GetIncomingDamageAttribute();
 
 	if (FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec(Effect, EffectContext, 1.f))
 	{

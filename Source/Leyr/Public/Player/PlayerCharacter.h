@@ -341,6 +341,7 @@ private:
 	FTimerHandle DefeatTimer;
 
 	FVector CurrentAdditiveOffset;
+	FVector PreviousAdditiveOffset;
 	float LastActorToInterpDistance;
 	
 	FOnKeyItemUsed OnKeyItemUsed;

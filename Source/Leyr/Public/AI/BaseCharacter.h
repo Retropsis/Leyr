@@ -139,11 +139,14 @@ protected:
 	virtual FVector GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
 	virtual FVector GetRelativeCombatSocketLocation_Implementation(const FGameplayTag& MontageTag) override;
 	virtual UPaperZDAnimInstance* GetPaperAnimInstance_Implementation() override { return AnimationComponent->GetAnimInstance(); }
+	virtual UPaperZDAnimInstance* GetUpperBodyAnimInstance_Implementation() override { return UpperBodyComponent->GetAnimInstance(); }
 	virtual UPaperZDAnimInstance* GetWeaponAnimInstance_Implementation() override { return WeaponComponent->GetAnimInstance(); }
+	
 	virtual void GetAttackAnimationData_Implementation(FVector& InBoxTraceStart, FVector& InBoxTraceEnd) override;
 	virtual FBoxTraceData GetBoxTraceDataByTag_Implementation(FGameplayTag MontageTag, ESequenceType SequenceType) override;
 	virtual TArray<FTaggedMontage> GetAttackMontages_Implementation(ESequenceType SequenceType) override;
 	virtual FTaggedMontage GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag, ESequenceType SequenceType) override;
+	
 	virtual int32 GetMinionCount_Implementation() override { return MinionCount; }
 	virtual void IncrementMinionCount_Implementation(const int32 Amount) override { MinionCount += Amount; }
 	virtual EObjectTypeQuery GetTraceObjectType_Implementation() override { return EOT_EnemyCapsule; }

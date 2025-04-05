@@ -93,7 +93,23 @@ void UInventoryWidgetController::BindCallbacksToDependencies()
 
 /*
  * Assigning
- */
+*/
+void UInventoryWidgetController::AssignButtonPressedLocked(FInventoryItemData ItemData)
+{
+	if(ItemData.Asset.Get() == nullptr) return;
+	
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	
+	FGameplayTag SlotTag = ItemData.EquipmentSlot;
+	FGameplayTag InputTag = GameplayTags.EquipmentSlotToInputTags[ItemData.EquipmentSlot];
+	
+	if (ItemData.EquipmentSlot.MatchesTagExact(GameplayTags.Equipment_Range))
+	{
+		
+	}
+	AssignButtonPressed(ItemData, InputTag);
+}
+
 void UInventoryWidgetController::AssignButtonPressed(const FInventoryItemData ItemData, const FGameplayTag InputTag)
 {
 	if(ItemData.Asset.Get() == nullptr) return;

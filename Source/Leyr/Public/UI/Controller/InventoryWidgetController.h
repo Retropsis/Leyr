@@ -59,6 +59,9 @@ public:
 	void RequestUpdateInventorySlotsOnce();
 
 	UFUNCTION(BlueprintCallable)
+	void AssignButtonPressedLocked(FInventoryItemData ItemData);
+	
+	UFUNCTION(BlueprintCallable)
 	void AssignButtonPressed(FInventoryItemData ItemData, const FGameplayTag InputTag);
 	
 	UFUNCTION(BlueprintCallable)
