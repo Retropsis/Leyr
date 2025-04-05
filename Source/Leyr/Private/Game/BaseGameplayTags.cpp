@@ -494,9 +494,9 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Equipment_ActionSlot_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.ActionSlot.1"), FString("Equipment ActionSlot 1"));
 	GameplayTags.Equipment_ActionSlot_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.ActionSlot.2"), FString("Equipment ActionSlot 2"));
 	GameplayTags.Equipment_ActionSlot_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.ActionSlot.3"), FString("Equipment ActionSlot 3"));
-	GameplayTags.Equipment_MainHand = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.MainHand"), FString("Equipment MainHand"));
-	GameplayTags.Equipment_OffHand = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.OffHand"), FString("Equipment OffHand"));
-	GameplayTags.Equipment_Range = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.Range"), FString("Equipment Range"));
+	GameplayTags.Equipment_ActionSlot_MainHand = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.ActionSlot.MainHand"), FString("Equipment ActionSlot MainHand"));
+	GameplayTags.Equipment_ActionSlot_OffHand = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.ActionSlot.OffHand"), FString("Equipment ActionSlot OffHand"));
+	GameplayTags.Equipment_ActionSlot_Range = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.ActionSlot.Range"), FString("Equipment ActionSlot Range"));
 	GameplayTags.Equipment_Headgear = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.Headgear"), FString("Equipment Headgear"));
 	GameplayTags.Equipment_Neck = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.Neck"), FString("Equipment Neck"));
 	GameplayTags.Equipment_UpperBody = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Equipment.UpperBody"), FString("Equipment UpperBody"));
@@ -549,16 +549,14 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.InputTag_Execute_RMB = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Execute.RMB"), FString("Execute RMB"));
 	GameplayTags.InputTag_Execute_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("InputTag.Execute.1"), FString("Execute 1"));
 
-	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_1, GameplayTags.InputTag_MainHand);
-	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_2, GameplayTags.InputTag_OffHand);
-	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_3, GameplayTags.InputTag_1);
-	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.InputTag_MainHand, GameplayTags.Equipment_ActionSlot_1);
-	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.InputTag_OffHand, GameplayTags.Equipment_ActionSlot_2);
-	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.InputTag_1, GameplayTags.Equipment_ActionSlot_3);
-	// ActionSlot locked
-	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_MainHand, GameplayTags.InputTag_MainHand);
-	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_OffHand, GameplayTags.InputTag_OffHand);
-	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_Range, GameplayTags.InputTag_OffHand);
+	// Input to Equipment
+	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.InputTag_MainHand, GameplayTags.Equipment_ActionSlot_MainHand);
+	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.InputTag_OffHand, GameplayTags.Equipment_ActionSlot_OffHand);
+	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.InputTag_1, GameplayTags.Equipment_ActionSlot);
+	// Equipment to Input
+	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_MainHand, GameplayTags.InputTag_MainHand);
+	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_OffHand, GameplayTags.InputTag_OffHand);
+	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_Range, GameplayTags.InputTag_OffHand);
 	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot, GameplayTags.InputTag_1);
 
 	/*

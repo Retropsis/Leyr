@@ -63,9 +63,9 @@ void UInventoryWidgetController::BindCallbacksToDependencies()
 	MonkSet->GiveToAbilitySystem(AbilitySystemComponent, &MonkAbility.OutGrantedHandles, FGameplayTag());
 	
 	EquippedItems.Add(GameplayTags.Equipment_ActionSlot_0, MonkAbility);
-	EquippedItems.FindOrAdd(GameplayTags.Equipment_ActionSlot_1, FEquippedItem{});
-	EquippedItems.FindOrAdd(GameplayTags.Equipment_ActionSlot_2, FEquippedItem{});
-	EquippedItems.FindOrAdd(GameplayTags.Equipment_ActionSlot_3, FEquippedItem{});
+	EquippedItems.FindOrAdd(GameplayTags.Equipment_ActionSlot_MainHand, FEquippedItem{});
+	EquippedItems.FindOrAdd(GameplayTags.Equipment_ActionSlot_OffHand, FEquippedItem{});
+	EquippedItems.FindOrAdd(GameplayTags.Equipment_ActionSlot, FEquippedItem{});
 	for (TTuple<FGameplayTag, FEquippedItem> ActionSlot : GetActionSlots())
 	{
 		if (ActionSlot.Key.MatchesTagExact(GameplayTags.Equipment_ActionSlot_0)) continue;;
@@ -99,14 +99,7 @@ void UInventoryWidgetController::AssignButtonPressedLocked(FInventoryItemData It
 	if(ItemData.Asset.Get() == nullptr) return;
 	
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-	
-	FGameplayTag SlotTag = ItemData.EquipmentSlot;
-	FGameplayTag InputTag = GameplayTags.EquipmentSlotToInputTags[ItemData.EquipmentSlot];
-	
-	if (ItemData.EquipmentSlot.MatchesTagExact(GameplayTags.Equipment_Range))
-	{
-		
-	}
+	const FGameplayTag InputTag = GameplayTags.EquipmentSlotToInputTags[ItemData.EquipmentSlot];
 	AssignButtonPressed(ItemData, InputTag);
 }
 
@@ -184,7 +177,16 @@ void UInventoryWidgetController::AsyncUpdateAbilities(FEquippedItem& ItemToEquip
  */
 void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData)
 {
-	Equip(ItemData);
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	if (ItemData.EquipmentSlot.MatchesTag(GameplayTags.Equipment_ActionSlot))
+	{
+		const FGameplayTag InputTag = GameplayTags.EquipmentSlotToInputTags[ItemData.EquipmentSlot];
+		AssignButtonPressed(ItemData, InputTag);
+	}
+	else
+	{
+		Equip(ItemData);
+	}
 }
 
 void UInventoryWidgetController::Equip(const FInventoryItemData& ItemData)
