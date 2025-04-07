@@ -77,6 +77,7 @@ enum class ECombatState : uint8
 	WalkingPeaceful UMETA(DisplayName="WalkingPeaceful"),
 	Aiming UMETA(DisplayName="Aiming"),
 	Casting UMETA(DisplayName="Casting"),
+	Shielding UMETA(DisplayName="Shielding"),
 
 	/* Locked Animations */
 	Dodging UMETA(DisplayName="Dodging"),

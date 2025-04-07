@@ -78,8 +78,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	TObjectPtr<UAbilitySet> AbilitySet;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Ability")
-	UAbilityData* AbilityData;
+	UPROPERTY(EditDefaultsOnly, Category="Ability", meta=(InlineEditConditionToggle))
+	bool bOverrideAbilityData = false;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Ability", meta=(EditCondition="bOverrideAbilityData"))
+	UAbilityData* AbilityDataOverride = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Item", meta=(Categories="Abilities"))
 	TArray<FGameplayTag> Abilities;

@@ -93,21 +93,6 @@ void APlayerCharacter::Tick(float DeltaSeconds)
 	InterpCameraAdditiveOffset(DeltaSeconds);
 }
 
-void APlayerCharacter::HandleCharacterMovementUpdated(float DeltaSeconds, FVector OldLocation, FVector OldVelocity)
-{	
-	if(GetCharacterMovement()->MovementMode == PreviousMovementMode) return;
-	
-	PreviousMovementMode = GetCharacterMovement()->MovementMode;
-	if (GetCharacterMovement()->MovementMode == MOVE_Falling)
-	{
-		MakeAndApplyEffectToSelf(FBaseGameplayTags::Get().CombatState_Condition_Falling);
-	}
-	else
-	{
-		GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(FBaseGameplayTags::Get().CombatState_Condition_Falling.GetSingleTagContainer());
-	}
-}
-
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -423,6 +408,7 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 		break;
 	case ECombatState::Aiming:
 	case ECombatState::Casting:
+	case ECombatState::Shielding:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
 		Pitch(MovementVector.Y);
 		break;
@@ -465,9 +451,8 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	case ECombatState::Dodging:
 	case ECombatState::Rolling:
 	case ECombatState::RollingEnd:
-	case ECombatState::Defeated:
-		break;
 	case ECombatState::Stunned:
+	case ECombatState::Defeated:
 		break;
 	}
 }
@@ -689,8 +674,9 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		break;
 	case ECombatState::UnCrouching:
 		// UnCrouch();
-		if (CombatState != ECombatState::Rolling) GetSprite()->SetRelativeLocation(FVector::ZeroVector);
-		else GetSprite()->SetRelativeLocation(FVector{ 0.f, 0.f, 24.f });
+		GetSprite()->SetRelativeLocation(FVector::ZeroVector);
+		// if (CombatState != ECombatState::Rolling) GetSprite()->SetRelativeLocation(FVector::ZeroVector);
+		// else GetSprite()->SetRelativeLocation(FVector{ 0.f, 0.f, 44.f });
 		CombatState = ECombatState::Unoccupied;
 		break;
 	case ECombatState::Attacking:
@@ -762,7 +748,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		break;
 	case ECombatState::Rolling:
 		Crouch();
-		GetSprite()->SetRelativeLocation(FVector(0.f, 0.f, 44.f));
+		// GetSprite()->SetRelativeLocation(FVector(0.f, 0.f, 44.f));
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Rolling);
 		break;
 	case ECombatState::RollingEnd:
@@ -773,6 +759,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		break;
 	case ECombatState::Aiming:
 	case ECombatState::Casting:
+	case ECombatState::Shielding:
 		GetCharacterMovement()->MaxWalkSpeed = AimingWalkSpeed;
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Aiming);
 		break;
@@ -784,6 +771,21 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 	}
 	UE_LOG(LogTemp, Warning, TEXT("CombatState: %s"), *UEnum::GetValueAsString(CombatState));
 	UE_LOG(LogTemp, Warning, TEXT("MovementMode: %s"), *UEnum::GetValueAsString(GetCharacterMovement()->MovementMode));
+}
+
+void APlayerCharacter::HandleCharacterMovementUpdated(float DeltaSeconds, FVector OldLocation, FVector OldVelocity)
+{	
+	if(GetCharacterMovement()->MovementMode == PreviousMovementMode) return;
+	
+	PreviousMovementMode = GetCharacterMovement()->MovementMode;
+	if (GetCharacterMovement()->MovementMode == MOVE_Falling)
+	{
+		MakeAndApplyEffectToSelf(FBaseGameplayTags::Get().CombatState_Condition_Falling);
+	}
+	else
+	{
+		GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(FBaseGameplayTags::Get().CombatState_Condition_Falling.GetSingleTagContainer());
+	}
 }
 
 void APlayerCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
@@ -891,7 +893,7 @@ void APlayerCharacter::SetMovementEnabled_Implementation(bool Enabled)
 	{
 		if (AbilitySystemComponent->HasAnyMatchingGameplayTags(FBaseGameplayTags::Get().ToPreviousStateFilter))
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Magenta, FString::Printf(TEXT("ToPreviousStateFilter")));
+			// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Magenta, FString::Printf(TEXT("ToPreviousStateFilter")));
 			HandleCombatState(PreviousCombatState);
 			HandleCrouching(PreviousCombatState == ECombatState::Crouching && bCrouchButtonHeld);
 		}
@@ -899,30 +901,16 @@ void APlayerCharacter::SetMovementEnabled_Implementation(bool Enabled)
 		{
 			HandleCombatState(ECombatState::Unoccupied);
 		}
-		if (AbilitySystemComponent->HasAnyMatchingGameplayTags(FBaseGameplayTags::Get().ToUnoccupiedStateFilter))
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("ToUnoccupiedStateFilter")));
-		}
+		// if (AbilitySystemComponent->HasAnyMatchingGameplayTags(FBaseGameplayTags::Get().ToUnoccupiedStateFilter))
+		// {
+		// 	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green, FString::Printf(TEXT("ToUnoccupiedStateFilter")));
+		// }
 	}
 	else
 	{
 		PreviousCombatState = CombatState;
 		CombatState = ECombatState::Attacking;
 	}
-	
-	// if(CombatState != ECombatState::Attacking) PreviousCombatState = CombatState;
-	// if (Enabled)
-	// {
-	// 	if(CombatState == ECombatState::Attacking)
-	// 	{
-	// 		HandleCombatState(PreviousCombatState);
-	// 	}
-	// 	HandleCrouching(PreviousCombatState == ECombatState::Crouching && bCrouchButtonHeld);
-	// }
-	// else
-	// {
-	// 	CombatState = ECombatState::Attacking;
-	// }
 }
 
 /*

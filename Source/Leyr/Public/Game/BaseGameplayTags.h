@@ -155,6 +155,7 @@ FGameplayTag Abilities_Dodge;
 FGameplayTag Abilities_Parry;
 FGameplayTag Abilities_Roll;
 FGameplayTag Abilities_Block;
+FGameplayTag Abilities_Shield;
 FGameplayTag Abilities_Summon;
 FGameplayTag Abilities_HitReact;
 FGameplayTag Abilities_Fire_FireBolt;
@@ -310,6 +311,8 @@ FGameplayTag GameplayCue_Cosmos_Meteor_1;
 FGameplayTag GameplayCue_Weapon_Sword_Slash;
 FGameplayTag GameplayCue_Weapon_Bow_Shot;
 FGameplayTag GameplayCue_Execute;
+FGameplayTag GameplayCue_Weapon_Throw;
+FGameplayTag GameplayCue_Shield;
  
 FGameplayTag GameplayCue_Alteration_Berserk_1;
  
@@ -410,6 +413,10 @@ FGameplayTag Montage_Attack_3;
 FGameplayTag Montage_Attack_4;
 FGameplayTag Montage_Casting;
 FGameplayTag Montage_Shielding;
+FGameplayTag Montage_Shielding_Begin;
+FGameplayTag Montage_Shielding_End;
+FGameplayTag Montage_Throwing;
+FGameplayTag Montage_Using;
 FGameplayTag Montage_Crouch_Attack;
 FGameplayTag Montage_Jump_Attack;
 FGameplayTag Montage_JumpForwardUp_Attack;

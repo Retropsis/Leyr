@@ -55,9 +55,9 @@ void UBaseGameplayAbility::InitAbility()
 				WeaponAnimInstance = Character->SetWeaponAnimInstance(AbilityItemData->AnimationInstance);
 			}
 		}
-		if (AbilityItemData->AbilityData)
+		if (AbilityItemData->AbilityDataOverride)
 		{
-			AbilityData = AbilityItemData->AbilityData;
+			AbilityData = AbilityItemData->AbilityDataOverride;
 			
 			AbilityPower = AbilityData->AbilityPower.GetValueAtLevel(GetAbilityLevel());
 			AbilityPoise = AbilityData->AbilityPoise;
