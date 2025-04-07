@@ -177,6 +177,8 @@ void UInventoryWidgetController::AsyncUpdateAbilities(FEquippedItem& ItemToEquip
  */
 void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData)
 {
+	if(ItemData.Asset.Get() == nullptr) return;
+	
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 	if (ItemData.Asset.Get()->EquipmentSlot.MatchesTag(GameplayTags.Equipment_ActionSlot))
 	{
