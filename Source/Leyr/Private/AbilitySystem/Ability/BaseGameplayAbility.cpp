@@ -20,6 +20,7 @@ void UBaseGameplayAbility::InitAbility()
 	
 	GameplayCueDefinition = NewObject<UGameplayCueDefinition>();
 	
+	if (bResetPitch) ICombatInterface::Execute_ResetAimingPitch(GetAvatarActorFromActorInfo());
 	PaperAnimInstance = ICombatInterface::Execute_GetPaperAnimInstance(GetAvatarActorFromActorInfo());
 	UpperBodyAnimInstance = ICombatInterface::Execute_GetUpperBodyAnimInstance(GetAvatarActorFromActorInfo());
 	WeaponAnimInstance = ICombatInterface::Execute_GetWeaponAnimInstance(GetAvatarActorFromActorInfo());
@@ -77,12 +78,24 @@ void UBaseGameplayAbility::InitAbility()
 	}
 }
 
+void UBaseGameplayAbility::InitAbilityWithParams(FInitAbilityParams Params)
+{
+	bResetPitch = Params.bResetPitch;
+	InitAbility();
+}
+
 void UBaseGameplayAbility::PrepareToEndAbility()
 {
 	if(bPoiseWasApplied)
 	{
 		GetAbilitySystemComponentFromActorInfo()->RemoveLooseGameplayTag(FBaseGameplayTags::Get().Poise);
 	}
+}
+
+void UBaseGameplayAbility::PrepareToEndAbilityWithParams(FEndAbilityParams Params)
+{
+	bResetPitch = Params.bResetPitch;
+	PrepareToEndAbility();
 }
 
 void UBaseGameplayAbility::MakeAndApplyExecuteEffectToTarget(const FGameplayTag& TagToApply, UAbilitySystemComponent* TargetASC, int32 Level)

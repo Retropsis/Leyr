@@ -147,6 +147,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetMovementEnabled(bool Enabled);
 
+	/*
+	 *
+	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetComboWindow(bool bOpen);
 
@@ -165,6 +168,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetAttackComboIndex(int32 Index);
 
+	/*
+	 *
+	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetGravityScale(float GravityValue);
 	
@@ -190,5 +196,8 @@ public:
 	float GetOverridePitch();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void AddImpulse(FVector Impulse); 
+	void AddImpulse(FVector Impulse);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ResetAimingPitch();
 };

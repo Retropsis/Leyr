@@ -14,6 +14,25 @@ class UGameplayCueDefinition;
 class UAbilityData;
 class UPaperZDAnimInstance;
 class UItemData;
+
+USTRUCT(BlueprintType)
+struct FEndAbilityParams
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bResetPitch = true;
+};
+
+USTRUCT(BlueprintType)
+struct FInitAbilityParams
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bResetPitch = true;
+};
+
 /**
  * 
  */
@@ -55,7 +74,13 @@ protected:
 	virtual void InitAbility();
 	
 	UFUNCTION(BlueprintCallable)
+	virtual void InitAbilityWithParams(FInitAbilityParams Params);
+	
+	UFUNCTION(BlueprintCallable)
 	virtual void PrepareToEndAbility();
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void PrepareToEndAbilityWithParams(FEndAbilityParams Params);
 	
 	float GetManaCost(float InLevel = 1.f) const;
 	float GetCooldown(float InLevel = 1.f) const;
@@ -103,4 +128,5 @@ protected:
 private:
 	FActiveGameplayEffectHandle ActiveSourceObjectEffectHandle;
 	bool bPoiseWasApplied = false;
+	bool bResetPitch = true;
 };

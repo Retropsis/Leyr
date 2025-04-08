@@ -62,7 +62,7 @@ ABaseCharacter::ABaseCharacter()
 
 	WeaponFlipbook = CreateDefaultSubobject<UPaperFlipbookComponent>("WeaponFlipbook");
 	WeaponFlipbook->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	WeaponFlipbook->SetupAttachment(GetRootComponent());
+	WeaponFlipbook->SetupAttachment(UpperBody);
 
 	WeaponComponent = CreateDefaultSubobject<UPaperZDAnimationComponent>("WeaponComponent");
 }

@@ -107,6 +107,7 @@ public:
 	virtual void SetMovementTarget_Implementation(const FVector Target) override { MovementTarget = Target; } 
 	virtual FTaggedMontage GetTaggedMontageByIndex_Implementation(int32 Index) override;
 	virtual float GetOverridePitch_Implementation() override { return OverridePitch; }
+	virtual void ResetAimingPitch_Implementation() override;
 	/** end Combat Interface */
 	
 	int32 GetPlayerLevel() const;

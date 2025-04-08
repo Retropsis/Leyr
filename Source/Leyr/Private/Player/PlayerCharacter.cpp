@@ -1019,6 +1019,16 @@ void APlayerCharacter::ToggleAiming_Implementation(bool bAiming)
 	}
 }
 
+void APlayerCharacter::ResetAimingPitch_Implementation()
+{
+	if(ForgetOverridePitchTimer.IsValid())
+	{
+		GetWorld()->GetTimerManager().ClearTimer(ForgetOverridePitchTimer);
+	}
+	OverridePitch = 0.f;
+	UpperBody->SetRelativeRotation(FRotator(0.f, 0.f, 0.f));
+}
+
 /*
  * Saving / Loading
  */
