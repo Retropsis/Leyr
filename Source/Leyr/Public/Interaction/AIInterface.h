@@ -11,6 +11,8 @@ enum class EEncounterSize : uint8;
 enum class EMovementType : uint8;
 enum class EBehaviourState : uint8;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndTimelineMovement);
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UAIInterface : public UInterface
@@ -39,6 +41,12 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SineMove();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void StartTimelineMovement();
+	
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void TimelineMovement();
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void FaceTarget();
 	

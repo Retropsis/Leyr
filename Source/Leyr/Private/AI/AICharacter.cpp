@@ -662,6 +662,11 @@ void AAICharacter::SineMove_Implementation()
 	AddMovementInput(GetActorForwardVector() + FVector::UpVector * SineValue, 1.f, true);
 }
 
+void AAICharacter::StartTimelineMovement_Implementation()
+{
+	InitialTimelineLocation = GetActorLocation();
+}
+
 void AAICharacter::FaceTarget_Implementation()
 {
 	if (CombatTarget)

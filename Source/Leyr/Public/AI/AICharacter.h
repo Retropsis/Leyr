@@ -65,6 +65,7 @@ public:
 	virtual void SetupFlyAroundTarget_Implementation(FVector TargetLocation, float Radius = 225.f) override;
 	virtual void FlyAroundTarget_Implementation() override;
 	virtual void SineMove_Implementation() override;
+	virtual void StartTimelineMovement_Implementation() override;
 	virtual void FaceTarget_Implementation() override;
 	virtual bool FollowSpline_Implementation(int32 SplineIndex) override;
 	virtual FVector GetNextLocation_Implementation(int32 SplineIndex) override;
@@ -173,6 +174,13 @@ protected:
 	EBehaviourState BehaviourState = EBehaviourState::Patrol;
 	EChasingState ChasingState = EChasingState::Chasing;
 	bool bShouldAttack = true;
+
+	// Timeline Movement
+	UPROPERTY(BlueprintReadOnly)
+	FVector InitialTimelineLocation = FVector::ZeroVector;
+
+	UPROPERTY(BlueprintAssignable, BlueprintCallable)
+	FEndTimelineMovement EndTimelineMovement;
 
 	// Fly Around Target
 	FVector FlyAroundTargetLocation = FVector::ZeroVector;
