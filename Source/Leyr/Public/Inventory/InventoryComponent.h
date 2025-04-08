@@ -23,6 +23,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	int32 Quantity = 0;
 	
+	bool bStackable = false;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	int32 StackSize = 0;
 	

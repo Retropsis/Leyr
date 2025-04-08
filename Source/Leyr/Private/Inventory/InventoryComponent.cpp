@@ -31,11 +31,10 @@ void UInventoryComponent::ServerAddItem_Implementation(FInventoryItemData ItemTo
 // bItemStackWasSplit is for splitting a stack, set it to true to skip stacking and add the new split in a new slot
 void UInventoryComponent::AddItem(FInventoryItemData& ItemToAdd, const bool bItemStackWasSplit)
 {
-	UItemData* Item = ItemToAdd.Asset.LoadSynchronous();
 	const int32 ItemID = ItemToAdd.ID;
 	int32 ItemQuantityToAdd = ItemToAdd.Quantity;
 	
-	if(Item && Item->bIsStackable && !bItemStackWasSplit)
+	if(ItemToAdd.bStackable && !bItemStackWasSplit)
 	{
 		for (int i = 0; i < Items.Num(); ++i)
 		{

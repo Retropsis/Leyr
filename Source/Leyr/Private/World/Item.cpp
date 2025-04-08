@@ -57,6 +57,7 @@ void AItem::InitializeItemFromDataTable(const FName& RowName)
 			{
 				PickupSound = Asset->PickupSound;
 				GetRenderComponent()->SetFlipbook(Asset->PickupFlipbook);
+				ItemData.bStackable = Asset->bIsStackable;
 			}
 			ItemData = ItemDataRow->ItemData;
 #if WITH_EDITOR
