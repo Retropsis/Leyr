@@ -28,7 +28,7 @@ class LEYR_API ACameraBoundary : public AActor
 public:	
 	ACameraBoundary();
 
-	UFUNCTION(CallInEditor, Category="Camera Boundary")
+	UFUNCTION(CallInEditor, Category="00 - Camera Boundary")
 	virtual void InitializeCameraExtent();
 	
 	AActor* GetTargetActor() { return TargetActor; }
@@ -61,17 +61,17 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> BoundaryVisualizer;
 	
-	UPROPERTY(EditAnywhere, Category="Camera Boundary")
+	UPROPERTY(EditAnywhere, Category="00 - Camera Boundary")
 	TObjectPtr<APaperTileMapActor> TileMap;
 	
-	UPROPERTY(EditAnywhere, Category="Camera Boundary")
-	EBoundaryRule BoundaryRule = EBoundaryRule::Detachment;
+	UPROPERTY(EditAnywhere, Category="00 - Camera Boundary")
+	EBoundaryRule BoundaryRule = EBoundaryRule::Extent;
 
-	UPROPERTY(EditAnywhere, Category="Camera Boundary")
-	bool bConstrainZ = false;
+	UPROPERTY(EditAnywhere, Category="00 - Camera Boundary")
+	bool bConstrainZ = true;
 	
-	UPROPERTY(EditAnywhere, Category="Camera Boundary")
-	bool bConstrainX = false;
+	UPROPERTY(EditAnywhere, Category="00 - Camera Boundary")
+	bool bConstrainX = true;
 
 private:
 	UPROPERTY() TObjectPtr<AActor> TargetActor;

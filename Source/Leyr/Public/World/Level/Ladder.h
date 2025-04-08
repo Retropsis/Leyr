@@ -16,6 +16,8 @@ class LEYR_API ALadder : public AHanger
 
 public:
 	ALadder();
+	
+	virtual void InitializeHangingExtent() override;
 
 	//~ Interact Interface
 	virtual void Interact_Implementation(AActor* InteractingActor) override;

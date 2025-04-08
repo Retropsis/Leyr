@@ -24,6 +24,12 @@ ALadder::ALadder()
 	LadderTop->SetCollisionResponseToChannel(ECC_Enemy, ECR_Block);
 }
 
+void ALadder::InitializeHangingExtent()
+{
+	Super::InitializeHangingExtent();
+	LadderTop->SetRelativeLocation(FVector{ 0.f, 0.f, HangingCollision->GetScaledBoxExtent().Z - LadderTop->GetScaledBoxExtent().Z });
+}
+
 void ALadder::BeginPlay()
 {
 	Super::BeginPlay();

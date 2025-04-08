@@ -29,6 +29,6 @@ protected:
 	UFUNCTION()
 	virtual void OnOccupancyEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
-	UPROPERTY(EditAnywhere, Category="Plaform|Mechanics")
+	UPROPERTY(EditAnywhere, Category="00 - Platforming")
 	TObjectPtr<UBoxComponent> OccupancyCollision;
 };

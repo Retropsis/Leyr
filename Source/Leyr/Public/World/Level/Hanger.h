@@ -27,6 +27,9 @@ class LEYR_API AHanger : public AActor, public IInteractionInterface
 	
 public:	
 	AHanger();
+	
+	UFUNCTION(CallInEditor, Category="00 - Platforming")
+	virtual void InitializeHangingExtent();
 
 protected:
 	UFUNCTION()
@@ -35,22 +38,19 @@ protected:
 	UFUNCTION()
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {}
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform")
-	TObjectPtr<UPaperGroupedSpriteComponent> TileMap;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UBoxComponent> HangingCollision;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="00 - Platforming")
 	EBuildDirection BuildDirection = EBuildDirection::None;
 	
-	UPROPERTY(EditAnywhere, Category="Plaform")
+	UPROPERTY(EditAnywhere, Category="00 - Platforming")
 	EHangingType HangingType = EHangingType::Ladder;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="00 - Platforming", meta=(ClampMin=1))
 	int32 Length = 3;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="00 - Platforming")
 	float IgnoreCollisionTime = .6f;
 
 	FTimerHandle IgnoreCollisionTimer;
