@@ -55,4 +55,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Projectile")
 	TObjectPtr<USoundBase> LoopingSound = nullptr;
 	
+	UPROPERTY(EditDefaultsOnly, Category="Projectile")
+	bool bPlayOnHitTimeline = false;
+	
 };

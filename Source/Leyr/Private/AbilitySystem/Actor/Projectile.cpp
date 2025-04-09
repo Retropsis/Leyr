@@ -12,6 +12,7 @@
 #include "Interaction/CombatInterface.h"
 #include "Interaction/InteractionInterface.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Leyr/Leyr.h"
 
 AProjectile::AProjectile()
@@ -48,6 +49,7 @@ bool AProjectile::InitProjectileData()
 		ProjectileMovement->ProjectileGravityScale = ProjectileData->ProjectileGravityScale;
 		ProjectileMovement->InitialSpeed = ProjectileData->InitialSpeed;
 		ProjectileMovement->MaxSpeed = ProjectileData->MaxSpeed;
+		bPlayOnHitTimeline = ProjectileData->bPlayOnHitTimeline;
 		SetImpactEffect(ProjectileData->ImpactEffect);
 		SetImpactSound(ProjectileData->ImpactSound);
 		SetLoopingSound(ProjectileData->LoopingSound);
@@ -102,6 +104,13 @@ bool AProjectile::IsValidOverlap(AActor* OtherActor)
 	return true;
 }
 
+void AProjectile::PrepareToDestroyProjectile()
+{
+	Sphere->SetSimulatePhysics(true);
+	Sphere->SetEnableGravity(true);
+	ProjectileMovement->ProjectileGravityScale = 0.3f;
+}
+
 void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if(!IsValidOverlap(OtherActor)) return;
@@ -110,7 +119,17 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	{
 		if (ResponseToStatic == EResponseToStatic::Destroy)
 		{
-			Destroy();
+			if (bPlayOnHitTimeline)
+			{
+				InitialOnHitTimeline = GetActorLocation();
+				ProjectileMovement->StopMovementImmediately();
+				const FVector RandomRotation = GetActorForwardVector().RotateAngleAxis(FMath::FRandRange(112.5f, 157.5f), FVector::RightVector);
+				TargetLocation = GetActorLocation() + RandomRotation * FMath::FRandRange(45.f, 85.f);
+				// UKismetSystemLibrary::DrawDebugSphere(this, TargetLocation, 3.f, 12, FLinearColor::Green, 3.f);
+				// UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), TargetLocation, 5.f, FLinearColor::Green, 3.f);
+				Sphere->SetCollisionResponseToAllChannels(ECR_Ignore);
+				OnHitTimeline();
+			} else Destroy();
 			return;
 		}
 		if (ResponseToStatic == EResponseToStatic::Stop)

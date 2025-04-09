@@ -19,12 +19,32 @@ class LEYR_API AProjectile : public AActor
 	
 public:	
 	AProjectile();
+	virtual bool InitProjectileData();
 	void SetImpactEffect(UNiagaraSystem* Effect) { ImpactEffect = Effect; }
 	void SetImpactSound(USoundBase* Sound) { ImpactSound = Sound; }
 	void SetLoopingSound(USoundBase* Sound) { LoopingSound = Sound; }
 	bool IsValidOverlap(AActor* OtherActor);
-	virtual bool InitProjectileData();
 
+	/*
+	 * OnHit VFX Timeline
+	 */
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void OnHitTimeline();
+
+	UFUNCTION(BlueprintCallable)
+	void PrepareToDestroyProjectile();
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector InitialOnHitTimeline = FVector::ZeroVector;
+	
+	UPROPERTY(BlueprintReadOnly)
+	FVector TargetLocation = FVector::ZeroVector;
+	
+	bool bPlayOnHitTimeline = false;
+
+	/*
+	 *
+	 */
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UProjectileData> ProjectileData = nullptr;
 	
