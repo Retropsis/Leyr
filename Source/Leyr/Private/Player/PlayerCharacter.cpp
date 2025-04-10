@@ -940,10 +940,6 @@ void APlayerCharacter::HandleSwimming_Implementation(float MinZ, float Environme
 {
 	if(bEndOverlap)
 	{
-		// if(const UWorld* World = GetWorld())
-		// {
-		// 	World->GetTimerManager().SetTimer(EntangledExitTimer, FTimerDelegate::CreateLambda([this] () { HandleCombatState(ECombatState::Unoccupied); }), SwimmingExitTime, false);
-		// }
 		GetCharacterMovement()->GetPhysicsVolume()->bWaterVolume = false;
 		HandleCombatState(ECombatState::Unoccupied);
 		Jump();
@@ -1532,7 +1528,10 @@ void APlayerCharacter::SetCombatState_Implementation(ECombatState NewState)
 void APlayerCharacter::Die(const FVector& DeathImpulse, bool bExecute)
 {
 	Super::Die(DeathImpulse, bExecute);
+	PreviousCombatState = CombatState;
 	HandleCombatState(ECombatState::Defeated);
+	if (PreviousCombatState == ECombatState::Swimming) GetCharacterMovement()->GravityScale = 0.f;
+	if (PreviousCombatState == ECombatState::Entangled) GetCharacterMovement()->GravityScale = 0.f;
 
 	FTimerDelegate DefeatTimerDelegate;
 	DefeatTimerDelegate.BindLambda([this] ()

@@ -341,10 +341,8 @@ void AAICharacter::HandleBehaviourState(EBehaviourState NewState)
 	switch (BehaviourState)
 	{
 	case EBehaviourState::Patrol:
-		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
-		GetCharacterMovement()->MaxFlySpeed = BaseFlySpeed;
-		break;
 	case EBehaviourState::Search:
+	case EBehaviourState::Ascent:
 		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 		GetCharacterMovement()->MaxFlySpeed = BaseFlySpeed;
 		break;

@@ -146,6 +146,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects")
 	static FGameplayEffectContextHandle ApplyAdditionalEffect(const FAdditionalEffectParams& AdditionalEffectParams);
 	
+	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects")
+	static FGameplayEffectContextHandle ApplyStatusEffect(const FAdditionalEffectParams& AdditionalEffectParams);
+	
 	/*
 	 * Damage Effect Params
 	 */

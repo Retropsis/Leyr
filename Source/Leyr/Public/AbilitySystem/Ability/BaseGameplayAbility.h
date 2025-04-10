@@ -34,6 +34,24 @@ struct FInitAbilityParams
 };
 
 /**
+ * EAbilityActivationPolicy
+ *
+ *	Defines how an ability is meant to activate.
+ */
+UENUM(BlueprintType)
+enum class EAbilityActivationPolicy : uint8
+{
+	// Try to activate the ability when the input is triggered.
+	OnInputTriggered,
+
+	// Continually try to activate the ability while the input is active.
+	WhileInputActive,
+
+	// Try to activate the ability when an avatar is assigned.
+	OnSpawn
+};
+
+/**
  * 
  */
 UCLASS()
@@ -42,8 +60,7 @@ class LEYR_API UBaseGameplayAbility : public UGameplayAbility
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditDefaultsOnly, Category="Input", meta=(Categories="InputTag"))
-	FGameplayTag StartupInputTag;
+	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
 	
 	void MakeAndApplyExecuteEffectToTarget(const FGameplayTag& TagToApply, UAbilitySystemComponent* TargetASC, int32 Level = 1);
 
@@ -68,8 +85,13 @@ public:
 
 	UGameplayCueDefinition* GetGameplayCueDefinition() const { return GameplayCueDefinition; }
 	void SetAbilityData(UAbilityData* Data);
+	
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Input", meta=(Categories="InputTag"))
+	FGameplayTag StartupInputTag;
 
 protected:
+	void TryActivateAbilityOnSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const;
+	
 	UFUNCTION(BlueprintCallable)
 	virtual void InitAbility();
 	
@@ -85,6 +107,10 @@ protected:
 	float GetManaCost(float InLevel = 1.f) const;
 	float GetCooldown(float InLevel = 1.f) const;
 
+	// Defines how this ability is meant to activate.
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Ability|Ability Activation")
+	EAbilityActivationPolicy ActivationPolicy = EAbilityActivationPolicy::OnInputTriggered;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta=(Categories="Montage"), Category="Ability")
 	FGameplayTag MontageTag = FGameplayTag();
 
