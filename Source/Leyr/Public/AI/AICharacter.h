@@ -66,6 +66,7 @@ public:
 	virtual void FlyAroundTarget_Implementation() override;
 	virtual void SineMove_Implementation() override;
 	virtual void StartTimelineMovement_Implementation() override;
+	virtual void SetJumpApex_Implementation(float NewApex) override { JumpApex = NewApex; }
 	virtual void FaceTarget_Implementation() override;
 	virtual bool FollowSpline_Implementation(int32 SplineIndex) override;
 	virtual FVector GetNextLocation_Implementation(int32 SplineIndex) override;
@@ -178,6 +179,12 @@ protected:
 	// Timeline Movement
 	UPROPERTY(BlueprintReadOnly)
 	FVector InitialTimelineLocation = FVector::ZeroVector;
+	
+	UPROPERTY(BlueprintReadWrite)
+	FVector EndTimelineLocation = FVector::ZeroVector;
+	
+	UPROPERTY(BlueprintReadOnly)
+	float JumpApex = 100.f;
 
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FEndTimelineMovement EndTimelineMovement;

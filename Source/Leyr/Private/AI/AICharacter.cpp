@@ -612,13 +612,13 @@ void AAICharacter::SetupFlyAroundTarget_Implementation(FVector TargetLocation, f
 
 void AAICharacter::FlyAroundTarget_Implementation()
 {
-	UKismetSystemLibrary::DrawDebugSphere(this, FlyAroundTargetLocation, 15.f, 12, FLinearColor::White);
+	// UKismetSystemLibrary::DrawDebugSphere(this, FlyAroundTargetLocation, 15.f, 12, FLinearColor::White);
 	const FVector ActorLocation = GetActorLocation();
 	const float DeltaTime = GetWorld()->GetTimeSeconds() - FlyAroundDeltaTimeStart;
 
 	float FactorX = 1.f;
 	
-	GEngine->AddOnScreenDebugMessage(778899, 5.f, FColor::Cyan, FString::Printf(TEXT("%f"), FMath::Cos(DeltaTime)));
+	// GEngine->AddOnScreenDebugMessage(778899, 5.f, FColor::Cyan, FString::Printf(TEXT("%f"), FMath::Cos(DeltaTime)));
 
 	FactorX *= FMath::Sin(DeltaTime * 2.f) * 200.f;
 	
@@ -645,14 +645,14 @@ void AAICharacter::FlyAroundTarget_Implementation()
 		}
 	}
 	
-	GEngine->AddOnScreenDebugMessage(778898, 5.f, FColor::Red, FString::Printf(TEXT("Factor X: %f"), FactorX));
+	// GEngine->AddOnScreenDebugMessage(778898, 5.f, FColor::Red, FString::Printf(TEXT("Factor X: %f"), FactorX));
 	UKismetSystemLibrary::DrawDebugSphere(this, FlyAroundTargetLocation + FVector(FactorX, 0.f, 0.f), 15.f, 12, FLinearColor::Green);
 
 	const FVector Movement{ FMath::Cos(DeltaTime * 1.5f), 0.f, FMath::Sin(DeltaTime * 1.5f) };
 	const float CurrentDistance = FMath::FInterpTo((FlyAroundTargetLocation - ActorLocation).Length(), FlyAroundRadius, DeltaTime, 5.f);
 
 	const FVector NewTargetLocation = FVector{ FlyAroundTargetLocation.X + FactorX + Movement.X * FlyAroundRadius, 0.f, FlyAroundTargetLocation.Z + Movement.Z * FlyAroundRadius };
-	UKismetSystemLibrary::DrawDebugSphere(this, NewTargetLocation, 15.f, 12, FLinearColor::Yellow);
+	// UKismetSystemLibrary::DrawDebugSphere(this, NewTargetLocation, 15.f, 12, FLinearColor::Yellow);
 	SetActorLocation(FMath::VInterpConstantTo(ActorLocation, NewTargetLocation, DeltaTime, 2.f));
 }
 

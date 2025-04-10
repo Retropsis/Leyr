@@ -40,7 +40,7 @@ public:
 	void UpdateFacingTarget(const FVector& Target);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void AdjustDirection();
+	void AdjustDirectionToFaceTarget(AActor* Target);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UAbilityData* LoadAndGetDefaultAbilityData();

@@ -32,9 +32,11 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; } 
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
-	void ChangeDirections();
 	UPaperZDAnimInstance* SetWeaponAnimInstance(const TSubclassOf<UPaperZDAnimInstance>& AnimInstance) const;
 
+	UFUNCTION(BlueprintCallable)
+	void ChangeDirections();
+	
 	UFUNCTION(BlueprintCallable)
 	void HitStop(float Duration, float Amount = 0.f); 
 	
@@ -164,7 +166,7 @@ protected:
 	virtual void ResetGravityScale_Implementation() override;
 	virtual bool IsCharacterAirborne_Implementation() override;
 	virtual void SetMovementMode_Implementation(EMovementMode MovementMode,  float NewWalkingSpeed = -1.f, float GravityValue = -1.f) override;
-	virtual void AdjustDirection_Implementation() override;
+	virtual void AdjustDirectionToFaceTarget_Implementation(AActor* Target) override;
 	virtual void AddImpulse_Implementation(FVector Impulse) override;
 	//~ Combat Interface
 	

@@ -46,6 +46,9 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void TimelineMovement();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetJumpApex(float NewApex);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void FaceTarget();

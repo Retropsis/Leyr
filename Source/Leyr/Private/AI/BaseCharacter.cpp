@@ -334,12 +334,16 @@ void ABaseCharacter::SetMovementMode_Implementation(EMovementMode MovementMode, 
 	GetCharacterMovement()->SetMovementMode(MovementMode);
 }
 
-void ABaseCharacter::AdjustDirection_Implementation()
+void ABaseCharacter::AdjustDirectionToFaceTarget_Implementation(AActor* Target)
 {
-	if((FMath::Sign(GetActorForwardVector().X) < 0.f && GetActorRotation().Yaw != 180.f) || (FMath::Sign(GetActorForwardVector().X) > 0.f && GetActorRotation().Yaw != 0.f))
+	if (FVector::DotProduct(GetActorForwardVector(), (Target->GetActorLocation() - GetActorLocation()).GetSafeNormal()) < 0.f)
 	{
-		SetActorRotation(UKismetMathLibrary::ComposeRotators(GetActorRotation(), FRotator(0.f, 180.f, 0.f)));
+		ChangeDirections();
 	}
+	// if((FMath::Sign(GetActorForwardVector().X) < 0.f && GetActorRotation().Yaw != 180.f) || (FMath::Sign(GetActorForwardVector().X) > 0.f && GetActorRotation().Yaw != 0.f))
+	// {
+	// 	SetActorRotation(UKismetMathLibrary::ComposeRotators(GetActorRotation(), FRotator(0.f, 180.f, 0.f)));
+	// }
 }
 
 void ABaseCharacter::AddImpulse_Implementation(FVector Impulse)
