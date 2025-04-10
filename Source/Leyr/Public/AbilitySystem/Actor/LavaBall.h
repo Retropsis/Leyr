@@ -6,7 +6,13 @@
 #include "AbilitySystem/Actor/Spikes.h"
 #include "LavaBall.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLand);
+UENUM(BlueprintType)
+enum class ELavaBallState : uint8
+{
+	Idle,
+	MovingUp,
+	MovingDown,
+};
 
 /**
  * 
@@ -18,25 +24,38 @@ class LEYR_API ALavaBall : public ASpikes
 
 public:
 	ALavaBall();
-	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
+	
+	void StartLaunching();
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void LaunchTimeline();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void HandleOnLand();
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShouldRotate(bool bRotate);
 
-	UPROPERTY(BlueprintReadOnly)
-	bool bLanded = false;
-
 protected:
-	void Launch();
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<USceneComponent> ApexComponent;
+	
+	UPROPERTY(BlueprintReadOnly, Category="AbilityActor|LavaBall")
+	FVector InitialLocation = FVector::ZeroVector;
+
+	UPROPERTY(BlueprintReadOnly, Category="AbilityActor|LavaBall")
+	FVector ApexLocation = FVector::ZeroVector;
+
+	UPROPERTY(BlueprintReadOnly, Category="AbilityActor|LavaBall")
+	float LaunchApex = 275.f;
 	
 	UPROPERTY(EditAnywhere, Category="AbilityActor|LavaBall")
 	float LaunchCoolDown = 3.f;
-	
-	UPROPERTY(EditAnywhere, Category="AbilityActor|LavaBall")
-	float LaunchImpulse = 750.f;
+
+	UPROPERTY(BlueprintReadWrite, Category="AbilityActor|LavaBall")
+	ELavaBallState LavaBallState = ELavaBallState::Idle;
 
 private:
 	FTimerHandle LaunchTimer;
-	float StoppingHeight = 0.f;
 };
