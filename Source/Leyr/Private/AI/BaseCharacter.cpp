@@ -300,8 +300,8 @@ void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImp
 	
 	GetAbilitySystemComponent()->AddLooseGameplayTag(FBaseGameplayTags::Get().Defeated);
 	DefeatState = InDefeatState;
-	BurnStatusEffectComponent->Deactivate();
-	StunStatusEffectComponent->Deactivate();
+	BurnStatusEffectComponent->DeactivateImmediate();
+	StunStatusEffectComponent->DeactivateImmediate();
 	OnDeath.Broadcast(this);
 }
 

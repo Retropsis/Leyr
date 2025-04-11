@@ -450,6 +450,7 @@ FGameplayEffectContextHandle ULeyrAbilitySystemLibrary::ApplyStatusEffect(const 
 	
 	const FGameplayEffectSpecHandle SpecHandle = AdditionalEffectParams.SourceAbilitySystemComponent->MakeOutgoingSpec(AdditionalEffectParams.AdditionalEffectClass, AdditionalEffectParams.AbilityLevel, EffectContextHandle);
 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, AdditionalEffectParams.DamageType, AdditionalEffectParams.AbilityPower);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, AdditionalEffectParams.StatusEffectType, AdditionalEffectParams.AbilityPower);
 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Chance, AdditionalEffectParams.StatusEffectChance);
 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Damage, AdditionalEffectParams.StatusEffectDamage);
 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Duration, AdditionalEffectParams.StatusEffectDuration);
@@ -706,6 +707,18 @@ FGameplayTag ULeyrAbilitySystemLibrary::GetDamageType(const FGameplayEffectConte
 	return FGameplayTag();
 }
 
+FGameplayTag ULeyrAbilitySystemLibrary::GetStatusEffectType(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	if (const FBaseGameplayEffectContext* BaseEffectContext = static_cast<const FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		if (BaseEffectContext->GetStatusEffectType().IsValid())
+		{
+			return *BaseEffectContext->GetStatusEffectType();
+		}
+	}
+	return FGameplayTag();
+}
+
 FVector ULeyrAbilitySystemLibrary::GetDeathImpulse(const FGameplayEffectContextHandle& EffectContextHandle)
 {
 	if (const FBaseGameplayEffectContext* BaseEffectContext = static_cast<const FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
@@ -762,6 +775,15 @@ void ULeyrAbilitySystemLibrary::SetDamageType(FGameplayEffectContextHandle& Effe
 	{
 		const TSharedPtr<FGameplayTag> DamageType = MakeShared<FGameplayTag>(InDamageType);
 		BaseEffectContext->SetDamageType(DamageType);
+	}
+}
+
+void ULeyrAbilitySystemLibrary::SetStatusEffectType(FGameplayEffectContextHandle& EffectContextHandle, const FGameplayTag& InStatusEffectType)
+{
+	if (FBaseGameplayEffectContext* BaseEffectContext = static_cast<FBaseGameplayEffectContext*>(EffectContextHandle.Get()))
+	{
+		const TSharedPtr<FGameplayTag> StatusEffectType = MakeShared<FGameplayTag>(InStatusEffectType);
+		BaseEffectContext->SetStatusEffectType(StatusEffectType);
 	}
 }
 

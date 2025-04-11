@@ -150,6 +150,12 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.StatusEffectsToResistances.Add(GameplayTags.StatusEffect_Silence, GameplayTags.Attributes_Resistance_Ice);
 	GameplayTags.StatusEffectsToResistances.Add(GameplayTags.StatusEffect_Sleep, GameplayTags.Attributes_Resistance_Wind);
 	GameplayTags.StatusEffectsToResistances.Add(GameplayTags.StatusEffect_Poison, GameplayTags.Attributes_Resistance_Noxious);
+	
+	GameplayTags.StatusEffectToPeriodicEffectOnApplicationPolicy.Add(GameplayTags.StatusEffect_Burn, false);
+	GameplayTags.StatusEffectToPeriodicEffectOnApplicationPolicy.Add(GameplayTags.StatusEffect_Stun, true);
+	GameplayTags.StatusEffectToPeriodicEffectOnApplicationPolicy.Add(GameplayTags.StatusEffect_Silence, true);
+	GameplayTags.StatusEffectToPeriodicEffectOnApplicationPolicy.Add(GameplayTags.StatusEffect_Sleep, true);
+	GameplayTags.StatusEffectToPeriodicEffectOnApplicationPolicy.Add(GameplayTags.StatusEffect_Poison, false);
 		
 	/*
 	 * Alteration

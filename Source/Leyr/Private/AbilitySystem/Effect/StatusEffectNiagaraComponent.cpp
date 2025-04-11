@@ -33,5 +33,5 @@ void UStatusEffectNiagaraComponent::BeginPlay()
 void UStatusEffectNiagaraComponent::StatusEffectTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 	const bool bOwnerAlive = IsValid(GetOwner()) && GetOwner()->Implements<UCombatInterface>() && ICombatInterface::Execute_GetDefeatState(GetOwner()) == EDefeatState::None;
-	NewCount > 0 && bOwnerAlive ? Activate() : Deactivate();
+	NewCount > 0 && bOwnerAlive ? Activate() : DeactivateImmediate();
 }

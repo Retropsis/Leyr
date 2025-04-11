@@ -135,6 +135,7 @@ FGameplayTag StatusEffect_Frequency;
 
 TMap<FGameplayTag, FGameplayTag> DamageTypesToStatusEffects;
 TMap<FGameplayTag, FGameplayTag> StatusEffectsToDamageTypes;
+ TMap<FGameplayTag, bool> StatusEffectToPeriodicEffectOnApplicationPolicy;
 
  /*
   * Alteration

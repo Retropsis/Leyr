@@ -11,7 +11,7 @@ struct FAdditionalEffectParams
 {
 	GENERATED_BODY()
 
-	FAdditionalEffectParams(){}
+	FAdditionalEffectParams() {}
 
 	UPROPERTY(BlueprintReadWrite) TObjectPtr<UObject> WorldContextObject = nullptr;
 	UPROPERTY(BlueprintReadWrite) TObjectPtr<UObject> SourceObject = nullptr;
@@ -21,6 +21,7 @@ struct FAdditionalEffectParams
 	UPROPERTY(BlueprintReadWrite) float AbilityPower = 0.f;
 	UPROPERTY(BlueprintReadWrite) float AbilityLevel = 1.f;
 	UPROPERTY(BlueprintReadWrite) FGameplayTag DamageType = FGameplayTag();
+	UPROPERTY(BlueprintReadWrite) FGameplayTag StatusEffectType = FGameplayTag();
 	UPROPERTY(BlueprintReadWrite) float StatusEffectChance = 0.f;
 	UPROPERTY(BlueprintReadWrite) float StatusEffectDamage = 0.f;
 	UPROPERTY(BlueprintReadWrite) float StatusEffectDuration = 0.f;
@@ -37,36 +38,64 @@ struct FAdditionalEffectParams
 };
 
 USTRUCT(BlueprintType)
+struct FStatusEffectParams
+{
+	GENERATED_BODY()
+
+	FStatusEffectParams() {}
+
+	UPROPERTY(BlueprintReadWrite) TObjectPtr<UObject> WorldContextObject = nullptr;
+	UPROPERTY(BlueprintReadWrite) TObjectPtr<UObject> SourceObject = nullptr;
+	UPROPERTY(BlueprintReadWrite) TSubclassOf<UGameplayEffect> StatusEffectClass = nullptr;
+	UPROPERTY(BlueprintReadWrite) TObjectPtr<UAbilitySystemComponent> SourceAbilitySystemComponent;
+	UPROPERTY(BlueprintReadWrite) TObjectPtr<UAbilitySystemComponent> TargetAbilitySystemComponent;
+	UPROPERTY(BlueprintReadWrite) float AbilityPower = 0.f;
+	UPROPERTY(BlueprintReadWrite) float AbilityLevel = 1.f;
+	UPROPERTY(BlueprintReadWrite) FGameplayTag StatusEffectType = FGameplayTag();
+	UPROPERTY(BlueprintReadWrite) FGameplayTag StatusEffectDamageType = FGameplayTag();
+	UPROPERTY(BlueprintReadWrite) float StatusEffectChance = 0.f;
+	UPROPERTY(BlueprintReadWrite) float StatusEffectDamage = 0.f;
+	UPROPERTY(BlueprintReadWrite) float StatusEffectDuration = 0.f;
+	UPROPERTY(BlueprintReadWrite) float StatusEffectFrequency = 0.f;
+};
+
+USTRUCT(BlueprintType)
 struct FBaseGameplayEffectContext : public FGameplayEffectContext
 {
 	GENERATED_BODY()
 
 public:
+	TSharedPtr<FGameplayTag> GetDamageType() const { return DamageType; }
 	bool IsCriticalHit() const { return bIsCriticalHit; }
 	bool IsBlockedHit () const { return bIsBlockedHit; }
 	bool IsExecuteHit () const { return bIsExecuteHit; }
+	FVector GetDeathImpulse() const { return DeathImpulse; }
+	FVector GetAirborneForce() const { return AirborneForce; }
+	//~ Status Effect
+	TSharedPtr<FGameplayTag> GetStatusEffectType() const { return StatusEffectType; }
 	bool IsSuccessfulStatusEffect() const { return bIsSuccessfulStatusEffect; }
 	float GetStatusEffectDamage() const { return StatusEffectDamage; }
 	float GetStatusEffectDuration() const { return StatusEffectDuration; }
 	float GetStatusEffectFrequency() const { return StatusEffectFrequency; }
-	TSharedPtr<FGameplayTag> GetDamageType() const { return DamageType; }
-	FVector GetDeathImpulse() const { return DeathImpulse; }
-	FVector GetAirborneForce() const { return AirborneForce; }
+	//~ Radial Damage
 	bool IsRadialDamage() const { return bIsRadialDamage; }
 	float GetRadialDamageInnerRadius() const { return RadialDamageInnerRadius; }
 	float GetRadialDamageOuterRadius() const { return RadialDamageOuterRadius; }
 	FVector GetRadialDamageOrigin() const { return RadialDamageOrigin; }
 	
+	void SetDamageType(const TSharedPtr<FGameplayTag>& InDamageType) { DamageType = InDamageType; }
 	void SetIsCriticalHit(bool bInIsCriticalHit) { bIsCriticalHit = bInIsCriticalHit; }
 	void SetIsBlockedHit(bool bInIsBlockedHit) { bIsBlockedHit = bInIsBlockedHit; }
 	void SetIsExecuteHit(bool bInIsExecuteHit) { bIsExecuteHit = bInIsExecuteHit; }
+	void SetDeathImpulse(const FVector& InImpulse) { DeathImpulse = InImpulse; }
+	void SetAirborneForce(const FVector& InForce) { AirborneForce = InForce; }
+	//~ Status Effect
 	void SetIsSuccessfulStatusEffect(bool bInIsStatusEffect) { bIsSuccessfulStatusEffect = bInIsStatusEffect; }
 	void SetStatusEffectDamage(float InDamage) { StatusEffectDamage = InDamage; }
 	void SetStatusEffectDuration(float InDuration) { StatusEffectDuration = InDuration; }
 	void SetStatusEffectFrequency(float InFrequency) { StatusEffectFrequency = InFrequency; }
-	void SetDamageType(const TSharedPtr<FGameplayTag>& InDamageType) { DamageType = InDamageType; }
-	void SetDeathImpulse(const FVector& InImpulse) { DeathImpulse = InImpulse; }
-	void SetAirborneForce(const FVector& InForce) { AirborneForce = InForce; }
+	void SetStatusEffectType(const TSharedPtr<FGameplayTag>& InStatusEffectType) { StatusEffectType = InStatusEffectType; }
+	//~ Radial Damage
 	void SetIsRadialDamage(bool bInIsRadialDamage) { bIsRadialDamage = bInIsRadialDamage; }
 	void SetRadialDamageInnerRadius(float InRadialDamageInnerRadius) { RadialDamageInnerRadius = InRadialDamageInnerRadius; }
 	void SetRadialDamageOuterRadius(float InRadialDamageOuterRadius) { RadialDamageOuterRadius = InRadialDamageOuterRadius; }
@@ -117,6 +146,7 @@ protected:
 	float StatusEffectFrequency = 0.f;
 
 	TSharedPtr<FGameplayTag> DamageType;
+	TSharedPtr<FGameplayTag> StatusEffectType;
 	
 	UPROPERTY()
 	FVector DeathImpulse = FVector::ZeroVector;

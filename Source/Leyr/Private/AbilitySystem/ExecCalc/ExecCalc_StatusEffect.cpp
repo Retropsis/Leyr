@@ -149,10 +149,11 @@ void UExecCalc_StatusEffect::DetermineStatusEffect(const FGameplayEffectCustomEx
 				const float StatusEffectDuration = Spec.GetSetByCallerMagnitude(GameplayTags.StatusEffect_Duration, false, -1.f);
 				ULeyrAbilitySystemLibrary::SetStatusEffectDuration(ContextHandle, StatusEffectDuration);
 
-				if (GameplayTags.StatusEffectsToDamageTypes.Contains(Pair.Key))
+				if (GameplayTags.StatusEffectsToDamageTypes.Contains(Pair.Key) && GameplayTags.StatusEffectsToDamageTypes[Pair.Key].IsValid())
 				{
-					const FGameplayTag& DamageType = GameplayTags.StatusEffectsToDamageTypes[Pair.Key];
-					ULeyrAbilitySystemLibrary::SetDamageType(ContextHandle, DamageType);
+					const FGameplayTag& StatusEffectDamageType = GameplayTags.StatusEffectsToDamageTypes[Pair.Key];
+					ULeyrAbilitySystemLibrary::SetDamageType(ContextHandle, StatusEffectDamageType);
+					ULeyrAbilitySystemLibrary::SetStatusEffectType(ContextHandle, StatusEffectType);
 
 					const float StatusEffectDamage = Spec.GetSetByCallerMagnitude(GameplayTags.StatusEffect_Damage, false, -1.f);
 					const float StatusEffectFrequency = Spec.GetSetByCallerMagnitude(GameplayTags.StatusEffect_Frequency, false, -1.f);

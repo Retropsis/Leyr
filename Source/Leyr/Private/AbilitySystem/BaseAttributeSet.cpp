@@ -315,25 +315,24 @@ void UBaseAttributeSet::HandleStatusEffect(const FEffectProperties& Props)
 	EffectContext.AddSourceObject(Props.SourceAvatarActor);
 
 	const FGameplayTag DamageType = ULeyrAbilitySystemLibrary::GetDamageType(Props.EffectContextHandle);
+	const FGameplayTag StatusEffectType = ULeyrAbilitySystemLibrary::GetStatusEffectType(Props.EffectContextHandle);
 	const float StatusEffectDamage = ULeyrAbilitySystemLibrary::GetStatusEffectDamage(Props.EffectContextHandle);
 	const float StatusEffectDuration = ULeyrAbilitySystemLibrary::GetStatusEffectDuration(Props.EffectContextHandle);
 	const float StatusEffectFrequency = ULeyrAbilitySystemLibrary::GetStatusEffectFrequency(Props.EffectContextHandle);
 
-	FString StatusEffectName = FString::Printf(TEXT("DynamicStatusEffect_%s"), *DamageType.ToString());
+	const FString StatusEffectName = FString::Printf(TEXT("Dynamic_%s"), *StatusEffectType.ToString());
 	UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(StatusEffectName));
-
+	
 	Effect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
 	Effect->Period = StatusEffectFrequency;
 	Effect->DurationMagnitude = FScalableFloat(StatusEffectDuration);
-	Effect->bExecutePeriodicEffectOnApplication = false; // TODO need to parameterize this, burn/poison dont need to exec on application but stun, sleep, silence would need
+	Effect->bExecutePeriodicEffectOnApplication = GameplayTags.StatusEffectToPeriodicEffectOnApplicationPolicy[StatusEffectType];
 	
 	UTargetTagsGameplayEffectComponent& AssetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
 	FInheritedTagContainer InheritedTagContainer;
-	// const FGameplayTag StatusEffectTag = DamageType;
-	const FGameplayTag StatusEffectTag = GameplayTags.DamageTypesToStatusEffects[DamageType];
 	
-	InheritedTagContainer.Added.AddTag(StatusEffectTag);
-	if (StatusEffectTag.MatchesTagExact(GameplayTags.StatusEffect_Stun))
+	InheritedTagContainer.Added.AddTag(StatusEffectType);
+	if (StatusEffectType.MatchesTagExact(GameplayTags.StatusEffect_Stun))
 	{
 		InheritedTagContainer.Added.AddTag(GameplayTags.Player_Block_CursorTrace);
 		InheritedTagContainer.Added.AddTag(GameplayTags.Player_Block_InputHeld);

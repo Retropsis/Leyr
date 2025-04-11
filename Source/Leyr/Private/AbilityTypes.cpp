@@ -63,38 +63,42 @@ bool FBaseGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 		{
 			RepBits |= 1 << 13;
 		}
-		if (!DeathImpulse.IsZero())
+		if (StatusEffectType.IsValid())
 		{
 			RepBits |= 1 << 14;
 		}
-		if (!AirborneForce.IsZero())
+		if (!DeathImpulse.IsZero())
 		{
 			RepBits |= 1 << 15;
 		}
-		if (bIsExecuteHit)
+		if (!AirborneForce.IsZero())
 		{
 			RepBits |= 1 << 16;
 		}
-		if (bIsRadialDamage)
+		if (bIsExecuteHit)
 		{
 			RepBits |= 1 << 17;
+		}
+		if (bIsRadialDamage)
+		{
+			RepBits |= 1 << 18;
  
 			if (RadialDamageInnerRadius > 0.f)
 			{
-				RepBits |= 1 << 18;
+				RepBits |= 1 << 19;
 			}
 			if (RadialDamageOuterRadius > 0.f)
 			{
-				RepBits |= 1 << 19;
+				RepBits |= 1 << 20;
 			}
 			if (!RadialDamageOrigin.IsZero())
 			{
-				RepBits |= 1 << 20;
+				RepBits |= 1 << 21;
 			}
 		}
 	}
 
-	Ar.SerializeBits(&RepBits, 21);
+	Ar.SerializeBits(&RepBits, 22);
 
 	if (RepBits & (1 << 0))
 	{
@@ -173,29 +177,40 @@ bool FBaseGameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, bo
 	}
 	if (RepBits & (1 << 14))
 	{
-		DeathImpulse.NetSerialize(Ar, Map, bOutSuccess);
+		if (Ar.IsLoading())
+		{
+			if (!StatusEffectType.IsValid())
+			{
+				StatusEffectType = TSharedPtr<FGameplayTag>(new FGameplayTag());
+			}
+		}
+		StatusEffectType->NetSerialize(Ar, Map, bOutSuccess);
 	}
 	if (RepBits & (1 << 15))
 	{
-		AirborneForce.NetSerialize(Ar, Map, bOutSuccess);
+		DeathImpulse.NetSerialize(Ar, Map, bOutSuccess);
 	}
 	if (RepBits & (1 << 16))
 	{
-		Ar << bIsExecuteHit;
+		AirborneForce.NetSerialize(Ar, Map, bOutSuccess);
 	}
 	if (RepBits & (1 << 17))
 	{
+		Ar << bIsExecuteHit;
+	}
+	if (RepBits & (1 << 18))
+	{
 		Ar << bIsRadialDamage;
  		
-		if (RepBits & (1 << 18))
+		if (RepBits & (1 << 19))
 		{
 			Ar << RadialDamageInnerRadius;
 		}
-		if (RepBits & (1 << 19))
+		if (RepBits & (1 << 20))
 		{
 			Ar << RadialDamageOuterRadius;
 		}
-		if (RepBits & (1 << 20))
+		if (RepBits & (1 << 21))
 		{
 			RadialDamageOrigin.NetSerialize(Ar, Map, bOutSuccess);
 		}

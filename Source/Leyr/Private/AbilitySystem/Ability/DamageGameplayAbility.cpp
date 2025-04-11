@@ -257,7 +257,8 @@ FAdditionalEffectParams UDamageGameplayAbility::MakeStatusEffectParamsFromClassD
 	Params.TargetAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 	Params.AbilityPower = AbilityPower.GetValueAtLevel(GetAbilityLevel());
 	Params.AbilityLevel = GetAbilityLevel();
-	Params.DamageType = StatusEffectType;
+	Params.DamageType = DamageType;
+	Params.StatusEffectType = StatusEffectType;
 	Params.StatusEffectChance = StatusEffectChance;
 	Params.StatusEffectDamage = StatusEffectDamage;
 	Params.StatusEffectDuration = StatusEffectDuration;

@@ -57,7 +57,7 @@ bool AProjectile::InitProjectileData()
 		
 		if (ProjectileData->StatusEffectData)
 		{
-			StatusEffectParams.DamageType = ProjectileData->StatusEffectData->StatusEffectType;
+			StatusEffectParams.StatusEffectType = ProjectileData->StatusEffectData->StatusEffectType;
 			StatusEffectParams.StatusEffectChance = ProjectileData->StatusEffectData->StatusEffectChance;
 			StatusEffectParams.StatusEffectDamage = ProjectileData->StatusEffectData->StatusEffectDamage;
 			StatusEffectParams.StatusEffectDuration = ProjectileData->StatusEffectData->StatusEffectDuration;

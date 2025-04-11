@@ -205,6 +205,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "LeyrAbilitySystemLibrary|GameplayEffects", meta=(WorldContext="WorldContextObject"))
 	static FGameplayTag GetDamageType(const FGameplayEffectContextHandle& EffectContextHandle);
+	
+	UFUNCTION(BlueprintPure, Category = "LeyrAbilitySystemLibrary|GameplayEffects", meta=(WorldContext="WorldContextObject"))
+	static FGameplayTag GetStatusEffectType(const FGameplayEffectContextHandle& EffectContextHandle);
 
 	UFUNCTION(BlueprintPure, Category = "LeyrAbilitySystemLibrary|GameplayEffects", meta=(WorldContext="WorldContextObject"))
 	static FVector GetDeathImpulse(const FGameplayEffectContextHandle& EffectContextHandle);
@@ -226,6 +229,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects", meta=(WorldContext="WorldContextObject"))
 	static void SetDamageType(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const FGameplayTag& InDamageType);
+
+	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects", meta=(WorldContext="WorldContextObject"))
+	static void SetStatusEffectType(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const FGameplayTag& InStatusEffectType);
 	
 	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects", meta=(WorldContext="WorldContextObject"))
 	static void SetDeathImpulse(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const FVector& InImpulse);
