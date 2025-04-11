@@ -38,10 +38,10 @@ void AFireBall::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 	{
 		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
 		{
-			const FVector DeathImpulse = GetActorForwardVector() * AdditionalEffectParams.DeathImpulseMagnitude;
-			AdditionalEffectParams.DeathImpulse = DeathImpulse;
-			AdditionalEffectParams.TargetAbilitySystemComponent = TargetASC;
-			ULeyrAbilitySystemLibrary::ApplyAdditionalEffect(AdditionalEffectParams);
+			const FVector DeathImpulse = GetActorForwardVector() * StatusEffectParams.DeathImpulseMagnitude;
+			StatusEffectParams.DeathImpulse = DeathImpulse;
+			StatusEffectParams.TargetAbilitySystemComponent = TargetASC;
+			ULeyrAbilitySystemLibrary::ApplyAdditionalEffect(StatusEffectParams);
 		}
 	}
 }

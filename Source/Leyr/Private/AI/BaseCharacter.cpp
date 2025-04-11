@@ -132,6 +132,11 @@ void ABaseCharacter::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCou
 	GetCharacterMovement()->MaxWalkSpeed = bIsStunned ? 0.f : BaseWalkSpeed;
 }
 
+void ABaseCharacter::BurnTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	bIsStunned = NewCount > 0;
+}
+
 /*
  * Combat Interface
  */

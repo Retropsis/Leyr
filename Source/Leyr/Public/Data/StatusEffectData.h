@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
 #include "StatusEffectData.generated.h"
 
+class UGameplayEffect;
 /**
  * 
  */
@@ -15,6 +17,12 @@ class LEYR_API UStatusEffectData : public UPrimaryDataAsset
 	GENERATED_BODY()
 	
 public:
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UGameplayEffect> StatusEffectClass = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly, meta=(Categories="StatusEffect"))
+	FGameplayTag StatusEffectType =FGameplayTag();
+	
 	UPROPERTY(EditDefaultsOnly, meta=(ClampMin=0.f, ClampMax=100.f))
 	float StatusEffectChance = 20.f;
 

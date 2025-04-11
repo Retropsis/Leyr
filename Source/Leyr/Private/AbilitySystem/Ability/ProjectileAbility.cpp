@@ -51,8 +51,9 @@ void UProjectileAbility::SpawnProjectile(const FGameplayTag& SocketTag, const FV
 			GetOwningActorFromActorInfo(),
 			Cast<APawn>(GetOwningActorFromActorInfo()),
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-	
-	Projectile->AdditionalEffectParams = MakeAdditionalEffectParamsFromClassDefaults();
+
+	Projectile->DamageEffectParams = MakeAdditionalEffectParamsFromClassDefaults();
+	Projectile->StatusEffectParams = MakeStatusEffectParamsFromClassDefaults();
 	Projectile->InitProjectileData();
 	Projectile->FinishSpawning(SpawnTransform);
 }

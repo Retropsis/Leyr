@@ -147,6 +147,7 @@ protected:
 	 * Base Ability Data
 	 */
 	FGameplayTag DamageType;
+	FGameplayTag StatusEffectType;
 	ESequenceType SequenceType = ESequenceType::Default;
 	FScalableFloat AbilityPower;
 	float AbilityPoise = 0.f;

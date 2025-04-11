@@ -138,6 +138,18 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.DamageTypesToStatusEffects.Add(GameplayTags.Damage_Ice, GameplayTags.StatusEffect_Silence);
 	GameplayTags.DamageTypesToStatusEffects.Add(GameplayTags.Damage_Wind, GameplayTags.StatusEffect_Sleep);
 	GameplayTags.DamageTypesToStatusEffects.Add(GameplayTags.Damage_Noxious, GameplayTags.StatusEffect_Poison);
+
+	GameplayTags.StatusEffectsToDamageTypes.Add(GameplayTags.StatusEffect_Burn, GameplayTags.Damage_Fire);
+	GameplayTags.StatusEffectsToDamageTypes.Add(GameplayTags.StatusEffect_Stun, GameplayTags.Damage_Blunt);
+	GameplayTags.StatusEffectsToDamageTypes.Add(GameplayTags.StatusEffect_Silence, FGameplayTag());
+	GameplayTags.StatusEffectsToDamageTypes.Add(GameplayTags.StatusEffect_Sleep, FGameplayTag());
+	GameplayTags.StatusEffectsToDamageTypes.Add(GameplayTags.StatusEffect_Poison, GameplayTags.Damage_Noxious);
+	
+	GameplayTags.StatusEffectsToResistances.Add(GameplayTags.StatusEffect_Burn, GameplayTags.Attributes_Resistance_Fire);
+	GameplayTags.StatusEffectsToResistances.Add(GameplayTags.StatusEffect_Stun, GameplayTags.Attributes_Resistance_Blunt);
+	GameplayTags.StatusEffectsToResistances.Add(GameplayTags.StatusEffect_Silence, GameplayTags.Attributes_Resistance_Ice);
+	GameplayTags.StatusEffectsToResistances.Add(GameplayTags.StatusEffect_Sleep, GameplayTags.Attributes_Resistance_Wind);
+	GameplayTags.StatusEffectsToResistances.Add(GameplayTags.StatusEffect_Poison, GameplayTags.Attributes_Resistance_Noxious);
 		
 	/*
 	 * Alteration

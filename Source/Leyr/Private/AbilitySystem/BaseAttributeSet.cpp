@@ -110,6 +110,10 @@ void UBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	{
 		HandleIncomingHealing(Props);
 	}
+	if (Data.EvaluatedData.Attribute == GetIncomingStatusEffectAttribute())
+	{
+		HandleIncomingStatusEffect(Props);
+	}
 	if (Data.EvaluatedData.Attribute == GetIncomingXPAttribute())
 	{
 		HandleIncomingXP(Props);
@@ -259,6 +263,14 @@ void UBaseAttributeSet::HandleIncomingHealing(const FEffectProperties& Props)
 	}
 }
 
+void UBaseAttributeSet::HandleIncomingStatusEffect(const FEffectProperties& Props)
+{
+	if (ULeyrAbilitySystemLibrary::IsSuccessfulStatusEffect(Props.EffectContextHandle))
+	{
+		HandleStatusEffect(Props);
+	}
+}
+
 void UBaseAttributeSet::HandleIncomingXP(const FEffectProperties& Props)
 {
 	const float LocalIncomingXP = GetIncomingXP();
@@ -313,9 +325,11 @@ void UBaseAttributeSet::HandleStatusEffect(const FEffectProperties& Props)
 	Effect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
 	Effect->Period = StatusEffectFrequency;
 	Effect->DurationMagnitude = FScalableFloat(StatusEffectDuration);
+	Effect->bExecutePeriodicEffectOnApplication = false; // TODO need to parameterize this, burn/poison dont need to exec on application but stun, sleep, silence would need
 	
 	UTargetTagsGameplayEffectComponent& AssetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
 	FInheritedTagContainer InheritedTagContainer;
+	// const FGameplayTag StatusEffectTag = DamageType;
 	const FGameplayTag StatusEffectTag = GameplayTags.DamageTypesToStatusEffects[DamageType];
 	
 	InheritedTagContainer.Added.AddTag(StatusEffectTag);
@@ -327,7 +341,6 @@ void UBaseAttributeSet::HandleStatusEffect(const FEffectProperties& Props)
 		InheritedTagContainer.Added.AddTag(GameplayTags.Player_Block_InputReleased);
 	}
 	AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
-
 	
 	Effect->StackingType = EGameplayEffectStackingType::AggregateBySource;
 	Effect->StackLimitCount = 1;

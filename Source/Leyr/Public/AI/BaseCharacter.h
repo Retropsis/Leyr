@@ -53,6 +53,7 @@ protected:
 	virtual void InitializeCharacterInfo() {}
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) {}
 	virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+	virtual void BurnTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, float Level) const;
 	void MakeAndApplyEffectToSelf(const FGameplayTag Tag, float Level = 1.f) const;
 

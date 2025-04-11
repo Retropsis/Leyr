@@ -52,9 +52,12 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UProjectileMovementComponent> ProjectileMovement;
+	
+	UPROPERTY(BlueprintReadWrite, meta=(ExposeOnSpawn = true))
+	FAdditionalEffectParams DamageEffectParams;
 		
 	UPROPERTY(BlueprintReadWrite, meta=(ExposeOnSpawn = true))
-	FAdditionalEffectParams AdditionalEffectParams;
+	FAdditionalEffectParams StatusEffectParams;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USphereComponent> Sphere;

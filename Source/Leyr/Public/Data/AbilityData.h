@@ -46,7 +46,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	bool bShouldExecute = false;
 
-	UPROPERTY(EditDefaultsOnly, Category="Ability|StatusEffect")
+	UPROPERTY(EditDefaultsOnly, Category="Ability|StatusEffect", meta=(InlineEditConditionToggle))
+	bool bApplyStatusEffect = false;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Ability|StatusEffect", meta=(EditCondition="bApplyStatusEffect"))
 	TObjectPtr<UStatusEffectData> StatusEffectData = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Range")

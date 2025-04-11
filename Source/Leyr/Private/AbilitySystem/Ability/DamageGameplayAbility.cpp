@@ -31,6 +31,8 @@ void UDamageGameplayAbility::InitAbility()
 		
 		if (AbilityData->StatusEffectData)
 		{
+			StatusEffectClass = AbilityData->StatusEffectData->StatusEffectClass;
+			StatusEffectType = AbilityData->StatusEffectData->StatusEffectType;
 			StatusEffectChance = AbilityData->StatusEffectData->StatusEffectChance;
 			StatusEffectDamage = AbilityData->StatusEffectData->StatusEffectDamage;
 			StatusEffectFrequency = AbilityData->StatusEffectData->StatusEffectFrequency;
@@ -214,8 +216,6 @@ FAdditionalEffectParams UDamageGameplayAbility::MakeAdditionalEffectParamsFromCl
 {
 	FAdditionalEffectParams Params;
 	Params.WorldContextObject = GetAvatarActorFromActorInfo();
-
-	// TODO: Could Additional Effect Class be specialised ? (Using AdditionalEffectClass instead of DamageEffectClass)
 	Params.AdditionalEffectClass = DamageEffectClass;
 	Params.SourceObject = GetSourceObject(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo());
 	Params.SourceAbilitySystemComponent = GetAbilitySystemComponentFromActorInfo();
@@ -247,6 +247,24 @@ FAdditionalEffectParams UDamageGameplayAbility::MakeAdditionalEffectParamsFromCl
 	return Params;
 }
 
+FAdditionalEffectParams UDamageGameplayAbility::MakeStatusEffectParamsFromClassDefaults(AActor* TargetActor) const
+{
+	FAdditionalEffectParams Params;
+	Params.WorldContextObject = GetAvatarActorFromActorInfo();
+	Params.AdditionalEffectClass = StatusEffectClass;
+	Params.SourceObject = GetSourceObject(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo());
+	Params.SourceAbilitySystemComponent = GetAbilitySystemComponentFromActorInfo();
+	Params.TargetAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	Params.AbilityPower = AbilityPower.GetValueAtLevel(GetAbilityLevel());
+	Params.AbilityLevel = GetAbilityLevel();
+	Params.DamageType = StatusEffectType;
+	Params.StatusEffectChance = StatusEffectChance;
+	Params.StatusEffectDamage = StatusEffectDamage;
+	Params.StatusEffectDuration = StatusEffectDuration;
+	Params.StatusEffectFrequency = StatusEffectFrequency;
+	return Params;
+}
+
 FTaggedMontage UDamageGameplayAbility::GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& TaggedMontages) const
 {
 	if (TaggedMontages.Num() > 0)
@@ -256,9 +274,3 @@ FTaggedMontage UDamageGameplayAbility::GetRandomTaggedMontageFromArray(const TAr
 	}
 	return FTaggedMontage();
 }
-
-// FVector2D UDamageGameplayAbility::GetDamageByDamageType(float InLevel, const FGameplayTag& DamageType)
-// {
-// 	checkf(DamageTypes.Contains(DamageType), TEXT("GameplayAbilit [%s] does not contain DamageType [%s]"), *GetNameSafe(this), *DamageType.ToString());
-// 	return FVector2D(DamageTypes[DamageType].ValueMin.GetValueAtLevel(InLevel), DamageTypes[DamageType].ValueMax.GetValueAtLevel(InLevel));
-// }

@@ -103,6 +103,7 @@ void AAICharacter::PossessedBy(AController* NewController)
 	if (!HasAuthority()) return;
 	InitializeCharacterInfo();
 	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().StatusEffect_Stun, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAICharacter::StunTagChanged);
+	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().StatusEffect_Burn, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAICharacter::BurnTagChanged);
 
 	StartLocation = GetActorLocation();
 	

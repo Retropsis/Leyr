@@ -249,6 +249,10 @@ public:
 	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, IncomingHealing);
 	
 	UPROPERTY(BlueprintReadOnly, Category="Meta Attributes")
+	FGameplayAttributeData IncomingStatusEffect;
+	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, IncomingStatusEffect);
+	
+	UPROPERTY(BlueprintReadOnly, Category="Meta Attributes")
 	FGameplayAttributeData IncomingXP;
 	ATTRIBUTE_ACCESSORS(UBaseAttributeSet, IncomingXP);
 
@@ -382,6 +386,7 @@ private:
 	
 	void HandleIncomingDamage(const FEffectProperties& Props);
 	void HandleIncomingHealing(const FEffectProperties& Props);
+	void HandleIncomingStatusEffect(const FEffectProperties& Props);
 	void HandleIncomingXP(const FEffectProperties& Props);
 	void HandleStatusEffect(const FEffectProperties& Props);
 	

@@ -329,6 +329,7 @@ void APlayerCharacter::InitAbilityActorInfo()
 	//TODO: Move this to some other (PlayerState, BeginPlay)
 	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::HitReactTagChanged);
  	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().StatusEffect_Stun, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::StunTagChanged);
+	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().StatusEffect_Burn, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::BurnTagChanged);
 }
 
 void APlayerCharacter::InitializeCharacterInfo()

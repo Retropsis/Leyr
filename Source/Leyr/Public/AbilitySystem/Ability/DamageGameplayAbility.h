@@ -60,6 +60,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	FAdditionalEffectParams MakeAdditionalEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
 	
+	UFUNCTION(BlueprintPure)
+	FAdditionalEffectParams MakeStatusEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
+	
 protected:		
 	UPROPERTY(BlueprintReadOnly)
 	bool bHasHitTarget = false;
@@ -83,6 +86,7 @@ protected:
 	 * Damage Ability Data
 	 */
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
+	TSubclassOf<UGameplayEffect> StatusEffectClass;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Damage")
 	bool bShouldApplyExecute = false;

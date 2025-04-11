@@ -111,6 +111,7 @@ FGameplayTag Damage_Execute;
 FGameplayTag Damage_True;
 
 TMap<FGameplayTag, FGameplayTag> DamageTypesToResistances;
+TMap<FGameplayTag, FGameplayTag> StatusEffectsToResistances;
 
  /*
   * Healing Types
@@ -133,6 +134,7 @@ FGameplayTag StatusEffect_Duration;
 FGameplayTag StatusEffect_Frequency;
 
 TMap<FGameplayTag, FGameplayTag> DamageTypesToStatusEffects;
+TMap<FGameplayTag, FGameplayTag> StatusEffectsToDamageTypes;
 
  /*
   * Alteration

@@ -21,8 +21,8 @@ public:
 	float ApplyMasteryEffects(const FGameplayEffectCustomExecutionParameters& ExecutionParams) const;
 	FActiveGameplayEffectHandle ApplyEquipmentEffects(const FGameplayEffectCustomExecutionParameters& ExecutionParams) const;
 	
-	void DetermineStatusEffect(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FGameplayEffectSpec& Spec, FAggregatorEvaluateParameters EvaluationParameters,
-					 const TMap<FGameplayTag, FGameplayEffectAttributeCaptureDefinition>& InTagsToDefs) const;
+	// void DetermineStatusEffect(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FGameplayEffectSpec& Spec, FAggregatorEvaluateParameters EvaluationParameters,
+	// 				 const TMap<FGameplayTag, FGameplayEffectAttributeCaptureDefinition>& InTagsToDefs) const;
 	
 	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;
 };

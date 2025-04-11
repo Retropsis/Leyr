@@ -22,7 +22,7 @@ TArray<AFireBall*> UFireBlast::SpawnFireBalls()
 			CurrentActorInfo->PlayerController->GetPawn(),
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
  		
-		FireBall->AdditionalEffectParams = MakeAdditionalEffectParamsFromClassDefaults(); // Overlapping Damage
+		FireBall->StatusEffectParams = MakeAdditionalEffectParamsFromClassDefaults(); // Overlapping Damage
 		FireBall->ExplosionDamageParams = MakeAdditionalEffectParamsFromClassDefaults(); // Exploding Damage
 		FireBall->SetOwner(GetAvatarActorFromActorInfo());
 		FireBall->InitProjectileData();

@@ -43,7 +43,8 @@ bool AProjectile::InitProjectileData()
 {
 	if (ProjectileData)
 	{
-		AdditionalEffectParams.DamageType = ProjectileData->DamageType;
+		DamageEffectParams.DamageType = ProjectileData->DamageType;
+		
 		Sphere->SetCollisionResponseToChannel(ECC_WorldStatic, ProjectileData->ResponseToStatic == EResponseToStatic::Ignore ? ECR_Ignore : ECR_Overlap);
 		ResponseToStatic = ProjectileData->ResponseToStatic;
 		ProjectileMovement->ProjectileGravityScale = ProjectileData->ProjectileGravityScale;
@@ -56,10 +57,11 @@ bool AProjectile::InitProjectileData()
 		
 		if (ProjectileData->StatusEffectData)
 		{
-			AdditionalEffectParams.StatusEffectChance = ProjectileData->StatusEffectData->StatusEffectChance;
-			AdditionalEffectParams.StatusEffectDamage = ProjectileData->StatusEffectData->StatusEffectDamage;
-			AdditionalEffectParams.StatusEffectDuration = ProjectileData->StatusEffectData->StatusEffectDuration;
-			AdditionalEffectParams.StatusEffectFrequency = ProjectileData->StatusEffectData->StatusEffectFrequency;
+			StatusEffectParams.DamageType = ProjectileData->StatusEffectData->StatusEffectType;
+			StatusEffectParams.StatusEffectChance = ProjectileData->StatusEffectData->StatusEffectChance;
+			StatusEffectParams.StatusEffectDamage = ProjectileData->StatusEffectData->StatusEffectDamage;
+			StatusEffectParams.StatusEffectDuration = ProjectileData->StatusEffectData->StatusEffectDuration;
+			StatusEffectParams.StatusEffectFrequency = ProjectileData->StatusEffectData->StatusEffectFrequency;
 		}
 		return true;
 	}
@@ -95,8 +97,8 @@ void AProjectile::OnHomingTargetDeath(AActor* DeadActor)
 
 bool AProjectile::IsValidOverlap(AActor* OtherActor)
 {
-	if (AdditionalEffectParams.SourceAbilitySystemComponent == nullptr) return false;
-	const AActor* SourceAvatarActor = AdditionalEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
+	if (DamageEffectParams.SourceAbilitySystemComponent == nullptr) return false;
+	const AActor* SourceAvatarActor = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
 	if (!IsValid(SourceAvatarActor)) Destroy();
 	if (SourceAvatarActor == OtherActor) return false;
 	if (!ULeyrAbilitySystemLibrary::IsHostile(SourceAvatarActor, OtherActor)) return false;
@@ -148,20 +150,25 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	{
 		if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
 		{
-			const FVector DeathImpulse = GetActorForwardVector() * AdditionalEffectParams.DeathImpulseMagnitude;
-			AdditionalEffectParams.DeathImpulse = DeathImpulse;
-			if (FMath::RandRange(1, 100) < AdditionalEffectParams.AirborneChance)
+			const FVector DeathImpulse = GetActorForwardVector() * DamageEffectParams.DeathImpulseMagnitude;
+			DamageEffectParams.DeathImpulse = DeathImpulse;
+			if (FMath::RandRange(1, 100) < DamageEffectParams.AirborneChance)
 			{
 				FRotator Rotation = GetActorRotation();
 				Rotation.Pitch = 45.f;
 
 				const FVector AirborneDirection = Rotation.Vector();
 				// const FVector AirborneForce = AirborneDirection * AdditionalEffectParams.AirborneForceMagnitude;
-				const FVector AirborneForce = FVector::UpVector * AdditionalEffectParams.AirborneForceMagnitude;
-				AdditionalEffectParams.AirborneForce = AirborneForce;
+				const FVector AirborneForce = FVector::UpVector * DamageEffectParams.AirborneForceMagnitude;
+				DamageEffectParams.AirborneForce = AirborneForce;
 			}
-			AdditionalEffectParams.TargetAbilitySystemComponent = TargetASC;
-			ULeyrAbilitySystemLibrary::ApplyAdditionalEffect(AdditionalEffectParams);
+			
+			DamageEffectParams.TargetAbilitySystemComponent = TargetASC;
+			ULeyrAbilitySystemLibrary::ApplyAdditionalEffect(DamageEffectParams);
+			
+			StatusEffectParams.TargetAbilitySystemComponent = TargetASC;
+			ULeyrAbilitySystemLibrary::ApplyStatusEffect(StatusEffectParams);
+			
 			Destroy();
 		}
 			
