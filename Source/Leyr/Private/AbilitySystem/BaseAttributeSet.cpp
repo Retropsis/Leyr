@@ -240,12 +240,6 @@ void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 		const bool bCriticalHit = ULeyrAbilitySystemLibrary::IsCriticalHit(Props.EffectContextHandle);
 		FUIMessageData MessageData{ EMessageType::DamageToEnemy, LocalIncomingDamage, Props.TargetAvatarActor, bBlockedHit, bCriticalHit };
 		ShowFloatingText(Props, MessageData);
-
-		/* Status Effect */
-		if (ULeyrAbilitySystemLibrary::IsSuccessfulStatusEffect(Props.EffectContextHandle))
-		{
-			HandleStatusEffect(Props);
-		}
 	}
 }
 

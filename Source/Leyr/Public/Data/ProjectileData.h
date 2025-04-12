@@ -30,12 +30,18 @@ class LEYR_API UProjectileData : public UDataAsset
 public:	
 	UPROPERTY(EditDefaultsOnly, Category="Projectile", meta=(Categories="Damage"))
 	FGameplayTag DamageType = FGameplayTag();
-
+	
 	UPROPERTY(EditDefaultsOnly, Category="Projectile")
 	TObjectPtr<UStatusEffectData> StatusEffectData = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Projectile")
+	bool bRandomResponseToStatic = false;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Projectile")
 	EResponseToStatic ResponseToStatic = EResponseToStatic::Destroy;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Projectile")
+	bool bPlayOnHitTimeline = false;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Projectile")
 	float ProjectileGravityScale = 0.f;
@@ -54,8 +60,5 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Projectile")
 	TObjectPtr<USoundBase> LoopingSound = nullptr;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Projectile")
-	bool bPlayOnHitTimeline = false;
 	
 };

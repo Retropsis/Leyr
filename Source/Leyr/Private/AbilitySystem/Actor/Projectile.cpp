@@ -51,12 +51,18 @@ bool AProjectile::InitProjectileData()
 		ProjectileMovement->InitialSpeed = ProjectileData->InitialSpeed;
 		ProjectileMovement->MaxSpeed = ProjectileData->MaxSpeed;
 		bPlayOnHitTimeline = ProjectileData->bPlayOnHitTimeline;
+		if (ProjectileData->bRandomResponseToStatic)
+		{
+			ResponseToStatic = FMath::RandRange(0,1) == 0 ? EResponseToStatic::Destroy : EResponseToStatic::Stop;
+			bPlayOnHitTimeline = ResponseToStatic == EResponseToStatic::Destroy;
+		}
 		SetImpactEffect(ProjectileData->ImpactEffect);
 		SetImpactSound(ProjectileData->ImpactSound);
 		SetLoopingSound(ProjectileData->LoopingSound);
 		
 		if (ProjectileData->StatusEffectData)
 		{
+			bApplyStatusEffect = true;
 			StatusEffectParams.StatusEffectType = ProjectileData->StatusEffectData->StatusEffectType;
 			StatusEffectParams.StatusEffectChance = ProjectileData->StatusEffectData->StatusEffectChance;
 			StatusEffectParams.StatusEffectDamage = ProjectileData->StatusEffectData->StatusEffectDamage;
@@ -127,8 +133,6 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 				ProjectileMovement->StopMovementImmediately();
 				const FVector RandomRotation = GetActorForwardVector().RotateAngleAxis(FMath::FRandRange(112.5f, 157.5f), FVector::RightVector);
 				TargetLocation = GetActorLocation() + RandomRotation * FMath::FRandRange(45.f, 85.f);
-				// UKismetSystemLibrary::DrawDebugSphere(this, TargetLocation, 3.f, 12, FLinearColor::Green, 3.f);
-				// UKismetSystemLibrary::DrawDebugArrow(this, GetActorLocation(), TargetLocation, 5.f, FLinearColor::Green, 3.f);
 				Sphere->SetCollisionResponseToAllChannels(ECR_Ignore);
 				OnHitTimeline();
 			} else Destroy();
@@ -142,8 +146,6 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 			return;
 		}
 	}
-	//
-	// if (!ULeyrAbilitySystemLibrary::IsHostile(SourceAvatarActor, OtherActor)) return;
 	if (!bHit) OnHit();
 
 	if (HasAuthority())
@@ -165,9 +167,12 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 			
 			DamageEffectParams.TargetAbilitySystemComponent = TargetASC;
 			ULeyrAbilitySystemLibrary::ApplyAdditionalEffect(DamageEffectParams);
-			
-			StatusEffectParams.TargetAbilitySystemComponent = TargetASC;
-			ULeyrAbilitySystemLibrary::ApplyStatusEffect(StatusEffectParams);
+
+			if (bApplyStatusEffect)
+			{
+				StatusEffectParams.TargetAbilitySystemComponent = TargetASC;
+				ULeyrAbilitySystemLibrary::ApplyStatusEffect(StatusEffectParams);
+			}
 			
 			Destroy();
 		}

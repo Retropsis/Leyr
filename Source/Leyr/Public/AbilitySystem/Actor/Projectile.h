@@ -83,6 +83,8 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly)
 	float LifeSpan = 15.f;
+
+	bool bApplyStatusEffect = false;
 	
 	UPROPERTY() TObjectPtr<UNiagaraSystem> ImpactEffect;
 	UPROPERTY() TObjectPtr<USoundBase> ImpactSound;
