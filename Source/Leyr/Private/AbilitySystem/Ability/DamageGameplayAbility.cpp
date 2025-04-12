@@ -223,10 +223,6 @@ FAdditionalEffectParams UDamageGameplayAbility::MakeAdditionalEffectParamsFromCl
 	Params.AbilityPower = AbilityPower.GetValueAtLevel(GetAbilityLevel());
 	Params.AbilityLevel = GetAbilityLevel();
 	Params.DamageType = DamageType;
-	Params.StatusEffectChance = StatusEffectChance;
-	Params.StatusEffectDamage = StatusEffectDamage;
-	Params.StatusEffectDuration = StatusEffectDuration;
-	Params.StatusEffectFrequency = StatusEffectFrequency;
 	Params.DeathImpulseMagnitude = DeathImpulseMagnitude;
 	Params.AirborneForceMagnitude = AirborneForceMagnitude;
 	Params.AirborneChance = AirborneChance;
@@ -247,9 +243,9 @@ FAdditionalEffectParams UDamageGameplayAbility::MakeAdditionalEffectParamsFromCl
 	return Params;
 }
 
-FAdditionalEffectParams UDamageGameplayAbility::MakeStatusEffectParamsFromClassDefaults(AActor* TargetActor) const
+FStatusEffectParams UDamageGameplayAbility::MakeStatusEffectParamsFromClassDefaults(AActor* TargetActor) const
 {
-	FAdditionalEffectParams Params;
+	FStatusEffectParams Params;
 	Params.WorldContextObject = GetAvatarActorFromActorInfo();
 	Params.AdditionalEffectClass = StatusEffectClass;
 	Params.SourceObject = GetSourceObject(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo());

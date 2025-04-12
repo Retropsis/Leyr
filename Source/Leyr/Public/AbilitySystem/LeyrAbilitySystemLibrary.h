@@ -7,6 +7,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "LeyrAbilitySystemLibrary.generated.h"
 
+struct FStatusEffectParams;
 class ULootDataSet;
 class UGameplayAbility;
 class ULoadMenuSaveGame;
@@ -147,7 +148,7 @@ public:
 	static FGameplayEffectContextHandle ApplyAdditionalEffect(const FAdditionalEffectParams& AdditionalEffectParams);
 	
 	UFUNCTION(BlueprintCallable, Category = "LeyrAbilitySystemLibrary|GameplayEffects")
-	static FGameplayEffectContextHandle ApplyStatusEffect(const FAdditionalEffectParams& AdditionalEffectParams);
+	static FGameplayEffectContextHandle ApplyStatusEffect(const FStatusEffectParams& StatusEffectParams);
 	
 	/*
 	 * Damage Effect Params

@@ -61,7 +61,7 @@ public:
 	FAdditionalEffectParams MakeAdditionalEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
 	
 	UFUNCTION(BlueprintPure)
-	FAdditionalEffectParams MakeStatusEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
+	FStatusEffectParams MakeStatusEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
 	
 protected:		
 	UPROPERTY(BlueprintReadOnly)

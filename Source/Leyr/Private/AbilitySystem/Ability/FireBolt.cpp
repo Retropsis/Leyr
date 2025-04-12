@@ -79,7 +79,8 @@ void UFireBolt::SpawnProjectiles(const FVector& ProjectileTargetLocation, const 
 				GetOwningActorFromActorInfo(), Cast<APawn>(GetOwningActorFromActorInfo()),
 				ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 	
-		Projectile->StatusEffectParams = MakeAdditionalEffectParamsFromClassDefaults();
+		Projectile->DamageEffectParams = MakeAdditionalEffectParamsFromClassDefaults();
+		Projectile->StatusEffectParams = MakeStatusEffectParamsFromClassDefaults();
 		Projectile->InitProjectileData();
 
 		if (bLaunchHomingProjectiles)

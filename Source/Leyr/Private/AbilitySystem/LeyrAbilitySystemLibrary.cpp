@@ -431,32 +431,28 @@ FGameplayEffectContextHandle ULeyrAbilitySystemLibrary::ApplyAdditionalEffect(co
 	
 	const FGameplayEffectSpecHandle SpecHandle = AdditionalEffectParams.SourceAbilitySystemComponent->MakeOutgoingSpec(AdditionalEffectParams.AdditionalEffectClass, AdditionalEffectParams.AbilityLevel, EffectContextHandle);
 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, AdditionalEffectParams.DamageType, AdditionalEffectParams.AbilityPower);
-	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Chance, AdditionalEffectParams.StatusEffectChance);
-	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Damage, AdditionalEffectParams.StatusEffectDamage);
-	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Duration, AdditionalEffectParams.StatusEffectDuration);
-	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Frequency, AdditionalEffectParams.StatusEffectFrequency);
 
 	AdditionalEffectParams.TargetAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
 	return EffectContextHandle;
 }
 
-FGameplayEffectContextHandle ULeyrAbilitySystemLibrary::ApplyStatusEffect(const FAdditionalEffectParams& AdditionalEffectParams)
+FGameplayEffectContextHandle ULeyrAbilitySystemLibrary::ApplyStatusEffect(const FStatusEffectParams& StatusEffectParams)
 {
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-	// const AActor* SourceAvatarActor = AdditionalEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
+	// const AActor* SourceAvatarActor = StatusEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
 
-	FGameplayEffectContextHandle EffectContextHandle = AdditionalEffectParams.SourceAbilitySystemComponent->MakeEffectContext();
-	EffectContextHandle.AddSourceObject(AdditionalEffectParams.SourceObject);
+	FGameplayEffectContextHandle EffectContextHandle = StatusEffectParams.SourceAbilitySystemComponent->MakeEffectContext();
+	EffectContextHandle.AddSourceObject(StatusEffectParams.SourceObject);
 	
-	const FGameplayEffectSpecHandle SpecHandle = AdditionalEffectParams.SourceAbilitySystemComponent->MakeOutgoingSpec(AdditionalEffectParams.AdditionalEffectClass, AdditionalEffectParams.AbilityLevel, EffectContextHandle);
-	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, AdditionalEffectParams.DamageType, AdditionalEffectParams.AbilityPower);
-	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, AdditionalEffectParams.StatusEffectType, AdditionalEffectParams.AbilityPower);
-	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Chance, AdditionalEffectParams.StatusEffectChance);
-	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Damage, AdditionalEffectParams.StatusEffectDamage);
-	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Duration, AdditionalEffectParams.StatusEffectDuration);
-	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Frequency, AdditionalEffectParams.StatusEffectFrequency);
+	const FGameplayEffectSpecHandle SpecHandle = StatusEffectParams.SourceAbilitySystemComponent->MakeOutgoingSpec(StatusEffectParams.AdditionalEffectClass, StatusEffectParams.AbilityLevel, EffectContextHandle);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, StatusEffectParams.DamageType, StatusEffectParams.AbilityPower);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, StatusEffectParams.StatusEffectType, StatusEffectParams.AbilityPower);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Chance, StatusEffectParams.StatusEffectChance);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Damage, StatusEffectParams.StatusEffectDamage);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Duration, StatusEffectParams.StatusEffectDuration);
+	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Frequency, StatusEffectParams.StatusEffectFrequency);
 
-	AdditionalEffectParams.TargetAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
+	StatusEffectParams.TargetAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
 	return EffectContextHandle;
 }
 

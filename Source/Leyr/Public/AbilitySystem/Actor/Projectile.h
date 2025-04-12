@@ -57,7 +57,7 @@ public:
 	FAdditionalEffectParams DamageEffectParams;
 		
 	UPROPERTY(BlueprintReadWrite, meta=(ExposeOnSpawn = true))
-	FAdditionalEffectParams StatusEffectParams;
+	FStatusEffectParams StatusEffectParams;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USphereComponent> Sphere;

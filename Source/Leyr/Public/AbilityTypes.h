@@ -21,11 +21,6 @@ struct FAdditionalEffectParams
 	UPROPERTY(BlueprintReadWrite) float AbilityPower = 0.f;
 	UPROPERTY(BlueprintReadWrite) float AbilityLevel = 1.f;
 	UPROPERTY(BlueprintReadWrite) FGameplayTag DamageType = FGameplayTag();
-	UPROPERTY(BlueprintReadWrite) FGameplayTag StatusEffectType = FGameplayTag();
-	UPROPERTY(BlueprintReadWrite) float StatusEffectChance = 0.f;
-	UPROPERTY(BlueprintReadWrite) float StatusEffectDamage = 0.f;
-	UPROPERTY(BlueprintReadWrite) float StatusEffectDuration = 0.f;
-	UPROPERTY(BlueprintReadWrite) float StatusEffectFrequency = 0.f;
 	UPROPERTY(BlueprintReadWrite) float DeathImpulseMagnitude = 0.f;
 	UPROPERTY(BlueprintReadWrite) FVector DeathImpulse = FVector::ZeroVector;
 	UPROPERTY(BlueprintReadWrite) float AirborneForceMagnitude = 0.f;
@@ -38,19 +33,12 @@ struct FAdditionalEffectParams
 };
 
 USTRUCT(BlueprintType)
-struct FStatusEffectParams
+struct FStatusEffectParams : public  FAdditionalEffectParams
 {
 	GENERATED_BODY()
 
 	FStatusEffectParams() {}
-
-	UPROPERTY(BlueprintReadWrite) TObjectPtr<UObject> WorldContextObject = nullptr;
-	UPROPERTY(BlueprintReadWrite) TObjectPtr<UObject> SourceObject = nullptr;
-	UPROPERTY(BlueprintReadWrite) TSubclassOf<UGameplayEffect> StatusEffectClass = nullptr;
-	UPROPERTY(BlueprintReadWrite) TObjectPtr<UAbilitySystemComponent> SourceAbilitySystemComponent;
-	UPROPERTY(BlueprintReadWrite) TObjectPtr<UAbilitySystemComponent> TargetAbilitySystemComponent;
-	UPROPERTY(BlueprintReadWrite) float AbilityPower = 0.f;
-	UPROPERTY(BlueprintReadWrite) float AbilityLevel = 1.f;
+	
 	UPROPERTY(BlueprintReadWrite) FGameplayTag StatusEffectType = FGameplayTag();
 	UPROPERTY(BlueprintReadWrite) FGameplayTag StatusEffectDamageType = FGameplayTag();
 	UPROPERTY(BlueprintReadWrite) float StatusEffectChance = 0.f;
