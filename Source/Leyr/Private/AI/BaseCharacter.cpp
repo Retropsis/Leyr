@@ -134,7 +134,7 @@ void ABaseCharacter::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCou
 
 void ABaseCharacter::BurnTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
-	bIsStunned = NewCount > 0;
+	bIsBurned = NewCount > 0;
 }
 
 /*

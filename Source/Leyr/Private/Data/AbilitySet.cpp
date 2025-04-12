@@ -111,8 +111,6 @@ void UAbilitySet::GiveToAbilitySystem(UAbilitySystemComponent* ASC, FAbilitySet_
 		}
 
 		UBaseGameplayAbility* AbilityCDO = AbilityToGrant.Ability->GetDefaultObject<UBaseGameplayAbility>();
-		AbilityCDO->SetAbilityData(AbilityToGrant.AbilityData);
-
 		FGameplayAbilitySpec AbilitySpec(AbilityCDO, AbilityToGrant.Level);
 		AbilitySpec.SourceObject = SourceObject;
 		AbilitySpec.DynamicAbilityTags.AddTag(AbilityToGrant.InputTag.IsValid() ? AbilityToGrant.InputTag : InputTag);

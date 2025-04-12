@@ -55,6 +55,21 @@ struct FBoxTraceData
 	UPROPERTY() FVector Extent = FVector(40.f, 20.f, 30.f);
 };
 
+USTRUCT(BlueprintType)
+struct FCombatStateParams
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintReadWrite)
+	bool bResetCollisionResponse = false;
+	
+	UPROPERTY(BlueprintReadWrite)
+	bool bResetMovementMode = true;
+	
+	EMovementMode NewMovementMode = MOVE_None;
+};
+
 UENUM(BlueprintType)
 enum class ECombatState : uint8
 {

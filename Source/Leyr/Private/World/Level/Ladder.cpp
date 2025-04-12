@@ -42,7 +42,7 @@ void ALadder::BeginPlay()
 
 void ALadder::Interact_Implementation(AActor* InteractingActor)
 {
-	ICombatInterface::Execute_SetCombatStateToHandle(InteractingActor, ECombatState::HangingLadder);
+	ICombatInterface::Execute_SetCombatStateToHandle(InteractingActor, ECombatState::HangingLadder, FCombatStateParams());
 }
 
 void ALadder::InteractBottom_Implementation(AActor* InteractingActor)

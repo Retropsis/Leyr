@@ -94,7 +94,7 @@ public:
 	virtual int32 GetCharacterLevel_Implementation() override;
 	virtual ECombatState GetCombatState_Implementation() const override { return CombatState; }
 	virtual void SetCombatState_Implementation(ECombatState NewState) override;
-	virtual void SetCombatStateToHandle_Implementation(ECombatState NewState) override;
+	virtual void SetCombatStateToHandle_Implementation(ECombatState NewState, const FCombatStateParams& Params) override;
 	virtual void SetMovementEnabled_Implementation(bool Enabled) override;
 	virtual void SetComboWindow_Implementation(bool bOpen) override { bIsComboWindowOpen = bOpen; }
 	virtual bool IsComboWindowOpen_Implementation() override { return bIsComboWindowOpen; }
@@ -181,7 +181,7 @@ protected:
 	virtual void InitAbilityActorInfo() override;
 	virtual void InitializeCharacterInfo() override;
 	virtual void AddCharacterAbilities() override;
-	void HandleCombatState(ECombatState NewState);
+	void HandleCombatState(ECombatState NewState, const FCombatStateParams& Params = FCombatStateParams());
 	void HandleHangingOnLedge(const FVector& HangingTarget);
 	void InitializeCameraBoundary();
 	void ClampToCameraBounds(FVector& PreferredCameraLocation) const;
@@ -331,7 +331,6 @@ private:
 	float MovementSpeed = 0.f;
 	float CurrentMinZ = 0.f;
 	float OverridePitch = 0.f;
-	bool bResetCollisionResponse = false;
 
 	UPROPERTY()
 	APawn* Elevator = nullptr;

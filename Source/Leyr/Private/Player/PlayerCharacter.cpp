@@ -363,18 +363,20 @@ FTaggedMontage APlayerCharacter::GetTaggedMontageByIndex_Implementation(int32 In
 void APlayerCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 	bHitReacting = NewCount > 0;
-	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseRunSpeed;
-	GetCharacterMovement()->MaxWalkSpeedCrouched = bHitReacting ? 0.f : BaseWalkSpeedCrouched;
 	if(bHitReacting)
 	{
-		GetCharacterMovement()->StopActiveMovement();
-		PreviousCombatState = CombatState;
-		UnCrouch();
+		HandleCombatState(ECombatState::HitReact);
 	}
 	else
 	{
-		// GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-		HandleCombatState(PreviousCombatState);
+		if (AbilitySystemComponent->HasAnyMatchingGameplayTags(FBaseGameplayTags::Get().ToPreviousStateFilter))
+		{
+			HandleCombatState(PreviousCombatState);
+		}
+		else
+		{
+			HandleCombatState(ECombatState::Unoccupied);
+		}
 	}
 }
 
@@ -624,16 +626,16 @@ void APlayerCharacter::JumpButtonPressed()
 	} else Jump();
 }
 
-void APlayerCharacter::SetCombatStateToHandle_Implementation(ECombatState NewState)
-{
-	HandleCombatState(NewState);
+void APlayerCharacter::SetCombatStateToHandle_Implementation(ECombatState NewState, const FCombatStateParams& Params)
+{	
+	HandleCombatState(NewState, Params);
 }
 
-void APlayerCharacter::HandleCombatState(ECombatState NewState)
+void APlayerCharacter::HandleCombatState(ECombatState NewState, const FCombatStateParams& Params)
 {
 	CombatState = NewState;
 	GetCharacterMovement()->GravityScale = BaseGravityScale;
-	if(bResetCollisionResponse)
+	if(Params.bResetCollisionResponse)
 	{
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Enemy, ECR_Overlap);
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Overlap);
@@ -646,11 +648,12 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 	switch (CombatState) {
 	case ECombatState::Unoccupied:
 		GetCharacterMovement()->MaxWalkSpeed = BaseRunSpeed;
+		GetCharacterMovement()->MaxWalkSpeedCrouched = BaseWalkSpeedCrouched;
 		GetCharacterMovement()->MaxFlySpeed = BaseFlySpeed;
 		GetCharacterMovement()->GravityScale = BaseGravityScale;
 		GetCharacterMovement()->MaxAcceleration = 2048.f;
 		GetCharacterMovement()->BrakingFrictionFactor = 2.f;
-		GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+		if (Params.bResetMovementMode) GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		// MakeAndApplyEffectToSelf(GameplayTags.CombatState_Unoccupied);
 		break;
 	case ECombatState::Falling:
@@ -674,7 +677,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Crouching);
 		break;
 	case ECombatState::UnCrouching:
-		// UnCrouch();
+		// UnCrouch()
 		GetSprite()->SetRelativeLocation(FVector::ZeroVector);
 		// if (CombatState != ECombatState::Rolling) GetSprite()->SetRelativeLocation(FVector::ZeroVector);
 		// else GetSprite()->SetRelativeLocation(FVector{ 0.f, 0.f, 44.f });
@@ -714,6 +717,11 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 	case ECombatState::OnRopeSlope:
 		break;
 	case ECombatState::HitReact:
+		PreviousCombatState = CombatState;
+		UnCrouch();
+		GetCharacterMovement()->StopActiveMovement();
+		GetCharacterMovement()->MaxWalkSpeed = 0.f;
+		GetCharacterMovement()->MaxWalkSpeedCrouched =0.f;
 		break;
 	case ECombatState::Entangled:
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
@@ -744,7 +752,6 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState)
 		GetCharacterMovement()->BrakingFrictionFactor = DodgingBrakeFrictionFactor;
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Enemy, ECR_Ignore);
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Projectile, ECR_Ignore);
-		bResetCollisionResponse = true;
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Dodging);
 		break;
 	case ECombatState::Rolling:
@@ -900,7 +907,9 @@ void APlayerCharacter::SetMovementEnabled_Implementation(bool Enabled)
 		}
 		else
 		{
-			HandleCombatState(ECombatState::Unoccupied);
+			FCombatStateParams Params;
+			Params.bResetMovementMode = false;
+			HandleCombatState(ECombatState::Unoccupied, Params);
 		}
 		// if (AbilitySystemComponent->HasAnyMatchingGameplayTags(FBaseGameplayTags::Get().ToUnoccupiedStateFilter))
 		// {

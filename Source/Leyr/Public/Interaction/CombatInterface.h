@@ -142,7 +142,7 @@ public:
 	void SetCombatState(ECombatState NewState);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void SetCombatStateToHandle(ECombatState NewState);
+	void SetCombatStateToHandle(ECombatState NewState, const FCombatStateParams& Params);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetMovementEnabled(bool Enabled);
