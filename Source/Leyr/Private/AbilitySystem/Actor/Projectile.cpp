@@ -59,17 +59,6 @@ bool AProjectile::InitProjectileData()
 		SetImpactEffect(ProjectileData->ImpactEffect);
 		SetImpactSound(ProjectileData->ImpactSound);
 		SetLoopingSound(ProjectileData->LoopingSound);
-		
-		if (ProjectileData->StatusEffectData)
-		{
-			bApplyStatusEffect = true;
-			StatusEffectParams.AdditionalEffectClass = ProjectileData->StatusEffectData->StatusEffectClass;
-			StatusEffectParams.StatusEffectType = ProjectileData->StatusEffectData->StatusEffectType;
-			StatusEffectParams.StatusEffectChance = ProjectileData->StatusEffectData->StatusEffectChance;
-			StatusEffectParams.StatusEffectDamage = ProjectileData->StatusEffectData->StatusEffectDamage;
-			StatusEffectParams.StatusEffectDuration = ProjectileData->StatusEffectData->StatusEffectDuration;
-			StatusEffectParams.StatusEffectFrequency = ProjectileData->StatusEffectData->StatusEffectFrequency;
-		}
 		return true;
 	}
 	return false;
@@ -106,7 +95,11 @@ bool AProjectile::IsValidOverlap(AActor* OtherActor)
 {
 	if (DamageEffectParams.SourceAbilitySystemComponent == nullptr) return false;
 	const AActor* SourceAvatarActor = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
-	if (!IsValid(SourceAvatarActor)) Destroy();
+	if (!IsValid(SourceAvatarActor))
+	{
+		Destroy();
+		return false;
+	}
 	if (SourceAvatarActor == OtherActor) return false;
 	if (!ULeyrAbilitySystemLibrary::IsHostile(SourceAvatarActor, OtherActor)) return false;
  
@@ -168,11 +161,11 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 			
 			DamageEffectParams.TargetAbilitySystemComponent = TargetASC;
 			ULeyrAbilitySystemLibrary::ApplyAdditionalEffect(DamageEffectParams);
-
-			if (bApplyStatusEffect)
+			
+			if (ProjectileData->StatusEffectData)
 			{
-				StatusEffectParams.TargetAbilitySystemComponent = TargetASC;
-				ULeyrAbilitySystemLibrary::ApplyStatusEffect(StatusEffectParams);
+				UAbilitySystemComponent* SourceASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner());
+				ProjectileData->StatusEffectData->ApplyStatusEffect(SourceASC, TargetASC);
 			}
 			
 			Destroy();

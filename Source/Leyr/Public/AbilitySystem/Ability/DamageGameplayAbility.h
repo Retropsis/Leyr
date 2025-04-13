@@ -60,8 +60,8 @@ public:
 	UFUNCTION(BlueprintPure)
 	FAdditionalEffectParams MakeAdditionalEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
 	
-	UFUNCTION(BlueprintPure)
-	FStatusEffectParams MakeStatusEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
+	// UFUNCTION(BlueprintPure)
+	// FStatusEffectParams MakeStatusEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
 	
 protected:		
 	UPROPERTY(BlueprintReadOnly)
@@ -86,7 +86,6 @@ protected:
 	 * Damage Ability Data
 	 */
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
-	TSubclassOf<UGameplayEffect> StatusEffectClass;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Damage")
 	bool bShouldApplyExecute = false;
@@ -100,14 +99,7 @@ protected:
 	
 	UPROPERTY(BlueprintReadWrite)
 	FVector RadialDamageOrigin = FVector::ZeroVector;
-
-	/*
-	 * Status Effect Data
-	 */
-	float StatusEffectChance = 20.f;
-	float StatusEffectDamage = 5.f;
-	float StatusEffectFrequency = 1.f;
-	float StatusEffectDuration = 5.f;
+	
 	float DeathImpulseMagnitude = 250.f;
 	float AirborneForceMagnitude = 250.f;
 	float AirborneChance = 0.f;

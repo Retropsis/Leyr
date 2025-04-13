@@ -31,12 +31,6 @@ void UDamageGameplayAbility::InitAbility()
 		
 		if (AbilityData->StatusEffectData)
 		{
-			StatusEffectClass = AbilityData->StatusEffectData->StatusEffectClass;
-			StatusEffectType = AbilityData->StatusEffectData->StatusEffectType;
-			StatusEffectChance = AbilityData->StatusEffectData->StatusEffectChance;
-			StatusEffectDamage = AbilityData->StatusEffectData->StatusEffectDamage;
-			StatusEffectFrequency = AbilityData->StatusEffectData->StatusEffectFrequency;
-			StatusEffectDuration = AbilityData->StatusEffectData->StatusEffectDuration;
 			DeathImpulseMagnitude = AbilityData->StatusEffectData->DeathImpulseMagnitude;
 			AirborneChance = AbilityData->StatusEffectData->AirborneChance;
 			AirborneForceMagnitude = AbilityData->StatusEffectData->AirborneForceMagnitude;
@@ -243,24 +237,24 @@ FAdditionalEffectParams UDamageGameplayAbility::MakeAdditionalEffectParamsFromCl
 	return Params;
 }
 
-FStatusEffectParams UDamageGameplayAbility::MakeStatusEffectParamsFromClassDefaults(AActor* TargetActor) const
-{
-	FStatusEffectParams Params;
-	Params.WorldContextObject = GetAvatarActorFromActorInfo();
-	Params.AdditionalEffectClass = StatusEffectClass;
-	Params.SourceObject = GetSourceObject(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo());
-	Params.SourceAbilitySystemComponent = GetAbilitySystemComponentFromActorInfo();
-	Params.TargetAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
-	Params.AbilityPower = AbilityPower.GetValueAtLevel(GetAbilityLevel());
-	Params.AbilityLevel = GetAbilityLevel();
-	Params.DamageType = DamageType;
-	Params.StatusEffectType = StatusEffectType;
-	Params.StatusEffectChance = StatusEffectChance;
-	Params.StatusEffectDamage = StatusEffectDamage;
-	Params.StatusEffectDuration = StatusEffectDuration;
-	Params.StatusEffectFrequency = StatusEffectFrequency;
-	return Params;
-}
+// FStatusEffectParams UDamageGameplayAbility::MakeStatusEffectParamsFromClassDefaults(AActor* TargetActor) const
+// {
+// 	FStatusEffectParams Params;
+// 	Params.WorldContextObject = GetAvatarActorFromActorInfo();
+// 	Params.AdditionalEffectClass = StatusEffectClass;
+// 	Params.SourceObject = GetSourceObject(GetCurrentAbilitySpecHandle(), GetCurrentActorInfo());
+// 	Params.SourceAbilitySystemComponent = GetAbilitySystemComponentFromActorInfo();
+// 	Params.TargetAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+// 	Params.AbilityPower = AbilityPower.GetValueAtLevel(GetAbilityLevel());
+// 	Params.AbilityLevel = GetAbilityLevel();
+// 	Params.DamageType = DamageType;
+// 	Params.StatusEffectType = StatusEffectType;
+// 	Params.StatusEffectChance = StatusEffectChance;
+// 	Params.StatusEffectDamage = StatusEffectDamage;
+// 	Params.StatusEffectDuration = StatusEffectDuration;
+// 	Params.StatusEffectFrequency = StatusEffectFrequency;
+// 	return Params;
+// }
 
 FTaggedMontage UDamageGameplayAbility::GetRandomTaggedMontageFromArray(const TArray<FTaggedMontage>& TaggedMontages) const
 {

@@ -53,7 +53,6 @@ void UProjectileAbility::SpawnProjectile(const FGameplayTag& SocketTag, const FV
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 	Projectile->DamageEffectParams = MakeAdditionalEffectParamsFromClassDefaults();
-	Projectile->StatusEffectParams = MakeStatusEffectParamsFromClassDefaults();
 	Projectile->InitProjectileData();
 	Projectile->FinishSpawning(SpawnTransform);
 }

@@ -55,9 +55,6 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite, meta=(ExposeOnSpawn = true))
 	FAdditionalEffectParams DamageEffectParams;
-		
-	UPROPERTY(BlueprintReadWrite, meta=(ExposeOnSpawn = true))
-	FStatusEffectParams StatusEffectParams;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USphereComponent> Sphere;
@@ -83,8 +80,6 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly)
 	float LifeSpan = 15.f;
-
-	bool bApplyStatusEffect = false;
 	
 	UPROPERTY() TObjectPtr<UNiagaraSystem> ImpactEffect;
 	UPROPERTY() TObjectPtr<USoundBase> ImpactSound;

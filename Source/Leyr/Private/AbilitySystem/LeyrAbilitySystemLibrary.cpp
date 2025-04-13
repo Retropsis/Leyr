@@ -436,25 +436,25 @@ FGameplayEffectContextHandle ULeyrAbilitySystemLibrary::ApplyAdditionalEffect(co
 	return EffectContextHandle;
 }
 
-FGameplayEffectContextHandle ULeyrAbilitySystemLibrary::ApplyStatusEffect(const FStatusEffectParams& StatusEffectParams)
-{
-	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-	// const AActor* SourceAvatarActor = StatusEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
-
-	FGameplayEffectContextHandle EffectContextHandle = StatusEffectParams.SourceAbilitySystemComponent->MakeEffectContext();
-	EffectContextHandle.AddSourceObject(StatusEffectParams.SourceObject);
-	
-	const FGameplayEffectSpecHandle SpecHandle = StatusEffectParams.SourceAbilitySystemComponent->MakeOutgoingSpec(StatusEffectParams.AdditionalEffectClass, StatusEffectParams.AbilityLevel, EffectContextHandle);
-	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, StatusEffectParams.DamageType, StatusEffectParams.AbilityPower);
-	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, StatusEffectParams.StatusEffectType, StatusEffectParams.AbilityPower);
-	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Chance, StatusEffectParams.StatusEffectChance);
-	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Damage, StatusEffectParams.StatusEffectDamage);
-	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Duration, StatusEffectParams.StatusEffectDuration);
-	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Frequency, StatusEffectParams.StatusEffectFrequency);
-
-	StatusEffectParams.TargetAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
-	return EffectContextHandle;
-}
+// FGameplayEffectContextHandle ULeyrAbilitySystemLibrary::ApplyStatusEffect(const FStatusEffectParams& StatusEffectParams)
+// {
+// 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+// 	// const AActor* SourceAvatarActor = StatusEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
+//
+// 	FGameplayEffectContextHandle EffectContextHandle = StatusEffectParams.SourceAbilitySystemComponent->MakeEffectContext();
+// 	EffectContextHandle.AddSourceObject(StatusEffectParams.SourceObject);
+// 	
+// 	const FGameplayEffectSpecHandle SpecHandle = StatusEffectParams.SourceAbilitySystemComponent->MakeOutgoingSpec(StatusEffectParams.AdditionalEffectClass, StatusEffectParams.AbilityLevel, EffectContextHandle);
+// 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, StatusEffectParams.DamageType, StatusEffectParams.AbilityPower);
+// 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, StatusEffectParams.StatusEffectType, StatusEffectParams.AbilityPower);
+// 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Chance, StatusEffectParams.StatusEffectChance);
+// 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Damage, StatusEffectParams.StatusEffectDamage);
+// 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Duration, StatusEffectParams.StatusEffectDuration);
+// 	UAbilitySystemBlueprintLibrary::AssignTagSetByCallerMagnitude(SpecHandle, GameplayTags.StatusEffect_Frequency, StatusEffectParams.StatusEffectFrequency);
+//
+// 	StatusEffectParams.TargetAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
+// 	return EffectContextHandle;
+// }
 
 /*
  * Damage Effect Params
