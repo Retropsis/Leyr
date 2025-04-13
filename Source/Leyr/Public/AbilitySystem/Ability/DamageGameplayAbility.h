@@ -60,9 +60,6 @@ public:
 	UFUNCTION(BlueprintPure)
 	FAdditionalEffectParams MakeAdditionalEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
 	
-	// UFUNCTION(BlueprintPure)
-	// FStatusEffectParams MakeStatusEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
-	
 protected:		
 	UPROPERTY(BlueprintReadOnly)
 	bool bHasHitTarget = false;

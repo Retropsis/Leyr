@@ -48,19 +48,4 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	float StatusEffectDuration = 5.f;
-
-	/*
-	 * Impulse on defeat
-	 */
-	UPROPERTY(EditDefaultsOnly)
-	float DeathImpulseMagnitude = 250.f;
-
-	/*
-	 * Airborne
-	*/
-	UPROPERTY(EditDefaultsOnly, meta=(ClampMin=0.f, ClampMax=100.f))
-	float AirborneChance = 0.f;
-	
-	UPROPERTY(EditDefaultsOnly)
-	float AirborneForceMagnitude = 250.f;
 };

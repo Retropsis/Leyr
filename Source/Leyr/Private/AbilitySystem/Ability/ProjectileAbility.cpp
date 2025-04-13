@@ -44,15 +44,16 @@ void UProjectileAbility::SpawnProjectile(const FGameplayTag& SocketTag, const FV
 	FTransform SpawnTransform;
 	SpawnTransform.SetLocation(SocketLocation);
 	SpawnTransform.SetRotation(Rotation.Quaternion());
-	
+
 	AProjectile* Projectile = GetWorld()->SpawnActorDeferred<AProjectile>(
 			AbilityData->ProjectileClass,
 			SpawnTransform,
 			GetOwningActorFromActorInfo(),
-			Cast<APawn>(GetOwningActorFromActorInfo()),
+			CurrentActorInfo->PlayerController.Get() ? CurrentActorInfo->PlayerController->GetPawn() : Cast<APawn>(GetOwningActorFromActorInfo()),
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 	Projectile->DamageEffectParams = MakeAdditionalEffectParamsFromClassDefaults();
+	Projectile->SetOwner(GetAvatarActorFromActorInfo());
 	Projectile->InitProjectileData();
 	Projectile->FinishSpawning(SpawnTransform);
 }

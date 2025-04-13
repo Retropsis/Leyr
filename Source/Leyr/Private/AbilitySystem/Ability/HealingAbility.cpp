@@ -29,7 +29,7 @@ void UHealingAbility::InitAbility()
 	
 	if (AbilityData)
 	{
-		HealingEffectClass = AbilityData->MainEffectClass;
+		HealingEffectClass = AbilityData->DamageEffectClass;
 		HealingType = AbilityData->HealingType;
 	}
 }

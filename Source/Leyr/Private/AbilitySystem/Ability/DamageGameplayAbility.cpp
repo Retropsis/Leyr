@@ -21,20 +21,16 @@ void UDamageGameplayAbility::InitAbility()
 	
 	if (AbilityData)
 	{
-		DamageEffectClass = AbilityData->MainEffectClass;
-		// bShouldApplyExecute = AbilityData->bShouldApplyExecute;
-		// bShouldExecute = AbilityData->bShouldExecute;
-			
+		DamageEffectClass = AbilityData->DamageEffectClass;
 		bIsRadialDamage = AbilityData->bIsRadialDamage;
 		RadialDamageInnerRadius = AbilityData->RadialDamageInnerRadius;
 		RadialDamageOuterRadius = AbilityData->RadialDamageOuterRadius;
+		DeathImpulseMagnitude = AbilityData->DeathImpulseMagnitude;
+		AirborneChance = AbilityData->AirborneChance;
+		AirborneForceMagnitude = AbilityData->AirborneForceMagnitude;
 		
-		if (AbilityData->StatusEffectData)
-		{
-			DeathImpulseMagnitude = AbilityData->StatusEffectData->DeathImpulseMagnitude;
-			AirborneChance = AbilityData->StatusEffectData->AirborneChance;
-			AirborneForceMagnitude = AbilityData->StatusEffectData->AirborneForceMagnitude;
-		}
+		// bShouldApplyExecute = AbilityData->bShouldApplyExecute;
+		// bShouldExecute = AbilityData->bShouldExecute;
 	}
 }
 
@@ -95,6 +91,9 @@ void UDamageGameplayAbility::CauseDamage(UAbilitySystemComponent* TargetASC)
 	if(bShouldApplyExecute) MakeAndApplyExecuteEffectToTarget(GameplayTags.Indicator_Execute, TargetASC);
 	
 	GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*DamageSpecHandle.Data.Get(), TargetASC);
+
+	// Status Effect Application
+	if (AbilityData && AbilityData->StatusEffectData) AbilityData->StatusEffectData->ApplyStatusEffect(GetAbilitySystemComponentFromActorInfo(), TargetASC); 
 }
 
 void UDamageGameplayAbility::ForEachHitTryCausingDamage(TArray<FHitResult> HitResults)

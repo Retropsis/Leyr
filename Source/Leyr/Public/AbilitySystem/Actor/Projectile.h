@@ -20,10 +20,10 @@ class LEYR_API AProjectile : public AActor
 public:	
 	AProjectile();
 	virtual bool InitProjectileData();
+	virtual bool IsValidOverlap(const AActor* OtherActor);
 	void SetImpactEffect(UNiagaraSystem* Effect) { ImpactEffect = Effect; }
 	void SetImpactSound(USoundBase* Sound) { ImpactSound = Sound; }
 	void SetLoopingSound(USoundBase* Sound) { LoopingSound = Sound; }
-	bool IsValidOverlap(AActor* OtherActor);
 
 	/*
 	 * OnHit VFX Timeline

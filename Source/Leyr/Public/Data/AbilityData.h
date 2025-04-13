@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayEffectTypes.h"
 #include "GameplayTagContainer.h"
 #include "ScalableFloat.h"
 #include "AbilitySystem/Data/AttackSequenceInfo.h"
@@ -22,8 +23,11 @@ class LEYR_API UAbilityData : public UDataAsset
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintCallable)
+	FGameplayEffectContextHandle ApplyAdditionalEffect(UAbilitySystemComponent* SourceASC, UAbilitySystemComponent* TargetASC);
+	
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
-	TSubclassOf<UGameplayEffect> MainEffectClass = nullptr;
+	TSubclassOf<UGameplayEffect> DamageEffectClass = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability", meta=(Categories=Damage))
 	FGameplayTag DamageType = FGameplayTag();
@@ -93,4 +97,19 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Range", meta=(EditCondition="ProjectileClass != nullptr", EditConditionHides))
 	float PitchOverride = 0.f;
+
+	/*
+	 * Impulse on defeat
+	 */
+	UPROPERTY(EditDefaultsOnly)
+	float DeathImpulseMagnitude = 250.f;
+
+	/*
+	 * Airborne
+	*/
+	UPROPERTY(EditDefaultsOnly, meta=(ClampMin=0.f, ClampMax=100.f))
+	float AirborneChance = 0.f;
+	
+	UPROPERTY(EditDefaultsOnly)
+	float AirborneForceMagnitude = 250.f;
 };

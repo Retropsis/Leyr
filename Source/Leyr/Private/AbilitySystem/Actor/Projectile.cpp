@@ -91,7 +91,7 @@ void AProjectile::OnHomingTargetDeath(AActor* DeadActor)
 	ProjectileMovement->bIsHomingProjectile = false;
 }
 
-bool AProjectile::IsValidOverlap(AActor* OtherActor)
+bool AProjectile::IsValidOverlap(const AActor* OtherActor)
 {
 	if (DamageEffectParams.SourceAbilitySystemComponent == nullptr) return false;
 	const AActor* SourceAvatarActor = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
