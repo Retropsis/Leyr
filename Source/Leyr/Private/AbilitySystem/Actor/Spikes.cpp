@@ -12,7 +12,7 @@ ASpikes::ASpikes()
 void ASpikes::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
-	BoxCollision->SetBoxExtent(FVector(BuildDirection == EBuildDirection::Horizontal ? Length * 32.f : 16.f, 100.f, BuildDirection == EBuildDirection::Vertical ? Length * 32.f : 16.f));
+	BoxCollision->SetBoxExtent(FVector(BuildDirection == EBuildPattern::Horizontal ? Length * 32.f : 16.f, 100.f, BuildDirection == EBuildPattern::Vertical ? Length * 32.f : 16.f));
 }
 
 void ASpikes::BeginPlay()

@@ -7,7 +7,7 @@
 
 ARope::ARope()
 {
-	BuildDirection = EBuildDirection::Horizontal;
+	BuildDirection = EBuildPattern::Horizontal;
 
 	HangingCollision->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	

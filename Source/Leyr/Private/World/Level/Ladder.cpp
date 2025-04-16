@@ -8,7 +8,7 @@
 
 ALadder::ALadder()
 {
-	BuildDirection = EBuildDirection::Vertical;
+	BuildDirection = EBuildPattern::Vertical;
 	HangingCollision->SetCollisionObjectType(ECC_Interaction);
 	HangingCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	HangingCollision->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);

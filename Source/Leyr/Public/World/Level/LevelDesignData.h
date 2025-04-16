@@ -4,7 +4,7 @@
 #include "LevelDesignData.generated.h"
 
 UENUM(BlueprintType)
-enum class EBuildDirection : uint8
+enum class EBuildPattern : uint8
 {
 	None,
 	Horizontal,

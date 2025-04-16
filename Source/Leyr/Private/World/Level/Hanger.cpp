@@ -14,17 +14,17 @@ AHanger::AHanger()
 void AHanger::InitializeHangingExtent()
 {
 	switch (BuildDirection) {
-	case EBuildDirection::None:
+	case EBuildPattern::None:
 		break;
-	case EBuildDirection::Horizontal:
+	case EBuildPattern::Horizontal:
 		HangingCollision->SetBoxExtent(FVector{ Length * 32.f, 100.f, 16.f });
 		break;
-	case EBuildDirection::Vertical:
+	case EBuildPattern::Vertical:
 		HangingCollision->SetBoxExtent(FVector{ 16.f, 100.f, Length * 32.f });
 		break;
-	case EBuildDirection::Diagonal_Up:
+	case EBuildPattern::Diagonal_Up:
 		break;
-	case EBuildDirection::Diagonal_Down:
+	case EBuildPattern::Diagonal_Down:
 		break;
 	}
 }

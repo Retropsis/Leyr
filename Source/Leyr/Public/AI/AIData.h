@@ -18,7 +18,7 @@ enum class EBehaviourState : uint8
 	Patrol UMETA(DisplayName="Patrol"),
 	Chase UMETA(DisplayName="Chase"),
 	Dive UMETA(DisplayName="Dive"),
-	Ascent UMETA(DisplayName="Ascent"),
+	Timeline UMETA(DisplayName="Timeline"),
 	Fall UMETA(DisplayName="Fall"),
 	Search UMETA(DisplayName="Search"),
 };

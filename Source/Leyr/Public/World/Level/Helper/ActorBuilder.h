@@ -14,9 +14,10 @@ class LEYR_API AActorBuilder : public AActor
 	
 public:	
 	AActorBuilder();
+	void ClearChildActors();
 
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void BuildChildActors(EBuildDirection Direction);
+	UFUNCTION(CallInEditor)
+	void Build();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="ActorBuilder")
 	int32 WidthCount = 2;
@@ -34,10 +35,9 @@ public:
 	TSubclassOf<AActor> ChildActorClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="ActorBuilder")
-	EBuildDirection BuildDirection = EBuildDirection::Horizontal;
+	bool bShowTopSprite = true;
 
-#if WITH_EDITORONLY_DATA
-	UPROPERTY(EditDefaultsOnly, Category="ActorBuilder")
-	TObjectPtr<UBillboardComponent> BillboardComponent;
-#endif
+private:
+	UPROPERTY()
+	TArray<AActor*> ChildActors;
 };

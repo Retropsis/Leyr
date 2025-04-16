@@ -38,7 +38,7 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FVector FindRandomLocation();
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void SineMove();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)

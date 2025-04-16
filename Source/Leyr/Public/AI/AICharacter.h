@@ -10,11 +10,11 @@
 #include "UI/Controller/OverlayWidgetController.h"
 #include "AICharacter.generated.h"
 
+enum class EBehaviourType : uint8;
 class ULootDataSet;
 class UEncounterData;
 class AArena;
 class ANavMeshBoundsVolume;
-enum class EBehaviourType : uint8;
 class ASplineComponentActor;
 class ASplineMeshActor;
 class USplineMeshComponent;
@@ -64,7 +64,6 @@ public:
 	virtual bool ChaseTargetWithinWater_Implementation(AActor* TargetToChase) override;
 	virtual void SetupFlyAroundTarget_Implementation(FVector TargetLocation, float Radius = 225.f) override;
 	virtual void FlyAroundTarget_Implementation() override;
-	virtual void SineMove_Implementation() override;
 	virtual void StartTimelineMovement_Implementation() override;
 	virtual void SetJumpApex_Implementation(float NewApex) override { JumpApex = NewApex; }
 	virtual void FaceTarget_Implementation() override;

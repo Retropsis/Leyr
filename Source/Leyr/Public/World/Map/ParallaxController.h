@@ -18,7 +18,7 @@ class LEYR_API AParallaxController : public AActor
 public:	
 	AParallaxController();
 	virtual void Tick(float DeltaSeconds) override;
-	void InitializeMapParallax(AActor* ActorToAttach);
+	void InitializeMapParallax();
 
 	UPROPERTY(EditAnywhere)
 	FName CurrentMapName = FName();

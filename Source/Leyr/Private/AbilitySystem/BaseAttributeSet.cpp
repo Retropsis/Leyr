@@ -221,7 +221,7 @@ void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 		}
 		else
 		{
-			if (Props.TargetCharacter->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsElectrocuted(Props.TargetCharacter))
+			if (Props.TargetCharacter && Props.TargetCharacter->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsElectrocuted(Props.TargetCharacter))
 			{
 				Props.TargetASC->TryActivateAbilitiesByTag(FBaseGameplayTags::Get().Effects_HitReact.GetSingleTagContainer());
 			}

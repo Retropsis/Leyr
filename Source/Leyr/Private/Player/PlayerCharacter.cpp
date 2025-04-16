@@ -135,7 +135,7 @@ void APlayerCharacter::InitializeParallaxController()
 	{
 		//TODO: Here should be pulled from data asset and not hard coded
 		ParallaxController->CurrentMapName = FName("Dorn");
-		ParallaxController->InitializeMapParallax(this);
+		// ParallaxController->InitializeMapParallax();
 		ParallaxController->AttachToComponent(FollowCamera, FAttachmentTransformRules::KeepWorldTransform);
 	}
 }

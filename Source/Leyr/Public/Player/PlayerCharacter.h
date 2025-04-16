@@ -38,16 +38,16 @@ public:
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 	virtual void OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
-	void TryClimbingRope(FVector2D MovementVector);
 	virtual void Die(const FVector& DeathImpulse, bool bExecute) override;
 	
 	void Move(const FVector2D MovementVector);
 	void Pitch(float InPitch);
 	void RotateController() const;
 	bool TryDescendLadder();
+	void TryClimbingRope(FVector2D MovementVector);
+	bool TryVaultingDown();
 	void HandleCrouching(bool bShouldCrouch);
 	void JumpButtonPressed();
-	bool TryVaultingDown();
 
 	UFUNCTION()
 	void HandleCharacterMovementUpdated(float DeltaSeconds, FVector OldLocation, FVector OldVelocity);

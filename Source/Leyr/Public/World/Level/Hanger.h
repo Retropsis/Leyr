@@ -42,7 +42,7 @@ protected:
 	TObjectPtr<UBoxComponent> HangingCollision;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="00 - Platforming")
-	EBuildDirection BuildDirection = EBuildDirection::None;
+	EBuildPattern BuildDirection = EBuildPattern::None;
 	
 	UPROPERTY(EditAnywhere, Category="00 - Platforming")
 	EHangingType HangingType = EHangingType::Ladder;

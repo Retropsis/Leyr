@@ -7,7 +7,7 @@
 #include "World/Level/LevelDesignData.h"
 #include "Spikes.generated.h"
 
-enum class EBuildDirection : uint8;
+enum class EBuildPattern : uint8;
 class UBoxComponent;
 /**
  * 
@@ -31,7 +31,7 @@ protected:
 	TObjectPtr<UBoxComponent> BoxCollision;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AbilityActor|Spikes")
-	EBuildDirection BuildDirection = EBuildDirection::Horizontal;
+	EBuildPattern BuildDirection = EBuildPattern::Horizontal;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="AbilityActor|Spikes")
 	int32 Length = 3;

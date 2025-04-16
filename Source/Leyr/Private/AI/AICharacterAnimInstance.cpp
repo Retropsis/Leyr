@@ -22,7 +22,7 @@ void UAICharacterAnimInstance::Tick(float DeltaTime)
 	if(!IsValid(AICharacter)) return;
 
 	Velocity = AICharacter->GetCharacterMovement()->Velocity;
-	bIsMoving =  UKismetMathLibrary::VSize(Velocity) > 0.f;
+	bIsMoving =  UKismetMathLibrary::VSize(Velocity) > 0.f || AICharacter->GetBehaviourState() == EBehaviourState::Timeline;
 	bAirborne = AICharacter->GetCharacterMovement()->IsFalling();
 	// bIsAccelerating = AICharacter->IsAccelerating();
 	bIsDiving = AICharacter->GetBehaviourState() == EBehaviourState::Dive;
