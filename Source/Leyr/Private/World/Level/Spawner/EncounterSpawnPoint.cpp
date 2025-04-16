@@ -5,6 +5,11 @@
 #include "Data/EncounterData.h"
 #include "Engine/AssetManager.h"
 
+AEncounterSpawnPoint::AEncounterSpawnPoint()
+{
+	PrimaryActorTick.bCanEverTick = false;
+}
+
 void AEncounterSpawnPoint::SpawnEncounter()
 {
 	if (EncounterData->EncounterClass)
@@ -15,17 +20,26 @@ void AEncounterSpawnPoint::SpawnEncounter()
 			if (IsValid(LoadedAsset))
 			{
 				FTransform SpawnTransform = GetActorTransform();
-				if (bRandomizeLocation)
+				if (SpawnLocationType == ESpawnLocationType::Random)
 				{
-					const float RandomX = FMath::FRandRange(LeftBound.X, RightBound.X);
-					const FVector RandomLocation = FVector{ RandomX, 0.f, LeftBound.Z };
+					const float RandomX = FMath::FRandRange(SpawningBounds.Left.X, SpawningBounds.Right.X);
+					const FVector RandomLocation = FVector{ RandomX, 0.f, SpawningBounds.Left.Z };
 					SpawnTransform.SetLocation(RandomLocation);
+				}
+				if (SpawnLocationType == ESpawnLocationType::RandomCloseToPlayer)
+				{
+					SpawnTransform.SetLocation(FindRandomPointWithinBounds(PreferredLocation));
+				}
+				if (SpawnLocationType == ESpawnLocationType::AroundPoint)
+				{
+					SpawnTransform.SetLocation(FindRandomPointWithinBounds(GetActorLocation()));
 				}
 				
 				AAICharacter* Encounter = GetWorld()->SpawnActorDeferred<AAICharacter>(LoadedAsset, SpawnTransform, this, nullptr,
 					ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
 				Encounter->SetEncounterLevel(EncounterLevel);
-				Encounter->SetEncounterData(EncounterData); 
+				Encounter->SetEncounterData(EncounterData);
+				IAIInterface::Execute_SetSpawningBounds(Encounter, SpawningBounds);
 				Encounter->FinishSpawning(SpawnTransform);
 				Encounter->SpawnDefaultController();
 				CurrentSpawn = Encounter;
@@ -53,4 +67,12 @@ void AEncounterSpawnPoint::DespawnEncounter()
 	CurrentSpawn = nullptr;
 	GetWorldTimerManager().ClearTimer(RespawnTimer);
 	RespawnTimer.Invalidate();
+}
+
+FVector AEncounterSpawnPoint::FindRandomPointWithinBounds(const FVector& Origin) const
+{
+	const float PreferredLeftX = FMath::Clamp(Origin.X - PreferredSpawningRange, SpawningBounds.Left.X, SpawningBounds.Right.X);
+	const float PreferredRightX = FMath::Clamp(Origin.X + PreferredSpawningRange, SpawningBounds.Left.X, SpawningBounds.Right.X);
+	const float RandomX = FMath::FRandRange(PreferredLeftX, PreferredRightX);
+	return  FVector{ RandomX, 0.f, SpawningBounds.Left.Z };
 }

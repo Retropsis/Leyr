@@ -36,6 +36,9 @@ public:
 	virtual FOnASCRegistered& GetOnASCRegistered() = 0;
 	virtual FOnDeath& GetOnDeath() = 0;
 	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void BroadcastOnDeath();
+	
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void UpdateFacingTarget(const FVector& Target);
 	

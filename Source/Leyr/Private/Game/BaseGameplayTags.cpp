@@ -265,7 +265,10 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	 */
 	GameplayTags.Abilities_Weapon_Aim = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Aim"), FString("Abilities Weapon Aim"));
 	GameplayTags.Abilities_Weapon_Bow_Shot = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Bow.Shot"), FString("Abilities Weapon Bow Shot"));
-	GameplayTags.Abilities_Weapon_Spear_Throw = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Spear.Throw"), FString("Abilities Weapon Spear Throw"));
+	GameplayTags.Abilities_Weapon_Throw_Spear = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Throw.Spear"), FString("Abilities Weapon Spear Throw"));
+	GameplayTags.Abilities_Weapon_Throw_Kunai = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Throw.Kunai"), FString("Abilities Weapon Kunai Throw"));
+	GameplayTags.Abilities_Weapon_Throw_Boomerang = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Throw.Boomerang"), FString("Abilities Weapon Boomerang Throw"));
+	GameplayTags.Abilities_Weapon_Throw_Knife = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Throw.Knife"), FString("Abilities Weapon Knife Throw"));
 	
 	GameplayTags.Abilities_Throw_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Throw.1"), FString("Abilities Throw 1"));
 	GameplayTags.Abilities_Throw_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Throw.2"), FString("Abilities Throw 2"));

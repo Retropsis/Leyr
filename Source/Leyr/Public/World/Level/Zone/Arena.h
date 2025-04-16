@@ -4,20 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Leyr/Leyr.h"
 #include "World/Map/CameraBoundary.h"
 #include "Arena.generated.h"
-
-USTRUCT(BlueprintType)
-struct FBoundLocations
-{
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadOnly)
-	FVector Left = FVector::ZeroVector;
-	
-	UPROPERTY(BlueprintReadOnly)
-	FVector Right = FVector::ZeroVector;
-};
 
 class UBoxComponent;
 

@@ -5,8 +5,10 @@
 #include "Interaction/PlayerInterface.h"
 #include "PaperTileMapComponent.h"
 #include "AI/AICharacter.h"
+#include "Data/LevelAreaData.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "World/Data/CameraData.h"
+#include "World/Level/Spawner/EncounterSpawnVolume.h"
 
 ACameraBoundary::ACameraBoundary()
 {
@@ -60,6 +62,53 @@ void ACameraBoundary::InitializeCameraExtent()
 		BoundaryVisualizer->SetWorldScale3D(FVector{ Bounds.BoxExtent.X / 50.f, Bounds.BoxExtent.Y / 50.f, Bounds.BoxExtent.Z / 50.f });
 		CameraBoundary->SetBoxExtent(FVector{ bConstrainX ? FMath::Max(0.f, Bounds.BoxExtent.X - 640.f) : Bounds.BoxExtent.X, 0.f, bConstrainZ ? FMath::Max(0.f, Bounds.BoxExtent.Z - 384.f) : Bounds.BoxExtent.Z });
 	}
+}
+
+void ACameraBoundary::InitializeSpawnVolumes()
+{	
+	if (SpawningVolumeClass == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Please fill up SpawningVolumeClass in [%s]"), *GetName());
+		return;
+	}
+	if (LevelAreaData == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Please fill up LevelAreaData in [%s]"), *GetName());
+		return;
+	}
+	
+	ClearSpawnVolumes();
+	
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		
+	FVector Offset = FVector{ 100.f, 0.f, 0.f };
+	for (int i = 0; i < LevelAreaData->SpawningVolumes.Num(); i++)
+	{
+		FVector Location = FVector{ GetActorLocation().X, 0.f, GetActorLocation().Z } + Offset;
+		AEncounterSpawnVolume* SpawningVolume = GetWorld()->SpawnActor<AEncounterSpawnVolume>(SpawningVolumeClass, Location, FRotator::ZeroRotator, SpawnParams);
+		SpawningVolume->SetEncounterSpawnData(LevelAreaData->SpawningVolumes[i]);
+		SpawningVolume->InitializeSpawnPoints();
+		OnPlayerLeaving.AddUObject(SpawningVolume, &AEncounterSpawnVolume::HandlePlayerLeaving);
+		SpawningVolumes.Add(SpawningVolume);
+		Offset.X += 50.f;
+	}
+}
+
+void ACameraBoundary::ClearSpawnVolumes()
+{
+	if (SpawningVolumes.Num() == 0) return;
+
+	for (AEncounterSpawnVolume* SpawningVolume : SpawningVolumes)
+	{
+		if (IsValid(SpawningVolume))
+		{
+			SpawningVolume->ClearSpawnPoints();
+			SpawningVolume->Destroy();
+		}
+	}
+	OnPlayerLeaving.RemoveAll(this);
+	SpawningVolumes.Empty();
 }
 
 void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

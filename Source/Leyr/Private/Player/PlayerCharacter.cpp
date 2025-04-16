@@ -226,7 +226,6 @@ void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 	FVector TargetAdditiveOffset = FVector{0.f, Delta.X, Delta.Z};
 	
 	CurrentAdditiveOffset = FMath::VInterpTo(AdditiveOffset.GetLocation(), TargetAdditiveOffset, DeltaTime, InterpSpeed);
-	FVector DeltaOffset = CurrentAdditiveOffset - PreviousAdditiveOffset; 
 	AdditiveOffset.SetLocation(CurrentAdditiveOffset);
 	FollowCamera->AddAdditiveOffset(AdditiveOffset, FOV);
 	ParallaxController->SetActorRelativeLocation(FVector{ 600.f, CurrentAdditiveOffset.Y, CurrentAdditiveOffset.Z });
@@ -256,9 +255,6 @@ void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 		if (!CameraBounds.bInitialized) FollowCamera->ClearAdditiveOffset();
 	}
 	PreviousAdditiveOffset = AdditiveOffset.GetLocation();
-	UE_LOG(LogTemp, Warning, TEXT("TargetAdditiveOffset: [%s] - ClampFirst is [%hhd]"), *TargetAdditiveOffset.ToCompactString(), bClampFirst);
-	UE_LOG(LogTemp, Warning, TEXT("FollowCamera: [%s]"), *FollowCamera->GetComponentLocation().ToCompactString());
-	UE_LOG(LogTemp, Warning, TEXT("DeltaOffset: [%f]"), DeltaOffset.Z);
 }
 
 void APlayerCharacter::SetCameraInterpolation_Implementation(ACameraBoundary* CameraBoundary, ECameraInterpState NewState)
@@ -654,7 +650,6 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState, const FCombatSta
 		GetCharacterMovement()->MaxAcceleration = 2048.f;
 		GetCharacterMovement()->BrakingFrictionFactor = 2.f;
 		if (Params.bResetMovementMode) GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-		// MakeAndApplyEffectToSelf(GameplayTags.CombatState_Unoccupied);
 		break;
 	case ECombatState::Falling:
 		GetCharacterMovement()->MaxWalkSpeed = BaseRunSpeed;
@@ -677,10 +672,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState, const FCombatSta
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Crouching);
 		break;
 	case ECombatState::UnCrouching:
-		// UnCrouch()
 		GetSprite()->SetRelativeLocation(FVector::ZeroVector);
-		// if (CombatState != ECombatState::Rolling) GetSprite()->SetRelativeLocation(FVector::ZeroVector);
-		// else GetSprite()->SetRelativeLocation(FVector{ 0.f, 0.f, 44.f });
 		CombatState = ECombatState::Unoccupied;
 		break;
 	case ECombatState::Attacking:
@@ -730,7 +722,6 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState, const FCombatSta
 	case ECombatState::Swimming:
 		GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 		GetCharacterMovement()->MaxFlySpeed = SwimmingSpeed;
-		// GetCharacterMovement()->GetPhysicsVolume()->bWaterVolume = true;
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Swimming);
 		break;
 	case ECombatState::ClimbingRope:
@@ -756,7 +747,6 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState, const FCombatSta
 		break;
 	case ECombatState::Rolling:
 		Crouch();
-		// GetSprite()->SetRelativeLocation(FVector(0.f, 0.f, 44.f));
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Transient_Rolling);
 		break;
 	case ECombatState::RollingEnd:
@@ -777,8 +767,8 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState, const FCombatSta
 	case ECombatState::Stunned:
 		break;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("CombatState: %s"), *UEnum::GetValueAsString(CombatState));
-	UE_LOG(LogTemp, Warning, TEXT("MovementMode: %s"), *UEnum::GetValueAsString(GetCharacterMovement()->MovementMode));
+	// UE_LOG(LogTemp, Warning, TEXT("CombatState: %s"), *UEnum::GetValueAsString(CombatState));
+	// UE_LOG(LogTemp, Warning, TEXT("MovementMode: %s"), *UEnum::GetValueAsString(GetCharacterMovement()->MovementMode));
 }
 
 void APlayerCharacter::HandleCharacterMovementUpdated(float DeltaSeconds, FVector OldLocation, FVector OldVelocity)
@@ -799,15 +789,12 @@ void APlayerCharacter::HandleCharacterMovementUpdated(float DeltaSeconds, FVecto
 void APlayerCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
 {
 	Super::OnStartCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
-	GEngine->AddOnScreenDebugMessage(123456978, 1.f, FColor::Emerald, "OnStartCrouch");
-	// HandleCombatState(ECombatState::Crouching);
 }
 
 void APlayerCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
 {
 	Super::OnEndCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
 	HandleCombatState(ECombatState::UnCrouching);
-	GEngine->AddOnScreenDebugMessage(123456977, 1.f, FColor::Orange, "OnEndCrouch");
 }
 
 void APlayerCharacter::HandleCrouching(bool bShouldCrouch)
@@ -827,7 +814,6 @@ void APlayerCharacter::HandleCrouching(bool bShouldCrouch)
 	if((bShouldCrouch && bIsCrouched) || CombatState >= ECombatState::HangingLedge) return;
 	if(bShouldCrouch && !bIsCrouched && CombatState == ECombatState::Unoccupied)
 	{
-		// if (TryDescendLadder()) return;
 		TryDescendLadder();
 		HandleCombatState(ECombatState::Crouching);
 	}

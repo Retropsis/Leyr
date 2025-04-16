@@ -24,7 +24,6 @@ void ACyclingPlatform::Tick(float DeltaSeconds)
 	if (FlipbookComponent->IsPlaying())
 	{
 		FString Sup = FlipbookComponent->GetPlaybackPosition() / FlipbookComponent->GetFlipbookLength() > CyclingPosition ? FString("True") : FString("False");
-		GEngine->AddOnScreenDebugMessage(6548, 1.f, FColor::Cyan, FString::Printf(TEXT("%f"), FlipbookComponent->GetPlaybackPosition() / FlipbookComponent->GetFlipbookLength()));
 		if(FlipbookComponent->GetPlaybackPosition() / FlipbookComponent->GetFlipbookLength() > CyclingPosition)
 		{
 			CycleCollision(false);

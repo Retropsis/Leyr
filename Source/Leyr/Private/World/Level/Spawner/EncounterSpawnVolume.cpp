@@ -3,12 +3,9 @@
 #include "World/Level/Spawner/EncounterSpawnVolume.h"
 #include "Components/BoxComponent.h"
 #include "Data/EncounterData.h"
-#include "Data/EncounterSpawnData.h"
 #include "Interaction/PlayerInterface.h"
-#include "Kismet/KismetSystemLibrary.h"
-#include "Leyr/Leyr.h"
 #include "World/Level/Spawner/EncounterSpawnPoint.h"
-#include "World/Map/CameraBoundary.h"
+#include "Leyr/Leyr.h"
 
 AEncounterSpawnVolume::AEncounterSpawnVolume()
 {
@@ -17,19 +14,33 @@ AEncounterSpawnVolume::AEncounterSpawnVolume()
 	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>("Root");
 	SetRootComponent(Root);
 	
-	BoxOverlap = CreateDefaultSubobject<UBoxComponent>("BoxOverlap");
-	BoxOverlap->SetupAttachment(GetRootComponent());
-	BoxOverlap->InitBoxExtent(FVector{ 100.f });
-	BoxOverlap->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	BoxOverlap->SetCollisionResponseToAllChannels(ECR_Ignore);
-	BoxOverlap->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	BoxOverlap->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
+	TriggerVolume = CreateDefaultSubobject<UBoxComponent>("TriggerVolume");
+	TriggerVolume->SetupAttachment(GetRootComponent());
+	TriggerVolume->InitBoxExtent(FVector{ 100.f });
+	TriggerVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	TriggerVolume->SetCollisionResponseToAllChannels(ECR_Ignore);
+	TriggerVolume->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	TriggerVolume->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
 	
-	BoxVisualizer = CreateDefaultSubobject<UStaticMeshComponent>("BoxVisualizer");
-	BoxVisualizer->SetupAttachment(BoxOverlap);
-	BoxVisualizer->SetWorldScale3D(FVector{ 2.f });
-	BoxVisualizer->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	BoxVisualizer->SetHiddenInGame(true);
+	TriggerVolumeVisualizer = CreateDefaultSubobject<UStaticMeshComponent>("TriggerVolumeVisualizer");
+	TriggerVolumeVisualizer->SetupAttachment(TriggerVolume);
+	TriggerVolumeVisualizer->SetWorldScale3D(FVector{ 2.f });
+	TriggerVolumeVisualizer->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	TriggerVolumeVisualizer->SetHiddenInGame(true);
+	TriggerVolumeVisualizer->SetGenerateOverlapEvents(false);
+	
+	SpawningBounds = CreateDefaultSubobject<UBoxComponent>("SpawningBounds");
+	SpawningBounds->SetupAttachment(GetRootComponent());
+	SpawningBounds->InitBoxExtent(FVector{ 100.f });
+	SpawningBounds->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SpawningBounds->SetCollisionResponseToAllChannels(ECR_Ignore);
+	
+	SpawningBoundsVisualizer = CreateDefaultSubobject<UStaticMeshComponent>("SpawningBoundsVisualizer");
+	SpawningBoundsVisualizer->SetupAttachment(SpawningBounds);
+	SpawningBoundsVisualizer->SetWorldScale3D(FVector{ 2.f });
+	SpawningBoundsVisualizer->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SpawningBoundsVisualizer->SetHiddenInGame(true);
+	SpawningBoundsVisualizer->SetGenerateOverlapEvents(false);
 }
 
 void AEncounterSpawnVolume::LoadActor_Implementation()
@@ -50,22 +61,30 @@ void AEncounterSpawnVolume::InitializeSpawnPoints()
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		
-		bRandomizeLocation = EncounterSpawnData->bRandomizeLocation;
-		SpawnerType = EncounterSpawnData->SpawnerType;
-
 		FVector Offset = FVector::ZeroVector;
 		for (FEncounterSpawn Spawn : EncounterSpawnData->EncounterSpawns)
 		{
-			AEncounterSpawnPoint* SpawnPoint = GetWorld()->SpawnActor<AEncounterSpawnPoint>(AEncounterSpawnPoint::StaticClass(), GetActorLocation() + Offset, FRotator::ZeroRotator, SpawnParams);
-			if(Spawn.OverrideBehaviourData) Spawn.EncounterData->BehaviourData = Spawn.OverrideBehaviourData;
-			SpawnPoint->EncounterClass = Spawn.EncounterClass;
-			SpawnPoint->EncounterLevel = Spawn.Level;
-			SpawnPoint->EncounterData = Spawn.EncounterData;
-			SpawnPoint->RespawnTime = Spawn.RespawnTime;
-			SpawnPoints.Add(SpawnPoint);
-			Offset.X += 50.f;
+			for (int i = 0; i < Spawn.Count; ++i)
+			{
+				AEncounterSpawnPoint* SpawnPoint = GetWorld()->SpawnActor<AEncounterSpawnPoint>(AEncounterSpawnPoint::StaticClass(), GetActorLocation() + Offset, FRotator::ZeroRotator, SpawnParams);
+				if(Spawn.OverrideBehaviourData) Spawn.EncounterData->BehaviourData = Spawn.OverrideBehaviourData;
+				
+				SpawnPoint->EncounterClass = Spawn.EncounterClass;
+				SpawnPoint->EncounterLevel = Spawn.Level;
+				SpawnPoint->EncounterData = Spawn.EncounterData;
+				SpawnPoint->RespawnTime = Spawn.RespawnTime;
+				SpawnPoint->SpawnerType = Spawn.SpawnerType;
+				SpawnPoint->SpawnLocationType = Spawn.SpawnLocationType;
+				SpawnPoint->PreferredSpawningRange = Spawn.PreferredSpawningRange;
+				SpawnPoints.Add(SpawnPoint);
+				Offset.X += 50.f;
+			}
 		}
 	}
+}
+
+void AEncounterSpawnVolume::UpdateSpawnPoints()
+{	
 }
 
 void AEncounterSpawnVolume::BeginPlay()
@@ -73,8 +92,7 @@ void AEncounterSpawnVolume::BeginPlay()
 	Super::BeginPlay();
 	if (HasAuthority())
 	{
-		BoxOverlap->OnComponentBeginOverlap.AddDynamic(this, &AEncounterSpawnVolume::OnBeginOverlap);
-		BindOnPlayerLeaving();
+		TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &AEncounterSpawnVolume::OnBeginOverlap);
 	}
 }
 
@@ -86,37 +104,13 @@ void AEncounterSpawnVolume::OnBeginOverlap(UPrimitiveComponent* OverlappedCompon
 		{
 			if (IsValid(SpawnPoint))
 			{
-				SpawnPoint->bRandomizeLocation = bRandomizeLocation;
-				SpawnPoint->SpawnerType = SpawnerType;
-
-				if(EncounterSpawnData->bRandomizeLocation)
-				{
-					SpawnPoint->LeftBound = FVector{ GetActorLocation().X - BoxOverlap->GetScaledBoxExtent().X, 0.f, GetActorLocation().Z };
-					SpawnPoint->RightBound = FVector{ GetActorLocation().X + BoxOverlap->GetScaledBoxExtent().X, 0.f, GetActorLocation().Z };
-				}
+				SpawnPoint->PreferredLocation = FVector{ OtherActor->GetActorLocation().X, 0.f, GetActorLocation().Z };
+				SpawnPoint->SpawningBounds = CalculateBounds();
 				SpawnPoint->SpawnEncounter();
 			}
 		}
 		if (SpawnerType == ESpawnerType::Once) bActivated = true;
 		DisableVolume();
-	}
-}
-
-void AEncounterSpawnVolume::BindOnPlayerLeaving()
-{
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery2);
-	TArray<AActor*> ActorsToIgnore;
-	ActorsToIgnore.Add(this);
-	TArray<AActor*> OutActors;
-	UKismetSystemLibrary::BoxOverlapActors(this, GetActorLocation(), FVector{ 50.f }, ObjectTypes, ACameraBoundary::StaticClass(), ActorsToIgnore, OutActors);
-	for (AActor* Overlap : OutActors)
-	{
-		if (ACameraBoundary* CameraBoundary = Cast<ACameraBoundary>(Overlap))
-		{
-			CameraBoundary->OnPlayerLeaving.AddUObject(this, &AEncounterSpawnVolume::HandlePlayerLeaving);
-			return;
-		}
 	}
 }
 
@@ -129,15 +123,36 @@ void AEncounterSpawnVolume::HandlePlayerLeaving()
 	}
 }
 
+void AEncounterSpawnVolume::ClearSpawnPoints()
+{
+	if (SpawnPoints.Num() == 0) return;
+	
+	for (AEncounterSpawnPoint* SpawnPoint : SpawnPoints)
+	{
+		if (IsValid(SpawnPoint)) SpawnPoint->Destroy();
+	}
+	SpawnPoints.Empty();
+}
+
+FBoundLocations AEncounterSpawnVolume::CalculateBounds() const
+{
+	FBoundLocations Bounds;
+	const FVector Extent = SpawningBounds->GetScaledBoxExtent();
+	const FVector Location = SpawningBounds->GetComponentLocation();
+	Bounds.Left = FVector{ Location.X - Extent.X, 0.f, Location.Z };
+	Bounds.Right = FVector{ Location.X + Extent.X, 0.f, Location.Z };
+	return Bounds;
+}
+
 void AEncounterSpawnVolume::DisableVolume() const
 {
-	BoxOverlap->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	BoxOverlap->SetCollisionResponseToAllChannels(ECR_Ignore);
+	TriggerVolume->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	TriggerVolume->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
 
 void AEncounterSpawnVolume::EnableVolume() const
 {
-	BoxOverlap->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	BoxOverlap->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	BoxOverlap->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
+	TriggerVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	TriggerVolume->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	TriggerVolume->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
 }

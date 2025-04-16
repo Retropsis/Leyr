@@ -3,12 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Data/EncounterSpawnData.h"
 #include "Engine/TargetPoint.h"
+#include "Leyr/Leyr.h"
 #include "EncounterSpawnPoint.generated.h"
 
-enum class ESpawnerType : uint8;
 class UBehaviourData;
 class UEncounterData;
 class AAICharacter;
@@ -21,6 +20,8 @@ class LEYR_API AEncounterSpawnPoint : public ATargetPoint
 	GENERATED_BODY()
 
 public:
+	AEncounterSpawnPoint();
+	
 	UFUNCTION(BlueprintCallable)
 	void SpawnEncounter();
 
@@ -29,6 +30,8 @@ public:
 
 	void DespawnEncounter();
 
+	FVector FindRandomPointWithinBounds(const FVector& Origin) const;
+
 	UPROPERTY()
 	float RespawnTime = 120.f;
 	
@@ -36,15 +39,18 @@ public:
 	TSubclassOf<AAICharacter> EncounterClass;
 	
 	UPROPERTY(EditAnywhere, Category="Spawner")
-	UEncounterData* EncounterData;
+	UEncounterData* EncounterData = nullptr;
 
 	UPROPERTY(EditAnywhere, Category="Spawner")
 	int32 EncounterLevel = 1;
 
-	bool bRandomizeLocation;
-	ESpawnerType SpawnerType = ESpawnerType::Once;
-	FVector LeftBound = FVector::ZeroVector;
-	FVector RightBound = FVector::ZeroVector;
+	UPROPERTY() ESpawnLocationType SpawnLocationType = ESpawnLocationType::Point;
+	UPROPERTY() ESpawnerType SpawnerType = ESpawnerType::Once;
+	UPROPERTY() FBoundLocations SpawningBounds;
+	UPROPERTY() FVector LeftBound = FVector::ZeroVector;
+	UPROPERTY() FVector RightBound = FVector::ZeroVector;
+	UPROPERTY() FVector PreferredLocation = FVector::ZeroVector;
+	UPROPERTY(EditDefaultsOnly) float PreferredSpawningRange = 750.f;
 
 private:
 	UPROPERTY()

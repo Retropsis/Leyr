@@ -84,6 +84,12 @@ public:
 	FBoxSphereBounds GetNavigationBounds();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FBoundLocations GetSpawningBounds();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetSpawningBounds(FBoundLocations NewBounds);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool IsWithinBounds(const FVector& Location);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)

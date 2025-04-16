@@ -80,6 +80,8 @@ public:
 	virtual bool IsWithinBounds_Implementation(const FVector& Location) override;
 	virtual FBoxSphereBounds GetEnteringBounds_Implementation() override { return EnteringBounds; }
 	virtual FBoxSphereBounds GetNavigationBounds_Implementation() override { return NavigationBounds; }
+	virtual FBoundLocations GetSpawningBounds_Implementation() override { return SpawningBounds; }
+	virtual void SetSpawningBounds_Implementation(const FBoundLocations NewBounds) override { SpawningBounds = NewBounds; }
 	virtual bool IsTargetWithinEnteringBounds_Implementation(const FVector& Location) override;
 	virtual bool ShouldDespawn_Implementation() override { return bShouldDespawn; }
 	/** end AI Interface */
@@ -220,6 +222,7 @@ protected:
 	//~ Bounds
 	FBoxSphereBounds EnteringBounds{};
 	FBoxSphereBounds NavigationBounds{};
+	FBoundLocations SpawningBounds{};
 	bool bShouldDespawn = false;
 	//~ LootData
 	UPROPERTY(BlueprintReadOnly)

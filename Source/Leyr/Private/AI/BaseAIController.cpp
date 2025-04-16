@@ -46,7 +46,7 @@ void ABaseAIController::UseSightSense(const FAIStimulus& ActiveStimulus) const
 {
 	if(ActiveStimulus.WasSuccessfullySensed())
 	{
-		GEngine->AddOnScreenDebugMessage(9877, 3.5f, FColor::Green, FString::Printf(TEXT("Player On Sight !!")));
+		// GEngine->AddOnScreenDebugMessage(9877, 3.5f, FColor::Green, FString::Printf(TEXT("Player On Sight !!")));
 		if(AAICharacter* ControlledCharacter = Cast<AAICharacter>(GetPawn()))
 		{
 			ControlledCharacter->HandleBehaviourState(EBehaviourState::Chase);
@@ -54,6 +54,6 @@ void ABaseAIController::UseSightSense(const FAIStimulus& ActiveStimulus) const
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(9878, 3.5f, FColor::Red, FString::Printf(TEXT("Player NOT On Sight !!")));
+		// GEngine->AddOnScreenDebugMessage(9878, 3.5f, FColor::Red, FString::Printf(TEXT("Player NOT On Sight !!")));
 	}
 }

@@ -12,6 +12,9 @@ UStatusEffectNiagaraComponent::UStatusEffectNiagaraComponent()
 void UStatusEffectNiagaraComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetCollisionResponseToAllChannels(ECR_Ignore);
+	SetGenerateOverlapEvents(false);
 	ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetOwner());
 	if (UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner()))
 	{

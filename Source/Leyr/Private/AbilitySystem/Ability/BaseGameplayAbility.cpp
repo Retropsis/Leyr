@@ -107,7 +107,6 @@ void UBaseGameplayAbility::InitAbility()
 	{
 		GetAbilitySystemComponentFromActorInfo()->AddLooseGameplayTag(FBaseGameplayTags::Get().Poise);
 		bPoiseWasApplied = true;
-		GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Magenta, FString::Printf(TEXT("%s has applied poised with : %f"), *GetAvatarActorFromActorInfo()->GetName(), EffectivePoiseChance));
 	}
 }
 

@@ -8,9 +8,13 @@
 #include "Components/BoxComponent.h"
 #include "CameraBoundary.generated.h"
 
+class ULevelAreaData;
+class ILevelActorInterface;
+class AEncounterSpawnVolume;
 class UBoxComponent;
 
 DECLARE_MULTICAST_DELEGATE(FOnPlayerLeaving);
+DECLARE_MULTICAST_DELEGATE(FOnPlayerEntering);
 
 UENUM(BlueprintType)
 enum class EBoundaryRule : uint8
@@ -31,6 +35,12 @@ public:
 	UFUNCTION(CallInEditor, Category="00 - Camera Boundary")
 	virtual void InitializeCameraExtent();
 	
+	UFUNCTION(CallInEditor, Category="00 - Camera Boundary")
+	virtual void InitializeSpawnVolumes();
+	
+	UFUNCTION(CallInEditor, Category="00 - Camera Boundary")
+	virtual void ClearSpawnVolumes();
+	
 	AActor* GetTargetActor() { return TargetActor; }
 	void SetTargetActor(AActor* InTargetActor) { TargetActor = InTargetActor; }
 	virtual void HandleOnBeginOverlap(AActor* OtherActor);
@@ -39,6 +49,7 @@ public:
 	FBoxSphereBounds GetNavigationBounds() const { return NavigationBoundary->Bounds; }
 	
 	FOnPlayerLeaving OnPlayerLeaving;
+	FOnPlayerEntering OnPlayerEntering;
 
 protected:
 	virtual void BeginPlay() override;
@@ -62,6 +73,9 @@ protected:
 	TObjectPtr<UStaticMeshComponent> BoundaryVisualizer;
 	
 	UPROPERTY(EditAnywhere, Category="00 - Camera Boundary")
+	TObjectPtr<ULevelAreaData> LevelAreaData;
+	
+	UPROPERTY(EditAnywhere, Category="00 - Camera Boundary")
 	TObjectPtr<APaperTileMapActor> TileMap;
 	
 	UPROPERTY(EditAnywhere, Category="00 - Camera Boundary")
@@ -72,6 +86,18 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category="00 - Camera Boundary")
 	bool bConstrainX = true;
+
+	/*
+	 * Other Game Mechanics
+	 */
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AEncounterSpawnVolume> SpawningVolumeClass;
+	
+	UPROPERTY()
+	TArray<TObjectPtr<AEncounterSpawnVolume>> SpawningVolumes;
+
+	UPROPERTY()
+	TArray<TScriptInterface<ILevelActorInterface>> LevelActors;
 
 private:
 	UPROPERTY() TObjectPtr<AActor> TargetActor;

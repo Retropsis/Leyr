@@ -54,15 +54,24 @@ ABaseCharacter::ABaseCharacter()
 	StunStatusEffectComponent->SetupAttachment(GetRootComponent());
 	StunStatusEffectComponent->StatusEffectTag = GameplayTags.StatusEffect_Stun;
 
+	GetSprite()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetSprite()->SetCollisionResponseToAllChannels(ECR_Ignore);
+	GetSprite()->SetGenerateOverlapEvents(false);
+	
 	UpperBody = CreateDefaultSubobject<UPaperFlipbookComponent>("UpperBody");
-	UpperBody->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	UpperBody->SetupAttachment(GetRootComponent());
+	UpperBody->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	UpperBody->SetCollisionResponseToAllChannels(ECR_Ignore);
+	UpperBody->SetGenerateOverlapEvents(false);
 
 	UpperBodyComponent = CreateDefaultSubobject<UPaperZDAnimationComponent>("UpperBodyComponent");
 
 	WeaponFlipbook = CreateDefaultSubobject<UPaperFlipbookComponent>("WeaponFlipbook");
 	WeaponFlipbook->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	WeaponFlipbook->SetupAttachment(UpperBody);
+	WeaponFlipbook->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	WeaponFlipbook->SetCollisionResponseToAllChannels(ECR_Ignore);
+	WeaponFlipbook->SetGenerateOverlapEvents(false);
 
 	WeaponComponent = CreateDefaultSubobject<UPaperZDAnimationComponent>("WeaponComponent");
 }

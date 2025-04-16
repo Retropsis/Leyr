@@ -27,9 +27,7 @@ void UKeepDistanceTask::Activate()
 	const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(ControlledPawn->GetActorLocation(), FVector(TargetLocation.X, ControlledPawn->GetActorLocation().Y, TargetLocation.Z));
 	const FRotator WorldDirection = FRotator(LookAtRotation.Pitch, 0.f, 0.f);
 	ControlledPawn->AddMovementInput(LookAtRotation.Vector(), 1.f, true);
-		
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Moving To");
-		
+				
 	if(!bBackward && FVector::DotProduct(LookAtRotation.Vector(), ControlledPawn->GetActorForwardVector()) < 0.f)
 	{
 		ControlledPawn->SetActorRotation(UKismetMathLibrary::ComposeRotators(ControlledPawn->GetActorRotation(), FRotator(0.f, 180.f, 0.f)));

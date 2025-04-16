@@ -158,6 +158,7 @@ protected:
 	
 	virtual FOnASCRegistered& GetOnASCRegistered() override { return OnASCRegistered; }
 	virtual FOnDeath& GetOnDeath() override { return OnDeath; }
+	virtual void BroadcastOnDeath_Implementation() override { OnDeath.Broadcast(this); }
 	
 	virtual void Die(const FVector& DeathImpulse, bool bExecute) override;
 	virtual EDefeatState GetDefeatState_Implementation() const override { return  DefeatState; }

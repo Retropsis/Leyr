@@ -3,20 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Data/EncounterSpawnData.h"
 #include "GameFramework/Actor.h"
 #include "Interaction/SaveInterface.h"
+#include "Leyr/Leyr.h"
 #include "EncounterSpawnVolume.generated.h"
 
 class UEncounterSpawnData;
-
-UENUM(BlueprintType)
-enum class ESpawnerType : uint8
-{
-	None,
-	Once,
-	Infinite,
-};
-
 class AEncounterSpawnPoint;
 class UBoxComponent;
 
@@ -36,16 +29,20 @@ public:
 
 	UFUNCTION(CallInEditor)
 	void InitializeSpawnPoints();
-	void BindOnPlayerLeaving();
+	
+	UFUNCTION(CallInEditor)
+	void UpdateSpawnPoints();
+	
+	UFUNCTION()
+	void HandlePlayerLeaving();
+	void ClearSpawnPoints();
+	void SetEncounterSpawnData(UEncounterSpawnData* Data) { EncounterSpawnData = Data; }
 
 protected:
 	virtual void BeginPlay() override;
 	
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-	void HandlePlayerLeaving();
 
 	UPROPERTY(EditAnywhere, Category="Spawner")
 	TObjectPtr<UEncounterSpawnData> EncounterSpawnData;
@@ -54,15 +51,24 @@ protected:
 	TArray<AEncounterSpawnPoint*> SpawnPoints;
 	
 private:
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UBoxComponent> BoxOverlap;
+	FBoundLocations CalculateBounds() const;
 	
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UStaticMeshComponent> BoxVisualizer;
+	TObjectPtr<UBoxComponent> TriggerVolume;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UStaticMeshComponent> TriggerVolumeVisualizer;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UBoxComponent> SpawningBounds;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UStaticMeshComponent> SpawningBoundsVisualizer;
 	
 	UPROPERTY(SaveGame)
 	bool bActivated = false;
 	
-	UPROPERTY() bool bRandomizeLocation;
+	UPROPERTY() ESpawnLocationType SpawnLocationType = ESpawnLocationType::Point;;
 	UPROPERTY() ESpawnerType SpawnerType = ESpawnerType::Once;
+	float PreferredSpawningRange = 0.f;
 };

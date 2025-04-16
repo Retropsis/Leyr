@@ -33,3 +33,15 @@ struct FValueRange
 		return FMath::FRandRange(ValueMin.GetValueAtLevel(Scaler), ValueMax.GetValueAtLevel(Scaler));
 	}
 };
+
+USTRUCT(BlueprintType)
+struct FBoundLocations
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector Left = FVector::ZeroVector;
+	
+	UPROPERTY(BlueprintReadOnly)
+	FVector Right = FVector::ZeroVector;
+};

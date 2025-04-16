@@ -24,6 +24,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly) // AI flow chart: patrol, airborne, ranger, turret
 	EBehaviourType BehaviourType = EBehaviourType::Patrol;
+
+	UPROPERTY(EditDefaultsOnly)
+	EMovementType MovementType = EMovementType::Destination;
 	
 	UPROPERTY(EditDefaultsOnly)
 	bool bEditValues = false;	
@@ -54,6 +57,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, meta=(EditCondition="bEditValues", EditConditionHides)) // How fast to dive
 	float DivingSpeed = 750.f;
+	
+	UPROPERTY(EditDefaultsOnly, meta=(EditCondition="bEditValues", EditConditionHides)) // How fast to chase the player
+	float BaseWalkSpeed = 120.f;
 	
 	UPROPERTY(EditDefaultsOnly)
 	bool bCollisionCauseDamage = false;

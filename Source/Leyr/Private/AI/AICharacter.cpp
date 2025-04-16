@@ -40,10 +40,16 @@ AAICharacter::AAICharacter()
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthBar");
 	HealthBar->SetupAttachment(GetRootComponent());
 	HealthBar->SetWidgetSpace(EWidgetSpace::Screen);
+	HealthBar->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HealthBar->SetCollisionResponseToAllChannels(ECR_Ignore);
+	HealthBar->SetGenerateOverlapEvents(false);
 	
 	PassiveIndicatorComponent = CreateDefaultSubobject<UWidgetComponent>("PassiveIndicator");
 	PassiveIndicatorComponent->SetupAttachment(GetRootComponent());
 	PassiveIndicatorComponent->SetWidgetSpace(EWidgetSpace::Screen);
+	PassiveIndicatorComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	PassiveIndicatorComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
+	PassiveIndicatorComponent->SetGenerateOverlapEvents(false);
 }
 
 #if WITH_EDITOR
@@ -243,6 +249,7 @@ void AAICharacter::InitializeCharacterInfo()
 	
 	BehaviorTree = EncounterData->BehaviourData->BehaviorTree;
 	BehaviourType = EncounterData->BehaviourData->BehaviourType;
+	MovementType = EncounterData->BehaviourData->MovementType; 
 	SineMoveHeight = EncounterData->BehaviourData->SineMoveHeight;
 	PatrolRadius = EncounterData->BehaviourData->PatrolRadius;
 	PatrolTickRadius = EncounterData->BehaviourData->PatrolTickRadius;
@@ -252,6 +259,7 @@ void AAICharacter::InitializeCharacterInfo()
 	ChasingSpeed = EncounterData->BehaviourData->ChasingSpeed;
 	ChasingHeightOffset = EncounterData->BehaviourData->ChasingHeightOffset;
 	DivingSpeed = EncounterData->BehaviourData->DivingSpeed;
+	BaseWalkSpeed = EncounterData->BehaviourData->BaseWalkSpeed;
 	
 	bCollisionCauseDamage = EncounterData->BehaviourData->bCollisionCauseDamage;
 	if(bCollisionCauseDamage)
@@ -566,7 +574,7 @@ bool AAICharacter::ChaseTargetWithinWater_Implementation(AActor* TargetToChase)
 		// const FVector TargetLocation = GetActorLocation() + LookAtRotation.Vector().GetSafeNormal() * 128.f;
 		if (IsTargetWithinNavigationBounds(PreferredLocation))
 		{
-			UKismetSystemLibrary::DrawDebugSphere(this, PreferredLocation, 15.f, 12, FLinearColor::Green);
+			// UKismetSystemLibrary::DrawDebugSphere(this, PreferredLocation, 15.f, 12, FLinearColor::Green);
 			AddMovementInput(LookAtRotation.Vector(), 1.f, true);
 			if(FVector::DotProduct(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetToChase->GetActorLocation()).Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
 			return false;
@@ -585,9 +593,8 @@ bool AAICharacter::ChaseTargetWithinWater_Implementation(AActor* TargetToChase)
 		// const FVector TargetLocation = GetActorLocation() - LookAtRotation.Vector().GetSafeNormal() * 128.f;
 		if (IsTargetWithinNavigationBounds(PreferredLocation))
 		{
-			UKismetSystemLibrary::DrawDebugSphere(this, PreferredLocation, 15.f, 12, FLinearColor::Blue);
+			// UKismetSystemLibrary::DrawDebugSphere(this, PreferredLocation, 15.f, 12, FLinearColor::Blue);
 			const float ScaleValue = FMath::Max(1.f - (GetActorLocation() - TargetToChase->GetActorLocation()).Length() / IdealRange, .33f);
-			GEngine->AddOnScreenDebugMessage(1122334, 5.f, FColor::Magenta, FString::Printf(TEXT("SacelValue: %f"), ScaleValue));
 			AddMovementInput(LookAtRotation.Vector(), ScaleValue, true);
 			if(FVector::DotProduct(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetToChase->GetActorLocation()).Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
 			return false;
@@ -645,7 +652,7 @@ void AAICharacter::FlyAroundTarget_Implementation()
 	}
 	
 	// GEngine->AddOnScreenDebugMessage(778898, 5.f, FColor::Red, FString::Printf(TEXT("Factor X: %f"), FactorX));
-	UKismetSystemLibrary::DrawDebugSphere(this, FlyAroundTargetLocation + FVector(FactorX, 0.f, 0.f), 15.f, 12, FLinearColor::Green);
+	// UKismetSystemLibrary::DrawDebugSphere(this, FlyAroundTargetLocation + FVector(FactorX, 0.f, 0.f), 15.f, 12, FLinearColor::Green);
 
 	const FVector Movement{ FMath::Cos(DeltaTime * 1.5f), 0.f, FMath::Sin(DeltaTime * 1.5f) };
 	const float CurrentDistance = FMath::FInterpTo((FlyAroundTargetLocation - ActorLocation).Length(), FlyAroundRadius, DeltaTime, 5.f);

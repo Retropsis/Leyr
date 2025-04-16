@@ -169,7 +169,10 @@ FGameplayTag Abilities_Lightning_Bolt_1;
 FGameplayTag Abilities_Earth_Earthquake;
 FGameplayTag Abilities_Cosmos_Meteor_1;
 FGameplayTag Abilities_Noxious_Bio_1;
-FGameplayTag Abilities_Sorcery;
+ FGameplayTag Abilities_Sorcery;
+ 
+ FGameplayTag Abilities_Throw_1;
+ FGameplayTag Abilities_Throw_2;
  
 FGameplayTag Abilities_ClimbingRope;
 FGameplayTag Abilities_SwimImpulse;
@@ -192,6 +195,7 @@ FGameplayTag Abilities_Passive_Mastery_Bow;
 FGameplayTag Abilities_Passive_Mastery_Crossbow;
 FGameplayTag Abilities_Passive_Mastery_Buckler;
 FGameplayTag Abilities_Passive_Mastery_Sorcery;
+FGameplayTag Abilities_Passive_Mastery_Throw;
  
 FGameplayTag Abilities_Passive_Barrier;
 FGameplayTag Abilities_Passive_HealthDrain;
@@ -218,7 +222,10 @@ FGameplayTag Abilities_Weapon_Fire_FireBolt;
 FGameplayTag Abilities_Weapon_Noxious_Bio_1;
 FGameplayTag Abilities_Weapon_Aim;
 FGameplayTag Abilities_Weapon_Bow_Shot;
-FGameplayTag Abilities_Weapon_Spear_Throw;
+FGameplayTag Abilities_Weapon_Throw_Spear;
+FGameplayTag Abilities_Weapon_Throw_Kunai;
+FGameplayTag Abilities_Weapon_Throw_Boomerang;
+ FGameplayTag Abilities_Weapon_Throw_Knife;
  
 FGameplayTag Abilities_Weapon;
 FGameplayTag Abilities_Weapon_Monk;
@@ -250,9 +257,6 @@ FGameplayTag Abilities_Combo_Window_Execute;
 FGameplayTag Abilities_Combo_Window_Begin;
 FGameplayTag Abilities_Combo_Window_Cue;
 FGameplayTag Abilities_Combo_Window_End;
- 
-FGameplayTag Abilities_Throw_1;
-FGameplayTag Abilities_Throw_2;
 
  /*
   * AI Abilities
