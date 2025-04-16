@@ -28,80 +28,9 @@ AParallaxController::AParallaxController()
 	CREATE_AND_SETUP_LAYER(FrontClouds, -900, -800.f);
 	CREATE_AND_SETUP_LAYER(BackLayer, 0, -700.f);
 	CREATE_AND_SETUP_LAYER(FrontLayer, -400, -600.f);
-	CREATE_AND_SETUP_LAYER(ForegroundFogLayer, 900, 200.f);
+	CREATE_AND_SETUP_LAYER(ForegroundFogLayer, 913, 200.f);
 	CREATE_AND_SETUP_LAYER(BackgroundFogLayer, 0, -100.f);
-	CREATE_AND_SETUP_LAYER(ForegroundLayer, -400, 100.f);
-	
-	// Sky = CreateDefaultSubobject<UPaperSpriteComponent>("Sky");
-	// Sky->SetupAttachment(GetRootComponent());
-	// Sky->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	// Sky->TranslucencySortPriority = -1000;
-	// Sky->SetRelativeLocation(FVector(0.f, -1000.f, 0.f));
-	// Sky->SetGenerateOverlapEvents(false);
-	
-	// Sun = CreateDefaultSubobject<UPaperSpriteComponent>("Sun");
-	// Sun->SetupAttachment(Sky);
-	// Sun->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	// Sun->SetRelativeLocation(FVector(0.f, 50.f, 0.f));
-	// Sun->SetGenerateOverlapEvents(false);
-	//
-	// FirstMoon = CreateDefaultSubobject<UPaperSpriteComponent>("FirstMoon");
-	// FirstMoon->SetupAttachment(Sky);
-	// FirstMoon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	// FirstMoon->SetRelativeLocation(FVector(0.f, 50.f, 0.f));
-	// FirstMoon->SetGenerateOverlapEvents(false);
-	//
-	// SecondMoon = CreateDefaultSubobject<UPaperSpriteComponent>("SecondMoon");
-	// SecondMoon->SetupAttachment(Sky);
-	// SecondMoon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	// SecondMoon->SetRelativeLocation(FVector(0.f, 50.f, 0.f));
-	// SecondMoon->SetGenerateOverlapEvents(false);
-	//
-	// BackClouds = CreateDefaultSubobject<UPaperSpriteComponent>("BackClouds");
-	// BackClouds->SetupAttachment(Sky);
-	// BackClouds->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	// BackClouds->SetRelativeLocation(FVector(0.f, 100.f, 0.f));
-	// BackClouds->SetGenerateOverlapEvents(false);
-	//
-	// FrontClouds = CreateDefaultSubobject<UPaperSpriteComponent>("FrontClouds");
-	// FrontClouds->SetupAttachment(Sky);
-	// FrontClouds->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	// FrontClouds->TranslucencySortPriority = -900;
-	// FrontClouds->SetRelativeLocation(FVector(0.f, 200.f, 0.f));
-	// FrontClouds->SetGenerateOverlapEvents(false);
-	
-	// BackLayer = CreateDefaultSubobject<UPaperSpriteComponent>("BackLayer");
-	// BackLayer->SetupAttachment(Sky);
-	// BackLayer->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	// BackLayer->SetRelativeLocation(FVector(0.f, 300.f, 0.f));
-	// BackLayer->SetGenerateOverlapEvents(false);
-	//
-	// FrontLayer = CreateDefaultSubobject<UPaperSpriteComponent>("FrontLayer");
-	// FrontLayer->SetupAttachment(Sky);
-	// FrontLayer->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	// FrontLayer->TranslucencySortPriority = -400;
-	// FrontLayer->SetRelativeLocation(FVector(0.f, 400.f, 0.f));
-	// FrontLayer->SetGenerateOverlapEvents(false);
-	//
-	// ForegroundFogLayer = CreateDefaultSubobject<UPaperSpriteComponent>("ForegroundFogLayer");
-	// ForegroundFogLayer->SetupAttachment(Sky);
-	// ForegroundFogLayer->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	// ForegroundFogLayer->TranslucencySortPriority = 900;
-	// ForegroundFogLayer->SetRelativeLocation(FVector(0.f, 1200.f, 0.f));
-	// ForegroundFogLayer->SetGenerateOverlapEvents(false);
-	//
-	// BackgroundFogLayer = CreateDefaultSubobject<UPaperSpriteComponent>("BackgroundFogLayer");
-	// BackgroundFogLayer->SetupAttachment(Sky);
-	// BackgroundFogLayer->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	// BackgroundFogLayer->SetRelativeLocation(FVector(0.f, 900.f, 0.f));
-	// BackgroundFogLayer->SetGenerateOverlapEvents(false);
-	//
-	// ForegroundLayer = CreateDefaultSubobject<UPaperSpriteComponent>("ForegroundLayer");
-	// ForegroundLayer->SetupAttachment(Sky);
-	// ForegroundLayer->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	// ForegroundLayer->TranslucencySortPriority = -400;
-	// ForegroundLayer->SetRelativeLocation(FVector(0.f, 1100.f, 0.f));
-	// ForegroundLayer->SetGenerateOverlapEvents(false);
+	CREATE_AND_SETUP_LAYER(ForegroundLayer, -413, 100.f);
 }
 
 void AParallaxController::Tick(float DeltaSeconds)

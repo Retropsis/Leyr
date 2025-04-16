@@ -223,7 +223,7 @@ void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 		{
 			if (Props.TargetCharacter && Props.TargetCharacter->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsElectrocuted(Props.TargetCharacter))
 			{
-				// Props.TargetASC->TryActivateAbilitiesByTag(FBaseGameplayTags::Get().Effects_HitReact.GetSingleTagContainer());
+				Props.TargetASC->TryActivateAbilitiesByTag(FBaseGameplayTags::Get().Effects_HitReact.GetSingleTagContainer());
 			}
 			const FVector& AirborneForce = ULeyrAbilitySystemLibrary::GetAirborneForce(Props.EffectContextHandle);
 			if (!AirborneForce.IsNearlyZero(1.f))
