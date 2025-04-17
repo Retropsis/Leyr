@@ -6,6 +6,8 @@
 #include "PaperTileMapComponent.h"
 #include "AI/AICharacter.h"
 #include "Data/LevelAreaData.h"
+#include "Engine/OverlapResult.h"
+#include "Interaction/LevelActorInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "World/Data/CameraData.h"
 #include "World/Level/Spawner/EncounterSpawnVolume.h"
@@ -116,6 +118,8 @@ void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>())
 	{
 		HandleOnBeginOverlap(OtherActor);
+		OnPlayerEntering.Broadcast();
+		ToggleLevelActorActivity(true);
 	}
 }
 
@@ -124,19 +128,8 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>() && OtherActor->Implements<UCombatInterface>() && ICombatInterface::Execute_GetDefeatState(OtherActor) == EDefeatState::None)
 	{
 		OnPlayerLeaving.Broadcast();
-
-		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-		ObjectTypes.Add(EOT_EnemyCapsule);
-		TArray<AActor*> ActorsToIgnore;
-		TArray<AActor*> OutActors;
-		UKismetSystemLibrary::BoxOverlapActors(this, GetActorLocation(), EnteringBoundary->GetScaledBoxExtent(), ObjectTypes, AAICharacter::StaticClass(), ActorsToIgnore, OutActors);
-		for (AActor* OverlapActor : OutActors)
-		{
-			if (IsValid(OverlapActor) && OverlapActor->Implements<UAIInterface>() && IAIInterface::Execute_ShouldDespawn(OverlapActor))
-			{
-				OverlapActor->Destroy();
-			}
-		}
+		DestroyOutOfBoundsEncounters();
+		ToggleLevelActorActivity(false);
 	}
 }
 
@@ -145,6 +138,49 @@ void ACameraBoundary::HandleOnBeginOverlap(AActor* OtherActor)
 	if (OtherActor->Implements<UPlayerInterface>())
 	{
 		IPlayerInterface::Execute_SetCameraInterpolation(OtherActor, this, ECameraInterpState::Entering);
+	}
+}
+
+void ACameraBoundary::DestroyOutOfBoundsEncounters() const
+{
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(EOT_EnemyCapsule);
+	TArray<AActor*> ActorsToIgnore;
+	TArray<AActor*> OutActors;
+	UKismetSystemLibrary::BoxOverlapActors(this, GetActorLocation(), EnteringBoundary->GetScaledBoxExtent(), ObjectTypes, AAICharacter::StaticClass(), ActorsToIgnore, OutActors);
+	for (AActor* OverlapActor : OutActors)
+	{
+		if (IsValid(OverlapActor) && OverlapActor->Implements<UAIInterface>() && IAIInterface::Execute_ShouldDespawn(OverlapActor))
+		{
+			OverlapActor->Destroy();
+		}
+	}
+}
+
+void ACameraBoundary::ToggleLevelActorActivity(bool bActivate) const
+{
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(EOT_OneWayPlatform);
+	TArray<AActor*> ActorsToIgnore;
+	TArray<AActor*> OutActors;
+	// UKismetSystemLibrary::BoxOverlapActors(this, GetActorLocation(), EnteringBoundary->GetScaledBoxExtent(), ObjectTypes, AActor::StaticClass(), ActorsToIgnore, OutActors);
+	// for (AActor* OverlapActor : OutActors)
+	// {
+	// 	if (IsValid(OverlapActor) && OverlapActor->Implements<ULevelActorInterface>())
+	// 	{
+	// 		ILevelActorInterface::Execute_ToggleActivate(OverlapActor, bActivate);
+	// 	}
+	// }
+	FCollisionQueryParams BoxParams;
+	BoxParams.AddIgnoredActors(ActorsToIgnore);
+	TArray<FOverlapResult> Overlaps;
+	GetWorld()->OverlapMultiByObjectType(Overlaps, GetActorLocation(), FQuat::Identity, FCollisionObjectQueryParams(FCollisionObjectQueryParams::InitType::AllDynamicObjects), FCollisionShape::MakeBox(EnteringBoundary->GetScaledBoxExtent()), BoxParams);
+	for (FOverlapResult& Overlap : Overlaps)
+	{
+		if (Overlap.GetActor() && Overlap.GetActor()->Implements<ULevelActorInterface>())
+		{
+			ILevelActorInterface::Execute_ToggleActivate(Overlap.GetActor(), bActivate);
+		}
 	}
 }
 

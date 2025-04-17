@@ -10,6 +10,7 @@
 #include "UI/Controller/OverlayWidgetController.h"
 #include "AICharacter.generated.h"
 
+class UTimelineComponent;
 enum class EBehaviourType : uint8;
 class ULootDataSet;
 class UEncounterData;
@@ -39,9 +40,9 @@ public:
 	void HandleBehaviourState(EBehaviourState NewState);
 	void HandlePlayerOverlappingArena(AActor* Player, bool bIsEntering);
 
-#if WITH_EDITOR
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-#endif
+// #if WITH_EDITOR
+// 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+// #endif
 	
 	/** Combat Interface */
 	virtual int32 GetCharacterLevel_Implementation() override { return Level; }
@@ -187,6 +188,19 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	float JumpApex = 100.f;
 
+	UFUNCTION(BlueprintCallable)
+	void InitializeSineMove();
+	
+	UFUNCTION(BlueprintCallable)
+	void ShouldEndSineMove(UTimelineComponent* Timeline);
+	
+	void RandomAmplitudeFromRange(float Min = 25.f, float Max = 100.f);
+	
+	UPROPERTY(BlueprintReadOnly)
+	float SineAmplitude = 0.f;
+
+	bool bExitSineMove = false;
+	
 	UPROPERTY(BlueprintAssignable, BlueprintCallable)
 	FEndTimelineMovement EndTimelineMovement;
 
@@ -204,6 +218,7 @@ protected:
 	EBehaviourType BehaviourType = EBehaviourType::Patrol;
 	EEncounterSize EncounterSize = EEncounterSize::Default;
 	float SineMoveHeight = 0.f;
+	float SineMoveSpeed = 0.f;
 	float PatrolRadius = 750.f;
 	float PatrolTickRadius = 450.f;
 	float AttackRange = 300.f;

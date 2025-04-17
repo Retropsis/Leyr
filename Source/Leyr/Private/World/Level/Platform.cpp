@@ -18,3 +18,14 @@ APlatform::APlatform()
 
 	Tags.Add(FName("Platform"));
 }
+
+void APlatform::BeginPlay()
+{
+	Super::BeginPlay();
+	SetActorTickEnabled(false);
+}
+
+void APlatform::ToggleActivate_Implementation(bool bActivate)
+{
+	SetActorTickEnabled(bActivate);
+}

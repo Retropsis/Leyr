@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystem/Actor/DamageAbilityActor.h"
+#include "Interaction/LevelActorInterface.h"
 #include "World/Level/LevelDesignData.h"
 #include "Spikes.generated.h"
 
@@ -13,13 +14,17 @@ class UBoxComponent;
  * 
  */
 UCLASS()
-class LEYR_API ASpikes : public ADamageAbilityActor
+class LEYR_API ASpikes : public ADamageAbilityActor, public ILevelActorInterface
 {
 	GENERATED_BODY()
 
 public:
 	ASpikes();
 	virtual void OnConstruction(const FTransform& Transform) override;
+
+	//~ LevelActorInterface
+	virtual void ToggleActivate_Implementation(bool bActivate) override;
+	//~ LevelActorInterface
 
 protected:
 	virtual void BeginPlay() override;

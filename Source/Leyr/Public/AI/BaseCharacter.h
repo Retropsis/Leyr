@@ -131,7 +131,7 @@ protected:
 	virtual UAbilityData* LoadAndGetDefaultAbilityData_Implementation() override;
 
 	virtual TSoftObjectPtr<UPaperZDAnimSequence> GetHitReactSequence_Implementation() override { return HitReactSequence; }
-	virtual TSoftObjectPtr<USoundBase> ImpactSoundFromTag_Implementation(const FGameplayTag& MontageTag, ESequenceType SequenceType) override;
+	virtual USoundBase* ImpactSoundFromTag_Implementation(const FGameplayTag& MontageTag, ESequenceType SequenceType) override;
 	virtual UNiagaraSystem* GetImpactEffect_Implementation() override { return ImpactEffect; }
 	virtual void SetImpactSoundLoaded_Implementation(USoundBase* ImpactSound) override { ImpactSoundLoaded = ImpactSound; }
 	virtual USoundBase* GetImpactSoundLoaded_Implementation() override { return ImpactSoundLoaded; }
@@ -203,7 +203,7 @@ protected:
 	 */
 	UPROPERTY() TObjectPtr<UNiagaraSystem> ImpactEffect;
 	UPROPERTY() TObjectPtr<USoundBase> ImpactSoundLoaded;
-	UPROPERTY() TSoftObjectPtr<USoundBase> DefeatedSound;
+	UPROPERTY() TObjectPtr<USoundBase> DefeatedSoundLoaded;
 	UPROPERTY() TSoftObjectPtr<UPaperZDAnimSequence> HitReactSequence;
 
 	UPROPERTY(EditAnywhere, Category="Character|Combat")

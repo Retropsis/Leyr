@@ -12,8 +12,6 @@
 #include "Components/CapsuleComponent.h"
 #include "Data/AbilityData.h"
 #include "Data/ItemData.h"
-#include "Engine/AssetManager.h"
-#include "Engine/StreamableManager.h"
 #include "Game/BaseGameplayTags.h"
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -228,7 +226,7 @@ UAbilityData* ABaseCharacter::LoadAndGetDefaultAbilityData_Implementation()
 	return DefaultAbilityData.LoadSynchronous();
 }
 
-TSoftObjectPtr<USoundBase> ABaseCharacter::ImpactSoundFromTag_Implementation(const FGameplayTag& MontageTag, ESequenceType SequenceType)
+USoundBase* ABaseCharacter::ImpactSoundFromTag_Implementation(const FGameplayTag& MontageTag, ESequenceType SequenceType)
 {
 	return GetTaggedMontageInfoByTag(MontageTag, SequenceType).ImpactSound;
 }
@@ -299,13 +297,8 @@ void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImp
 	GetCapsuleComponent()->SetSimulatePhysics(true);
 	GetCapsuleComponent()->AddImpulse(DeathImpulse, NAME_None, true);
 	
-	UAssetManager::GetStreamableManager().RequestAsyncLoad(DefeatedSound.ToSoftObjectPath(), [this] () {
-		USoundBase* LoadedAsset = DefeatedSound.Get();
-		if (IsValid(LoadedAsset))
-		{
-			UGameplayStatics::PlaySoundAtLocation(this, LoadedAsset, GetActorLocation(), GetActorRotation());
-		}
-	}, FStreamableManager::AsyncLoadHighPriority);
+	// UAssetManager::GetStreamableManager().RequestAsyncLoad(DefeatedSound.ToSoftObjectPath(), FStreamableDelegate::CreateUObject(this, &ABaseCharacter::PlayDeathSound), FStreamableManager::DefaultAsyncLoadPriority);
+	UGameplayStatics::PlaySoundAtLocation(this, DefeatedSoundLoaded, GetActorLocation(), GetActorRotation());
 	
 	GetAbilitySystemComponent()->AddLooseGameplayTag(FBaseGameplayTags::Get().Defeated);
 	DefeatState = InDefeatState;

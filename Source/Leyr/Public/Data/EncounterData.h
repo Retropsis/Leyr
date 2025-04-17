@@ -9,8 +9,8 @@
 #include "Engine/DataAsset.h"
 #include "EncounterData.generated.h"
 
-class ULootDataSet;
 enum class ECharacterClass : uint8;
+class ULootDataSet;
 class UAbilitySet;
 class AAICharacter;
 class UPaperZDAnimSequence;

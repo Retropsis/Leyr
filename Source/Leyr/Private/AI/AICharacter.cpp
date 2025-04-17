@@ -14,6 +14,7 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SplineComponent.h"
+#include "Components/TimelineComponent.h"
 #include "Components/WidgetComponent.h"
 #include "Data/BehaviourData.h"
 #include "Data/EncounterData.h"
@@ -52,48 +53,48 @@ AAICharacter::AAICharacter()
 	PassiveIndicatorComponent->SetGenerateOverlapEvents(false);
 }
 
-#if WITH_EDITOR
-void AAICharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-	Super::PostEditChangeProperty(PropertyChangedEvent);
+// #if WITH_EDITOR
+// void AAICharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+// {
+// 	Super::PostEditChangeProperty(PropertyChangedEvent);
 	
-	if(MovementType == EMovementType::Spline && !SplineComponentActor)
-	{
-		FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
-		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SplineComponentActor = GetWorld()->SpawnActor<ASplineComponentActor>(ASplineComponentActor::StaticClass(), GetActorTransform(), SpawnParameters);
-		SplineComponentActor->SetActorLabel(FString::Printf(TEXT("%s_PatrolSpline"), *GetName()));
-		for (int i = 0; i < SplineComponentActor->GetSplineComponent()->GetNumberOfSplinePoints(); ++i)
-		{
-			SplineComponentActor->GetSplineComponent()->SetSplinePointType(i, ESplinePointType::Linear);
-		}
-	}
-	if(MovementType != EMovementType::Spline && SplineComponentActor)
-	{
-		SplineComponentActor->Destroy();
-		SplineComponentActor = nullptr;
-	}
-	if(!NavMeshBoundsVolume && bShouldBuildNavMesh)
-	{
-		FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
-		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		NavMeshBoundsVolume = GetWorld()->SpawnActor<ANavMeshBoundsVolume>(ANavMeshBoundsVolume::StaticClass(), GetActorTransform(), SpawnParameters);
-		NavMeshBoundsVolume->SetActorLabel(FString::Printf(TEXT("%s_NavMesh"), *GetName()));
-		// UBrushComponent* Brush = NavMeshBoundsVolume->GetBrushComponent();
-		// Brush->Brush->Bounds = FBox(FVector(100.f), FVector(200.f));
-		// GetWorld()->GetNavigationSystem()->OnNavigationBoundsUpdated(NavMeshBoundsVolume);
-
-		NavMeshBoundsVolume->GetRootComponent()->Bounds = FBox(FVector(100.f), FVector(200.f));
-		NavMeshBoundsVolume->SetActorLocation(FVector{ GetActorLocation().X, 50.f, GetActorLocation().Z });
-		// GetWorld()->GetNavigationSystem()->OnNavAreaRegisteredDelegate(NavMeshBoundsVolume);
-	}
-	if(!bShouldBuildNavMesh && NavMeshBoundsVolume)
-	{
-		NavMeshBoundsVolume->Destroy();
-		NavMeshBoundsVolume = nullptr;
-	}
-}
-#endif
+	// if(MovementType == EMovementType::Spline && !SplineComponentActor)
+	// {
+	// 	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
+	// 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	// 	SplineComponentActor = GetWorld()->SpawnActor<ASplineComponentActor>(ASplineComponentActor::StaticClass(), GetActorTransform(), SpawnParameters);
+	// 	SplineComponentActor->SetActorLabel(FString::Printf(TEXT("%s_PatrolSpline"), *GetName()));
+	// 	for (int i = 0; i < SplineComponentActor->GetSplineComponent()->GetNumberOfSplinePoints(); ++i)
+	// 	{
+	// 		SplineComponentActor->GetSplineComponent()->SetSplinePointType(i, ESplinePointType::Linear);
+	// 	}
+	// }
+	// if(MovementType != EMovementType::Spline && SplineComponentActor)
+	// {
+	// 	SplineComponentActor->Destroy();
+	// 	SplineComponentActor = nullptr;
+	// }
+	// if(!NavMeshBoundsVolume && bShouldBuildNavMesh)
+	// {
+	// 	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
+	// 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	// 	NavMeshBoundsVolume = GetWorld()->SpawnActor<ANavMeshBoundsVolume>(ANavMeshBoundsVolume::StaticClass(), GetActorTransform(), SpawnParameters);
+	// 	NavMeshBoundsVolume->SetActorLabel(FString::Printf(TEXT("%s_NavMesh"), *GetName()));
+	// 	// UBrushComponent* Brush = NavMeshBoundsVolume->GetBrushComponent();
+	// 	// Brush->Brush->Bounds = FBox(FVector(100.f), FVector(200.f));
+	// 	// GetWorld()->GetNavigationSystem()->OnNavigationBoundsUpdated(NavMeshBoundsVolume);
+	//
+	// 	NavMeshBoundsVolume->GetRootComponent()->Bounds = FBox(FVector(100.f), FVector(200.f));
+	// 	NavMeshBoundsVolume->SetActorLocation(FVector{ GetActorLocation().X, 50.f, GetActorLocation().Z });
+	// 	// GetWorld()->GetNavigationSystem()->OnNavAreaRegisteredDelegate(NavMeshBoundsVolume);
+	// }
+	// if(!bShouldBuildNavMesh && NavMeshBoundsVolume)
+	// {
+	// 	NavMeshBoundsVolume->Destroy();
+	// 	NavMeshBoundsVolume = nullptr;
+	// }
+// }
+// #endif
 
 void AAICharacter::Tick(float DeltaSeconds)
 {
@@ -242,8 +243,6 @@ void AAICharacter::InitializeCharacterInfo()
 	WeaponSocketName = EncounterData->WeaponSocketTag.GetTagName();
 
 	LootData = EncounterData->LootData;
-	
-	DefeatedSound = EncounterData->DeathSound;
 	HitReactSequence = EncounterData->HitReactSequence;
 	AttackSequenceInfo = EncounterData->AttackSequenceInfo;
 	
@@ -251,6 +250,7 @@ void AAICharacter::InitializeCharacterInfo()
 	BehaviourType = EncounterData->BehaviourData->BehaviourType;
 	MovementType = EncounterData->BehaviourData->MovementType; 
 	SineMoveHeight = EncounterData->BehaviourData->SineMoveHeight;
+	SineMoveSpeed = EncounterData->BehaviourData->SineMoveSpeed;
 	PatrolRadius = EncounterData->BehaviourData->PatrolRadius;
 	PatrolTickRadius = EncounterData->BehaviourData->PatrolTickRadius;
 	AttackRange = EncounterData->BehaviourData->AttackRange;
@@ -274,6 +274,13 @@ void AAICharacter::InitializeCharacterInfo()
 		if (IsValid(LoadedAsset))
 		{
 			ImpactEffect = LoadedAsset;
+		}
+	}, FStreamableManager::DefaultAsyncLoadPriority);
+	UAssetManager::GetStreamableManager().RequestAsyncLoad(EncounterData->DeathSound.ToSoftObjectPath(), [this] () {
+		USoundBase* LoadedAsset = EncounterData->DeathSound.Get();
+		if (IsValid(LoadedAsset))
+		{
+			DefeatedSoundLoaded = LoadedAsset;
 		}
 	}, FStreamableManager::DefaultAsyncLoadPriority);
 }
@@ -650,6 +657,7 @@ void AAICharacter::FlyAroundTarget_Implementation()
 void AAICharacter::StartTimelineMovement_Implementation()
 {
 	InitialTimelineLocation = GetActorLocation();
+	RandomAmplitudeFromRange();
 }
 
 void AAICharacter::FaceTarget_Implementation()
@@ -839,4 +847,30 @@ bool AAICharacter::IsWithinBounds_Implementation(const FVector& Location)
 		return FVector::Distance(Location, BoundLocations.Left) > Extent.X * 2.f;
 	}
 	return false;
+}
+
+void AAICharacter::InitializeSineMove()
+{
+	InitialTimelineLocation = GetActorLocation();
+	EndTimelineLocation = FVector{ InitialTimelineLocation.X + GetActorForwardVector().X * SineMoveSpeed, 0.f, InitialTimelineLocation.Z };
+}
+
+void AAICharacter::ShouldEndSineMove(UTimelineComponent* Timeline)
+{
+	if (!IsTargetWithinEnteringBounds(GetActorLocation()))
+	{
+		FTimerHandle StopTimer;
+		GetWorld()->GetTimerManager().SetTimer(StopTimer, FTimerDelegate::CreateLambda([this, Timeline] ()
+		{
+			if(Timeline) Timeline->Stop();
+			Destroy();
+		}), .5f, false);
+	}
+	if (DefeatState > EDefeatState::None) if(Timeline) Timeline->Stop();
+}
+
+void AAICharacter::RandomAmplitudeFromRange(const float Min, const float Max)
+{
+	const float Sign = FMath::RandBool() ? 1.f : -1.f;
+	SineAmplitude = FMath::FRandRange(Sign * Min, Sign * Max);
 }

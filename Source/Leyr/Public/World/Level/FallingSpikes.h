@@ -10,13 +10,17 @@
  * 
  */
 UCLASS()
-class LEYR_API AFallingSpikes : public AActor
+class LEYR_API AFallingSpikes : public AActor, public ILevelActorInterface
 {
 	GENERATED_BODY()
 
 public:
 	AFallingSpikes();
 	virtual void Tick(float DeltaSeconds) override;
+	
+	//~ LevelActorInterface
+	virtual void ToggleActivate_Implementation(bool bActivate) override;
+	//~ LevelActorInterface
 	
 protected:
 	virtual void BeginPlay() override;

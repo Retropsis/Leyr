@@ -334,7 +334,7 @@ void APlayerCharacter::InitializeCharacterInfo()
 	
 	const FCharacterDefaultInfo Info = CharacterInfo->GetCharacterDefaultInfo(CharacterTag);
 	ImpactEffect = Info.ImpactEffect;
-	DefeatedSound = Info.DeathSound;
+	DefeatedSoundLoaded = Info.DeathSound;
 	HitReactSequence = Info.HitReactSequence;
 	AttackSequenceInfo = Info.AttackSequenceInfo;
 }

@@ -191,7 +191,11 @@ void UDamageGameplayAbility::SelectMontageTagFromCombatState()
 
 void UDamageGameplayAbility::ExecuteDamageGameplayCue(FGameplayTag GameplayCueTag)
 {
-	if (HitActor->Implements<UCombatInterface>()) GameplayCueDefinition->ImpactEffect = ICombatInterface::Execute_GetImpactEffect(HitActor);
+	if (HitActor->Implements<UCombatInterface>())
+	{
+		GameplayCueDefinition->ImpactEffect = ICombatInterface::Execute_GetImpactEffect(HitActor);
+	}
+	GameplayCueDefinition->ImpactSound = ICombatInterface::Execute_ImpactSoundFromTag(GetAvatarActorFromActorInfo(), MontageTag, SequenceType);
 		
 	FGameplayCueParameters GameplayCueParameters;
 	GameplayCueParameters.Location = HitLocation;

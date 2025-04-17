@@ -67,7 +67,7 @@ public:
 	UNiagaraSystem* GetImpactEffect();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	TSoftObjectPtr<USoundBase> ImpactSoundFromTag(const FGameplayTag& MontageTag, ESequenceType SequenceType);
+	USoundBase* ImpactSoundFromTag(const FGameplayTag& MontageTag, ESequenceType SequenceType);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetImpactSoundLoaded(USoundBase* ImpactSound);

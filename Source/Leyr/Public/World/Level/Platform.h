@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interaction/LevelActorInterface.h"
 #include "Interaction/PlatformInterface.h"
 #include "Platform.generated.h"
 
@@ -29,14 +30,20 @@ enum class EInterpMethod : uint8
 };
 
 UCLASS(Blueprintable, BlueprintType)
-class LEYR_API APlatform : public AActor, public IPlatformInterface
+class LEYR_API APlatform : public AActor, public IPlatformInterface, public ILevelActorInterface
 {
 	GENERATED_BODY()
 	
 public:	
 	APlatform();
 
+	//~ LevelActorInterface
+	virtual void ToggleActivate_Implementation(bool bActivate) override;
+	//~ LevelActorInterface
+
 protected:	
+	virtual void BeginPlay() override;
+	
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {}
 	

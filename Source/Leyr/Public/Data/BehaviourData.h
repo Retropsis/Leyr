@@ -34,6 +34,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, meta=(EditCondition="bEditValues", EditConditionHides))
 	float SineMoveHeight = 0.f;
 	
+	UPROPERTY(EditDefaultsOnly, meta=(EditCondition="bEditValues", EditConditionHides))
+	float SineMoveSpeed = 0.f;
+	
 	UPROPERTY(EditDefaultsOnly, meta=(EditCondition="bEditValues", EditConditionHides)) // How far to patrol from start location
 	float PatrolRadius = 750.f;
 	

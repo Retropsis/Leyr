@@ -59,6 +59,12 @@ void AFallingSpikes::BeginPlay()
 		DownPosition = RouteSpline->GetLocationAtSplinePoint(1, ESplineCoordinateSpace::World);
 		if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(UpPositionTimer, this, &AFallingSpikes::HandleUpPositionTimeEnd, UpPositionTime);
 	}
+	SetActorTickEnabled(false);
+}
+
+void AFallingSpikes::ToggleActivate_Implementation(bool bActivate)
+{
+	SetActorTickEnabled(bActivate);
 }
 
 void AFallingSpikes::MoveTo(const FVector& InCurrentTarget, float Speed, float InterpolationSpeed, float DeltaSeconds) const
