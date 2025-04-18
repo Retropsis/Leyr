@@ -69,9 +69,47 @@ TArray<USceneComponent*> APointCollection::GetGroundPoints(int32 NumPoints, floa
 	return ArrayCopy;
 }
 
+TArray<FVector> APointCollection::GetGroundLocations(int32 NumPoints)
+{
+	if (NumPoints > Points.Num())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Attempted to access Points out of bounds. It was set to Points.Num instead"));
+		NumPoints = Points.Num();
+	}
+ 
+	TArray<FVector> ArrayCopy;
+ 
+	for (const TObjectPtr<USceneComponent>& Point : Points)
+	{ 
+		FVector ToPoint = Point->GetComponentLocation() - GetActorLocation();
+		Point->SetWorldLocation(GetActorLocation() + ToPoint);
+ 
+		const FVector RaisedLocation = FVector(Point->GetComponentLocation().X, Point->GetComponentLocation().Y, Point->GetComponentLocation().Z + RaisedLocationZ);
+		const FVector LoweredLocation = FVector(Point->GetComponentLocation().X, Point->GetComponentLocation().Y, Point->GetComponentLocation().Z - LoweredLocationZ);
+ 
+		FHitResult HitResult;
+		TArray<AActor*> IgnoreActors;
+		ULeyrAbilitySystemLibrary::GetLivePlayersWithinRadius(this, IgnoreActors, TArray<AActor*>(), LiveActorRadius, GetActorLocation());
+ 
+		FCollisionQueryParams QueryParams;
+		QueryParams.AddIgnoredActors(IgnoreActors);
+		UKismetSystemLibrary::LineTraceSingle(this, RaisedLocation, LoweredLocation, TraceTypeQuery1, false, IgnoreActors, EDrawDebugTrace::ForDuration, HitResult, true);
+
+		if (HitResult.bBlockingHit)
+		{
+			const FVector AdjustedLocation = FVector(Point->GetComponentLocation().X, Point->GetComponentLocation().Y, HitResult.ImpactPoint.Z);
+			Point->SetWorldLocation(AdjustedLocation);
+			Point->SetWorldRotation(UKismetMathLibrary::MakeRotFromZ(HitResult.ImpactNormal));
+ 
+			ArrayCopy.Add(Point->GetComponentLocation());
+			if (ArrayCopy.Num() == NumPoints) break;
+		}
+	}
+	return ArrayCopy;
+}
+
 void APointCollection::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 

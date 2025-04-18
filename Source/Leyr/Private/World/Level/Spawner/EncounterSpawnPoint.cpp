@@ -1,6 +1,7 @@
 // @ Retropsis 2024-2025.
 
 #include "World/Level/Spawner/EncounterSpawnPoint.h"
+#include "AbilitySystem/Actor/PointCollection.h"
 #include "AI/AICharacter.h"
 #include "Data/EncounterData.h"
 #include "Engine/AssetManager.h"
@@ -19,34 +20,50 @@ void AEncounterSpawnPoint::SpawnEncounter()
 			const TSubclassOf<AAICharacter> LoadedAsset = EncounterData->EncounterClass.Get();
 			if (IsValid(LoadedAsset))
 			{
-				FTransform SpawnTransform = GetActorTransform();
-				if (SpawnLocationType == ESpawnLocationType::Random)
+				TArray<FVector> SpawnLocations;
+				if (PointCollectionClass && SpawnLocationType == ESpawnLocationType::PointCollection)
 				{
-					const float RandomX = FMath::FRandRange(SpawningBounds.Left.X, SpawningBounds.Right.X);
-					const FVector RandomLocation = FVector{ RandomX, 0.f, SpawningBounds.Left.Z };
-					SpawnTransform.SetLocation(RandomLocation);
-				}
-				if (SpawnLocationType == ESpawnLocationType::RandomCloseToPlayer)
-				{
-					SpawnTransform.SetLocation(FindRandomPointWithinBounds(PreferredLocation));
-				}
-				if (SpawnLocationType == ESpawnLocationType::AroundPoint)
-				{
-					SpawnTransform.SetLocation(FindRandomPointWithinBounds(GetActorLocation()));
+					FActorSpawnParameters SpawnParams;
+					SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+					APointCollection* PointCollection = GetWorld()->SpawnActor<APointCollection>(PointCollectionClass, GetActorTransform(), SpawnParams);
+					SpawnLocations = PointCollection->GetGroundLocations(Count);
 				}
 				
-				AAICharacter* Encounter = GetWorld()->SpawnActorDeferred<AAICharacter>(LoadedAsset, SpawnTransform, this, nullptr,
-					ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
-				Encounter->SetEncounterLevel(EncounterLevel);
-				Encounter->SetEncounterData(EncounterData);
-				IAIInterface::Execute_SetSpawningBounds(Encounter, SpawningBounds);
-				Encounter->FinishSpawning(SpawnTransform);
-				Encounter->SpawnDefaultController();
-				CurrentSpawn = Encounter;
-
-				if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Encounter); CombatInterface && SpawnerType == ESpawnerType::Infinite)
+				for (int i = 0; i < Count; ++i)
 				{
-					CombatInterface->GetOnDeath().AddDynamic(this, &AEncounterSpawnPoint::Respawn);
+					SpawnTransform = GetActorTransform();
+					switch (SpawnLocationType) {
+					case ESpawnLocationType::Point:
+						break;
+					case ESpawnLocationType::AroundPoint:
+						SpawnTransform.SetLocation(FindRandomPointWithinBounds(GetActorLocation()));
+						break;
+					case ESpawnLocationType::PointCollection:
+						SpawnTransform.SetLocation(SpawnLocations[i] + FVector{ 0.f, 0.f, 75.f });
+						break;
+					case ESpawnLocationType::Random:
+						SpawnTransform.SetLocation(FVector{ FMath::FRandRange(SpawningBounds.Left.X, SpawningBounds.Right.X), 0.f, SpawningBounds.Left.Z });
+						break;
+					case ESpawnLocationType::RandomCloseToPlayer:
+						SpawnTransform.SetLocation(FindRandomPointWithinBounds(PreferredLocation));
+						break;
+					}
+
+					// Spawn An Encounter
+					AAICharacter* Encounter = GetWorld()->SpawnActorDeferred<AAICharacter>(LoadedAsset, SpawnTransform, this, nullptr,
+						ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
+					Encounter->SetEncounterLevel(EncounterLevel);
+					Encounter->SetEncounterData(EncounterData);
+					IAIInterface::Execute_SetSpawningBounds(Encounter, SpawningBounds);
+					Encounter->FinishSpawning(SpawnTransform);
+					Encounter->SpawnDefaultController();
+					CurrentSpawns.Add(Encounter);
+
+					if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Encounter); CombatInterface && SpawnerType == ESpawnerType::Infinite)
+					{
+						CurrentCount++;
+						CombatInterface->GetOnDeath().AddDynamic(this, &AEncounterSpawnPoint::Respawn);
+					}
 				}
 			}
 		}, FStreamableManager::AsyncLoadHighPriority);
@@ -55,16 +72,27 @@ void AEncounterSpawnPoint::SpawnEncounter()
 
 void AEncounterSpawnPoint::Respawn(AActor* DefeatedEncounter)
 {
-	GetWorldTimerManager().SetTimer(RespawnTimer, [this] (){ SpawnEncounter(); }, RespawnTime, false);
+	CurrentCount--;
+	if(CurrentCount <= 0)
+	{
+		GetWorldTimerManager().SetTimer(RespawnTimer, [this] (){ SpawnEncounter(); }, RespawnTime, false);
+		SpawnTransform.SetLocation(FindRandomPointWithinBounds(GetActorLocation()));
+	}
 }
 
 void AEncounterSpawnPoint::DespawnEncounter()
 {
-	if (IsValid(CurrentSpawn))
+	if (CurrentSpawns.Num() > 0)
 	{
-		CurrentSpawn->Destroy();
+		for (TObjectPtr<AActor> CurrentSpawn : CurrentSpawns)
+		{
+			if (IsValid(CurrentSpawn))
+			{
+				CurrentSpawn->Destroy();
+				CurrentSpawn = nullptr;
+			}
+		}
 	}
-	CurrentSpawn = nullptr;
 	GetWorldTimerManager().ClearTimer(RespawnTimer);
 	RespawnTimer.Invalidate();
 }

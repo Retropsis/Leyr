@@ -8,6 +8,7 @@
 #include "Leyr/Leyr.h"
 #include "EncounterSpawnPoint.generated.h"
 
+class APointCollection;
 class UBehaviourData;
 class UEncounterData;
 class AAICharacter;
@@ -43,17 +44,22 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="Spawner")
 	int32 EncounterLevel = 1;
+	
+	UPROPERTY()
+	TSubclassOf<APointCollection> PointCollectionClass;
 
 	UPROPERTY() ESpawnLocationType SpawnLocationType = ESpawnLocationType::Point;
 	UPROPERTY() ESpawnerType SpawnerType = ESpawnerType::Once;
 	UPROPERTY() FBoundLocations SpawningBounds;
+	UPROPERTY() int32 Count = 1;
 	UPROPERTY() FVector LeftBound = FVector::ZeroVector;
 	UPROPERTY() FVector RightBound = FVector::ZeroVector;
 	UPROPERTY() FVector PreferredLocation = FVector::ZeroVector;
+	UPROPERTY() FTransform SpawnTransform = FTransform::Identity;
 	UPROPERTY(EditDefaultsOnly) float PreferredSpawningRange = 750.f;
 
 private:
-	UPROPERTY()
-	TObjectPtr<AActor> CurrentSpawn = nullptr;
+	UPROPERTY() TArray<TObjectPtr<AActor>> CurrentSpawns;
 	FTimerHandle RespawnTimer;
+	int32 CurrentCount = 0;
 };

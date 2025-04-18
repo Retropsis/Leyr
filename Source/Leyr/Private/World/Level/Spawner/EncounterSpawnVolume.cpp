@@ -61,24 +61,23 @@ void AEncounterSpawnVolume::InitializeSpawnPoints()
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		
-		FVector Offset = FVector::ZeroVector;
+		FVector Offset = FVector{ 100.f, 0.f, 0.f};
 		for (FEncounterSpawn Spawn : EncounterSpawnData->EncounterSpawns)
 		{
-			for (int i = 0; i < Spawn.Count; ++i)
-			{
-				AEncounterSpawnPoint* SpawnPoint = GetWorld()->SpawnActor<AEncounterSpawnPoint>(AEncounterSpawnPoint::StaticClass(), GetActorLocation() + Offset, FRotator::ZeroRotator, SpawnParams);
-				if(Spawn.OverrideBehaviourData) Spawn.EncounterData->BehaviourData = Spawn.OverrideBehaviourData;
+			AEncounterSpawnPoint* SpawnPoint = GetWorld()->SpawnActor<AEncounterSpawnPoint>(AEncounterSpawnPoint::StaticClass(), GetActorLocation() + Offset, FRotator::ZeroRotator, SpawnParams);
+			if(Spawn.OverrideBehaviourData) Spawn.EncounterData->BehaviourData = Spawn.OverrideBehaviourData;
 				
-				SpawnPoint->EncounterClass = Spawn.EncounterClass;
-				SpawnPoint->EncounterLevel = Spawn.Level;
-				SpawnPoint->EncounterData = Spawn.EncounterData;
-				SpawnPoint->RespawnTime = Spawn.RespawnTime;
-				SpawnPoint->SpawnerType = Spawn.SpawnerType;
-				SpawnPoint->SpawnLocationType = Spawn.SpawnLocationType;
-				SpawnPoint->PreferredSpawningRange = Spawn.PreferredSpawningRange;
-				SpawnPoints.Add(SpawnPoint);
-				Offset.X += 50.f;
-			}
+			SpawnPoint->EncounterClass = Spawn.EncounterClass;
+			SpawnPoint->EncounterLevel = Spawn.Level;
+			SpawnPoint->EncounterData = Spawn.EncounterData;
+			SpawnPoint->RespawnTime = Spawn.RespawnTime;
+			SpawnPoint->SpawnerType = Spawn.SpawnerType;
+			SpawnPoint->SpawnLocationType = Spawn.SpawnLocationType;
+			SpawnPoint->PreferredSpawningRange = Spawn.PreferredSpawningRange;
+			SpawnPoint->PointCollectionClass = Spawn.PointCollectionClass;
+			SpawnPoint->Count = Spawn.Count;
+			SpawnPoints.Add(SpawnPoint);
+			Offset.X += 50.f;
 		}
 	}
 }

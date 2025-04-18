@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "EncounterSpawnData.generated.h"
 
+class APointCollection;
 class AAICharacter;
 class UBehaviourData;
 class UEncounterData;
@@ -23,6 +24,7 @@ enum class ESpawnLocationType : uint8
 {
 	Point,
 	AroundPoint,
+	PointCollection,
 	Random,
 	RandomCloseToPlayer,
 };
@@ -43,6 +45,9 @@ struct FEncounterSpawn
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UBehaviourData> OverrideBehaviourData = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<APointCollection> PointCollectionClass;
 
 	UPROPERTY(EditDefaultsOnly)
 	float RespawnTime = 8.f;
