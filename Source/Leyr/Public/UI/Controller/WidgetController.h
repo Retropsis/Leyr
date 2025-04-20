@@ -17,6 +17,7 @@ class UAttributeSet;
 class UAbilitySystemComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChangedSignature, int32, NewValue);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAttributeInfoSignature, const FBaseAttributeInfo&, Info);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttributeChangedSignature, float, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnXPValueChanged, int32, NewValue);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnLevelChangedSignature, int32, NewValue, bool, bLevelUp);
@@ -67,6 +68,36 @@ public:
 	
 	UPROPERTY(BlueprintAssignable, Category="GAS|Abilities")
 	FAbilityInfoSignature AbilityInfoDelegate;
+	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
+	FAttributeInfoSignature AttributeInfoDelegate;
+
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
+	FOnAttributeChangedSignature OnHealthChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
+	FOnAttributeChangedSignature OnMaxHealthChanged;
+
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
+	FOnAttributeChangedSignature OnManaChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
+	FOnAttributeChangedSignature OnMaxManaChanged;
+	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Meta")
+	FOnAttributeChangedSignature OnXPPercentChangedDelegate;
+	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Meta")
+	FOnXPValueChanged OnXPValueChanged;
+
+	UPROPERTY(BlueprintAssignable, Category="GAS|Meta")
+	FOnPlayerStatChangedSignature OnPlayerLevelChanged;
+
+	UPROPERTY(BlueprintAssignable, Category="GAS|Meta")
+	FOnPlayerStatChangedSignature OnXPToNextLevelChanged;
+
+	UPROPERTY(BlueprintAssignable, Category="GAS|Meta")
+	FOnLevelChangedSignature OnPlayerLevelChangedDelegate;
 	
 protected:
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")

@@ -1,6 +1,8 @@
 // @ Retropsis 2024-2025.
 
 #include "World/Map/CameraBoundary.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
 #include "Components/BoxComponent.h"
 #include "Interaction/PlayerInterface.h"
 #include "PaperTileMapComponent.h"
@@ -120,6 +122,7 @@ void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 		HandleOnBeginOverlap(OtherActor);
 		OnPlayerEntering.Broadcast();
 		ToggleLevelActorActivity(true);
+		GiveToAbilitySystem(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor), &LevelArea_GrantedHandles);
 	}
 }
 
@@ -130,6 +133,7 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 		OnPlayerLeaving.Broadcast();
 		DestroyOutOfBoundsEncounters();
 		ToggleLevelActorActivity(false);
+		LevelArea_GrantedHandles.TakeFromAbilitySystem(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor));
 	}
 }
 
@@ -163,14 +167,6 @@ void ACameraBoundary::ToggleLevelActorActivity(bool bActivate) const
 	ObjectTypes.Add(EOT_OneWayPlatform);
 	TArray<AActor*> ActorsToIgnore;
 	TArray<AActor*> OutActors;
-	// UKismetSystemLibrary::BoxOverlapActors(this, GetActorLocation(), EnteringBoundary->GetScaledBoxExtent(), ObjectTypes, AActor::StaticClass(), ActorsToIgnore, OutActors);
-	// for (AActor* OverlapActor : OutActors)
-	// {
-	// 	if (IsValid(OverlapActor) && OverlapActor->Implements<ULevelActorInterface>())
-	// 	{
-	// 		ILevelActorInterface::Execute_ToggleActivate(OverlapActor, bActivate);
-	// 	}
-	// }
 	FCollisionQueryParams BoxParams;
 	BoxParams.AddIgnoredActors(ActorsToIgnore);
 	TArray<FOverlapResult> Overlaps;
@@ -184,3 +180,63 @@ void ACameraBoundary::ToggleLevelActorActivity(bool bActivate) const
 	}
 }
 
+void ACameraBoundary::GiveToAbilitySystem(UAbilitySystemComponent* ASC, FLevelArea_GrantedHandles* OutGrantedHandles, float Level, UObject* SourceObject) const
+{
+	check(ASC);
+
+	if (!ASC->IsOwnerActorAuthoritative())
+	{
+		// Must be authoritative to give or take ability sets.
+		return;
+	}
+
+	// Grant the gameplay effects.
+	for (int32 EffectIndex = 0; EffectIndex < GrantedGameplayEffects.Num(); ++EffectIndex)
+	{
+		const FLevelArea_GameplayEffect& EffectToGrant = GrantedGameplayEffects[EffectIndex];
+
+		if (!IsValid(EffectToGrant.GameplayEffect))
+		{
+			UE_LOG(LogTemp, Error, TEXT("GrantedGameplayEffects[%d] on ability set [%s] is not valid"), EffectIndex, *GetNameSafe(this));
+			continue;
+		}
+
+		const UGameplayEffect* GameplayEffect = EffectToGrant.GameplayEffect->GetDefaultObject<UGameplayEffect>();
+		FGameplayEffectContextHandle ContextHandle =ASC->MakeEffectContext();
+		ContextHandle.AddSourceObject(ASC->GetAvatarActor());
+		const FActiveGameplayEffectHandle GameplayEffectHandle = ASC->ApplyGameplayEffectToSelf(GameplayEffect, Level, ContextHandle);
+
+		if (OutGrantedHandles)
+		{
+			OutGrantedHandles->AddGameplayEffectHandle(GameplayEffectHandle);
+		}
+	}
+}
+
+void FLevelArea_GrantedHandles::AddGameplayEffectHandle(const FActiveGameplayEffectHandle& Handle)
+{
+	if (Handle.IsValid())
+	{
+		GameplayEffectHandles.Add(Handle);
+	}
+}
+
+void FLevelArea_GrantedHandles::TakeFromAbilitySystem(UAbilitySystemComponent* ASC)
+{
+	check(ASC);
+
+	if (!ASC->IsOwnerActorAuthoritative())
+	{
+		// Must be authoritative to give or take ability sets.
+		return;
+	}
+
+	for (const FActiveGameplayEffectHandle& Handle : GameplayEffectHandles)
+	{
+		if (Handle.IsValid())
+		{
+			ASC->RemoveActiveGameplayEffect(Handle);
+		}
+	}
+	GameplayEffectHandles.Reset();
+}

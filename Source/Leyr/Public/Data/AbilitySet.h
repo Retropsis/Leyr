@@ -114,6 +114,7 @@ protected:
 	UPROPERTY()
 	TArray<FActiveGameplayEffectHandle> GameplayEffectHandles;
 };
+
 /**
  * 
  */

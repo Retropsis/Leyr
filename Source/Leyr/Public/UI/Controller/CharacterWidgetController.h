@@ -3,35 +3,28 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "OverlayWidgetController.h"
 #include "UI/Controller/WidgetController.h"
-#include "AttributeMenuWidgetController.generated.h"
+#include "CharacterWidgetController.generated.h"
 
 struct FGameplayTag;
 class UAttributeInfo;
-
 /**
  * 
  */
 UCLASS(BlueprintType, Blueprintable)
-class LEYR_API UAttributeMenuWidgetController : public UWidgetController
+class LEYR_API UCharacterWidgetController : public UWidgetController
 {
 	GENERATED_BODY()
 	
 public:
-	virtual void BindCallbacksToDependencies() override;
 	virtual void BroadcastInitialValues() override;
+	virtual void BindCallbacksToDependencies() override;
 	
-	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
-	FOnPlayerStatChangedSignature AttributePointsChangedDelegate;
-	
-	UFUNCTION(BlueprintCallable)
-	void UpgradeAttribute(const FGameplayTag& AttributeTag);
-
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UAttributeInfo> AttributeInfo;
 
 private:
+	UFUNCTION() void OnXPChanged(int32 NewXP);
 	void BroadcastAttributeInfo(const FGameplayTag& AttributeTag) const;
 };

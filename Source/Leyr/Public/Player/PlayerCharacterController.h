@@ -4,19 +4,20 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "InputActionValue.h"
 #include "Interaction/ControllerInterface.h"
+#include "InputActionValue.h"
 #include "UI/Data/UIData.h"
+#include "CommonUserWidget.h"
 #include "PlayerCharacterController.generated.h"
 
-class UBaseUserWidget;
-class UEquipmentWidgetController;
 struct FWidgetControllerParams;
+struct FGameplayTag;
+class UBaseUserWidget;
 class UInventoryWidgetController;
+class UCharacterWidgetController;
 class UWidget;
 class UDamageTextComponent;
 class UBaseAbilitySystemComponent;
-struct FGameplayTag;
 class APlayerCharacter;
 class UInputAction;
 class UInputConfig;
@@ -33,6 +34,7 @@ class LEYR_API APlayerCharacterController : public APlayerController, public ICo
 public:
 	virtual void PlayerTick(float DeltaTime) override;
 	
+	UCharacterWidgetController* GetCharacterWidgetController(const FWidgetControllerParams& WCParams);
 	UInventoryWidgetController* GetInventoryWidgetController(const FWidgetControllerParams& WCParams);
 	UInventoryWidgetController* GetInventoryWidgetController() { return InventoryWidgetController; }
 	APlayerCharacter* GetPlayerCharacter();
@@ -105,6 +107,7 @@ protected:
 	void InteractButtonPressed(const FInputActionValue& Value);
 	void Jump();
 	void StopJumping();
+	void InitializeRootLayout();
 
 	/*
 	 * Inventory
@@ -124,6 +127,18 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UInventoryWidgetController> InventoryWidgetControllerClass;
+	
+	UPROPERTY()
+	TObjectPtr<UCharacterWidgetController> CharacterWidgetController;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UCharacterWidgetController> CharacterWidgetControllerClass;
+	
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UCommonUserWidget> RootLayout;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<UCommonUserWidget> RootLayoutClass;
 	
 	/*
 	 * Hotbar

@@ -54,7 +54,7 @@ TArray<USceneComponent*> APointCollection::GetGroundPoints(int32 NumPoints, floa
  
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActors(IgnoreActors);
-		UKismetSystemLibrary::LineTraceSingle(this, RaisedLocation, LoweredLocation, TraceTypeQuery1, false, IgnoreActors, EDrawDebugTrace::ForDuration, HitResult, true);
+		UKismetSystemLibrary::LineTraceSingle(this, RaisedLocation, LoweredLocation, TraceTypeQuery1, false, IgnoreActors, EDrawDebugTrace::None, HitResult, true);
 
 		if (HitResult.bBlockingHit)
 		{
@@ -93,7 +93,7 @@ TArray<FVector> APointCollection::GetGroundLocations(int32 NumPoints)
  
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActors(IgnoreActors);
-		UKismetSystemLibrary::LineTraceSingle(this, RaisedLocation, LoweredLocation, TraceTypeQuery1, false, IgnoreActors, EDrawDebugTrace::ForDuration, HitResult, true);
+		UKismetSystemLibrary::LineTraceSingle(this, RaisedLocation, LoweredLocation, TraceTypeQuery1, false, IgnoreActors, EDrawDebugTrace::None, HitResult, true);
 
 		if (HitResult.bBlockingHit)
 		{

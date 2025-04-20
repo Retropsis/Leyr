@@ -7,7 +7,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "LeyrAbilitySystemLibrary.generated.h"
 
-struct FStatusEffectParams;
+class UCharacterWidgetController;
 class ULootDataSet;
 class UGameplayAbility;
 class ULoadMenuSaveGame;
@@ -15,14 +15,15 @@ class UInventoryCostData;
 class UEquipmentWidgetController;
 class UInventoryComponent;
 class UContainerComponent;
-enum class EContainerType : uint8;
 class UItemAbilityInfo;
-struct FInventoryItemData;
 class UInventoryWidgetController;
+enum class EContainerType : uint8;
 enum class EActorClass : uint8;
 enum class ECharacterClass : uint8;
 enum class EEncounterName : uint8;
+struct FInventoryItemData;
 struct FAdditionalEffectParams;
+struct FStatusEffectParams;
 struct FGameplayEffectContextHandle;
 struct FWidgetControllerParams;
 class UAbilitySystemComponent;
@@ -59,6 +60,9 @@ public:
 	
 	UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary", meta=(WorldContext="WorldContextObject"))
 	static  UInventoryWidgetController* GetInventoryWidgetController(const UObject* WorldContextObject);
+	
+	UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary", meta=(WorldContext="WorldContextObject"))
+	static  UCharacterWidgetController* GetCharacterWidgetController(const UObject* WorldContextObject);
 	
 	UFUNCTION(BlueprintPure, Category="LeyrAbilitySystemLibrary", meta=(WorldContext="WorldContextObject"))
 	static  bool MakeWidgetControllerParams(const UObject* WorldContextObject, FWidgetControllerParams& OutWCParams, APlayerHUD*& OutPlayerHUD);

@@ -93,9 +93,6 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnEquipmentSlotQuantityUpdatedSignature OnEquipmentSlotQuantityUpdated;
-
-	UPROPERTY(BlueprintAssignable)
-	FOnPlayerStatChangedSignature OnPlayerLevelChanged;
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature OnXPPercentChanged;
@@ -112,7 +109,7 @@ public:
 private:
 	void UpdateEquipmentEffect();
 	void UpdateAmmunitionCounter(FGameplayTag Slot, FEquippedItem EquippedItem) const;
-	void OnXPChanged(int32 NewXP);
+	UFUNCTION() void OnXPChanged(int32 NewXP);
 	void AsyncUpdateAbilities(FEquippedItem& ItemToEquip, FGameplayTag InputTag);
 	TMap<FGameplayTag, FEquippedItem> GetActionSlots();
 	TMap<FGameplayTag, FEquippedItem> GetEquipmentSlots();

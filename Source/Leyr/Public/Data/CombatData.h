@@ -89,7 +89,7 @@ enum class ECombatState : uint8
 	Entangled UMETA(DisplayName="Entangled"),
 	Swimming UMETA(DisplayName="Swimming"),
 	Walking UMETA(DisplayName="Walking"),
-	WalkingPeaceful UMETA(DisplayName="WalkingPeaceful"),
+	Peaceful UMETA(DisplayName="Peaceful"),
 	Aiming UMETA(DisplayName="Aiming"),
 	Casting UMETA(DisplayName="Casting"),
 	Shielding UMETA(DisplayName="Shielding"),

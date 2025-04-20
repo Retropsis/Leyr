@@ -10,6 +10,7 @@
 #include "Game/BaseGameplayTags.h"
 #include "Interaction/BaseUserWidgetInterface.h"
 #include "Player/Input/BaseInputComponent.h"
+#include "UI/Controller/CharacterWidgetController.h"
 #include "UI/Controller/InventoryWidgetController.h"
 #include "UI/Widget/BaseUserWidget.h"
 #include "UI/Widget/DamageTextComponent.h"
@@ -19,6 +20,7 @@ void APlayerCharacterController::BeginPlay()
 	Super::BeginPlay();
 	bReplicates = true;
 	PlayerCharacter = Cast<APlayerCharacter>(GetCharacter());
+	InitializeRootLayout();
 }
 
 void APlayerCharacterController::SetupInputComponent()
@@ -130,6 +132,17 @@ void APlayerCharacterController::StopJumping()
 	if (PlayerCharacter) PlayerCharacter->StopJumping();
 }
 
+/*
+ * HUD / UI
+ */
+void APlayerCharacterController::InitializeRootLayout()
+{
+	if (HasAuthority() && !IsLocalController()) return;
+
+	RootLayout = CreateWidget<UCommonUserWidget>(this, RootLayoutClass);
+	RootLayout->AddToViewport();
+}
+
 void APlayerCharacterController::InventoryButtonPressed_Implementation()
 {
 	ToggleInventory();
@@ -153,6 +166,18 @@ void APlayerCharacterController::ToggleInputMode(UWidget* InWidgetToFocus)
 		SetShowMouseCursor(true);
 		bIsInventoryOpen = true;
 	}
+}
+
+UCharacterWidgetController* APlayerCharacterController::GetCharacterWidgetController(const FWidgetControllerParams& WCParams)
+{
+	if (CharacterWidgetController == nullptr)
+	{
+		CharacterWidgetController = NewObject<UCharacterWidgetController>(this, CharacterWidgetControllerClass);
+		CharacterWidgetController->SetWidgetControllerParams(WCParams);
+		PlayerCharacter = Cast<APlayerCharacter>(GetCharacter());
+		CharacterWidgetController->BindCallbacksToDependencies();
+	}
+	return CharacterWidgetController;
 }
 
 UInventoryWidgetController* APlayerCharacterController::GetInventoryWidgetController(const FWidgetControllerParams& WCParams)

@@ -326,6 +326,7 @@ void APlayerCharacter::InitAbilityActorInfo()
 	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::HitReactTagChanged);
  	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().StatusEffect_Stun, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::StunTagChanged);
 	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().StatusEffect_Burn, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::BurnTagChanged);
+	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Peaceful, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::PeacefulTagChanged);
 }
 
 void APlayerCharacter::InitializeCharacterInfo()
@@ -376,6 +377,20 @@ void APlayerCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 
 	}
 }
 
+void APlayerCharacter::PeacefulTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	if (NewCount > 0)
+	{
+		HandleCombatState(ECombatState::Peaceful, FCombatStateParams());
+	}
+	else
+	{
+		FCombatStateParams Params;
+		Params.bResetMovementMode = false;
+		HandleCombatState(ECombatState::Unoccupied, Params);
+	}
+}
+
 /*
  * Movement
  */
@@ -402,7 +417,7 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 		}
 		break;
 	case ECombatState::Walking:
-	case ECombatState::WalkingPeaceful:
+	case ECombatState::Peaceful:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));
 		break;
 	case ECombatState::Aiming:
@@ -659,7 +674,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState, const FCombatSta
 		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Condition_Walking);
 		break;
-	case ECombatState::WalkingPeaceful:
+	case ECombatState::Peaceful:
 		GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
 		MakeAndApplyEffectToSelf(GameplayTags.CombatState_Peaceful);
 		break;
@@ -1239,7 +1254,7 @@ bool APlayerCharacter::TryVaultingDown()
 
 void APlayerCharacter::TraceForSlope()
 {
-	if(CombatState == ECombatState::OnElevator || CombatState == ECombatState::WalkingPeaceful || CombatState == ECombatState::Attacking) return;
+	if(CombatState == ECombatState::OnElevator || CombatState == ECombatState::Peaceful || CombatState == ECombatState::Attacking) return;
 	
 	if(!GetCharacterMovement()->IsFalling() && CombatState == ECombatState::OnGroundSlope) HandleCombatState(ECombatState::Unoccupied);
 	

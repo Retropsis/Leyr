@@ -33,7 +33,7 @@ protected:
 	TObjectPtr<UBoxComponent> OverlapZone;
 
 	UPROPERTY(EditAnywhere)
-	ECombatState RequiredState = ECombatState::WalkingPeaceful;
+	ECombatState RequiredState = ECombatState::Peaceful;
 	
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(EditAnywhere)

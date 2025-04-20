@@ -19,4 +19,7 @@ public:
 	
 	UFUNCTION(Exec)
 	void Invincibility(bool bEnable) const;
+	
+	UFUNCTION(Exec)
+	void Teleport(FName Tag) const;
 };

@@ -42,30 +42,9 @@ class LEYR_API UOverlayWidgetController : public UWidgetController
 public:
 	virtual void BroadcastInitialValues() override;
 	virtual void BindCallbacksToDependencies() override;
-
-	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
-	FOnAttributeChangedSignature OnHealthChanged;
-	
-	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
-	FOnAttributeChangedSignature OnMaxHealthChanged;
-
-	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
-	FOnAttributeChangedSignature OnManaChanged;
-	
-	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
-	FOnAttributeChangedSignature OnMaxManaChanged;
 	
 	UPROPERTY(BlueprintAssignable, Category="GAS|Messages")
 	FMessageWidgetRowSignature MessageWidgetRowDelegate;
-	
-	UPROPERTY(BlueprintAssignable, Category="GAS|Meta")
-	FOnAttributeChangedSignature OnXPPercentChangedDelegate;
-	
-	UPROPERTY(BlueprintAssignable, Category="GAS|Meta")
-	FOnXPValueChanged OnXPValueChanged;
-
-	UPROPERTY(BlueprintAssignable, Category="GAS|Meta")
-	FOnLevelChangedSignature OnPlayerLevelChangedDelegate;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
