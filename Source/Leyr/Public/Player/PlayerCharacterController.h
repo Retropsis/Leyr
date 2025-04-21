@@ -135,7 +135,7 @@ protected:
 	TSubclassOf<UCharacterWidgetController> CharacterWidgetControllerClass;
 	
 	UPROPERTY(BlueprintReadOnly)
-	TObjectPtr<UCommonUserWidget> RootLayout;
+	TObjectPtr<UCommonUserWidget> MainLayout;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<UCommonUserWidget> RootLayoutClass;

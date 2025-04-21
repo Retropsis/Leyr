@@ -20,7 +20,7 @@ void APlayerCharacterController::BeginPlay()
 	Super::BeginPlay();
 	bReplicates = true;
 	PlayerCharacter = Cast<APlayerCharacter>(GetCharacter());
-	InitializeRootLayout();
+	// InitializeRootLayout();
 }
 
 void APlayerCharacterController::SetupInputComponent()
@@ -139,8 +139,8 @@ void APlayerCharacterController::InitializeRootLayout()
 {
 	if (HasAuthority() && !IsLocalController()) return;
 
-	RootLayout = CreateWidget<UCommonUserWidget>(this, RootLayoutClass);
-	RootLayout->AddToViewport();
+	MainLayout = CreateWidget<UCommonUserWidget>(this, RootLayoutClass);
+	MainLayout->AddToViewport();
 }
 
 void APlayerCharacterController::InventoryButtonPressed_Implementation()
