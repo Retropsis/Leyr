@@ -24,7 +24,7 @@ class LEYR_API IControllerInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void CloseInventory();
 	
 	UFUNCTION(BlueprintNativeEvent)

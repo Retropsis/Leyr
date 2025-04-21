@@ -6,12 +6,12 @@
 #include "GameFramework/HUD.h"
 #include "PlayerHUD.generated.h"
 
+struct FWidgetControllerParams;
 class UCommonActivatableWidget;
 class USkillMenuWidgetController;
 class UAttributeMenuWidgetController;
 class UAttributeSet;
 class UAbilitySystemComponent;
-struct FWidgetControllerParams;
 class UOverlayWidgetController;
 class UBaseUserWidget;
 
@@ -24,8 +24,13 @@ class LEYR_API APlayerHUD : public AHUD
 	GENERATED_BODY()
 
 public:
+	UFUNCTION(BlueprintCallable)
 	UOverlayWidgetController* GetOverlayWidgetController(const FWidgetControllerParams& WCParams);
+	
+	UFUNCTION(BlueprintCallable)
 	UAttributeMenuWidgetController* GetAttributeMenuWidgetController(const FWidgetControllerParams& WCParams);
+	
+	UFUNCTION(BlueprintCallable)
 	USkillMenuWidgetController* GetSkillMenuWidgetController(const FWidgetControllerParams& WCParams);
 	
 	void InitOverlay(APlayerController* PC, APlayerState* PS, UAbilitySystemComponent* ASC, UAttributeSet* AS);

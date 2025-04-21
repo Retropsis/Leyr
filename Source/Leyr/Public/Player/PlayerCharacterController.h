@@ -117,8 +117,9 @@ protected:
 	UFUNCTION(BlueprintCallable) virtual void ToggleContainer_Implementation(int32 SlotCount) override {}
 	
 	UFUNCTION(Client, Reliable) void InventoryButtonPressed();
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable) void ToggleInventory();
-	UFUNCTION(BlueprintCallable) void ToggleInputMode(UWidget* InWidgetToFocus);
+	UFUNCTION(Client, Reliable) void ToggleInventory(bool bOpen);
+	virtual void CloseInventory_Implementation() override;
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="ToggleInventory")) void K2_ToggleInventory(bool bOpen);
 	UPROPERTY(BlueprintReadWrite) bool bIsInventoryOpen = false;
 	UPROPERTY(BlueprintReadWrite) bool bIsContainerOpen = false;
 	

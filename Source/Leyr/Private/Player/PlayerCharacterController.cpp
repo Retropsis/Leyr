@@ -145,27 +145,33 @@ void APlayerCharacterController::InitializeRootLayout()
 
 void APlayerCharacterController::InventoryButtonPressed_Implementation()
 {
-	ToggleInventory();
+	ToggleInventory(true);
 }
 
-void APlayerCharacterController::ToggleInputMode(UWidget* InWidgetToFocus)
+void APlayerCharacterController::CloseInventory_Implementation()
 {
-	if (bIsInventoryOpen)
+	ToggleInventory(false);
+}
+
+void APlayerCharacterController::ToggleInventory_Implementation(bool bOpen)
+{
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
-		const FInputModeGameOnly InputModeGameOnly;
-		SetInputMode(InputModeGameOnly);
-		SetShowMouseCursor(false);
-		bIsInventoryOpen = false;
+		if (bOpen)
+		{
+			Subsystem->RemoveMappingContext(DefaultMappingContext);
+			const FInputModeUIOnly InputModeUIOnly;
+			SetInputMode(InputModeUIOnly);
+		}
+		else
+		{
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+			const FInputModeGameOnly InputModeGameOnly;
+			SetInputMode(InputModeGameOnly);
+			FlushPressedKeys();
+		}
 	}
-	else
-	{
-		FInputModeUIOnly InputModeUIOnly;
-		InputModeUIOnly.SetWidgetToFocus(InWidgetToFocus->TakeWidget());
-		SetInputMode(InputModeUIOnly);
-		FlushPressedKeys();
-		SetShowMouseCursor(true);
-		bIsInventoryOpen = true;
-	}
+	K2_ToggleInventory(bOpen);
 }
 
 UCharacterWidgetController* APlayerCharacterController::GetCharacterWidgetController(const FWidgetControllerParams& WCParams)

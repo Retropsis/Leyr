@@ -314,13 +314,13 @@ void APlayerCharacter::InitAbilityActorInfo()
 	AttributeSet = PlayerCharacterState->GetAttributeSet();
 	OnASCRegistered.Broadcast(AbilitySystemComponent);
 
-	if(APlayerCharacterController* PlayerCharacterController = Cast<APlayerCharacterController>(GetController()))
-	{
-		if (APlayerHUD* PlayerHUD = Cast<APlayerHUD>(PlayerCharacterController->GetHUD()))
-		{
-			PlayerHUD->InitOverlay(PlayerCharacterController, PlayerCharacterState, AbilitySystemComponent, AttributeSet);
-		}
-	}
+	// if(APlayerCharacterController* PlayerCharacterController = Cast<APlayerCharacterController>(GetController()))
+	// {
+	// 	if (APlayerHUD* PlayerHUD = Cast<APlayerHUD>(PlayerCharacterController->GetHUD()))
+	// 	{
+	// 		PlayerHUD->InitOverlay(PlayerCharacterController, PlayerCharacterState, AbilitySystemComponent, AttributeSet);
+	// 	}
+	// }
 
 	//TODO: Move this to some other (PlayerState, BeginPlay)
 	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::HitReactTagChanged);
