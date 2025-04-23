@@ -48,6 +48,7 @@ class LEYR_API UInventoryWidgetController : public UWidgetController
 
 public:
 	void BroadcastEquippedItems();
+	virtual void BroadcastInitialValues() override;
 	virtual void BindCallbacksToDependencies() override;
 	UItemData* HasCompatibleItemCostInAmmunitionSlot(const FGameplayTag CostTag);
 	bool HasCompatibleItemCostInInventory(const FGameplayTag CostTag, FInventoryItemData& OutItem) const;

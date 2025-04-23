@@ -18,6 +18,11 @@
 #include "Kismet/GameplayStatics.h"
 #include "Player/PlayerCharacterState.h"
 
+void UInventoryWidgetController::BroadcastInitialValues()
+{
+	OnPlayerLevelChanged.Broadcast(GetBasePS()->GetCharacterLevel());
+}
+
 void UInventoryWidgetController::BindCallbacksToDependencies()
 {
 	checkf(InventoryComponent, TEXT("InventoryComponent is NULL, please check [%s]"), *GetName());
@@ -48,7 +53,6 @@ void UInventoryWidgetController::BindCallbacksToDependencies()
 			OnPlayerLevelChanged.Broadcast(NewLevel);
 		}
 	);
-
 	
 	const ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this));
 	const ULeyrGameInstance* LeyrGameInstance = Cast<ULeyrGameInstance>(LeyrGameMode->GetGameInstance());
