@@ -1351,7 +1351,7 @@ void APlayerCharacter::ResetInventorySlot_Implementation(EContainerType Containe
 void APlayerCharacter::SetContainer_Implementation(AContainer* Container)
 {
 	InteractingContainer = Container;
-	IControllerInterface::Execute_ToggleContainer(Controller, Container->GetSlotCountContainer());
+	IControllerInterface::Execute_ToggleContainer(Controller, true, Container->GetSlotCountContainer());
 }
 
 void APlayerCharacter::CloseContainer_Implementation()

@@ -155,6 +155,12 @@ void APlayerCharacterController::CloseInventory_Implementation()
 
 void APlayerCharacterController::ToggleInventory_Implementation(bool bOpen)
 {
+	ToggleInputAndMappingContext(bOpen);
+	K2_ToggleInventory(bOpen);
+}
+
+void APlayerCharacterController::ToggleInputAndMappingContext(bool bOpen)
+{
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
 	{
 		if (bOpen)
@@ -171,7 +177,13 @@ void APlayerCharacterController::ToggleInventory_Implementation(bool bOpen)
 			FlushPressedKeys();
 		}
 	}
-	K2_ToggleInventory(bOpen);
+}
+
+void APlayerCharacterController::ToggleContainer_Implementation(bool bOpen, int32 SlotCount)
+{
+	ToggleInputAndMappingContext(bOpen);
+	InventoryWidgetController->SetContainerOpen(bOpen);
+	K2_ToggleContainer(bOpen);
 }
 
 UCharacterWidgetController* APlayerCharacterController::GetCharacterWidgetController(const FWidgetControllerParams& WCParams)

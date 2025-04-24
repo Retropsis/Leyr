@@ -3,11 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Inventory/InventoryComponent.h"
 #include "UObject/Interface.h"
+#include "Inventory/InventoryComponent.h"
 #include "ControllerInterface.generated.h"
 
 enum class EContainerType : uint8;
+struct FInventoryItemData;
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UControllerInterface : public UInterface
@@ -27,8 +29,8 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void CloseInventory();
 	
-	UFUNCTION(BlueprintNativeEvent)
-	void ToggleContainer(int32 SlotCount);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ToggleContainer(bool bOpen, int32 SlotCount);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void UpdateInventorySlot(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData);

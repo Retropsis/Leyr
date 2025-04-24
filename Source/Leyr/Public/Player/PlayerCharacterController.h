@@ -114,12 +114,13 @@ protected:
 	 */
 	virtual void UpdateInventorySlot_Implementation(EContainerType ContainerType, int32 SlotIndex, FInventoryItemData ItemData) override {}
 	virtual void UpdateContainerSlots_Implementation(int32 TotalSlots) override {}
-	UFUNCTION(BlueprintCallable) virtual void ToggleContainer_Implementation(int32 SlotCount) override {}
-	
+	UFUNCTION(BlueprintCallable) virtual void ToggleContainer_Implementation(bool bOpen, int32 SlotCount = 0) override;
 	UFUNCTION(Client, Reliable) void InventoryButtonPressed();
 	UFUNCTION(Client, Reliable) void ToggleInventory(bool bOpen);
 	virtual void CloseInventory_Implementation() override;
+	void ToggleInputAndMappingContext(bool bOpen);
 	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="ToggleInventory")) void K2_ToggleInventory(bool bOpen);
+	UFUNCTION(BlueprintImplementableEvent, meta=(DisplayName="ToggleContainer")) void K2_ToggleContainer(bool bOpen);
 	UPROPERTY(BlueprintReadWrite) bool bIsInventoryOpen = false;
 	UPROPERTY(BlueprintReadWrite) bool bIsContainerOpen = false;
 	
