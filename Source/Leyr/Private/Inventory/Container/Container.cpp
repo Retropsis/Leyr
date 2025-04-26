@@ -74,6 +74,7 @@ void AContainer::BuildContainerLoot()
 		
 		FInventoryItemData ItemToAdd = ULeyrAbilitySystemLibrary::FindItemDataByRowName(this, ContainerItem.Item.RowName);
 		ItemToAdd.Quantity = ContainerItem.Quantity;
+		ItemToAdd.EquipmentSlot = ItemToAdd.Asset.LoadSynchronous()->EquipmentSlot;
 		Container->ServerAddItem(ItemToAdd);
 	}
 	bInitialized = true;

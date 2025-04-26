@@ -69,7 +69,7 @@ void UInventoryWidgetController::BindCallbacksToDependencies()
 	EquippedItems.Add(GameplayTags.Equipment_ActionSlot_0, MonkAbility);
 	EquippedItems.FindOrAdd(GameplayTags.Equipment_ActionSlot_MainHand, FEquippedItem{});
 	EquippedItems.FindOrAdd(GameplayTags.Equipment_ActionSlot_OffHand, FEquippedItem{});
-	EquippedItems.FindOrAdd(GameplayTags.Equipment_ActionSlot, FEquippedItem{});
+	EquippedItems.FindOrAdd(GameplayTags.Equipment_ActionSlot_Range, FEquippedItem{});
 	for (TTuple<FGameplayTag, FEquippedItem> ActionSlot : GetActionSlots())
 	{
 		if (ActionSlot.Key.MatchesTagExact(GameplayTags.Equipment_ActionSlot_0)) continue;;
@@ -404,6 +404,31 @@ void UInventoryWidgetController::LootAllButtonPressed() const
 				ContainerComponent->TransferItemToEmptySlot(InventoryComponent, i);
 			}
 		}
+	}
+}
+
+/*
+ * GETTERS
+ */
+TArray<FInventoryItemData> UInventoryWidgetController::GetFilteredItems(const FGameplayTagContainer& Filters)
+{
+	TArray<FInventoryItemData> FilteredItems;
+	for (const FInventoryItemData& Item : InventoryComponent->Items)
+	{
+		if (Filters.HasTag(Item.EquipmentSlot))
+		{
+			FilteredItems.Add(Item);
+		}
+	}
+	return FilteredItems;
+}
+
+void UInventoryWidgetController::UseItem(const FInventoryItemData& Item, int32& OutQuantity)
+{
+	if (AbilitySystemComponent && Item.Asset.Get()->AbilitySet)
+	{
+		FGameplayAbilitySpecHandle AbilitySpecHandle = Item.Asset.Get()->AbilitySet->ActivateMenuAbility(AbilitySystemComponent, Item.Asset.Get());
+		
 	}
 }
 

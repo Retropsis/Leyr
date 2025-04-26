@@ -33,15 +33,19 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSoftObjectPtr<UItemData> Asset = nullptr;
+	
+	UPROPERTY()
+	FGameplayTag EquipmentSlot = FGameplayTag();
 };
 
 UENUM(BlueprintType)
 enum class EContainerType : uint8
 {
 	Inventory UMETA(DisplayName="Inventory"),
-	Hotbar UMETA(DisplayName="Hotbar"),
+	Use UMETA(DisplayName="Use"),
 	Container UMETA(DisplayName="Container"),
-	Equipment UMETA(DisplayName="Equipment")
+	Equipment UMETA(DisplayName="Equipment"),
+	Hotbar UMETA(DisplayName="Hotbar"),
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnInventoryChanged);

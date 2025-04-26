@@ -24,12 +24,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FEquipButtonPressed, FGameplayTag, I
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAttributePointSpent, FGameplayTag, AttributeTag);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FSkillPointSpent, FGameplayTag, AbilityTag);
 
-USTRUCT()
+USTRUCT(BlueprintType)
 struct FEquippedItem
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	FInventoryItemData ItemData = FInventoryItemData();
 
 	FAbilitySet_GrantedHandles OutGrantedHandles = FAbilitySet_GrantedHandles();
@@ -52,6 +52,8 @@ public:
 	virtual void BindCallbacksToDependencies() override;
 	UItemData* HasCompatibleItemCostInAmmunitionSlot(const FGameplayTag CostTag);
 	bool HasCompatibleItemCostInInventory(const FGameplayTag CostTag, FInventoryItemData& OutItem) const;
+	
+	UFUNCTION(BlueprintCallable, meta=(DisplayName=GetEquippedItems))
 	TMap<FGameplayTag, FEquippedItem> GetEquippedItems() { return EquippedItems; }
 
 	void UpdateInventorySlots() const;
@@ -79,6 +81,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void SetContainerOpen(bool bIsOpen) { bContainerIsOpen = bIsOpen; }
+
+	UFUNCTION(BlueprintCallable)
+	TArray<FInventoryItemData> GetFilteredItems(const FGameplayTagContainer& Filters);
+
+	UFUNCTION(BlueprintCallable)
+	void UseItem(const FInventoryItemData& Item, int32& OutQuantity);
 
 	UPROPERTY(BlueprintAssignable)
 	FOnInputAssignedSignature OnInputAssigned;

@@ -579,12 +579,12 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	// Input to Equipment
 	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.InputTag_MainHand, GameplayTags.Equipment_ActionSlot_MainHand);
 	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.InputTag_OffHand, GameplayTags.Equipment_ActionSlot_OffHand);
-	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.InputTag_1, GameplayTags.Equipment_ActionSlot);
+	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.InputTag_1, GameplayTags.Equipment_ActionSlot_Range);
 	// Equipment to Input
 	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_MainHand, GameplayTags.InputTag_MainHand);
 	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_OffHand, GameplayTags.InputTag_OffHand);
-	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_Range, GameplayTags.InputTag_OffHand);
-	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot, GameplayTags.InputTag_1);
+	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_Range, GameplayTags.InputTag_1);
+	// GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot, GameplayTags.InputTag_1);
 
 	/*
 	* Player Tags

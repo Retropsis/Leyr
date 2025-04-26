@@ -125,6 +125,7 @@ class LEYR_API UAbilitySet : public UDataAsset
 
 public:
 	void GiveToAbilitySystem(UAbilitySystemComponent* ASC, FAbilitySet_GrantedHandles* OutGrantedHandles, FGameplayTag InputTag = FGameplayTag(), float Level = 1.f, UObject* SourceObject = nullptr) const;
+	FGameplayAbilitySpecHandle ActivateMenuAbility(UAbilitySystemComponent* ASC, UObject* SourceObject) const;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Abilities", meta=(Categories="Abilities"))
 	FGameplayTag AbilityTag = FGameplayTag();
@@ -132,6 +133,9 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Abilities", meta=(TitleProperty=Ability))
 	TArray<FAbilitySet_GameplayAbility> GrantedGameplayAbilities;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Gameplay Abilities", meta=(TitleProperty=Ability))
+	FAbilitySet_GameplayAbility MenuAbility;
 
 	// These abilities are always loaded and not saved, non-UI, necessary gameplay, level 1
 	UPROPERTY(EditDefaultsOnly, Category="Gameplay Abilities", meta=(TitleProperty=Ability))

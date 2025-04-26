@@ -1367,6 +1367,8 @@ UInventoryComponent* APlayerCharacter::GetInventoryComponentByType_Implementatio
 	case EContainerType::Container: return InteractingContainer ? InteractingContainer->Container : nullptr;
 	case EContainerType::Equipment:
 		break;
+	case EContainerType::Use:
+		break;
 	}
 	return nullptr;
 }
