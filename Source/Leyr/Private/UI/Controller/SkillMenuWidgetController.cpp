@@ -154,6 +154,23 @@ void USkillMenuWidgetController::ActivateButtonPressed(const FGameplayTag& Abili
 	}
 }
 
+TArray<FBaseAbilityInfo> USkillMenuWidgetController::GetAvailableAbilities(const FGameplayTagContainer& Filters)
+{
+	TArray<FBaseAbilityInfo> Abilities;
+
+	if (AbilityInfo)
+	{
+		for (FBaseAbilityInfo& Info : AbilityInfo->AbilityInformation)
+		{
+			if (Filters.IsEmpty() || Filters.HasTag(Info.AbilityType))
+			{
+				Abilities.Add(Info);
+			}
+		}
+	}
+	return Abilities;
+}
+
 void USkillMenuWidgetController::SkillRowSlotPressed(const FGameplayTag& SlotTag, const FGameplayTag& AbilityType)
 {
 	if (!bWaitingForEquipSelection) return;

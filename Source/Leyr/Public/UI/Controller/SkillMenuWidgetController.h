@@ -8,6 +8,7 @@
 #include "GameplayTagContainer.h"
 #include "Game/BaseGameplayTags.h"
 #include "UI/Controller/WidgetController.h"
+#include "AbilitySystem/Data/AbilityInfo.h"
 #include "SkillMenuWidgetController.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FSkillSlotSelectedSignature, bool, bSpendPointsButtonEnabled, bool, bEquipButtonEnabled, FString, DescriptionString, FString, NextLevelDescriptionString);
@@ -68,10 +69,12 @@ public:
 	void SkillRowSlotPressed(const FGameplayTag& SlotTag, const FGameplayTag& AbilityType);
 
 	void OnAbilityEquipped(const FGameplayTag& AbilityTag, const FGameplayTag& Status, const FGameplayTag& Slot, const FGameplayTag& PreviousSlot);
-
 	
 	UFUNCTION(BlueprintCallable)
 	void ActivateButtonPressed(const FGameplayTag& AbilityTag);
+
+	UFUNCTION(BlueprintCallable)
+	TArray<FBaseAbilityInfo> GetAvailableAbilities(const FGameplayTagContainer& Filters);
 
 private:
 	static void ShouldEnableButtons(const FGameplayTag& AbilityStatus, int32 SkillPoints, bool& bShouldEnableSkillPointsButton, bool& bShouldEnableEquipButton);

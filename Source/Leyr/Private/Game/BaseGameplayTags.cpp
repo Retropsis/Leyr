@@ -227,6 +227,8 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_Type_Offensive = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Type.Offensive"), FString("Abilities Type Offensive"));
 	GameplayTags.Abilities_Type_Passive = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Type.Passive"), FString("Abilities Type Passive"));
 	GameplayTags.Abilities_Type_ActionSlot = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Type.ActionSlot"), FString("Abilities Type ActionSlot"));
+	GameplayTags.Abilities_Type_ActionSlot_Main = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Type.ActionSlot.Main"), FString("Abilities Type ActionSlot Main"));
+	GameplayTags.Abilities_Type_ActionSlot_Sub = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Type.ActionSlot.Sub"), FString("Abilities Type ActionSlot Sub"));
 	GameplayTags.Abilities_Type_PassiveSlot = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Type.PassiveSlot"), FString("Abilities Type PassiveSlot"));
 
 	/*

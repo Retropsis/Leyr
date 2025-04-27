@@ -210,6 +210,8 @@ FGameplayTag Abilities_Type_Offensive;
 FGameplayTag Abilities_Type_Passive;
 FGameplayTag Abilities_Type_None;
 FGameplayTag Abilities_Type_ActionSlot;
+FGameplayTag Abilities_Type_ActionSlot_Main;
+FGameplayTag Abilities_Type_ActionSlot_Sub;
 FGameplayTag Abilities_Type_PassiveSlot;
 
  /*
