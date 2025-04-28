@@ -479,6 +479,7 @@ FGameplayTag Montage_Window_Execute;
  FGameplayTag Equipment_Ammunition_3;
 
  TMap<FGameplayTag, FGameplayTag> EquipmentSlotToInputTags;
+ TMap<FGameplayTag, FGameplayTag> AbilitySlotToInputTags;
  
  /*
   * Input Tags

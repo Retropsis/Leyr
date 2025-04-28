@@ -26,6 +26,18 @@ struct FPassiveEffect
 	TArray<FGameplayModifierInfo> Modifiers;
 };
 
+USTRUCT(BlueprintType)
+struct FEquippedAbility
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayTag AbilityTag = FGameplayTag();
+	
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayTag AbilityType = FGameplayTag();
+};
+
 /**
  * 
  */
@@ -75,7 +87,16 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	TArray<FBaseAbilityInfo> GetAvailableAbilities(const FGameplayTagContainer& Filters);
+	
+	UFUNCTION(BlueprintCallable)
+	TMap<FGameplayTag, FEquippedAbility> GetEquippedAbilities() { return EquippedAbilities; }
+	
+	UFUNCTION(BlueprintCallable)
+	TMap<FGameplayTag, FBaseAbilityInfo> GetEquippedAbilityInfos();
 
+	UFUNCTION(BlueprintCallable)
+	void AbilityRowButtonPressed(const FBaseAbilityInfo& AbilityToEquipInfo);
+	
 private:
 	static void ShouldEnableButtons(const FGameplayTag& AbilityStatus, int32 SkillPoints, bool& bShouldEnableSkillPointsButton, bool& bShouldEnableEquipButton);
 	FSelectedAbility SelectedAbility = { FBaseGameplayTags::Get().Abilities_None,  FBaseGameplayTags::Get().Abilities_Status_Locked };
@@ -83,6 +104,7 @@ private:
 	bool bWaitingForEquipSelection = false;
 	FGameplayTag SelectedSlot;
 
+	TMap<FGameplayTag, FEquippedAbility> EquippedAbilities;
 	TMap<FGameplayTag, FPassiveEffect> ActivatedEffects;
 	FActiveGameplayEffectHandle ActiveEquipmentEffectHandle;
 };

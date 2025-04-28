@@ -120,6 +120,12 @@ void AEncounterSpawnVolume::HandlePlayerLeaving()
 	{
 		if (SpawnPoint) SpawnPoint->DespawnEncounter();
 	}
+	GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Red, FString::Printf(TEXT("HandlePlayerLeaving")));
+}
+
+void AEncounterSpawnVolume::HandlePlayerEntering()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Green, FString::Printf(TEXT("HandlePlayerEntering")));
 }
 
 void AEncounterSpawnVolume::ClearSpawnPoints()

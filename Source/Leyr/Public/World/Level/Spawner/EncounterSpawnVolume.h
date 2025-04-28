@@ -35,6 +35,10 @@ public:
 	
 	UFUNCTION()
 	void HandlePlayerLeaving();
+	
+	UFUNCTION()
+	void HandlePlayerEntering();
+	
 	void ClearSpawnPoints();
 	void SetEncounterSpawnData(UEncounterSpawnData* Data) { EncounterSpawnData = Data; }
 

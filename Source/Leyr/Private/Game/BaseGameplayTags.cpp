@@ -587,6 +587,11 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_OffHand, GameplayTags.InputTag_OffHand);
 	GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot_Range, GameplayTags.InputTag_1);
 	// GameplayTags.EquipmentSlotToInputTags.Add(GameplayTags.Equipment_ActionSlot, GameplayTags.InputTag_1);
+	
+	// Ability to Input
+	GameplayTags.AbilitySlotToInputTags.Add(GameplayTags.Abilities_Type_ActionSlot_Main, GameplayTags.InputTag_Shoulder_Right);
+	GameplayTags.AbilitySlotToInputTags.Add(GameplayTags.Abilities_Type_ActionSlot_Sub, GameplayTags.InputTag_Execute_1);
+	GameplayTags.AbilitySlotToInputTags.Add(GameplayTags.Abilities_Type_PassiveSlot, FGameplayTag{});
 
 	/*
 	* Player Tags

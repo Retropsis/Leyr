@@ -54,6 +54,11 @@ void USkillMenuWidgetController::BindCallbacksToDependencies()
 		GetBaseASC()->GetDescriptionsByAbilityTag(SelectedAbility.Ability, Description, NextLevelDescription);
 		SkillSlotSelectedDelegate.Broadcast(bEnableSpendPoints, bEnableEquip, Description, NextLevelDescription);
 	});
+	
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	EquippedAbilities.FindOrAdd(GameplayTags.Abilities_Type_ActionSlot_Main, FEquippedAbility{});
+	EquippedAbilities.FindOrAdd(GameplayTags.Abilities_Type_ActionSlot_Sub, FEquippedAbility{});
+	EquippedAbilities.FindOrAdd(GameplayTags.Abilities_Type_PassiveSlot, FEquippedAbility{});
 }
 
 void USkillMenuWidgetController::SkillSlotSelected(const FGameplayTag& AbilityTag)
@@ -133,7 +138,7 @@ void USkillMenuWidgetController::ActivateButtonPressed(const FGameplayTag& Abili
 	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
 	EffectContext.AddSourceObject(this);
 
-	FString SourceObjectName = FString::Printf(TEXT("GE_MasteryEffects"));
+	FString SourceObjectName = FString::Printf(TEXT("GE_PassiveEffects"));
 	UGameplayEffect* Effect = NewObject<UGameplayEffect>(this, FName(SourceObjectName));
 
 	Effect->DurationPolicy = EGameplayEffectDurationType::Infinite;
@@ -169,6 +174,69 @@ TArray<FBaseAbilityInfo> USkillMenuWidgetController::GetAvailableAbilities(const
 		}
 	}
 	return Abilities;
+}
+
+TMap<FGameplayTag, FBaseAbilityInfo> USkillMenuWidgetController::GetEquippedAbilityInfos()
+{
+	TMap<FGameplayTag, FBaseAbilityInfo> Infos;
+
+	for (TTuple<FGameplayTag, FEquippedAbility> EquippedAbility :  EquippedAbilities)
+	{		
+		Infos.Add(EquippedAbility.Key, AbilityInfo->FindAbilityInfoForTag(EquippedAbility.Value.AbilityTag));
+	}
+	return Infos;
+}
+
+void USkillMenuWidgetController::AbilityRowButtonPressed(const FBaseAbilityInfo& AbilityToEquipInfo)
+{
+	FGameplayAbilitySpec* AbilitySpec = GetBaseASC()->GetSpecFromAbilityTag(AbilityToEquipInfo.AbilityTag);
+	if (AbilitySpec == nullptr) return;
+	if (AbilitySpec && !AbilitySpec->Handle.IsValid()) return;
+	
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	const FGameplayTag InputTag = GameplayTags.AbilitySlotToInputTags[AbilityToEquipInfo.AbilityType]; 
+	
+	// Active Slot
+	if (AbilityToEquipInfo.AbilityType.MatchesTag(GameplayTags.Abilities_Type_ActionSlot))
+	{
+		AbilitySpec->DynamicAbilityTags.Reset();
+		FEquippedAbility* FoundAbility = EquippedAbilities.Find(AbilityToEquipInfo.AbilityType);
+		if (FoundAbility && FoundAbility->AbilityTag.IsValid() && AbilityToEquipInfo.AbilityTag.MatchesTagExact(FoundAbility->AbilityTag))
+		{
+			// Deactivate Ability
+			EquippedAbilities.Add(AbilityToEquipInfo.AbilityType, FEquippedAbility{});
+			GetBaseASC()->ClientEquipAbility(AbilityToEquipInfo.AbilityTag, GameplayTags.Abilities_Status_Eligible, InputTag, FGameplayTag());
+		}
+		else
+		{
+			// Activate Ability
+			EquippedAbilities.Add(AbilityToEquipInfo.AbilityType, FEquippedAbility{ AbilityToEquipInfo.AbilityTag });
+			AbilitySpec->DynamicAbilityTags.AppendTags(InputTag.GetSingleTagContainer());
+			GetBaseASC()->ClientEquipAbility(AbilityToEquipInfo.AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
+		}
+	}
+	
+	// Passive Ability Slot
+	if (AbilityToEquipInfo.AbilityType.MatchesTagExact(GameplayTags.Abilities_Type_PassiveSlot))
+	{
+		FEquippedAbility* FoundAbility = EquippedAbilities.Find(AbilityToEquipInfo.AbilityType);
+		if (FoundAbility && FoundAbility->AbilityTag.IsValid() && AbilityToEquipInfo.AbilityTag.MatchesTagExact(FoundAbility->AbilityTag))
+		{
+			// Deactivate passive
+			EquippedAbilities.Add(AbilityToEquipInfo.AbilityType, FEquippedAbility{});
+			AbilitySpec->Level = 0;
+			// if(ActiveEquipmentEffectHandle.IsValid()) AbilitySystemComponent->RemoveActiveGameplayEffect(ActiveEquipmentEffectHandle);
+			GetBaseASC()->ClientEquipAbility(AbilityToEquipInfo.AbilityTag, GameplayTags.Abilities_Status_Eligible, InputTag, FGameplayTag());
+		}
+		else
+		{
+			// Activate passive
+			EquippedAbilities.Add(AbilityToEquipInfo.AbilityType, FEquippedAbility{ AbilityToEquipInfo.AbilityTag });
+			AbilitySpec->Level = 1;
+			// ActivateButtonPressed(AbilityToEquipInfo.AbilityTag);
+			GetBaseASC()->ClientEquipAbility(AbilityToEquipInfo.AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
+		}
+	}
 }
 
 void USkillMenuWidgetController::SkillRowSlotPressed(const FGameplayTag& SlotTag, const FGameplayTag& AbilityType)

@@ -53,6 +53,13 @@ void ACameraBoundary::BeginPlay()
 	Super::BeginPlay();
 	EnteringBoundary->OnComponentBeginOverlap.AddDynamic(this, &ACameraBoundary::OnBeginOverlap);
 	EnteringBoundary->OnComponentEndOverlap.AddDynamic(this, &ACameraBoundary::OnEndOverlap);
+	
+	for (const TObjectPtr<AEncounterSpawnVolume> SpawningVolume : SpawningVolumes)
+	{
+		if (SpawningVolume == nullptr) continue;
+		OnPlayerLeaving.AddUObject(SpawningVolume, &AEncounterSpawnVolume::HandlePlayerLeaving);
+		OnPlayerEntering.AddUObject(SpawningVolume, &AEncounterSpawnVolume::HandlePlayerEntering);
+	}
 }
 
 void ACameraBoundary::InitializeCameraExtent()
@@ -93,7 +100,6 @@ void ACameraBoundary::InitializeSpawnVolumes()
 		AEncounterSpawnVolume* SpawningVolume = GetWorld()->SpawnActor<AEncounterSpawnVolume>(SpawningVolumeClass, Location, FRotator::ZeroRotator, SpawnParams);
 		SpawningVolume->SetEncounterSpawnData(LevelAreaData->SpawningVolumes[i]);
 		SpawningVolume->InitializeSpawnPoints();
-		OnPlayerLeaving.AddUObject(SpawningVolume, &AEncounterSpawnVolume::HandlePlayerLeaving);
 		SpawningVolumes.Add(SpawningVolume);
 		Offset.X += 50.f;
 	}
