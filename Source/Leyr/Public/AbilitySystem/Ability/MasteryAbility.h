@@ -16,9 +16,23 @@ class LEYR_API UMasteryAbility : public UBaseGameplayAbility
 	GENERATED_BODY()
 
 public:
+	virtual void PrepareToEndAbility() override;
+	
+	UFUNCTION(BlueprintCallable)
+	void ApplyMasteryEffect();
+	
 	virtual FString GetDescription(int32 Level) override;
 	virtual FString GetNextLevelDescription(int32 Level) override;
 
+	/*
+	 * Damage Ability Data
+	 */
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UGameplayEffect> MasteryEffectClass;
+	
 	UPROPERTY(EditDefaultsOnly)
 	FAbilityDescription Info;
+
+private:
+	FActiveGameplayEffectHandle ActiveGameplayEffectHandle;
 };

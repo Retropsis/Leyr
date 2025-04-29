@@ -333,18 +333,23 @@ float UExecCalc_Damage::ApplyMasteryEffects(const FGameplayEffectCustomExecution
 	MasteryTags.AddTag(GameplayTags.Abilities_Passive_Mastery);
 	TArray<FGameplayAbilitySpec*> MasteryAbilities;
 	ExecutionParams.GetSourceAbilitySystemComponent()->GetActivatableGameplayAbilitySpecsByAllMatchingTags(MasteryTags, MasteryAbilities);
-
+	
 	if (UObject* SourceObject = ExecutionParams.GetOwningSpec().GetContext().GetSourceObject())
 	{
 		if (const UItemData* Asset = Cast<UItemData>(SourceObject))
 		{
-			for (const FGameplayAbilitySpec* Mastery : MasteryAbilities)
+			if (ExecutionParams.GetSourceAbilitySystemComponent()->HasMatchingGameplayTag(Asset->MasteryTag))
 			{
-				if(Mastery->Ability->AbilityTags.HasTagExact(Asset->MasteryTag))
+				TArray<FGameplayEffectSpec> OutSpecCopies;
+				ExecutionParams.GetSourceAbilitySystemComponent()->GetAllActiveGameplayEffectSpecs(OutSpecCopies);
+				for (FGameplayEffectSpec& EffectSpec : OutSpecCopies)
 				{
-					return 1.f + FMath::Min(Mastery->Level * 0.05, 1.f);
+					if (EffectSpec.Def.Get()->GetGrantedTags().HasTagExact(Asset->MasteryTag))
+					{
+						return 1.f + FMath::Min(EffectSpec.GetLevel() * 0.05, 1.f);
+					}
 				}
-			}
+			}			
 		}
 	}
 	return 1.f;

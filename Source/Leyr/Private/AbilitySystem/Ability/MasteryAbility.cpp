@@ -1,7 +1,29 @@
 // @ Retropsis 2024-2025.
 
 #include "AbilitySystem/Ability/MasteryAbility.h"
+#include "AbilitySystemComponent.h"
 #include "AbilitySystem/Data/AbilityDescriptionData.h"
+
+void UMasteryAbility::PrepareToEndAbility()
+{
+	if (ActiveGameplayEffectHandle.IsValid())
+	{
+		GetAbilitySystemComponentFromActorInfo()->RemoveActiveGameplayEffect(ActiveGameplayEffectHandle);
+	}
+}
+
+void UMasteryAbility::ApplyMasteryEffect()
+{
+	if (MasteryEffectClass == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT(""));	
+	}
+	
+	FGameplayEffectContextHandle EffectContext = GetAbilitySystemComponentFromActorInfo()->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
+	FGameplayEffectSpecHandle EffectSpecHandle = GetAbilitySystemComponentFromActorInfo()->MakeOutgoingSpec(MasteryEffectClass, GetAbilityLevel(), EffectContext);
+	ActiveGameplayEffectHandle = GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToSelf(*EffectSpecHandle.Data);
+}
 
 FString UMasteryAbility::GetDescription(int32 Level)
 {

@@ -13,7 +13,7 @@
 void USkillMenuWidgetController::BroadcastInitialValues()
 {
 	BroadcastAbilityInfo();
-	BaseAbilitySystemComponent->UpdateAbilityStatuses(PlayerCharacterState->GetCharacterLevel());
+	// BaseAbilitySystemComponent->UpdateAbilityStatuses(PlayerCharacterState->GetCharacterLevel());
 	SkillPointsChanged.Broadcast(GetBasePS()->GetSkillPoints());
 }
 
@@ -224,16 +224,17 @@ void USkillMenuWidgetController::AbilityRowButtonPressed(const FBaseAbilityInfo&
 		{
 			// Deactivate passive
 			EquippedAbilities.Add(AbilityToEquipInfo.AbilityType, FEquippedAbility{});
-			AbilitySpec->Level = 0;
-			// if(ActiveEquipmentEffectHandle.IsValid()) AbilitySystemComponent->RemoveActiveGameplayEffect(ActiveEquipmentEffectHandle);
+			if (FGameplayAbilitySpec* FoundAbilitySpec = AbilitySystemComponent->FindAbilitySpecFromClass(AbilityToEquipInfo.Ability))
+			{
+				AbilitySystemComponent->CancelAbilityHandle(FoundAbilitySpec->Handle);
+			}
 			GetBaseASC()->ClientEquipAbility(AbilityToEquipInfo.AbilityTag, GameplayTags.Abilities_Status_Eligible, InputTag, FGameplayTag());
 		}
 		else
 		{
 			// Activate passive
 			EquippedAbilities.Add(AbilityToEquipInfo.AbilityType, FEquippedAbility{ AbilityToEquipInfo.AbilityTag });
-			AbilitySpec->Level = 1;
-			// ActivateButtonPressed(AbilityToEquipInfo.AbilityTag);
+			AbilitySystemComponent->TryActivateAbilityByClass(AbilityToEquipInfo.Ability);
 			GetBaseASC()->ClientEquipAbility(AbilityToEquipInfo.AbilityTag, GameplayTags.Abilities_Status_Equipped, InputTag, FGameplayTag());
 		}
 	}
