@@ -432,6 +432,11 @@ void UInventoryWidgetController::UseItem(const FInventoryItemData& Item, int32& 
 	}
 }
 
+void UInventoryWidgetController::GetDescription(FString Description)
+{
+	OnDescriptionUpdated.Broadcast(Description);
+}
+
 /*
  * Experience Points
  */

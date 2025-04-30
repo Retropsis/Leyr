@@ -240,6 +240,11 @@ void USkillMenuWidgetController::AbilityRowButtonPressed(const FBaseAbilityInfo&
 	}
 }
 
+void USkillMenuWidgetController::GetDescription(FString Description)
+{
+	OnDescriptionUpdated.Broadcast(Description);
+}
+
 void USkillMenuWidgetController::SkillRowSlotPressed(const FGameplayTag& SlotTag, const FGameplayTag& AbilityType)
 {
 	if (!bWaitingForEquipSelection) return;

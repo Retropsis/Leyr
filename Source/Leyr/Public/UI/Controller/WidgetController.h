@@ -24,6 +24,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnLevelChangedSignature, int32, Ne
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityInfoSignature, const FBaseAbilityInfo&, Info);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGameplayTagAddedOrRemoved, const FGameplayTag&, Tag, int32, NewCount);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDescriptionUpdated, FString, Description);
+
 USTRUCT(BlueprintType)
 struct FWidgetControllerParams
 {
@@ -98,6 +100,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category="GAS|Meta")
 	FOnLevelChangedSignature OnPlayerLevelChangedDelegate;
+	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Meta")
+	FOnDescriptionUpdated OnDescriptionUpdated;
 	
 protected:
 	UPROPERTY(BlueprintReadOnly, Category="WidgetController")

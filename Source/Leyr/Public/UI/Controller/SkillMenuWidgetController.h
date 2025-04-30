@@ -97,6 +97,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AbilityRowButtonPressed(const FBaseAbilityInfo& AbilityToEquipInfo);
 	
+	UFUNCTION(BlueprintCallable)
+	void GetDescription(FString Description);
+	
 private:
 	static void ShouldEnableButtons(const FGameplayTag& AbilityStatus, int32 SkillPoints, bool& bShouldEnableSkillPointsButton, bool& bShouldEnableEquipButton);
 	FSelectedAbility SelectedAbility = { FBaseGameplayTags::Get().Abilities_None,  FBaseGameplayTags::Get().Abilities_Status_Locked };

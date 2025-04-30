@@ -88,6 +88,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UseItem(const FInventoryItemData& Item, int32& OutQuantity);
 
+	UFUNCTION(BlueprintCallable)
+	void GetDescription(FString Description);
+
 	UPROPERTY(BlueprintAssignable)
 	FOnInputAssignedSignature OnInputAssigned;
 	
