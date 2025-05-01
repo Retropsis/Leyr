@@ -241,9 +241,12 @@ void USkillMenuWidgetController::AbilityRowButtonPressed(const FBaseAbilityInfo&
 	}
 }
 
-void USkillMenuWidgetController::GetDescription(FString Description)
+void USkillMenuWidgetController::GetDescription(const FGameplayTag& AbilityTag)
 {
-	OnDescriptionUpdated.Broadcast(Description);
+	FString Description;
+	FString NextLevelDescription;
+	GetBaseASC()->GetDescriptionsByAbilityTag(AbilityTag, Description, NextLevelDescription);
+	OnDescriptionUpdated.Broadcast(Description, NextLevelDescription);
 }
 
 void USkillMenuWidgetController::SkillRowSlotPressed(const FGameplayTag& SlotTag, const FGameplayTag& AbilityType)

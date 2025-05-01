@@ -10,6 +10,7 @@
 #include "Engine/DataAsset.h"
 #include "ItemData.generated.h"
 
+class UAttributeInfo;
 class UAbilitySet;
 class UAbilityData;
 class UPaperZDAnimInstance;
@@ -116,4 +117,7 @@ public:
 
 	UFUNCTION(BlueprintPure, Category="Item")
 	float GetPrimaryAttributeMagnitude();
+	
+	UFUNCTION(BlueprintPure)
+	virtual FString GetDescription(UAttributeInfo* AttributeInfo, int32 Level) { return FString(); }
 };

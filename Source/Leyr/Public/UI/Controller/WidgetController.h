@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "WidgetController.generated.h"
 
+class UAttributeInfo;
 class UDescriptionInfo;
 class UPassiveInfo;
 class UInventoryComponent;
@@ -25,7 +26,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnLevelChangedSignature, int32, Ne
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAbilityInfoSignature, const FBaseAbilityInfo&, Info);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGameplayTagAddedOrRemoved, const FGameplayTag&, Tag, int32, NewCount);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDescriptionUpdated, FString, Description);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnDescriptionUpdated, FString, Description, FString, NextDescription);
 
 USTRUCT(BlueprintType)
 struct FWidgetControllerParams
@@ -141,6 +142,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
 	TObjectPtr<UDescriptionInfo> DescriptionInfo;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
+	TObjectPtr<UAttributeInfo> AttributeInfo;
 
 	UFUNCTION(BlueprintPure) APlayerCharacterController* GetBasePC();
 	UFUNCTION(BlueprintPure) APlayerCharacterState* GetBasePS();

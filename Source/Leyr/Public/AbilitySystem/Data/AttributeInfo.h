@@ -45,6 +45,7 @@ class LEYR_API UAttributeInfo : public UDataAsset
 	
 public:
 	FBaseAttributeInfo FindAttributeInfoForTag(const FGameplayTag& AttributeTag, bool bLogNotFound = false) const;
+	FBaseAttributeInfo FindAttributeInfoForName(const FString& Name, bool bLogNotFound = false) const;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta=(TitleProperty="AttributeName"))
 	TArray<FBaseAttributeInfo> AttributeInformation;

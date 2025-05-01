@@ -8,7 +8,6 @@
 #include "AttributeMenuWidgetController.generated.h"
 
 struct FGameplayTag;
-class UAttributeInfo;
 
 /**
  * 
@@ -24,10 +23,6 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void UpgradeAttribute(const FGameplayTag& AttributeTag);
-
-protected:
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UAttributeInfo> AttributeInfo;
 
 private:
 	void BroadcastAttributeInfo(const FGameplayTag& AttributeTag) const;

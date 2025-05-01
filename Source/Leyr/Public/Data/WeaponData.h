@@ -16,4 +16,5 @@ class LEYR_API UWeaponData : public UItemData
 
 public:
 	UWeaponData();
+	virtual FString GetDescription(UAttributeInfo* AttributeInfo, int32 Level) override;
 };

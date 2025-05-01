@@ -7,7 +7,6 @@
 #include "CharacterWidgetController.generated.h"
 
 struct FGameplayTag;
-class UAttributeInfo;
 /**
  * 
  */
@@ -22,10 +21,6 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void UpgradeAttribute(const FGameplayTag& AttributeTag);
-	
-protected:
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<UAttributeInfo> AttributeInfo;
 
 private:
 	UFUNCTION() void OnXPChanged(int32 NewXP);

@@ -98,7 +98,7 @@ public:
 	void AbilityRowButtonPressed(const FBaseAbilityInfo& AbilityToEquipInfo);
 	
 	UFUNCTION(BlueprintCallable)
-	void GetDescription(FString Description);
+	void GetDescription(const FGameplayTag& Description);
 	
 private:
 	static void ShouldEnableButtons(const FGameplayTag& AbilityStatus, int32 SkillPoints, bool& bShouldEnableSkillPointsButton, bool& bShouldEnableEquipButton);
