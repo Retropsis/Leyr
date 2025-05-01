@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "WidgetController.generated.h"
 
+class UDescriptionInfo;
 class UPassiveInfo;
 class UInventoryComponent;
 class UBaseAttributeSet;
@@ -137,6 +138,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
 	TObjectPtr<UPassiveInfo> PassiveInfo;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
+	TObjectPtr<UDescriptionInfo> DescriptionInfo;
 
 	UFUNCTION(BlueprintPure) APlayerCharacterController* GetBasePC();
 	UFUNCTION(BlueprintPure) APlayerCharacterState* GetBasePS();
