@@ -101,6 +101,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category="GAS|Meta")
 	FOnLevelChangedSignature OnPlayerLevelChangedDelegate;
 	
+	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
+	FOnPlayerStatChangedSignature AttributePointsChangedDelegate;
+	
 	UPROPERTY(BlueprintAssignable, Category="GAS|Meta")
 	FOnDescriptionUpdated OnDescriptionUpdated;
 	

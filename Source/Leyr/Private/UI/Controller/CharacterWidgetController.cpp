@@ -2,6 +2,7 @@
 
 #include "UI/Controller/CharacterWidgetController.h"
 #include "AbilitySystemComponent.h"
+#include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/Data/AttributeInfo.h"
 #include "AbilitySystem/Data/LevelUpInfo.h"
@@ -22,6 +23,7 @@ void UCharacterWidgetController::BroadcastInitialValues()
 	OnMaxManaChanged.Broadcast(GetBaseAS()->GetMaxMana());
 	OnPlayerLevelChanged.Broadcast(GetBasePS()->GetCharacterLevel());
 	OnXPChanged(GetBasePS()->GetXP());
+	AttributePointsChangedDelegate.Broadcast(GetBasePS()->GetAttributePoints());
 }
 
 void UCharacterWidgetController::BindCallbacksToDependencies()
@@ -37,12 +39,15 @@ void UCharacterWidgetController::BindCallbacksToDependencies()
 		);
 	}
 	GetBasePS()->OnXPChangedDelegate.AddUObject(this, &UCharacterWidgetController::OnXPChanged);
-	GetBasePS()->OnLevelChangedDelegate.AddLambda(
-		[this](int32 NewLevel, bool bLevelUp)
+	GetBasePS()->OnLevelChangedDelegate.AddLambda([this](int32 NewLevel, bool bLevelUp)
 		{
 			OnPlayerLevelChanged.Broadcast(NewLevel);
 		}
 	);
+	GetBasePS()->OnAttributePointsChangedDelegate.AddLambda([this](int32 NewCount)
+	{
+		AttributePointsChangedDelegate.Broadcast(NewCount);
+	});
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(GetBaseAS()->GetHealthAttribute()).AddLambda(
 		[this] (const FOnAttributeChangeData& Data)
 		{
@@ -67,6 +72,11 @@ void UCharacterWidgetController::BindCallbacksToDependencies()
 			OnMaxManaChanged.Broadcast(Data.NewValue);
 		}
 	);
+}
+
+void UCharacterWidgetController::UpgradeAttribute(const FGameplayTag& AttributeTag)
+{
+	GetBaseASC()->UpgradeAttribute(AttributeTag);
 }
 
 void UCharacterWidgetController::OnXPChanged(int32 NewXP)

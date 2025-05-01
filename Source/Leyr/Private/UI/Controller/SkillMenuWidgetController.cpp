@@ -15,6 +15,7 @@ void USkillMenuWidgetController::BroadcastInitialValues()
 	BroadcastAbilityInfo();
 	// BaseAbilitySystemComponent->UpdateAbilityStatuses(PlayerCharacterState->GetCharacterLevel());
 	SkillPointsChanged.Broadcast(GetBasePS()->GetSkillPoints());
+	OnPlayerLevelChanged.Broadcast(GetBasePS()->GetCharacterLevel());
 }
 
 void USkillMenuWidgetController::BindCallbacksToDependencies()

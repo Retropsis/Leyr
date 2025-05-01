@@ -22,9 +22,6 @@ public:
 	virtual void BindCallbacksToDependencies() override;
 	virtual void BroadcastInitialValues() override;
 	
-	UPROPERTY(BlueprintAssignable, Category="GAS|Attributes")
-	FOnPlayerStatChangedSignature AttributePointsChangedDelegate;
-	
 	UFUNCTION(BlueprintCallable)
 	void UpgradeAttribute(const FGameplayTag& AttributeTag);
 
