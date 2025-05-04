@@ -288,7 +288,7 @@ void ABaseCharacter::Die(const FVector& DeathImpulse, bool bExecute)
 	MulticastHandleDeath(DeathImpulse, DefeatState);
 }
 
-void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImpulse, EDefeatState InDefeatState)
+void ABaseCharacter::HandleDeathCapsuleComponent(const FVector& DeathImpulse)
 {
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
@@ -296,8 +296,10 @@ void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImp
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Player, ECR_Ignore);
 	GetCapsuleComponent()->SetSimulatePhysics(true);
 	GetCapsuleComponent()->AddImpulse(DeathImpulse, NAME_None, true);
-	
-	// UAssetManager::GetStreamableManager().RequestAsyncLoad(DefeatedSound.ToSoftObjectPath(), FStreamableDelegate::CreateUObject(this, &ABaseCharacter::PlayDeathSound), FStreamableManager::DefaultAsyncLoadPriority);
+}
+
+void ABaseCharacter::HandleDeath(EDefeatState InDefeatState)
+{
 	UGameplayStatics::PlaySoundAtLocation(this, DefeatedSoundLoaded, GetActorLocation(), GetActorRotation());
 	
 	GetAbilitySystemComponent()->AddLooseGameplayTag(FBaseGameplayTags::Get().Defeated);
@@ -305,6 +307,13 @@ void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImp
 	BurnStatusEffectComponent->DeactivateImmediate();
 	StunStatusEffectComponent->DeactivateImmediate();
 	OnDeath.Broadcast(this);
+}
+
+void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImpulse, EDefeatState InDefeatState)
+{
+	HandleDeathCapsuleComponent(DeathImpulse);
+	// UAssetManager::GetStreamableManager().RequestAsyncLoad(DefeatedSound.ToSoftObjectPath(), FStreamableDelegate::CreateUObject(this, &ABaseCharacter::PlayDeathSound), FStreamableManager::DefaultAsyncLoadPriority);
+	HandleDeath(InDefeatState);
 }
 
 void ABaseCharacter::SetGravityScale_Implementation(float GravityValue)

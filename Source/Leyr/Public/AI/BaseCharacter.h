@@ -161,6 +161,8 @@ protected:
 	virtual void BroadcastOnDeath_Implementation() override { OnDeath.Broadcast(this); }
 	
 	virtual void Die(const FVector& DeathImpulse, bool bExecute) override;
+	void HandleDeathCapsuleComponent(const FVector& DeathImpulse);
+	void HandleDeath(EDefeatState InDefeatState);
 	virtual EDefeatState GetDefeatState_Implementation() const override { return  DefeatState; }
 	virtual  bool IsDefeated_Implementation() const override { return DefeatState != EDefeatState::None; }
 	virtual void SetGravityScale_Implementation(float GravityValue) override;
