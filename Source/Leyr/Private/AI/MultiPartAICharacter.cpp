@@ -3,6 +3,7 @@
 #include "AI/MultiPartAICharacter.h"
 #include "PaperFlipbookComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/WidgetComponent.h"
 
 AMultiPartAICharacter::AMultiPartAICharacter()
 {
@@ -10,6 +11,8 @@ AMultiPartAICharacter::AMultiPartAICharacter()
 	MultiPartFlipbook->SetupAttachment(GetRootComponent());
 
 	GetSprite()->SetupAttachment(MultiPartFlipbook, HeadSocket);
+	
+	HealthBar->SetupAttachment(GetSprite());
 }
 
 void AMultiPartAICharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)

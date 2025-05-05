@@ -25,7 +25,6 @@
 #include "Interaction/PlayerInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "NavMesh/NavMeshBoundsVolume.h"
 #include "World/Data/CameraData.h"
 #include "World/Level/Moving/WaterGroup.h"
 #include "World/Level/Zone/Arena.h"
@@ -132,6 +131,7 @@ void AAICharacter::PossessedBy(AController* NewController)
 	if(bCollisionCauseDamage)
 	{
 		GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBeginOverlap);
+		SetupCollisionDamage();
 	}
 	SineMoveHeight = GetActorLocation().Z;
 	InitializeNavigationBounds();
@@ -375,6 +375,11 @@ void AAICharacter::HandleBehaviourState(EBehaviourState NewState)
 }
 
 void AAICharacter::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	HandleBeginOverlap(OtherActor);
+}
+
+void AAICharacter::HandleBeginOverlap(AActor* OtherActor)
 {
 	if(OtherActor && Cast<IAbilitySystemInterface>(OtherActor) && ULeyrAbilitySystemLibrary::IsHostile(this, OtherActor))
 	{

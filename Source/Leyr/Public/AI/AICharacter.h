@@ -40,6 +40,12 @@ public:
 	void HandleBehaviourState(EBehaviourState NewState);
 	void HandlePlayerOverlappingArena(AActor* Player, bool bIsEntering);
 
+	UFUNCTION(BlueprintCallable)
+	void HandleBeginOverlap(AActor* OtherActor);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void SetupCollisionDamage();
+	
 // #if WITH_EDITOR
 // 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 // #endif
@@ -254,5 +260,6 @@ public:
 	virtual void SetBehaviourState(EBehaviourState NewState) override { BehaviourState = NewState; }
 	
 	virtual EMovementType GetMovementType_Implementation() override { return MovementType; }
-	
+
+	UFUNCTION(BlueprintPure) bool ShouldCollisionCauseDamage() const { return bCollisionCauseDamage; }
 };
