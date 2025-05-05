@@ -4,18 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystem/Actor/AbilityActor.h"
+#include "Interaction/InteractionInterface.h"
 #include "MultiPartAbilityActor.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class LEYR_API AMultiPartAbilityActor : public AAbilityActor
+class LEYR_API AMultiPartAbilityActor : public AAbilityActor, public IInteractionInterface
 {
 	GENERATED_BODY()
 
 public:
 	AMultiPartAbilityActor();
+	virtual void InteractHit_Implementation(AActor* InteractingActor) override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void HandleDetachment();
 	
 protected:
 	UFUNCTION(BlueprintCallable)
@@ -24,6 +29,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	float ImpactImpulse = 100.f;
 	
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	bool bCanBreak = false;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USkeletalMeshComponent> MultiPartFlipbook;
 };
