@@ -173,7 +173,8 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 			
 		if(OtherActor && OtherActor->Implements<UInteractionInterface>())
 		{
-			IInteractionInterface::Execute_InteractHit(OtherActor, /*SourceAvatarActor*/ GetInstigator());
+			IInteractionInterface::Execute_InteractHit(OtherActor, /*SourceAvatarActor*/ GetInstigator(), SweepResult.BoneName);
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Magenta, SweepResult.BoneName.ToString());
 		}
 		bool bActorOverlappingProjectiles = OtherActor && OtherActor->ActorHasTag("OverlapProjectiles");
 		bool bInteractiveActorBlockingProjectile = OtherActor && OtherActor->Implements<UInteractionInterface>() && IInteractionInterface::Execute_ShouldBlockProjectile(OtherActor);

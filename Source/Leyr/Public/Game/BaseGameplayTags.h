@@ -245,6 +245,7 @@ FGameplayTag Abilities_Weapon_TwoHanded_States;
 FGameplayTag Abilities_Weapon_TwoHanded_Combo;
 FGameplayTag Abilities_Weapon_TwoHanded_Extra;
 FGameplayTag Abilities_Weapon_TwoHanded_Execute;
+FGameplayTag Abilities_Weapon_Whip_Attack;
  
 FGameplayTag Abilities_Combo_Attack_1;
 FGameplayTag Abilities_Combo_Attack_2;

@@ -1,8 +1,6 @@
 // @ Retropsis 2024-2025.
 
 #include "AbilitySystem/Actor/MultiPartAbilityActor.h"
-#include "PhysicsEngine/PhysicsAsset.h"
-#include "PhysicsEngine/ConstraintInstance.h"
 
 AMultiPartAbilityActor::AMultiPartAbilityActor()
 {
@@ -15,14 +13,14 @@ AMultiPartAbilityActor::AMultiPartAbilityActor()
 	MultiPartFlipbook->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
 
-void AMultiPartAbilityActor::InteractHit_Implementation(AActor* InteractingActor)
+void AMultiPartAbilityActor::InteractHit_Implementation(AActor* InteractingActor, FName BoneName)
 {
-	if(bCanBreak)
+	if(bCanBreak && BoneName != UnbreakableRoot)
 	{
 		// MultiPartFlipbook->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-		MultiPartFlipbook->SetAllBodiesBelowSimulatePhysics(FName("Bone_001"), true);
-		MultiPartFlipbook->AddImpulseToAllBodiesBelow(InteractingActor->GetActorForwardVector() * ImpactImpulse, FName("Bone_004"), true);
-		HandleDetachment();
+		MultiPartFlipbook->SetAllBodiesBelowSimulatePhysics(BoneName, true);
+		MultiPartFlipbook->AddImpulseToAllBodiesBelow(InteractingActor->GetActorForwardVector() * ImpactImpulse, BoneName, true);
+		HandleDetachment(BoneName);
 	}
 }
 
@@ -31,7 +29,7 @@ void AMultiPartAbilityActor::OnBeginOverlap(UPrimitiveComponent* OverlappedCompo
 	if (OtherActor && OtherActor->ActorHasTag("Player"))
 	{
 		MultiPartFlipbook->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-		MultiPartFlipbook->SetAllBodiesBelowSimulatePhysics(FName("Bone_001"), true);
-		MultiPartFlipbook->AddImpulseToAllBodiesBelow(OtherActor->GetActorForwardVector() * ImpactImpulse, FName("Bone_004"), true);
+		MultiPartFlipbook->SetAllBodiesBelowSimulatePhysics(FName("First"), true);
+		MultiPartFlipbook->AddImpulseToAllBodiesBelow(OtherActor->GetActorForwardVector() * ImpactImpulse, FName("Tail"), true);
 	}
 }

@@ -61,7 +61,12 @@ TArray<FHitResult> UDamageGameplayAbility::BoxTrace(bool bDebug)
 	{
 		if(HitResult.bBlockingHit && HitResult.GetActor() && HitResult.GetActor()->Implements<UInteractionInterface>())
 		{
-			IInteractionInterface::Execute_InteractHit(HitResult.GetActor(), GetAvatarActorFromActorInfo());
+			FName Socket = FName();
+			if (HitResult.GetComponent() && HitResult.GetComponent()->GetAttachParent())
+			{
+				Socket = HitResult.GetComponent()->GetAttachParent()->GetAttachSocketName();
+			}
+			IInteractionInterface::Execute_InteractHit(HitResult.GetActor(), GetAvatarActorFromActorInfo(), Socket);
 		}
 	}
 	return Hits;

@@ -47,9 +47,9 @@ void APulley::BeginPlay()
 	}
 }
 
-void APulley::InteractHit_Implementation(AActor* InteractingActor)
+void APulley::InteractHit_Implementation(AActor* InteractingActor, FName BoneName)
 {
-	Super::InteractHit_Implementation(InteractingActor);
+	Super::InteractHit_Implementation(InteractingActor, BoneName);
 	
 	LeverState = ELeverState::On;
 	HandleLeverVisualState(LeverState);

@@ -24,7 +24,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void InteractHit_Implementation(AActor* InteractingActor) override;
+	virtual void InteractHit_Implementation(AActor* InteractingActor, FName BoneName) override;
 
 private:
 	UFUNCTION()

@@ -27,7 +27,7 @@ public:
 	void Interact(AActor* InteractingActor);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void InteractHit(AActor* InteractingActor);
+	void InteractHit(AActor* InteractingActor, FName BoneName);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void InteractBottom(AActor* InteractingActor);

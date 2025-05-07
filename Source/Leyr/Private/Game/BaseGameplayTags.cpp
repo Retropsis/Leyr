@@ -261,6 +261,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_Weapon_TwoHanded_Combo = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.TwoHanded.Combo"), FString("Abilities Weapon TwoHanded Combo"));
 	GameplayTags.Abilities_Weapon_TwoHanded_Extra = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.TwoHanded.Extra"), FString("Abilities Weapon TwoHanded Extra"));
 	GameplayTags.Abilities_Weapon_TwoHanded_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.TwoHanded.Execute"), FString("Abilities Weapon TwoHanded Execute"));
+	GameplayTags.Abilities_Weapon_Whip_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Weapon.Whip.Attack"), FString("Abilities Weapon Whip Attack"));
 
 	/*
 	 * Range Weapons

@@ -10,7 +10,7 @@ AMultiPartAICharacter::AMultiPartAICharacter()
 	MultiPartFlipbook = CreateDefaultSubobject<USkeletalMeshComponent>("MultiPartFlipbook");
 	MultiPartFlipbook->SetupAttachment(GetRootComponent());
 
-	GetSprite()->SetupAttachment(MultiPartFlipbook, HeadSocket);
+	GetSprite()->SetupAttachment(MultiPartFlipbook, TailSocket);
 	
 	HealthBar->SetupAttachment(GetSprite());
 }
