@@ -39,5 +39,5 @@ protected:
 	TObjectPtr<USkeletalMeshComponent> MultiPartFlipbook;
 
 	UPROPERTY(EditDefaultsOnly)
-	FName TailSocket = FName("Tail");
+	FName SpriteSocket = FName("Tail");
 };
