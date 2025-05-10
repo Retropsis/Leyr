@@ -23,7 +23,9 @@ public:
 
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
-	
+	void CheckForPlayerOverlap();
+	virtual void BeginPlay() override;
+
 	UPROPERTY(EditAnywhere, Category="Moving|Entangled")
 	float SwimmingSpeed = 50.f;
 

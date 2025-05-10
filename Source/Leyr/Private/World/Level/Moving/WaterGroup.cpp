@@ -4,6 +4,7 @@
 #include "Components/BoxComponent.h"
 #include "Interaction/PlayerInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Player/PlayerCharacter.h"
 
 AWaterGroup::AWaterGroup()
 {
@@ -18,9 +19,14 @@ void AWaterGroup::OnConstruction(const FTransform& Transform)
 	SurfaceZ = OverlapBox->GetComponentLocation().Z + OverlapBox->GetScaledBoxExtent().Z;
 }
 
+void AWaterGroup::BeginPlay()
+{
+	Super::BeginPlay();	
+	CheckForPlayerOverlap();
+}
+
 void AWaterGroup::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// if(OtherActor && OtherActor->Implements<UPlayerInterface>())
 	if(OtherComp && OtherComp->ComponentHasTag("SwimmingCollision"))
 	{
 		ActiveActors.AddUnique(OtherActor);
@@ -30,7 +36,6 @@ void AWaterGroup::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 
 void AWaterGroup::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	// if(OtherActor && OtherActor->Implements<UPlayerInterface>() && ActiveActors.Contains(OtherActor))
 	if(OtherComp && OtherComp->ComponentHasTag("SwimmingCollision") && ActiveActors.Contains(OtherActor))
 	{
 		ActiveActors.Remove(OtherActor);
@@ -71,6 +76,24 @@ void AWaterGroup::HandleActiveActors(float DeltaSeconds)
 			case EMovingDirection::Still:
 				break;
 			}
+		}
+	}
+}
+
+void AWaterGroup::CheckForPlayerOverlap()
+{
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(EOT_PlayerCapsule);
+	ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery3);
+	TArray<AActor*> ActorsToIgnore;
+	TArray<AActor*> OutActors;
+	UKismetSystemLibrary::BoxOverlapActors(this, GetActorLocation(), OverlapBox->GetScaledBoxExtent(), ObjectTypes, APlayerCharacter::StaticClass(), ActorsToIgnore, OutActors);
+	for (AActor* OverlapActor : OutActors)
+	{
+		if(OverlapActor && OverlapActor->Implements<UPlayerInterface>())
+		{
+			ActiveActors.AddUnique(OverlapActor);
+			IPlayerInterface::Execute_HandleSwimming(OverlapActor, MinZ, SwimmingSpeed, SwimmingGravityScale, false);
 		}
 	}
 }

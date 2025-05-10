@@ -102,6 +102,8 @@ void ABaseCharacter::MakeAndApplyEffectToSelf(const FGameplayTag Tag, float Leve
 	FGameplayEffectContextHandle EffectContext = GetAbilitySystemComponent()->MakeEffectContext();
 	EffectContext.AddSourceObject(this);
 
+	GetAbilitySystemComponent()->RemoveLooseGameplayTag(Tag);
+
 	FString EffectName = FString::Printf(TEXT("CombatState_%s"), *Tag.ToString());
 	UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(EffectName));
 

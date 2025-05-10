@@ -31,5 +31,6 @@ void AMultiPartAbilityActor::OnBeginOverlap(UPrimitiveComponent* OverlappedCompo
 		MultiPartFlipbook->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 		MultiPartFlipbook->SetAllBodiesBelowSimulatePhysics(FName("First"), true);
 		MultiPartFlipbook->AddImpulseToAllBodiesBelow(OtherActor->GetActorForwardVector() * ImpactImpulse, FName("Tail"), true);
+		HandleBeginOverlap();
 	}
 }

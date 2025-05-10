@@ -22,10 +22,13 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void HandleDetachment(FName BoneName);
 	
+	UFUNCTION(BlueprintImplementableEvent)
+	void HandleBeginOverlap();
+	
 protected:
 	UFUNCTION(BlueprintCallable)
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-		
+	
 	UPROPERTY(EditDefaultsOnly)
 	float ImpactImpulse = 100.f;
 	

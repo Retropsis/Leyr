@@ -326,6 +326,7 @@ void APlayerCharacter::InitAbilityActorInfo()
 	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::HitReactTagChanged);
  	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().StatusEffect_Stun, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::StunTagChanged);
 	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().StatusEffect_Burn, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::BurnTagChanged);
+	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().CombatState_Condition_Swimming, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::SwimmingTagChanged);
 	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Peaceful, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::PeacefulTagChanged);
 }
 
@@ -360,13 +361,16 @@ FTaggedMontage APlayerCharacter::GetTaggedMontageByIndex_Implementation(int32 In
 void APlayerCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 	bHitReacting = NewCount > 0;
+	const bool bRequiresPreviousState = AbilitySystemComponent->HasAnyMatchingGameplayTags(FBaseGameplayTags::Get().ToPreviousStateFilter);
+		
 	if(bHitReacting)
 	{
+		if (bRequiresPreviousState) PreviousCombatState = CombatState;
 		HandleCombatState(ECombatState::HitReact);
 	}
 	else
 	{
-		if (AbilitySystemComponent->HasAnyMatchingGameplayTags(FBaseGameplayTags::Get().ToPreviousStateFilter))
+		if (bRequiresPreviousState)
 		{
 			HandleCombatState(PreviousCombatState);
 		}
@@ -388,6 +392,20 @@ void APlayerCharacter::PeacefulTagChanged(const FGameplayTag CallbackTag, int32 
 		FCombatStateParams Params;
 		Params.bResetMovementMode = false;
 		HandleCombatState(ECombatState::Unoccupied, Params);
+	}
+}
+
+void APlayerCharacter::SwimmingTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	if (NewCount > 0)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Cyan, "SwimmingTagChanged");
+		// TODO : Spawn Entering Splashes and/or bubbles
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Cyan, "SwimmingFinished");
+		// TODO : Spawn Leaving Splashes and/or bubbles
 	}
 }
 
@@ -654,7 +672,10 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState, const FCombatSta
 	}
 
 	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-	GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(GameplayTags.CombatStates);
+	if (!AbilitySystemComponent->HasAnyMatchingGameplayTags(FBaseGameplayTags::Get().ToPreviousStateFilter))
+	{
+		GetAbilitySystemComponent()->RemoveActiveEffectsWithGrantedTags(GameplayTags.CombatStates);
+	}
 	
 	switch (CombatState) {
 	case ECombatState::Unoccupied:
@@ -724,7 +745,7 @@ void APlayerCharacter::HandleCombatState(ECombatState NewState, const FCombatSta
 	case ECombatState::OnRopeSlope:
 		break;
 	case ECombatState::HitReact:
-		PreviousCombatState = CombatState;
+		// PreviousCombatState = CombatState;
 		UnCrouch();
 		GetCharacterMovement()->StopActiveMovement();
 		GetCharacterMovement()->MaxWalkSpeed = 0.f;
@@ -897,10 +918,11 @@ void APlayerCharacter::HandleHangingOnLedge(const FVector& HangingTarget)
 void APlayerCharacter::SetMovementEnabled_Implementation(bool Enabled)
 {
 	GetCharacterMovement()->MaxWalkSpeed = !Enabled ? 0.f : BaseRunSpeed;
+	const bool bRequiresPreviousState = AbilitySystemComponent->HasAnyMatchingGameplayTags(FBaseGameplayTags::Get().ToPreviousStateFilter);
 	
 	if (Enabled)
 	{
-		if (AbilitySystemComponent->HasAnyMatchingGameplayTags(FBaseGameplayTags::Get().ToPreviousStateFilter))
+		if (bRequiresPreviousState)
 		{
 			// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Magenta, FString::Printf(TEXT("ToPreviousStateFilter")));
 			HandleCombatState(PreviousCombatState);
@@ -919,7 +941,7 @@ void APlayerCharacter::SetMovementEnabled_Implementation(bool Enabled)
 	}
 	else
 	{
-		PreviousCombatState = CombatState;
+		if (bRequiresPreviousState) PreviousCombatState = CombatState;
 		CombatState = ECombatState::Attacking;
 	}
 }
