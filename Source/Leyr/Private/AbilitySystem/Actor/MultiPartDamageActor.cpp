@@ -1,6 +1,5 @@
 // @ Retropsis 2024-2025.
 
-
 #include "AbilitySystem/Actor/MultiPartDamageActor.h"
 
 AMultiPartDamageActor::AMultiPartDamageActor()
@@ -18,7 +17,7 @@ void AMultiPartDamageActor::InteractHit_Implementation(AActor* InteractingActor,
 {
 	if(bCanBreak && BoneName != UnbreakableRoot)
 	{
-		// MultiPartFlipbook->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		MultiPartFlipbook->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 		MultiPartFlipbook->SetAllBodiesBelowSimulatePhysics(BoneName, true);
 		MultiPartFlipbook->AddImpulseToAllBodiesBelow(InteractingActor->GetActorForwardVector() * ImpactImpulse, BoneName, true);
 		HandleDetachment(BoneName);
@@ -29,9 +28,7 @@ void AMultiPartDamageActor::OnBeginOverlap(UPrimitiveComponent* OverlappedCompon
 {
 	if (OtherActor && OtherActor->ActorHasTag("Player"))
 	{
-		MultiPartFlipbook->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-		MultiPartFlipbook->SetAllBodiesBelowSimulatePhysics(FName("First"), true);
-		MultiPartFlipbook->AddImpulseToAllBodiesBelow(OtherActor->GetActorForwardVector() * ImpactImpulse, FName("Tail"), true);
 		HandleBeginOverlap();
+		CauseDamage(OtherActor);
 	}
 }

@@ -28,9 +28,11 @@ void AAbilityActor::BeginPlay()
 void AAbilityActor::InitAbilityActorInfo()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
-	if (HasAuthority())
+	if (HasAuthority() && AbilitySet)
 	{
-		InitializeDefaultAttributes();		
+		InitializeDefaultAttributes();
+		// FAbilitySet_GrantedHandles OutGrantedHandles;
+		// AbilitySet->GiveToAbilitySystem(Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent), &OutGrantedHandles, FGameplayTag(), Level, Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent));
 	}
 	// OnASCRegistered.Broadcast(AbilitySystemComponent);
 }

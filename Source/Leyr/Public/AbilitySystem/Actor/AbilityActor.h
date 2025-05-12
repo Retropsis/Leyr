@@ -9,6 +9,7 @@
 #include "Interaction/CombatInterface.h"
 #include "AbilityActor.generated.h"
 
+class UAbilitySet;
 class UPaperSprite;
 class UWidgetComponent;
 class UGameplayEffect;
@@ -49,6 +50,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
 	EActorClass ActorClass = EActorClass::Default;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
+	TObjectPtr<UAbilitySet> AbilitySet = nullptr;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Combat")
 	float LifeSpan = 1.f;
 	
@@ -57,7 +61,7 @@ protected:
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastHandleDestruction();
-
+	
 	UPROPERTY(BlueprintReadOnly)
 	bool bDestroyed = false;
 	

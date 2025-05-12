@@ -11,4 +11,3 @@ AWhip::AWhip()
 	Whip->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Whip->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
-

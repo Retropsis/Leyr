@@ -266,6 +266,8 @@ protected:
 	ECombatDirection CombatDirection = ECombatDirection::None;
 	ECombatDirection PreviousCombatDirection = ECombatDirection::None;
 
+	bool bApplyTag = false;
+
 	ECombatDirection GetCombatDirectionFromVector2D(FVector2D MovementVector);
 	void HandleCombatDirectionTag() const;
 	

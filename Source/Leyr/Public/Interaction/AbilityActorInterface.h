@@ -34,6 +34,9 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	EActorClass GetActorClass();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool ShouldShowFloatingText();
 	
 	// FOnASCRegistered& GetOnASCRegistered();
 	// FOnDeath& GetOnDeath();

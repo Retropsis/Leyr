@@ -233,7 +233,7 @@ void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 			}
 		}
 		
-		if(Props.TargetAvatarActor->Implements<UAbilityActorInterface>()) return;
+		if(Props.TargetAvatarActor->Implements<UAbilityActorInterface>() && !IAbilityActorInterface::Execute_ShouldShowFloatingText(Props.TargetAvatarActor)) return;
 
 		/* Message */
 		const bool bBlockedHit = ULeyrAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);

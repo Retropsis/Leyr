@@ -66,6 +66,8 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite)
 	bool bResetMovementMode = true;
+
+	bool bPreviousState = false;
 	
 	EMovementMode NewMovementMode = MOVE_None;
 };

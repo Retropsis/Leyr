@@ -14,6 +14,12 @@ class LEYR_API AWhip : public AActor
 public:	
 	AWhip();
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void HandleAttackFinished();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USkeletalMeshComponent> Whip;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UAnimationAsset> WhipIdle;
 };
