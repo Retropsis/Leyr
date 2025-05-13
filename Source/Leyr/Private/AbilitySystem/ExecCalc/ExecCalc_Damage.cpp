@@ -322,8 +322,6 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	const FGameplayModifierEvaluatedData EvaluatedData(UBaseAttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Additive, Damage);
 	OutExecutionOutput.AddOutputModifier(EvaluatedData);
-
-	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Magenta, FString::Printf(TEXT("===== %f ====="), Damage));
 	
 	if(ActiveSourceObjectEffectHandle.IsValid()) ExecutionParams.GetSourceAbilitySystemComponent()->RemoveActiveGameplayEffect(ActiveSourceObjectEffectHandle);
 }

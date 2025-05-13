@@ -19,18 +19,6 @@ AMultiPartActor::AMultiPartActor()
 	MultiPartFlipbook->SetCollisionResponseToChannel(ECC_Enemy, ECR_Block);
 }
 
-void AMultiPartActor::InteractHit_Implementation(AActor* InteractingActor, FName BoneName)
-{
-	if(!UnbreakableBones.Contains(BoneName))
-	{
-		MultiPartFlipbook->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-		MultiPartFlipbook->SetAllBodiesBelowSimulatePhysics(FName("First"), true);
-		MultiPartFlipbook->SetAllBodiesBelowSimulatePhysics(FName("First.R"), true);
-		MultiPartFlipbook->SetCollisionResponseToAllChannels(ECR_Ignore);
-		OnInteractHit(BoneName);
-	}
-}
-
 void AMultiPartActor::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	MultiPartFlipbook->SetBodySimulatePhysics(SweepResult.BoneName, true);

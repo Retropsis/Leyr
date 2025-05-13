@@ -31,15 +31,16 @@ void AMultiPartAICharacter::PlayMultiPartMontage(UAnimationAsset* AnimToPlay)
 
 void AMultiPartAICharacter::MulticastHandleDeath(const FVector& DeathImpulse, EDefeatState InDefeatState)
 {
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Player, ECR_Ignore);
-	MultiPartFlipbook->SetSimulatePhysics(true);
-	MultiPartFlipbook->SetEnableGravity(true);
-	MultiPartFlipbook->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
-	MultiPartFlipbook->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-	MultiPartFlipbook->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-	MultiPartFlipbook->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-	MultiPartFlipbook->SetCollisionResponseToChannel(ECC_Player, ECR_Ignore);
+	// MultiPartFlipbook->SetSimulatePhysics(true);
+	// MultiPartFlipbook->SetEnableGravity(true);
+	// MultiPartFlipbook->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	// MultiPartFlipbook->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	// MultiPartFlipbook->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	// MultiPartFlipbook->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	// MultiPartFlipbook->SetCollisionResponseToChannel(ECC_Player, ECR_Ignore);
 	HandleDeathMultiParts();
 	HandleDeath(InDefeatState);
 }
