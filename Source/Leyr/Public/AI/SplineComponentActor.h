@@ -19,5 +19,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<USplineComponent> SplineComponent;
 
+	UFUNCTION(BlueprintPure)
 	FORCEINLINE USplineComponent* GetSplineComponent() { return SplineComponent; }
 };

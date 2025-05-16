@@ -119,6 +119,7 @@ void AAICharacter::PossessedBy(AController* NewController)
 	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), false);
 	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("RangedAttacker"), CharacterClass != ECharacterClass::Warrior);
 	BaseAIController->GetBlackboardComponent()->SetValueAsVector(FName("StartLocation"), StartLocation);
+	BaseAIController->GetBlackboardComponent()->SetValueAsObject(FName("SplineComponent"), SplineComponentActor);
 	BaseAIController->SetPawn(this);
 
 	if (Arena)
@@ -688,6 +689,16 @@ bool AAICharacter::FollowSpline_Implementation(const int32 SplineIndex)
 	return FVector::Distance(GetActorLocation(), Destination) < 20.f;
 }
 
+bool AAICharacter::FollowSplinePoints_Implementation(int32 SplineIndex)
+{
+	if(SplinePoints.IsEmpty()) return false;
+	const FVector Destination = SplinePoints.IsValidIndex(SplineIndex) ? SplinePoints[SplineIndex] : FVector::ZeroVector;
+	const FVector Direction = (Destination - GetActorLocation()).GetSafeNormal();
+	AddMovementInput(Direction, 1.f);
+
+	return FVector::Distance(GetActorLocation(), Destination) < 40.f;
+}
+
 FVector AAICharacter::GetNextLocation_Implementation(const int32 SplineIndex)
 {
 	if(SplineComponentActor == nullptr) return GetActorLocation();
@@ -707,16 +718,6 @@ void AAICharacter::StartSplineMovement_Implementation()
 	SplinePoints.Add(CombatTarget->GetActorLocation() + GetActorForwardVector() * 300.f);
 	SplinePoints.Add(FVector(CombatTarget->GetActorLocation().X + GetActorForwardVector().X * 900.f, 0.f, GetActorLocation().Z));
 	// SplineComponentActor->GetSplineComponent()->SetSplinePoints(SplinePoints, ESplineCoordinateSpace::World);
-}
-
-bool AAICharacter::FollowSplinePoints_Implementation(int32 SplineIndex)
-{
-	if(SplinePoints.IsEmpty()) return false;
-	const FVector Destination = SplinePoints.IsValidIndex(SplineIndex) ? SplinePoints[SplineIndex] : FVector::ZeroVector;
-	const FVector Direction = (Destination - GetActorLocation()).GetSafeNormal();
-	AddMovementInput(Direction, 1.f);
-
-	return FVector::Distance(GetActorLocation(), Destination) < 40.f;
 }
 
 void AAICharacter::SetNewMovementSpeed_Implementation(EMovementMode InMovementMode, float NewSpeed)
@@ -878,4 +879,13 @@ void AAICharacter::RandomAmplitudeFromRange(const float Min, const float Max)
 {
 	const float Sign = FMath::RandBool() ? 1.f : -1.f;
 	SineAmplitude = FMath::FRandRange(Sign * Min, Sign * Max);
+}
+
+ASplineComponentActor* AAICharacter::FindSplineForTag(const FGameplayTag& Tag)
+{
+	if (PatternTagToSplineComponents.Contains(Tag))
+	{
+		return PatternTagToSplineComponents[Tag];
+	}
+	return nullptr;
 }

@@ -57,7 +57,7 @@ void UBaseGameplayAbility::InitAbility()
 	PaperAnimInstance = ICombatInterface::Execute_GetPaperAnimInstance(GetAvatarActorFromActorInfo());
 	UpperBodyAnimInstance = ICombatInterface::Execute_GetUpperBodyAnimInstance(GetAvatarActorFromActorInfo());
 	WeaponAnimInstance = ICombatInterface::Execute_GetWeaponAnimInstance(GetAvatarActorFromActorInfo());
-	WeaponAnimInstance->StopAllAnimationOverrides();
+	if (WeaponAnimInstance) WeaponAnimInstance->StopAllAnimationOverrides();
 	
 	DamageType = FBaseGameplayTags::Get().Damage_Physical;
 	

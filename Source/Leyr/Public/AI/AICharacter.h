@@ -26,6 +26,7 @@ class UWidgetComponent;
 /**
  * 
  */
+
 UCLASS()
 class LEYR_API AAICharacter : public ABaseCharacter, public IEnemyInterface, public IAIInterface
 {
@@ -120,7 +121,13 @@ public:
 	float LifeSpan = 5.f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|AI")
-	TObjectPtr<ASplineComponentActor> SplineComponentActor;
+	ASplineComponentActor* SplineComponentActor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|AI")
+	TMap<FGameplayTag, ASplineComponentActor*> PatternTagToSplineComponents;
+
+	UFUNCTION(BlueprintPure)
+	ASplineComponentActor* FindSplineForTag(const FGameplayTag& Tag);
 	
 	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	TObjectPtr<ANavMeshBoundsVolume> NavMeshBoundsVolume;
