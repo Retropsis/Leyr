@@ -2,6 +2,7 @@
 
 #include "AI/MultiPartAICharacter.h"
 #include "PaperFlipbookComponent.h"
+#include "AI/MultiPartAnimInstance.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
 
@@ -26,6 +27,28 @@ void AMultiPartAICharacter::PlayMultiPartMontage(UAnimationAsset* AnimToPlay)
 	if (MultiPartFlipbook)
 	{
 		MultiPartFlipbook->PlayAnimation(AnimToPlay, false);
+	}
+}
+
+void AMultiPartAICharacter::ChangeDirection_Implementation(EDirection NewDirection)
+{
+	if (MultiPartFlipbook == nullptr) return;
+	if (UMultiPartAnimInstance* AnimInstance = Cast<UMultiPartAnimInstance>(MultiPartFlipbook->GetAnimInstance()))
+	{
+		AnimInstance->Direction = NewDirection;
+	}
+}
+
+void AMultiPartAICharacter::ChangeMultiPartAnimInstance_Implementation(const TSubclassOf<UAnimInstance> NewInstance)
+{
+	SetMultiPartAnimInstance(NewInstance);
+}
+
+void AMultiPartAICharacter::SetMultiPartAnimInstance(const TSubclassOf<UAnimInstance> NewInstance)
+{
+	if (MultiPartFlipbook && NewInstance)
+	{
+		MultiPartFlipbook->SetAnimInstanceClass(NewInstance);
 	}
 }
 

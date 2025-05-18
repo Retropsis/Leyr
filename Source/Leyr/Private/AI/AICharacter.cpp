@@ -119,7 +119,6 @@ void AAICharacter::PossessedBy(AController* NewController)
 	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), false);
 	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("RangedAttacker"), CharacterClass != ECharacterClass::Warrior);
 	BaseAIController->GetBlackboardComponent()->SetValueAsVector(FName("StartLocation"), StartLocation);
-	BaseAIController->GetBlackboardComponent()->SetValueAsObject(FName("SplineComponent"), SplineComponentActor);
 	BaseAIController->SetPawn(this);
 
 	if (Arena)
@@ -167,6 +166,7 @@ void AAICharacter::BeginPlay()
 	checkf(EncounterData->AbilitySet, TEXT("AbilitySet is missing on [%s]"), *EncounterData->GetName());
 	
 	GetCharacterMovement()->MaxWalkSpeed = BaseWalkSpeed;
+	GetCharacterMovement()->MaxFlySpeed = BaseFlySpeed;
 	GetCharacterMovement()->GravityScale = BaseGravityScale;
 	InitAbilityActorInfo();
 	AddCharacterAbilities();
@@ -261,6 +261,7 @@ void AAICharacter::InitializeCharacterInfo()
 	ChasingHeightOffset = EncounterData->BehaviourData->ChasingHeightOffset;
 	DivingSpeed = EncounterData->BehaviourData->DivingSpeed;
 	BaseWalkSpeed = EncounterData->BehaviourData->BaseWalkSpeed;
+	BaseFlySpeed = EncounterData->BehaviourData->BaseFlySpeed;
 	
 	bCollisionCauseDamage = EncounterData->BehaviourData->bCollisionCauseDamage;
 	if(bCollisionCauseDamage)
@@ -392,6 +393,7 @@ void AAICharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewC
 {
 	bHitReacting = NewCount > 0;
 	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	GetCharacterMovement()->MaxFlySpeed = bHitReacting ? 0.f : BaseFlySpeed;
 	if (BaseAIController && BaseAIController->GetBlackboardComponent())
 	{
 		BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), bHitReacting);
@@ -442,6 +444,14 @@ void AAICharacter::HandleCombatTargetDefeated(AActor* Actor)
 	if (UAICharacterAnimInstance* Instance = Cast<UAICharacterAnimInstance>(AnimationComponent->GetAnimInstance()))
 	{
 		Instance->bIsCombatTargetDefeated = true;
+	}
+}
+
+void AAICharacter::ChangePaperAnimInstance_Implementation(const TSubclassOf<UPaperZDAnimInstance> NewInstance)
+{
+	if (AnimationComponent && NewInstance)
+	{
+		AnimationComponent->SetAnimInstanceClass(NewInstance);
 	}
 }
 
@@ -882,10 +892,79 @@ void AAICharacter::RandomAmplitudeFromRange(const float Min, const float Max)
 }
 
 ASplineComponentActor* AAICharacter::FindSplineForTag(const FGameplayTag& Tag)
-{
-	if (PatternTagToSplineComponents.Contains(Tag))
+{	
+	if (PatternParams.Contains(Tag))
 	{
-		return PatternTagToSplineComponents[Tag];
+		if (PatternParams[Tag].SplineComponentActors.Num() > 0)
+		{
+			return  PatternParams[Tag].SplineComponentActors[FMath::RandRange(0, PatternParams[Tag].SplineComponentActors.Num() - 1)];
+		}
 	}
 	return nullptr;
+}
+
+ASplineComponentActor* AAICharacter::FindSplineForTagName_Implementation(const FName& TagName)
+{
+	return FindSplineForTagName(TagName);
+}
+
+UPaperZDAnimInstance* AAICharacter::FindPaperAnimInstanceForTag(const FGameplayTag& Tag)
+{
+	if (PatternParams.Contains(Tag))
+	{
+		return PatternParams[Tag].PaperAnimInstance.GetDefaultObject();
+	}
+	return nullptr;
+}
+
+UPaperZDAnimInstance* AAICharacter::FindPaperAnimInstanceForTagName_Implementation(const FName& TagName)
+{
+	return FindPaperAnimInstanceForTagName(TagName);
+}
+
+UAnimInstance* AAICharacter::FindMultiPartAnimInstanceForTag(const FGameplayTag& Tag)
+{
+	if (PatternParams.Contains(Tag))
+	{
+		return PatternParams[Tag].MultiPartAnimInstance.GetDefaultObject();
+	}
+	return nullptr;
+}
+
+UAnimInstance* AAICharacter::FindMultiPartAnimInstanceForTagName_Implementation(const FName& TagName)
+{
+	return FindMultiPartAnimInstanceForTagName(TagName);
+}
+
+void AAICharacter::FindAndApplyPatternParamsForPattern_Implementation(const FName& PatternName)
+{
+	const FGameplayTag PatternTag = FGameplayTag::RequestGameplayTag(PatternName);
+	if (PatternTag.IsValid() && PatternParams.Contains(PatternTag))
+	{
+		const FPatternParams Params = PatternParams[PatternTag];
+		switch (BehaviourType) {
+		case EBehaviourType::Patrol: 
+		case EBehaviourType::Ranger:
+			GetCharacterMovement()->MaxWalkSpeed = Params.Speed > 0.f ? Params.Speed : BaseWalkSpeed;
+			break;
+		case EBehaviourType::Turret:
+			break;
+		case EBehaviourType::Airborne:
+		case EBehaviourType::Aquatic:
+			GetCharacterMovement()->MaxFlySpeed = Params.Speed > 0.f ? Params.Speed : BaseFlySpeed;
+			break;
+		}
+		if (Params.SplineComponentActors.Num() > 0)
+		{
+			SplineComponentActor = Params.SplineComponentActors[FMath::RandRange(0, Params.SplineComponentActors.Num() - 1)];
+		}
+		if (AnimationComponent && Params.PaperAnimInstance)
+		{
+			AnimationComponent->SetAnimInstanceClass(Params.PaperAnimInstance);
+		}
+		if (Params.MultiPartAnimInstance)
+		{
+			SetMultiPartAnimInstance(Params.MultiPartAnimInstance);
+		}		
+	}
 }

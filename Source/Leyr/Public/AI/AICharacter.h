@@ -60,8 +60,25 @@ public:
 
 	UFUNCTION()
 	void HandleCombatTargetDefeated(AActor* Actor);
+
+	UFUNCTION(BlueprintPure)
+	UAnimInstance* FindMultiPartAnimInstanceForTag(const FGameplayTag& Tag);
+	
+	UFUNCTION(BlueprintPure)
+	UPaperZDAnimInstance* FindPaperAnimInstanceForTag(const FGameplayTag& Tag);
+	
+	UFUNCTION(BlueprintPure)
+	ASplineComponentActor* FindSplineForTag(const FGameplayTag& Tag);
+
+	virtual void SetMultiPartAnimInstance(TSubclassOf<UAnimInstance> NewInstance) {}
 	
 	/** AI Interface */
+	virtual void ChangePaperAnimInstance_Implementation(TSubclassOf<UPaperZDAnimInstance> NewInstance) override;
+	virtual UAnimInstance* FindMultiPartAnimInstanceForTagName_Implementation(const FName& TagName) override;
+	virtual UPaperZDAnimInstance* FindPaperAnimInstanceForTagName_Implementation(const FName& TagName) override;
+	virtual ASplineComponentActor* FindSplineForTagName_Implementation(const FName& TagName) override;
+	virtual void FindAndApplyPatternParamsForPattern_Implementation(const FName& PatternName) override;
+	
 	virtual FVector FindRandomLocation_Implementation() override;
 	virtual bool MoveToLocation_Implementation(FVector TargetLocation, float Threshold, bool bBackward = false) override;
 	virtual FVector FindTargetLocation_Implementation(AActor* TargetActor, float DistanceToKeep) override;
@@ -122,12 +139,12 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Character|AI")
 	ASplineComponentActor* SplineComponentActor;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Character|AI")
+	TArray<FGameplayTag> BehaviourPatterns;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|AI")
-	TMap<FGameplayTag, ASplineComponentActor*> PatternTagToSplineComponents;
-
-	UFUNCTION(BlueprintPure)
-	ASplineComponentActor* FindSplineForTag(const FGameplayTag& Tag);
+	TMap<FGameplayTag, FPatternParams> PatternParams;
 	
 	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	TObjectPtr<ANavMeshBoundsVolume> NavMeshBoundsVolume;
@@ -145,8 +162,6 @@ public:
 	TObjectPtr<AArena> Arena = nullptr;
 
 	// TODO: Add this to Data
-	UPROPERTY(EditDefaultsOnly, Category = "Character|AI")
-	TArray<FGameplayTag> BehaviourPatterns;
 
 protected:
 	virtual void BeginPlay() override;

@@ -7,6 +7,9 @@
 #include "World/Level/Zone/Arena.h"
 #include "AIInterface.generated.h"
 
+class ASplineComponentActor;
+struct FGameplayTag;
+class UPaperZDAnimInstance;
 enum class EEncounterSize : uint8;
 enum class EMovementType : uint8;
 enum class EBehaviourState : uint8;
@@ -29,6 +32,27 @@ class LEYR_API IAIInterface
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	/*
+	 * Components / Classes
+	 */	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	ASplineComponentActor* FindSplineForTagName(const FName& TagName);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UPaperZDAnimInstance* FindPaperAnimInstanceForTagName(const FName& TagName);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UAnimInstance* FindMultiPartAnimInstanceForTagName(const FName& TagName);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ChangePaperAnimInstance(TSubclassOf<UPaperZDAnimInstance> NewInstance);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void FindAndApplyPatternParamsForPattern(const FName& PatternName);
+	
+	/*
+	 * Movement
+	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void StartSplineMovement();
 

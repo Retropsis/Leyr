@@ -64,6 +64,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, meta=(EditCondition="bEditValues", EditConditionHides)) // How fast to chase the player
 	float BaseWalkSpeed = 120.f;
 	
+	UPROPERTY(EditDefaultsOnly, meta=(EditCondition="bEditValues", EditConditionHides)) // How fast to chase the player
+	float BaseFlySpeed = 120.f;
+	
 	UPROPERTY(EditDefaultsOnly)
 	bool bCollisionCauseDamage = false;
 

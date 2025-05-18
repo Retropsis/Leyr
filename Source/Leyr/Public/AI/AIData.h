@@ -1,6 +1,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AIData.generated.h"
+
+class UPaperZDAnimInstance;
+class ASplineComponentActor;
 
 UENUM(BlueprintType)
 enum class EEncounterSize : uint8
@@ -51,4 +55,23 @@ enum class EMovementType : uint8
 	Spline UMETA(DisplayName="Spline"),
 	Patrol UMETA(DisplayName="Patrol"),
 	Points UMETA(DisplayName="Points"),
+};
+
+USTRUCT(BlueprintType)
+struct FPatternParams
+{
+	GENERATED_BODY();
+
+public:	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Speed = -1.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<ASplineComponentActor*> SplineComponentActors;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<UPaperZDAnimInstance> PaperAnimInstance = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<UAnimInstance> MultiPartAnimInstance = nullptr;
 };

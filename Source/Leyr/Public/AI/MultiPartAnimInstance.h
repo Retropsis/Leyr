@@ -9,6 +9,7 @@
 UENUM(Blueprintable, BlueprintType)
 enum class EDirection : uint8
 {
+	None,
 	Left,
 	Right,
 	Downward,

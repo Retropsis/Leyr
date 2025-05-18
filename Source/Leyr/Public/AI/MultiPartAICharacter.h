@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AI/AICharacter.h"
+#include "Interaction/MultiPartAIInterface.h"
 #include "MultiPartAICharacter.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAnimationFinished);
@@ -12,7 +13,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAnimationFinished);
  * 
  */
 UCLASS()
-class LEYR_API AMultiPartAICharacter : public AAICharacter
+class LEYR_API AMultiPartAICharacter : public AAICharacter, public IMultiPartAIInterface
 {
 	GENERATED_BODY()
 
@@ -20,6 +21,12 @@ public:
 	AMultiPartAICharacter();
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 
+	//~ IMultiPartAIInterface
+	virtual void ChangeDirection_Implementation(EDirection NewDirection) override;
+	virtual void ChangeMultiPartAnimInstance_Implementation(TSubclassOf<UAnimInstance> NewInstance) override;
+	virtual void SetMultiPartAnimInstance(TSubclassOf<UAnimInstance> NewInstance) override;
+	//~ IMultiPartAIInterface
+	
 	UFUNCTION(BlueprintImplementableEvent)
 	void PlayHitReactMontage();
 
@@ -35,6 +42,10 @@ public:
 protected:
 	virtual void MulticastHandleDeath(const FVector& DeathImpulse, EDefeatState InDefeatState) override;
 
+public:
+	
+
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USkeletalMeshComponent> MultiPartFlipbook;
 
