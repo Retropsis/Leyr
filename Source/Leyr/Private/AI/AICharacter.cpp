@@ -16,6 +16,7 @@
 #include "Components/SplineComponent.h"
 #include "Components/TimelineComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Data/AttributeData.h"
 #include "Data/BehaviourData.h"
 #include "Data/EncounterData.h"
 #include "Engine/AssetManager.h"
@@ -227,7 +228,7 @@ void AAICharacter::InitAbilityActorInfo()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 	Cast<UBaseAbilitySystemComponent>(AbilitySystemComponent)->AbilityActorInfoSet();
-	// InitializeDefaultAttributes(); // Done along AbilitySet->GiveToAbilitySystem
+	InitializeDefaultAttributes(); 
 	OnASCRegistered.Broadcast(AbilitySystemComponent);
 }
 
@@ -289,8 +290,26 @@ void AAICharacter::InitializeCharacterInfo()
 
 void AAICharacter::AddCharacterAbilities()
 {	
-	UBaseAbilitySystemComponent* BaseASC = CastChecked<UBaseAbilitySystemComponent>(AbilitySystemComponent);
-	EncounterData->AbilitySet->GiveToAbilitySystem(BaseASC, &GrantedHandles, FGameplayTag(), Level, BaseASC);
+	EncounterData->AbilitySet->GiveToAbilitySystem(AbilitySystemComponent, &GrantedHandles, FGameplayTag(), Level, AbilitySystemComponent);
+}
+
+void AAICharacter::InitializeDefaultAttributes() const
+{
+	EncounterData->AttributeData->GiveToAbilitySystem(AbilitySystemComponent, Level);
+}
+
+/*
+ * Tag Changed Callbacks
+ */
+void AAICharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	bHitReacting = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	GetCharacterMovement()->MaxFlySpeed = bHitReacting ? 0.f : BaseFlySpeed;
+	if (BaseAIController && BaseAIController->GetBlackboardComponent())
+	{
+		BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), bHitReacting);
+	}
 }
 
 void AAICharacter::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
@@ -302,15 +321,8 @@ void AAICharacter::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount
 	}
 }
 
-void AAICharacter::OnRep_Stunned()
-{
-	Super::OnRep_Stunned();
-}
-
-void AAICharacter::OnRep_Burned()
-{
-	Super::OnRep_Burned();
-}
+void AAICharacter::OnRep_Stunned() { Super::OnRep_Stunned(); }
+void AAICharacter::OnRep_Burned() { Super::OnRep_Burned(); }
 
 void AAICharacter::InitializeNavigationBounds()
 {
@@ -389,17 +401,6 @@ void AAICharacter::HandleBeginOverlap(AActor* OtherActor)
 	}
 }
 
-void AAICharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
-{
-	bHitReacting = NewCount > 0;
-	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
-	GetCharacterMovement()->MaxFlySpeed = bHitReacting ? 0.f : BaseFlySpeed;
-	if (BaseAIController && BaseAIController->GetBlackboardComponent())
-	{
-		BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), bHitReacting);
-	}
-}
-
 /*
  * Combat Interface
  */
@@ -438,6 +439,7 @@ void AAICharacter::SetCombatTarget_Implementation(AActor* InCombatTarget)
 	}
 }
 
+// ReSharper disable once CppMemberFunctionMayBeConst
 void AAICharacter::HandleCombatTargetDefeated(AActor* Actor)
 {
 	if (BaseAIController) BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("ShouldEndCombat"), true);
@@ -486,7 +488,7 @@ bool AAICharacter::MoveToLocation_Implementation(FVector TargetLocation, float T
 	if ((GetActorLocation() - TargetLocation).Size() > Threshold)
 	{
 		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetLocation.X, GetActorLocation().Y, TargetLocation.Z));
-		const FRotator WorldDirection = FRotator(LookAtRotation.Pitch, 0.f, 0.f);
+		// const FRotator WorldDirection = FRotator(LookAtRotation.Pitch, 0.f, 0.f);
 		AddMovementInput(LookAtRotation.Vector(), 1.f, true);
 		if(!bBackward && FVector::DotProduct(LookAtRotation.Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
 		return false;
@@ -664,7 +666,7 @@ void AAICharacter::FlyAroundTarget_Implementation()
 		}
 	}
 	const FVector Movement{ FMath::Cos(DeltaTime * 1.5f), 0.f, FMath::Sin(DeltaTime * 1.5f) };
-	const float CurrentDistance = FMath::FInterpTo((FlyAroundTargetLocation - ActorLocation).Length(), FlyAroundRadius, DeltaTime, 5.f);
+	// const float CurrentDistance = FMath::FInterpTo((FlyAroundTargetLocation - ActorLocation).Length(), FlyAroundRadius, DeltaTime, 5.f);
 
 	const FVector NewTargetLocation = FVector{ FlyAroundTargetLocation.X + FactorX + Movement.X * FlyAroundRadius, 0.f, FlyAroundTargetLocation.Z + Movement.Z * FlyAroundRadius };
 	SetActorLocation(FMath::VInterpConstantTo(ActorLocation, NewTargetLocation, DeltaTime, 2.f));

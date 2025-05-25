@@ -10,7 +10,7 @@ UMMC_MaxMana::UMMC_MaxMana()
 	IntelligenceDef.AttributeSource = EGameplayEffectAttributeCaptureSource::Target;
 	IntelligenceDef.bSnapshot = false;
 	
-	WisdomDef.AttributeToCapture = UBaseAttributeSet::GetIntelligenceAttribute();
+	WisdomDef.AttributeToCapture = UBaseAttributeSet::GetWisdomAttribute();
 	WisdomDef.AttributeSource = EGameplayEffectAttributeCaptureSource::Target;
 	WisdomDef.bSnapshot = false;
 

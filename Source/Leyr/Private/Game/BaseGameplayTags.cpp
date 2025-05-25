@@ -399,6 +399,9 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.GameplayCue_Weapon_Bow_Shot = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Bow.Shot"), FString("GameplayCue Weapon Bow Shot"));
 	GameplayTags.GameplayCue_Alteration_Berserk_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Alteration.Berserk.1"), FString("GameplayCue Alteration Berserk 1"));
 	GameplayTags.GameplayCue_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Execute"), FString("GameplayCue Execute"));
+	GameplayTags.GameplayCue_WaterSplash_Small = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.WaterSplash.Small"), FString("GameplayCue WaterSplash_Small"));
+	GameplayTags.GameplayCue_WaterSplash_Regular = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.WaterSplash.Regular"), FString("GameplayCue WaterSplash_Regular"));
+	GameplayTags.GameplayCue_WaterSplash_Large = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.WaterSplash.Large"), FString("GameplayCue WaterSplash_Large"));
 	
 	/*
 	 * Asset Cues
@@ -511,6 +514,12 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Montage_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Execute"), FString("Montage Execute"));
 	GameplayTags.Montage_HitStop = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.HitStop"), FString("Montage HitStop"));
 	GameplayTags.Montage_Impulse = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Impulse"), FString("Montage Impulse"));
+	
+	GameplayTags.Montage_Cue = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Cue"), FString("Montage Cue"));
+	GameplayTags.Montage_Cue_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Cue.1"), FString("Montage Cue 1"));
+	GameplayTags.Montage_Cue_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Cue.2"), FString("Montage Cue 2"));
+	GameplayTags.Montage_Cue_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Cue.3"), FString("Montage Cue 3"));
+	GameplayTags.Montage_Cue_4 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Cue.4"), FString("Montage Cue 4"));
 	
 	GameplayTags.Montage_Window_Combo = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Window.Combo"), FString("Montage Window Combo"));
 	GameplayTags.Montage_Window_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Window.Execute"), FString("Montage Window Execute"));

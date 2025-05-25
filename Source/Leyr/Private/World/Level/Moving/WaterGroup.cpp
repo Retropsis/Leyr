@@ -1,6 +1,8 @@
 // @ Retropsis 2024-2025.
 
 #include "World/Level/Moving/WaterGroup.h"
+
+#include "NiagaraFunctionLibrary.h"
 #include "Components/BoxComponent.h"
 #include "Interaction/PlayerInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -31,6 +33,8 @@ void AWaterGroup::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	{
 		ActiveActors.AddUnique(OtherActor);
 		IPlayerInterface::Execute_HandleSwimming(OtherActor, MinZ, SwimmingSpeed, SwimmingGravityScale, false);
+		FVector Location{ OtherComp->GetComponentLocation().X, 0.f, OverlapBox->GetComponentLocation().Z + OverlapBox->GetScaledBoxExtent().Z + 32.f };
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, WaterSplash, Location);
 	}
 }
 
@@ -40,6 +44,8 @@ void AWaterGroup::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 	{
 		ActiveActors.Remove(OtherActor);
 		IPlayerInterface::Execute_HandleSwimming(OtherActor, 0.f, 0.f, 0.f, true);
+		FVector Location{ OtherComp->GetComponentLocation().X, 0.f, OverlapBox->GetComponentLocation().Z + OverlapBox->GetScaledBoxExtent().Z + 32.f };
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, WaterSplash, Location);
 	}
 }
 

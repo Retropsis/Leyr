@@ -12,6 +12,7 @@ class APointCollection;
 class UBehaviourData;
 class UEncounterData;
 class AAICharacter;
+
 /**
  * 
  */
@@ -30,9 +31,10 @@ public:
 	void Respawn(AActor* DefeatedEncounter);
 
 	void DespawnEncounter();
+	bool RequestRespawnEncounter(AAICharacter* Encounter);
 
 	FVector FindRandomPointWithinBounds(const FVector& Origin) const;
-
+	
 	UPROPERTY()
 	float RespawnTime = 120.f;
 	
@@ -41,6 +43,9 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category="Spawner")
 	UEncounterData* EncounterData = nullptr;
+	
+	UPROPERTY(EditAnywhere, Category="Spawner")
+	UBehaviourData* OverrideBehaviourData = nullptr;
 
 	UPROPERTY(EditAnywhere, Category="Spawner")
 	int32 EncounterLevel = 1;
@@ -57,6 +62,7 @@ public:
 	UPROPERTY() FVector PreferredLocation = FVector::ZeroVector;
 	UPROPERTY() FTransform SpawnTransform = FTransform::Identity;
 	UPROPERTY(EditDefaultsOnly) float PreferredSpawningRange = 750.f;
+	UPROPERTY() TObjectPtr<AActor> Target = nullptr;
 
 private:
 	UPROPERTY() TArray<TObjectPtr<AActor>> CurrentSpawns;

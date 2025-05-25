@@ -29,7 +29,7 @@ public:
 
 	UFUNCTION(CallInEditor)
 	void InitializeSpawnPoints();
-	
+
 	UFUNCTION(CallInEditor)
 	void UpdateSpawnPoints();
 	
@@ -47,6 +47,9 @@ protected:
 	
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
+	UFUNCTION()
+	virtual void OnDespawnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UPROPERTY(EditAnywhere, Category="Spawner")
 	TObjectPtr<UEncounterSpawnData> EncounterSpawnData;
@@ -68,6 +71,12 @@ private:
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> SpawningBoundsVisualizer;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UBoxComponent> DespawningBounds;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UStaticMeshComponent> DespawningBoundsVisualizer;
 	
 	UPROPERTY(SaveGame)
 	bool bActivated = false;

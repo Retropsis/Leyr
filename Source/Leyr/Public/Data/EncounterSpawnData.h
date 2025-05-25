@@ -25,8 +25,11 @@ enum class ESpawnLocationType : uint8
 	Point,
 	AroundPoint,
 	PointCollection,
+	PointCollectionRandom,
 	Random,
 	RandomCloseToPlayer,
+	OutOfBounds,
+	OutOfBoundsFixed,
 };
 
 USTRUCT(BlueprintType)

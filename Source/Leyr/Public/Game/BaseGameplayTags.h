@@ -324,6 +324,9 @@ FGameplayTag GameplayCue_Weapon_Bow_Shot;
 FGameplayTag GameplayCue_Execute;
 FGameplayTag GameplayCue_Weapon_Throw;
 FGameplayTag GameplayCue_Shield;
+FGameplayTag GameplayCue_WaterSplash_Small;
+FGameplayTag GameplayCue_WaterSplash_Regular;
+FGameplayTag GameplayCue_WaterSplash_Large;
  
 FGameplayTag GameplayCue_Alteration_Berserk_1;
  
@@ -454,6 +457,12 @@ FGameplayTag Montage_Impulse;
  
 FGameplayTag Montage_Window_Combo;
 FGameplayTag Montage_Window_Execute;
+ 
+FGameplayTag Montage_Cue;
+FGameplayTag Montage_Cue_1;
+FGameplayTag Montage_Cue_2;
+FGameplayTag Montage_Cue_3;
+FGameplayTag Montage_Cue_4;
  
  /*
   * Equipment Tags

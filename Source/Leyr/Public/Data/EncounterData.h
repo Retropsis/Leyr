@@ -9,6 +9,7 @@
 #include "Engine/DataAsset.h"
 #include "EncounterData.generated.h"
 
+class UAttributeData;
 enum class ECharacterClass : uint8;
 class ULootDataSet;
 class UAbilitySet;
@@ -32,6 +33,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UAbilitySet> AbilitySet;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UAttributeData> AttributeData;
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UBehaviourData> BehaviourData = nullptr;

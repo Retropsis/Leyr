@@ -132,12 +132,16 @@ void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 	}
 }
 
+/*
+ * Encounters from the previous Boundary are destroyed when the player leaves
+ * (doesn't handle case where encounter destroyed if itself leaves)
+ */
 void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>() && OtherActor->Implements<UCombatInterface>() && ICombatInterface::Execute_GetDefeatState(OtherActor) == EDefeatState::None)
 	{
 		OnPlayerLeaving.Broadcast();
-		DestroyOutOfBoundsEncounters();
+		// DestroyOutOfBoundsEncounters();
 		ToggleLevelActorActivity(false);
 		LevelArea_GrantedHandles.TakeFromAbilitySystem(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor));
 	}

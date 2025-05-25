@@ -13,6 +13,11 @@ AEncounterSpawnPoint::AEncounterSpawnPoint()
 
 void AEncounterSpawnPoint::SpawnEncounter()
 {
+	if (Target && SpawnLocationType == ESpawnLocationType::OutOfBounds)
+	{
+		SetActorLocation(FVector{ GetActorLocation().X, 0.f, Target->GetActorLocation().Z });
+	}
+	
 	if (EncounterData->EncounterClass)
 	{
 		UAssetManager::GetStreamableManager().RequestAsyncLoad(EncounterData->EncounterClass.ToSoftObjectPath(), [this] ()
@@ -21,12 +26,21 @@ void AEncounterSpawnPoint::SpawnEncounter()
 			if (IsValid(LoadedAsset))
 			{
 				TArray<FVector> SpawnLocations;
-				if (PointCollectionClass && SpawnLocationType == ESpawnLocationType::PointCollection)
+				if (PointCollectionClass)
 				{
 					FActorSpawnParameters SpawnParams;
 					SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 					APointCollection* PointCollection = GetWorld()->SpawnActor<APointCollection>(PointCollectionClass, GetActorTransform(), SpawnParams);
-					SpawnLocations = PointCollection->GetGroundLocations(Count);
+					if (SpawnLocationType == ESpawnLocationType::PointCollection)
+					{
+						SpawnLocations = PointCollection->GetGroundLocations(Count);
+					}
+					if (Target && SpawnLocationType == ESpawnLocationType::PointCollectionRandom)
+					{
+						PointCollection->SetActorLocation(FVector{ PointCollection->GetActorLocation().X, 0.f, Target->GetActorLocation().Z });
+						SpawnLocations = PointCollection->GetLocations();
+					}
+					if (PointCollection) PointCollection->Destroy();
 				}
 				
 				for (int i = 0; i < Count; ++i)
@@ -41,20 +55,28 @@ void AEncounterSpawnPoint::SpawnEncounter()
 					case ESpawnLocationType::PointCollection:
 						SpawnTransform.SetLocation(SpawnLocations[i] + FVector{ 0.f, 0.f, 75.f });
 						break;
+					case ESpawnLocationType::PointCollectionRandom:
+						SpawnTransform.SetLocation(SpawnLocations[FMath::RandRange(0, SpawnLocations.Num() - 1)]);
+						break;
 					case ESpawnLocationType::Random:
 						SpawnTransform.SetLocation(FVector{ FMath::FRandRange(SpawningBounds.Left.X, SpawningBounds.Right.X), 0.f, SpawningBounds.Left.Z });
 						break;
 					case ESpawnLocationType::RandomCloseToPlayer:
 						SpawnTransform.SetLocation(FindRandomPointWithinBounds(PreferredLocation));
 						break;
+					case ESpawnLocationType::OutOfBounds:
+						break;
+					case ESpawnLocationType::OutOfBoundsFixed:
+						break;
 					}
 
 					// Spawn An Encounter
-					AAICharacter* Encounter = GetWorld()->SpawnActorDeferred<AAICharacter>(LoadedAsset, SpawnTransform, this, nullptr,
-						ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn);
+					AAICharacter* Encounter = GetWorld()->SpawnActorDeferred<AAICharacter>(LoadedAsset, SpawnTransform, this, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 					Encounter->SetEncounterLevel(EncounterLevel);
 					Encounter->SetEncounterData(EncounterData);
-					IAIInterface::Execute_SetSpawningBounds(Encounter, SpawningBounds);
+					Encounter->InitializeEncounterData();
+					if (OverrideBehaviourData) Encounter->SetBehaviourData(OverrideBehaviourData);
+					IAIInterface::Execute_SetSpawningBounds(Encounter, SpawningBounds);					
 					Encounter->FinishSpawning(SpawnTransform);
 					Encounter->SpawnDefaultController();
 					CurrentSpawns.Add(Encounter);
@@ -73,6 +95,8 @@ void AEncounterSpawnPoint::SpawnEncounter()
 void AEncounterSpawnPoint::Respawn(AActor* DefeatedEncounter)
 {
 	CurrentCount--;
+	CurrentSpawns.Remove(DefeatedEncounter);
+	if (DefeatedEncounter) DefeatedEncounter->Destroy();
 	if(CurrentCount <= 0)
 	{
 		GetWorldTimerManager().SetTimer(RespawnTimer, [this] (){ SpawnEncounter(); }, RespawnTime, false);
@@ -80,21 +104,35 @@ void AEncounterSpawnPoint::Respawn(AActor* DefeatedEncounter)
 	}
 }
 
+/*
+ * Despawn encounter when player leaves
+ * (not killed, it doesn't respawn and timer is invalidated)
+ */
 void AEncounterSpawnPoint::DespawnEncounter()
 {
-	if (CurrentSpawns.Num() > 0)
+	for (int i = 0; i < CurrentSpawns.Num(); ++i)
 	{
-		for (TObjectPtr<AActor> CurrentSpawn : CurrentSpawns)
+		if (CurrentSpawns[i] != nullptr)
 		{
-			if (IsValid(CurrentSpawn))
-			{
-				CurrentSpawn->Destroy();
-				CurrentSpawn = nullptr;
-			}
+			CurrentSpawns[i]->Destroy();
+			CurrentSpawns.Shrink();
 		}
 	}
 	GetWorldTimerManager().ClearTimer(RespawnTimer);
 	RespawnTimer.Invalidate();
+}
+
+/*
+ * Request to respawn
+ */
+bool AEncounterSpawnPoint::RequestRespawnEncounter(AAICharacter* Encounter)
+{
+	if (IsValid(Encounter) && CurrentSpawns.Contains(Encounter))
+	{
+		Respawn(Encounter);
+		return true;
+	}
+	return false;
 }
 
 FVector AEncounterSpawnPoint::FindRandomPointWithinBounds(const FVector& Origin) const

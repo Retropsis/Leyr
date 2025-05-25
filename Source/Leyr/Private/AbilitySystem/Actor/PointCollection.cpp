@@ -108,8 +108,21 @@ TArray<FVector> APointCollection::GetGroundLocations(int32 NumPoints)
 	return ArrayCopy;
 }
 
-void APointCollection::BeginPlay()
+TArray<FVector> APointCollection::GetLocations()
+{ 
+	TArray<FVector> ArrayCopy;
+	for (const TObjectPtr<USceneComponent>& Point : Points)
+	{ 
+		FVector ToPoint = Point->GetComponentLocation() - GetActorLocation();
+		Point->SetWorldLocation(GetActorLocation() + ToPoint);
+		ArrayCopy.Add(Point->GetComponentLocation());
+	}
+	return ArrayCopy;
+}
+
+FVector APointCollection::GetRandomLocation()
 {
-	Super::BeginPlay();
+	if (Points.Num() == 0) return GetActorLocation();
+	return Points[FMath::RandRange(0, Points.Num() - 1)]->GetComponentLocation();
 }
 

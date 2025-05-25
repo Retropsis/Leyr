@@ -19,10 +19,14 @@ public:
 	
 	UFUNCTION(BlueprintPure)
 	TArray<FVector> GetGroundLocations(int32 NumPoints);
+	
+	UFUNCTION(BlueprintPure)
+	TArray<FVector> GetLocations();
+	
+	UFUNCTION(BlueprintPure)
+	FVector GetRandomLocation();
  	
 protected:
-	virtual void BeginPlay() override;
-
 	UPROPERTY(EditDefaultsOnly)
 	float LiveActorRadius = 350.f;
 	

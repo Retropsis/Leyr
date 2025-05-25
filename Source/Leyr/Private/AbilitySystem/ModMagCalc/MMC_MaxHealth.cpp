@@ -26,8 +26,13 @@ float UMMC_MaxHealth::CalculateBaseMagnitude_Implementation(const FGameplayEffec
 	EvaluationParameters.TargetTags = TargetTags;
 
 	float Vitality = 0.f;
-	GetCapturedAttributeMagnitude(VitalityDef, Spec, EvaluationParameters, Vitality);
+	float HasFailed = GetCapturedAttributeMagnitude(VitalityDef, Spec, EvaluationParameters, Vitality);
 	Vitality = FMath::Max<float>(Vitality, 0.f);
+
+	// if (HasFailed)
+	// {
+	// 	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Magenta, FString::Printf(TEXT("%s has failed"), *Spec.GetContext().GetSourceObject()->GetName()));
+	// }
 
 	int32 CharacterLevel = 1;
 	if (Spec.GetContext().GetSourceObject()->Implements<UCombatInterface>())
@@ -52,5 +57,6 @@ float UMMC_MaxHealth::CalculateBaseMagnitude_Implementation(const FGameplayEffec
 		}
 	}
 	// return /*80.f + */2.5f * Vitality + 10.f * CharacterLevel;
+	// GEngine->AddOnScreenDebugMessage(-1, 999.f, FColor::Magenta, FString::Printf(TEXT("EncounterSizeFactor[%f] Vitality[%f] CharacterLevel[%d] = [%f]"), EncounterSizeFactor, Vitality, CharacterLevel, EncounterSizeFactor * Vitality + 5.f * CharacterLevel));
 	return EncounterSizeFactor * Vitality + 5.f * CharacterLevel;
 }

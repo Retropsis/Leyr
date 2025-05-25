@@ -5,11 +5,13 @@
 #include "CoreMinimal.h"
 #include "AI/BaseCharacter.h"
 #include "AIData.h"
+#include "Data/EncounterData.h"
 #include "Interaction/AIInterface.h"
 #include "Interaction/EnemyInterface.h"
 #include "UI/Controller/OverlayWidgetController.h"
 #include "AICharacter.generated.h"
 
+class UBehaviourData;
 class UTimelineComponent;
 enum class EBehaviourType : uint8;
 class ULootDataSet;
@@ -121,6 +123,8 @@ public:
 	void SetEncounterClass(const ECharacterClass NewClass) { CharacterClass = NewClass; }
 	void SetEncounterLevel(const int32 InLevel) { Level = InLevel; }
 	void SetEncounterData(UEncounterData* Data) { EncounterData = Data; }
+	void SetBehaviourData(UBehaviourData* Data) const { if (EncounterData) EncounterData->BehaviourData = Data; }
+	void InitializeEncounterData() { InitializeCharacterInfo(); }
 	
 	UPROPERTY(BlueprintReadWrite, Category = "Combat")
 	TObjectPtr<AActor> CombatTarget;
@@ -161,12 +165,10 @@ public:
 	UPROPERTY(EditInstanceOnly, Category = "Character|AI")
 	TObjectPtr<AArena> Arena = nullptr;
 
-	// TODO: Add this to Data
-
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;
-	virtual void InitializeDefaultAttributes() const override {}
+	virtual void InitializeDefaultAttributes() const override;
 	virtual void InitializeCharacterInfo() override;
 	virtual void AddCharacterAbilities() override;
 	virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;

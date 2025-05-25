@@ -1,6 +1,7 @@
 // @ Retropsis 2024-2025.
 
 #include "World/Level/Spawner/EncounterSpawnVolume.h"
+#include "AI/AICharacter.h"
 #include "Components/BoxComponent.h"
 #include "Data/EncounterData.h"
 #include "Interaction/PlayerInterface.h"
@@ -41,6 +42,20 @@ AEncounterSpawnVolume::AEncounterSpawnVolume()
 	SpawningBoundsVisualizer->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SpawningBoundsVisualizer->SetHiddenInGame(true);
 	SpawningBoundsVisualizer->SetGenerateOverlapEvents(false);
+	
+	DespawningBounds = CreateDefaultSubobject<UBoxComponent>("DespawningBounds");
+	DespawningBounds->SetupAttachment(GetRootComponent());
+	DespawningBounds->InitBoxExtent(FVector{ 100.f });
+	DespawningBounds->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	DespawningBounds->SetCollisionResponseToAllChannels(ECR_Ignore);
+	DespawningBounds->SetCollisionResponseToChannel(ECC_Enemy, ECR_Overlap);
+	
+	DespawningBoundsVisualizer = CreateDefaultSubobject<UStaticMeshComponent>("DespawningBoundsVisualizer");
+	DespawningBoundsVisualizer->SetupAttachment(DespawningBounds);
+	DespawningBoundsVisualizer->SetWorldScale3D(FVector{ 2.f });
+	DespawningBoundsVisualizer->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	DespawningBoundsVisualizer->SetHiddenInGame(true);
+	DespawningBoundsVisualizer->SetGenerateOverlapEvents(false);
 }
 
 void AEncounterSpawnVolume::LoadActor_Implementation()
@@ -70,6 +85,7 @@ void AEncounterSpawnVolume::InitializeSpawnPoints()
 			SpawnPoint->EncounterClass = Spawn.EncounterClass;
 			SpawnPoint->EncounterLevel = Spawn.Level;
 			SpawnPoint->EncounterData = Spawn.EncounterData;
+			SpawnPoint->OverrideBehaviourData = Spawn.OverrideBehaviourData;
 			SpawnPoint->RespawnTime = Spawn.RespawnTime;
 			SpawnPoint->SpawnerType = Spawn.SpawnerType;
 			SpawnPoint->SpawnLocationType = Spawn.SpawnLocationType;
@@ -83,7 +99,30 @@ void AEncounterSpawnVolume::InitializeSpawnPoints()
 }
 
 void AEncounterSpawnVolume::UpdateSpawnPoints()
-{	
+{
+	if (SpawnPoints.IsEmpty() || !IsValid(EncounterSpawnData)) return;
+	
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	for (int i = 0; i < EncounterSpawnData->EncounterSpawns.Num(); ++i)
+	{
+		FEncounterSpawn Spawn = EncounterSpawnData->EncounterSpawns[i];
+		AEncounterSpawnPoint* SpawnPoint = SpawnPoints[i];
+
+		if (SpawnPoint == nullptr) continue;
+		
+		if(Spawn.OverrideBehaviourData) Spawn.EncounterData->BehaviourData = Spawn.OverrideBehaviourData;
+		SpawnPoint->EncounterClass = Spawn.EncounterClass;
+		SpawnPoint->EncounterLevel = Spawn.Level;
+		SpawnPoint->EncounterData = Spawn.EncounterData;
+		SpawnPoint->RespawnTime = Spawn.RespawnTime;
+		SpawnPoint->SpawnerType = Spawn.SpawnerType;
+		SpawnPoint->SpawnLocationType = Spawn.SpawnLocationType;
+		SpawnPoint->PreferredSpawningRange = Spawn.PreferredSpawningRange;
+		SpawnPoint->PointCollectionClass = Spawn.PointCollectionClass;
+		SpawnPoint->Count = Spawn.Count;
+	}
 }
 
 void AEncounterSpawnVolume::BeginPlay()
@@ -92,6 +131,7 @@ void AEncounterSpawnVolume::BeginPlay()
 	if (HasAuthority())
 	{
 		TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &AEncounterSpawnVolume::OnBeginOverlap);
+		DespawningBounds->OnComponentEndOverlap.AddDynamic(this, &AEncounterSpawnVolume::OnDespawnOverlap);
 	}
 }
 
@@ -105,11 +145,23 @@ void AEncounterSpawnVolume::OnBeginOverlap(UPrimitiveComponent* OverlappedCompon
 			{
 				SpawnPoint->PreferredLocation = FVector{ OtherActor->GetActorLocation().X, 0.f, GetActorLocation().Z };
 				SpawnPoint->SpawningBounds = CalculateBounds();
+				SpawnPoint->Target = OtherActor;
 				SpawnPoint->SpawnEncounter();
 			}
 		}
 		if (SpawnerType == ESpawnerType::Once) bActivated = true;
 		DisableVolume();
+	}
+}
+
+void AEncounterSpawnVolume::OnDespawnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if(AAICharacter* Encounter = Cast<AAICharacter>(OtherActor))
+	{
+		for (AEncounterSpawnPoint* SpawnPoint : SpawnPoints)
+		{
+			if (SpawnPoint->RequestRespawnEncounter(Encounter)) return;
+		}
 	}
 }
 

@@ -115,7 +115,7 @@ void UDamageGameplayAbility::ForEachHitTryCausingDamage(TArray<FHitResult> HitRe
 			if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitActor))
 			{
 				CauseDamage(TargetASC);
-				FVector Loc = Hit.GetComponent() ? Hit.GetComponent()->GetComponentLocation() : Hit.GetActor()->GetActorLocation();
+				FVector Loc = Hit.GetComponent() ? Hit.GetComponent()->GetComponentLocation() : Hit.GetActor() ? Hit.GetActor()->GetActorLocation() : Hit.ImpactPoint;
 				HitLocation = (Loc + Hit.ImpactPoint) / 2.f;
 				HitLocation.Y = 0.f;
 				HitActors.AddUnique(HitActor);
