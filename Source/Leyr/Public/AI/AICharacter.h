@@ -49,10 +49,6 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void SetupCollisionDamage();
 	
-// #if WITH_EDITOR
-// 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-// #endif
-	
 	/** Combat Interface */
 	virtual int32 GetCharacterLevel_Implementation() override { return Level; }
 	virtual void SetCombatTarget_Implementation(AActor* InCombatTarget) override;
@@ -124,7 +120,6 @@ public:
 	void SetEncounterLevel(const int32 InLevel) { Level = InLevel; }
 	void SetEncounterData(UEncounterData* Data) { EncounterData = Data; }
 	void SetBehaviourData(UBehaviourData* Data) const { if (EncounterData) EncounterData->BehaviourData = Data; }
-	void InitializeEncounterData() { InitializeCharacterInfo(); }
 	
 	UPROPERTY(BlueprintReadWrite, Category = "Combat")
 	TObjectPtr<AActor> CombatTarget;
@@ -155,8 +150,10 @@ public:
 	
 	UPROPERTY(EditAnywhere, Category = "Character|AI")
 	bool bShouldBuildNavMesh = false;
-	
+
+	UPROPERTY()
 	TObjectPtr<USplineComponent> SplineComponent;
+	
 	TArray<FVector> SplinePoints;
 
 	UPROPERTY(EditAnywhere, Category = "Character|AI")
@@ -286,4 +283,7 @@ public:
 	virtual EMovementType GetMovementType_Implementation() override { return MovementType; }
 
 	UFUNCTION(BlueprintPure) bool ShouldCollisionCauseDamage() const { return bCollisionCauseDamage; }
+	
+	virtual ECharacterClass GetEncounterClass() override { return CharacterClass; }
+	virtual int32 GetEncounterLevel() override { return Level; }
 };

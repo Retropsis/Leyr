@@ -24,17 +24,10 @@ CustomCalculationBasedFloat##Name.CalculationClassMagnitude = AttributeData.Calc
 ModifierInfo##Name.ModifierMagnitude = CustomCalculationBasedFloat##Name; \
 VitalAttributes.Add(ModifierInfo##Name); \
 
-// FAttributeBasedFloat AttributeBasedFloat##Name; \
-// AttributeBasedFloat##Name.Coefficient = AttributeData.Coefficient; \
-// AttributeBasedFloat##Name.PreMultiplyAdditiveValue = AttributeData.PreMultiplyAdditiveValue; \
-// AttributeBasedFloat##Name.PostMultiplyAdditiveValue = AttributeData.PostMultiplyAdditiveValue; \
-// AttributeBasedFloat##Name.BackingAttribute = FGameplayEffectAttributeCaptureDefinition(AttributeData.BackingAttribute, EGameplayEffectAttributeCaptureSource::Source, false); \
-// ModifierInfo##Name.ModifierMagnitude = AttributeBasedFloat##Name; \
-
-void UAttributeData::BuildAttributes()
+TArray<FGameplayModifierInfo> UAttributeData::BuildPrimaryAttributes()
 {
-	Attributes.Empty();
-	VitalAttributes.Empty();
+	TArray<FGameplayModifierInfo> Attributes;
+	
 	ATTRIBUTE(STR, UBaseAttributeSet::GetStrengthAttribute(), Strength);
 	ATTRIBUTE(DEX, UBaseAttributeSet::GetDexterityAttribute(), Dexterity);
 	ATTRIBUTE(VIT, UBaseAttributeSet::GetVitalityAttribute(), Vitality);
@@ -42,24 +35,21 @@ void UAttributeData::BuildAttributes()
 	ATTRIBUTE(WIS, UBaseAttributeSet::GetWisdomAttribute(), Wisdom);
 	ATTRIBUTE(SPR, UBaseAttributeSet::GetSpiritAttribute(), Spirit);
 	ATTRIBUTE(LCK, UBaseAttributeSet::GetLuckAttribute(), Luck);
+	return Attributes;
+}
+
+TArray<FGameplayModifierInfo> UAttributeData::BuildVitalAttributes() const
+{
+	TArray<FGameplayModifierInfo> VitalAttributes;
+	
 	VITAL_ATTRIBUTE(HP, UBaseAttributeSet::GetMaxHealthAttribute(), MaxHealth);
 	VITAL_ATTRIBUTE(MP, UBaseAttributeSet::GetMaxManaAttribute(), MaxMana);
-	
-	// FGameplayModifierInfo ModifierInfoTest; \
-	// ModifierInfoTest.Attribute = UBaseAttributeSet::GetMaxHealthAttribute(); 
-	// ModifierInfoTest.ModifierOp = EGameplayModOp::Override;
-	// FCustomCalculationBasedFloat CustomCalculationBasedFloat;
-	// CustomCalculationBasedFloat.Coefficient = MaxHealth.Coefficient;
-	// CustomCalculationBasedFloat.PreMultiplyAdditiveValue = MaxHealth.PreMultiplyAdditiveValue; 
-	// CustomCalculationBasedFloat.PostMultiplyAdditiveValue = MaxHealth.PostMultiplyAdditiveValue; 
-	// CustomCalculationBasedFloat.CalculationClassMagnitude = MaxHealth.CalculationClassMagnitude;
-	// ModifierInfoTest.ModifierMagnitude = CustomCalculationBasedFloat; 
-	// VitalAttributes.Add(ModifierInfoTest); 
+	return VitalAttributes;
 }
 
 void UAttributeData::GiveToAbilitySystem(UAbilitySystemComponent* ASC, const float Level)
 {
-	BuildAttributes();
+	BuildPrimaryAttributes();
 	
 	FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
 	EffectContext.AddSourceObject(ASC->GetAvatarActor());
@@ -68,23 +58,18 @@ void UAttributeData::GiveToAbilitySystem(UAbilitySystemComponent* ASC, const flo
 	UGameplayEffect* Effect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(EffectName));
 	
 	Effect->DurationPolicy = EGameplayEffectDurationType::Instant;
-	Effect->StackingType = EGameplayEffectStackingType::AggregateBySource;
-	Effect->StackLimitCount = 1;
-	Effect->Modifiers.Append(Attributes);
+	Effect->Modifiers.Append(BuildPrimaryAttributes());
 	
-	// const UGameplayEffect* GameplayEffect = EffectToGrant.GameplayEffect->GetDefaultObject<UGameplayEffect>();
 	const FActiveGameplayEffectHandle GameplayEffectHandle = ASC->ApplyGameplayEffectToSelf(Effect, Level, EffectContext);
 	
-	const FString VitalAttributesEffectName = FString::Printf(TEXT("VitalAttributes"));
-	UGameplayEffect* VitalAttributesEffect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(VitalAttributesEffectName));
+	FGameplayEffectContextHandle VitalEffectContext = ASC->MakeEffectContext();
+	VitalEffectContext.AddSourceObject(ASC->GetAvatarActor());
+
+	const FString VitalEffectName = FString::Printf(TEXT("VitalAttributes"));
+	UGameplayEffect* VitalEffect = NewObject<UGameplayEffect>(GetTransientPackage(), FName(VitalEffectName));
 	
-	VitalAttributesEffect->DurationPolicy = EGameplayEffectDurationType::Instant;
-	VitalAttributesEffect->StackingType = EGameplayEffectStackingType::AggregateBySource;
-	VitalAttributesEffect->StackLimitCount = 1;
-	VitalAttributesEffect->Modifiers.Append(VitalAttributes);
+	VitalEffect->DurationPolicy = EGameplayEffectDurationType::Instant;
+	VitalEffect->Modifiers.Append(BuildVitalAttributes());
 	
-	// const UGameplayEffect* GameplayEffect = EffectToGrant.GameplayEffect->GetDefaultObject<UGameplayEffect>();
-	FGameplayEffectContextHandle VItalAttributesEffectContext = ASC->MakeEffectContext();
-	VItalAttributesEffectContext.AddSourceObject(ASC->GetAvatarActor());
-	const FActiveGameplayEffectHandle VitalAttributesEffectHandle = ASC->ApplyGameplayEffectToSelf(VitalAttributesEffect, Level, VItalAttributesEffectContext);
+	const FActiveGameplayEffectHandle VitalGameplayEffectHandle = ASC->ApplyGameplayEffectToSelf(VitalEffect, Level, VitalEffectContext);
 }

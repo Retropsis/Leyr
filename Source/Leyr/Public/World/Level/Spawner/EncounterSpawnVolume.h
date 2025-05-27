@@ -32,6 +32,12 @@ public:
 
 	UFUNCTION(CallInEditor)
 	void UpdateSpawnPoints();
+
+	UFUNCTION(CallInEditor)
+	void SetTriggerBoundaryToRoomSize() const;
+
+	UFUNCTION(CallInEditor)
+	void SetDespawnBoundaryToRoomSize() const;
 	
 	UFUNCTION()
 	void HandlePlayerLeaving();
@@ -41,6 +47,8 @@ public:
 	
 	void ClearSpawnPoints();
 	void SetEncounterSpawnData(UEncounterSpawnData* Data) { EncounterSpawnData = Data; }
+	
+	FBoxSphereBounds TileMapBounds;
 
 protected:
 	virtual void BeginPlay() override;
@@ -64,19 +72,10 @@ private:
 	TObjectPtr<UBoxComponent> TriggerVolume;
 	
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UStaticMeshComponent> TriggerVolumeVisualizer;
-	
-	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBoxComponent> SpawningBounds;
 	
 	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UStaticMeshComponent> SpawningBoundsVisualizer;
-	
-	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBoxComponent> DespawningBounds;
-	
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<UStaticMeshComponent> DespawningBoundsVisualizer;
 	
 	UPROPERTY(SaveGame)
 	bool bActivated = false;

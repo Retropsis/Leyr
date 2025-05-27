@@ -16,21 +16,27 @@ class UPaperZDAnimInstance;
 class UItemData;
 
 USTRUCT(BlueprintType)
-struct FEndAbilityParams
-{
-	GENERATED_BODY()
-
-	UPROPERTY(BlueprintReadWrite)
-	bool bResetPitch = true;
-};
-
-USTRUCT(BlueprintType)
 struct FInitAbilityParams
 {
 	GENERATED_BODY()
 
 	UPROPERTY(BlueprintReadWrite)
 	bool bResetPitch = true;
+
+	UPROPERTY(BlueprintReadWrite)
+	FGameplayTagContainer TagsToApply;
+};
+
+USTRUCT(BlueprintType)
+struct FEndAbilityParams
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite)
+	bool bResetPitch = true;
+	
+	UPROPERTY(BlueprintReadWrite)
+	FGameplayTagContainer TagsToRemove;
 };
 
 /**

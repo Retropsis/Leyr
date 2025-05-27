@@ -35,6 +35,8 @@ public:
 	virtual void Die(const FVector& DeathImpulse, bool bExecute) = 0;
 	virtual FOnASCRegistered& GetOnASCRegistered() = 0;
 	virtual FOnDeath& GetOnDeath() = 0;
+	virtual ECharacterClass GetEncounterClass() { return ECharacterClass::Default; }
+	virtual int32 GetEncounterLevel() { return 0; }
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void BroadcastOnDeath();

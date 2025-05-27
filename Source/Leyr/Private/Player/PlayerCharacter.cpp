@@ -323,11 +323,13 @@ void APlayerCharacter::InitAbilityActorInfo()
 	// }
 
 	//TODO: Move this to some other (PlayerState, BeginPlay)
-	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::HitReactTagChanged);
- 	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().StatusEffect_Stun, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::StunTagChanged);
-	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().StatusEffect_Burn, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::BurnTagChanged);
-	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().CombatState_Condition_Swimming, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::SwimmingTagChanged);
-	AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Peaceful, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::PeacefulTagChanged);
+	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+	AbilitySystemComponent->RegisterGameplayTagEvent(GameplayTags.StatusEffect_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::HitReactTagChanged);
+ 	AbilitySystemComponent->RegisterGameplayTagEvent(GameplayTags.StatusEffect_Stun, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::StunTagChanged);
+	AbilitySystemComponent->RegisterGameplayTagEvent(GameplayTags.StatusEffect_Burn, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::BurnTagChanged);
+	AbilitySystemComponent->RegisterGameplayTagEvent(GameplayTags.CombatState_Condition_Swimming, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::SwimmingTagChanged);
+	AbilitySystemComponent->RegisterGameplayTagEvent(GameplayTags.Peaceful, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::PeacefulTagChanged);
+	AbilitySystemComponent->RegisterGameplayTagEvent(GameplayTags.CombatState_Rule, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::RuleTagChanged);
 }
 
 void APlayerCharacter::InitializeCharacterInfo()
@@ -362,22 +364,25 @@ void APlayerCharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 
 {
 	bHitReacting = NewCount > 0;
 	const bool bRequiresPreviousState = AbilitySystemComponent->HasAnyMatchingGameplayTags(FBaseGameplayTags::Get().ToPreviousStateFilter);
+	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
 		
 	if(bHitReacting)
 	{
-		if (bRequiresPreviousState) PreviousCombatState = CombatState;
-		HandleCombatState(ECombatState::HitReact);
+		// if (bRequiresPreviousState) PreviousCombatState = CombatState;
+		// HandleCombatState(ECombatState::HitReact);
+		AbilitySystemComponent->AddLooseGameplayTags(GameplayTags.CombatState_Rule_Block_Movement.GetSingleTagContainer());
 	}
 	else
 	{
-		if (bRequiresPreviousState)
-		{
-			HandleCombatState(PreviousCombatState);
-		}
-		else
-		{
-			HandleCombatState(ECombatState::Unoccupied);
-		}
+		AbilitySystemComponent->RemoveLooseGameplayTags(GameplayTags.CombatState_Rule_Block_Movement.GetSingleTagContainer());
+		// if (bRequiresPreviousState)
+		// {
+		// 	HandleCombatState(PreviousCombatState);
+		// }
+		// else
+		// {
+		// 	HandleCombatState(ECombatState::Unoccupied);
+		// }
 	}
 }
 
@@ -409,11 +414,27 @@ void APlayerCharacter::SwimmingTagChanged(const FGameplayTag CallbackTag, int32 
 	}
 }
 
+void APlayerCharacter::RuleTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+	if (AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Rule_Block_Movement))
+	{
+		GetCharacterMovement()->StopMovementImmediately();
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, FString::Printf(TEXT("RuleTagChanged: [%s] [%d]"), *GameplayTags.CombatState_Rule_Block_Movement.ToString(), NewCount));
+	}
+	// if (AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Rule_Block_Ability))
+	// {
+	// }
+}
+
 /*
  * Movement
  */
 void APlayerCharacter::Move(const FVector2D MovementVector)
 {
+	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+	if (AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Rule_Block_Movement)) return;
+	
 	if(CombatState >= ECombatState::Dodging) return;
 	
 	if(CombatState < ECombatState::Aiming && CombatState != ECombatState::Attacking) RotateController();

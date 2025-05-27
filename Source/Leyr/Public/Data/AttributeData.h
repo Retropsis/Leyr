@@ -43,7 +43,6 @@ class LEYR_API UAttributeData : public UPrimaryDataAsset
 	GENERATED_BODY()
 	
 public:
-	void BuildAttributes();
 	void GiveToAbilitySystem(UAbilitySystemComponent* ASC, float Level);
 	
 	UPROPERTY(EditDefaultsOnly, DisplayName="HP (Health Points)", meta=(FullyExpand=true))
@@ -72,8 +71,8 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, DisplayName="LCK (Luck)", meta=(FullyExpand=true))
 	FAttribute Luck;
-
+	
 private:
-	TArray<FGameplayModifierInfo> Attributes;
-	TArray<FGameplayModifierInfo> VitalAttributes;
+	TArray<FGameplayModifierInfo> BuildPrimaryAttributes();
+	TArray<FGameplayModifierInfo> BuildVitalAttributes() const;
 };

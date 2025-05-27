@@ -113,6 +113,7 @@ void UBaseGameplayAbility::InitAbility()
 void UBaseGameplayAbility::InitAbilityWithParams(FInitAbilityParams Params)
 {
 	bResetPitch = Params.bResetPitch;
+	GetAbilitySystemComponentFromActorInfo()->AddLooseGameplayTags(Params.TagsToApply);
 	InitAbility();
 }
 
@@ -127,6 +128,7 @@ void UBaseGameplayAbility::PrepareToEndAbility()
 void UBaseGameplayAbility::PrepareToEndAbilityWithParams(FEndAbilityParams Params)
 {
 	bResetPitch = Params.bResetPitch;
+	GetAbilitySystemComponentFromActorInfo()->RemoveLooseGameplayTags(Params.TagsToRemove);
 	PrepareToEndAbility();
 }
 

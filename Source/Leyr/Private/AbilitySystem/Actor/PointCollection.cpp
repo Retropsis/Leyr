@@ -120,6 +120,20 @@ TArray<FVector> APointCollection::GetLocations()
 	return ArrayCopy;
 }
 
+TArray<FVector> APointCollection::GetLocationsWithTag(FName Tag)
+{
+	TArray<FVector> ArrayCopy;
+	for (const TObjectPtr<USceneComponent>& Point : Points)
+	{
+		if (!Point->ComponentHasTag(Tag)) continue;
+		
+		FVector ToPoint = Point->GetComponentLocation() - GetActorLocation();
+		Point->SetWorldLocation(GetActorLocation() + ToPoint);
+		ArrayCopy.Add(Point->GetComponentLocation());
+	}
+	return ArrayCopy;
+}
+
 FVector APointCollection::GetRandomLocation()
 {
 	if (Points.Num() == 0) return GetActorLocation();

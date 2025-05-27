@@ -24,6 +24,9 @@ public:
 	TArray<FVector> GetLocations();
 	
 	UFUNCTION(BlueprintPure)
+	TArray<FVector> GetLocationsWithTag(FName Tag);
+	
+	UFUNCTION(BlueprintPure)
 	FVector GetRandomLocation();
  	
 protected:

@@ -122,6 +122,7 @@ FGameplayTag Healing_Mana;
  /*
   * Status Effects
   */
+FGameplayTag StatusEffect_HitReact;
 FGameplayTag StatusEffect_Burn;
 FGameplayTag StatusEffect_Stun;
 FGameplayTag StatusEffect_Poison;
@@ -300,11 +301,22 @@ FGameplayTag CombatState_Directional_Downward;
 FGameplayTag CombatState_Directional_Forward;
 FGameplayTag CombatState_Directional_ForwardUp;
 FGameplayTag CombatState_Directional_ForwardDown;
+	
+FGameplayTag CombatState_Rule;
+FGameplayTag CombatState_Rule_Block;
+FGameplayTag CombatState_Rule_Block_All;
+FGameplayTag CombatState_Rule_Block_Movement;
+FGameplayTag CombatState_Rule_Block_Ability;
+FGameplayTag CombatState_Rule_Stop;
+FGameplayTag CombatState_Rule_Stop_All;
+FGameplayTag CombatState_Rule_Stop_Movement;
+FGameplayTag CombatState_Rule_Stop_Ability;
  
  FGameplayTagContainer CombatStates;
  FGameplayTagContainer CombatDirections;
  FGameplayTagContainer ToPreviousStateFilter;
  FGameplayTagContainer ToUnoccupiedStateFilter;
+ FGameplayTagContainer CombatStateRules;
 
  /*
   * Gameplay Cues
@@ -373,11 +385,6 @@ FGameplayTag Cooldown_SwimImpulse;
  FGameplayTag Cost_Bolt;
  FGameplayTag Cost_Bone;
  FGameplayTag Cost_Feather;
- 
-/*
- * Side Effects
- */
-FGameplayTag Effects_HitReact;
  
  /*
   * Combat Sockets
@@ -553,6 +560,14 @@ FGameplayTag Player_Block_CursorTrace;
  FGameplayTag AI_Pattern_Phase3_B;
  FGameplayTag AI_Pattern_Phase3_C;
  FGameplayTag AI_Pattern_Phase3_D;
+
+/*
+ * Spawn Positions
+*/
+FGameplayTag Spawn_Left;
+FGameplayTag Spawn_Right;
+FGameplayTag Spawn_Above;
+FGameplayTag Spawn_Below;
  
 private:
 	static FBaseGameplayTags GameplayTags;

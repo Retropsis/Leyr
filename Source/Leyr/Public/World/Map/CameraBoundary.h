@@ -148,4 +148,5 @@ protected:
 private:
 	UPROPERTY() TObjectPtr<AActor> TargetActor;
 	UPROPERTY() FLevelArea_GrantedHandles LevelArea_GrantedHandles;
+	FBoxSphereBounds TileMapBounds;
 };

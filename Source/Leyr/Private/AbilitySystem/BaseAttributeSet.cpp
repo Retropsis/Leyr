@@ -6,6 +6,7 @@
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "GameplayEffectExtension.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
+#include "AI/AICharacter.h"
 #include "Game/BaseGameplayTags.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -173,9 +174,13 @@ void UBaseAttributeSet::SendXPEvent(const FEffectProperties& Props)
 {
 	if (Props.TargetAvatarActor->Implements<UCombatInterface>())
 	{
-		const int32 TargetLevel = ICombatInterface::Execute_GetCharacterLevel(Props.TargetAvatarActor);
-		const ECharacterClass TargetClass = ICombatInterface::Execute_GetCharacterClass(Props.TargetAvatarActor);
+		// const int32 TargetLevel = ICombatInterface::Execute_GetCharacterLevel(Props.TargetAvatarActor);
+		// const ECharacterClass TargetClass = ICombatInterface::Execute_GetCharacterClass(Props.TargetAvatarActor);
+		const int32 TargetLevel = Cast<ICombatInterface>(Props.TargetAvatarActor)->GetEncounterLevel();
+		const ECharacterClass TargetClass = Cast<ICombatInterface>(Props.TargetAvatarActor)->GetEncounterClass();
 		const int32 XPReward = ULeyrAbilitySystemLibrary::GetXPRewardForClassAndLevel(Props.TargetAvatarActor, TargetClass, TargetLevel);
+
+		// GEngine->AddOnScreenDebugMessage(-1, 12.f, FColor::Green, FString::Printf(TEXT("[%s] [%d]"), *UEnum::GetValueAsString(Character->GetCharacterClass()), Character->GetCharacterLevel()));
 
 		const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 		FGameplayEventData Payload;
@@ -223,7 +228,7 @@ void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 		{
 			if (Props.TargetCharacter && Props.TargetCharacter->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsElectrocuted(Props.TargetCharacter))
 			{
-				Props.TargetASC->TryActivateAbilitiesByTag(FBaseGameplayTags::Get().Effects_HitReact.GetSingleTagContainer());
+				Props.TargetASC->TryActivateAbilitiesByTag(FBaseGameplayTags::Get().StatusEffect_HitReact.GetSingleTagContainer());
 			}
 			const FVector& AirborneForce = ULeyrAbilitySystemLibrary::GetAirborneForce(Props.EffectContextHandle);
 			if (!AirborneForce.IsNearlyZero(1.f))

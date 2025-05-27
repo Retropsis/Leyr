@@ -121,6 +121,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	/*
 	 * Status Effects
 	 */
+	GameplayTags.StatusEffect_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("StatusEffect.HitReact"), FString("Hit Reacting Status Effect"));
 	GameplayTags.StatusEffect_Burn = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("StatusEffect.Burn"), FString("Status Effect from Fire"));
 	GameplayTags.StatusEffect_Stun = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("StatusEffect.Stun"), FString("Status Effect from Ice"));
 	GameplayTags.StatusEffect_Sleep = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("StatusEffect.Sleep"), FString("Status Effect"));
@@ -335,6 +336,16 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatState_Directional_Forward = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Directional.Forward"), FString("CombatState Directional Forward"));
 	GameplayTags.CombatState_Directional_ForwardUp = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Directional.ForwardUp"), FString("CombatState Directional ForwardUp"));
 	GameplayTags.CombatState_Directional_ForwardDown = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Directional.ForwardDown"), FString("CombatState Directional ForwardDown"));
+
+	GameplayTags.CombatState_Rule = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule"), FString("CombatState Rule"));
+	GameplayTags.CombatState_Rule_Block = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Block"), FString("CombatState Rule Block"));
+	GameplayTags.CombatState_Rule_Block_All = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Block.All"), FString("CombatState Rule Block All"));
+	GameplayTags.CombatState_Rule_Block_Movement = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Block.Movement"), FString("CombatState Rule Block Movement"));
+	GameplayTags.CombatState_Rule_Block_Ability = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Block.Ability"), FString("CombatState Rule Block Ability"));
+	GameplayTags.CombatState_Rule_Stop = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Stop"), FString("CombatState Rule Stop"));
+	GameplayTags.CombatState_Rule_Stop_All = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Stop.All"), FString("CombatState Rule Stop All"));
+	GameplayTags.CombatState_Rule_Stop_Movement = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Stop.Movement"), FString("CombatState Rule Stop Movement"));
+	GameplayTags.CombatState_Rule_Stop_Ability = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Stop.Ability"), FString("CombatState Rule Stop Ability"));
 	
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Unoccupied);
 	GameplayTags.CombatStates.AddTag(GameplayTags.CombatState_Defeated);
@@ -381,6 +392,13 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.ToUnoccupiedStateFilter.AddTag(GameplayTags.CombatState_Transient_Dodging);
 	GameplayTags.ToUnoccupiedStateFilter.AddTag(GameplayTags.CombatState_Transient_Rolling);
 	GameplayTags.ToUnoccupiedStateFilter.AddTag(GameplayTags.CombatState_Transient_Aiming);
+
+	GameplayTags.CombatStateRules.AddTag(GameplayTags.CombatState_Rule_Block_All);
+	GameplayTags.CombatStateRules.AddTag(GameplayTags.CombatState_Rule_Block_Movement);
+	GameplayTags.CombatStateRules.AddTag(GameplayTags.CombatState_Rule_Block_Ability);
+	GameplayTags.CombatStateRules.AddTag(GameplayTags.CombatState_Rule_Stop_All);
+	GameplayTags.CombatStateRules.AddTag(GameplayTags.CombatState_Rule_Stop_Movement);
+	GameplayTags.CombatStateRules.AddTag(GameplayTags.CombatState_Rule_Stop_Ability);
 	
 	/*
 	 * Gameplay Cues
@@ -433,11 +451,6 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Cooldown_Item_Long = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Item.Long"), FString("Cooldown Item Long"));
 	GameplayTags.Cooldown_Item_VeryLong = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.Item.VeryLong"), FString("Cooldown Item VeryLong"));
 	GameplayTags.Cooldown_SwimImpulse = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Cooldown.SwimImpulse"), FString("Cooldown SwimImpulse"));
-	
-	/*
-	 * Side Effects
-	 */
-	GameplayTags.Effects_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Effects.HitReact"), FString("Hit Reacting Effect"));
 		
 	/*
 	 * Combat Sockets
@@ -635,4 +648,11 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.AI_Pattern_Phase3_B = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase3.B"), FString("AI Pattern Phase 3 Set B"));
 	GameplayTags.AI_Pattern_Phase3_C = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase3.C"), FString("AI Pattern Phase 3 Set C"));
 	GameplayTags.AI_Pattern_Phase3_D = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase3.D"), FString("AI Pattern Phase 3 Set D"));
+	/*
+	 * Spawn Positions
+	*/
+	GameplayTags.Spawn_Left = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Spawn.Left"), FString("Spawn Left"));
+	GameplayTags.Spawn_Right = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Spawn.Right"), FString("Spawn Right"));
+	GameplayTags.Spawn_Above = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Spawn.Above"), FString("Spawn Above"));
+	GameplayTags.Spawn_Below = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Spawn.Below"), FString("Spawn Below"));
 }

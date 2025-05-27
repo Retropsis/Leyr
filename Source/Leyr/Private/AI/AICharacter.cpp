@@ -53,49 +53,6 @@ AAICharacter::AAICharacter()
 	PassiveIndicatorComponent->SetGenerateOverlapEvents(false);
 }
 
-// #if WITH_EDITOR
-// void AAICharacter::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-// {
-// 	Super::PostEditChangeProperty(PropertyChangedEvent);
-	
-	// if(MovementType == EMovementType::Spline && !SplineComponentActor)
-	// {
-	// 	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
-	// 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	// 	SplineComponentActor = GetWorld()->SpawnActor<ASplineComponentActor>(ASplineComponentActor::StaticClass(), GetActorTransform(), SpawnParameters);
-	// 	SplineComponentActor->SetActorLabel(FString::Printf(TEXT("%s_PatrolSpline"), *GetName()));
-	// 	for (int i = 0; i < SplineComponentActor->GetSplineComponent()->GetNumberOfSplinePoints(); ++i)
-	// 	{
-	// 		SplineComponentActor->GetSplineComponent()->SetSplinePointType(i, ESplinePointType::Linear);
-	// 	}
-	// }
-	// if(MovementType != EMovementType::Spline && SplineComponentActor)
-	// {
-	// 	SplineComponentActor->Destroy();
-	// 	SplineComponentActor = nullptr;
-	// }
-	// if(!NavMeshBoundsVolume && bShouldBuildNavMesh)
-	// {
-	// 	FActorSpawnParameters SpawnParameters = FActorSpawnParameters();
-	// 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	// 	NavMeshBoundsVolume = GetWorld()->SpawnActor<ANavMeshBoundsVolume>(ANavMeshBoundsVolume::StaticClass(), GetActorTransform(), SpawnParameters);
-	// 	NavMeshBoundsVolume->SetActorLabel(FString::Printf(TEXT("%s_NavMesh"), *GetName()));
-	// 	// UBrushComponent* Brush = NavMeshBoundsVolume->GetBrushComponent();
-	// 	// Brush->Brush->Bounds = FBox(FVector(100.f), FVector(200.f));
-	// 	// GetWorld()->GetNavigationSystem()->OnNavigationBoundsUpdated(NavMeshBoundsVolume);
-	//
-	// 	NavMeshBoundsVolume->GetRootComponent()->Bounds = FBox(FVector(100.f), FVector(200.f));
-	// 	NavMeshBoundsVolume->SetActorLocation(FVector{ GetActorLocation().X, 50.f, GetActorLocation().Z });
-	// 	// GetWorld()->GetNavigationSystem()->OnNavAreaRegisteredDelegate(NavMeshBoundsVolume);
-	// }
-	// if(!bShouldBuildNavMesh && NavMeshBoundsVolume)
-	// {
-	// 	NavMeshBoundsVolume->Destroy();
-	// 	NavMeshBoundsVolume = nullptr;
-	// }
-// }
-// #endif
-
 void AAICharacter::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -128,12 +85,7 @@ void AAICharacter::PossessedBy(AController* NewController)
 		Arena->OnPlayerLeaving.AddLambda([this](AActor* Player) { HandlePlayerOverlappingArena(Player, false); });
 		Arena->SetTargetActor(this);
 	}
-
-	if(bCollisionCauseDamage)
-	{
-		GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBeginOverlap);
-		SetupCollisionDamage();
-	}
+	
 	SineMoveHeight = GetActorLocation().Z;
 	InitializeNavigationBounds();
 	
@@ -171,6 +123,12 @@ void AAICharacter::BeginPlay()
 	GetCharacterMovement()->GravityScale = BaseGravityScale;
 	InitAbilityActorInfo();
 	AddCharacterAbilities();
+
+	if(bCollisionCauseDamage)
+	{
+		GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBeginOverlap);
+		SetupCollisionDamage();
+	}
 	
 	if (UBaseUserWidget* BaseUserWidget = Cast<UBaseUserWidget>(HealthBar->GetUserWidgetObject()))
 	{
@@ -195,7 +153,7 @@ void AAICharacter::BeginPlay()
 				OnMaxHealthChanged.Broadcast(Data.NewValue);
 			}
 		);
-		AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAICharacter::HitReactTagChanged);
+		AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().StatusEffect_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAICharacter::HitReactTagChanged);
 		AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Indicator_Execute, EGameplayTagEventType::NewOrRemoved).AddLambda([this] (const FGameplayTag CallbackTag, int32 NewCount)
 		{
 			OnGameplayTagAddedOrRemoved.Broadcast(CallbackTag, NewCount);
@@ -875,15 +833,15 @@ void AAICharacter::InitializeSineMove()
 
 void AAICharacter::ShouldEndSineMove(UTimelineComponent* Timeline)
 {
-	if (!IsTargetWithinEnteringBounds(GetActorLocation()))
-	{
-		FTimerHandle StopTimer;
-		GetWorld()->GetTimerManager().SetTimer(StopTimer, FTimerDelegate::CreateLambda([this, Timeline] ()
-		{
-			if(Timeline) Timeline->Stop();
-			Destroy();
-		}), .5f, false);
-	}
+	// if (!IsTargetWithinEnteringBounds(GetActorLocation()))
+	// {
+	// 	FTimerHandle StopTimer;
+	// 	GetWorld()->GetTimerManager().SetTimer(StopTimer, FTimerDelegate::CreateLambda([this, Timeline] ()
+	// 	{
+	// 		if(Timeline) Timeline->Stop();
+	// 		Destroy();
+	// 	}), .5f, false);
+	// }
 	if (DefeatState > EDefeatState::None) if(Timeline) Timeline->Stop();
 }
 

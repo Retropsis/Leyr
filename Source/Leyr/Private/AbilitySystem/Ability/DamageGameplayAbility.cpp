@@ -17,7 +17,7 @@ void UDamageGameplayAbility::InitAbility()
 {
 	Super::InitAbility();
 	bHasHitTarget = false;
-	ICombatInterface::Execute_SetMovementEnabled(GetAvatarActorFromActorInfo(), false);
+	// ICombatInterface::Execute_SetMovementEnabled(GetAvatarActorFromActorInfo(), false);
 	
 	if (AbilityData)
 	{
@@ -37,7 +37,7 @@ void UDamageGameplayAbility::InitAbility()
 void UDamageGameplayAbility::PrepareToEndAbility()
 {
 	Super::PrepareToEndAbility();
-	ICombatInterface::Execute_SetMovementEnabled(GetAvatarActorFromActorInfo(), true);
+	// ICombatInterface::Execute_SetMovementEnabled(GetAvatarActorFromActorInfo(), true);
 	HitActor = nullptr;
 	HitLocation = FVector::ZeroVector;
 }
@@ -76,7 +76,7 @@ void UDamageGameplayAbility::CauseDamage(UAbilitySystemComponent* TargetASC)
 {
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 	const FGameplayEffectSpecHandle DamageSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass, GetAbilityLevel());
-	const float ScaledDamage =AbilityPower.GetValueAtLevel(GetAbilityLevel());
+	const float ScaledDamage = AbilityPower.GetValueAtLevel(GetAbilityLevel());
 	
 	if (bShouldExecute)
 	{

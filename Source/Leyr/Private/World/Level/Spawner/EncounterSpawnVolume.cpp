@@ -22,13 +22,8 @@ AEncounterSpawnVolume::AEncounterSpawnVolume()
 	TriggerVolume->SetCollisionResponseToAllChannels(ECR_Ignore);
 	TriggerVolume->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	TriggerVolume->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
-	
-	TriggerVolumeVisualizer = CreateDefaultSubobject<UStaticMeshComponent>("TriggerVolumeVisualizer");
-	TriggerVolumeVisualizer->SetupAttachment(TriggerVolume);
-	TriggerVolumeVisualizer->SetWorldScale3D(FVector{ 2.f });
-	TriggerVolumeVisualizer->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	TriggerVolumeVisualizer->SetHiddenInGame(true);
-	TriggerVolumeVisualizer->SetGenerateOverlapEvents(false);
+	TriggerVolume->SetLineThickness(3.f);
+	TriggerVolume->ShapeColor = FColor::Green;
 	
 	SpawningBounds = CreateDefaultSubobject<UBoxComponent>("SpawningBounds");
 	SpawningBounds->SetupAttachment(GetRootComponent());
@@ -36,26 +31,14 @@ AEncounterSpawnVolume::AEncounterSpawnVolume()
 	SpawningBounds->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SpawningBounds->SetCollisionResponseToAllChannels(ECR_Ignore);
 	
-	SpawningBoundsVisualizer = CreateDefaultSubobject<UStaticMeshComponent>("SpawningBoundsVisualizer");
-	SpawningBoundsVisualizer->SetupAttachment(SpawningBounds);
-	SpawningBoundsVisualizer->SetWorldScale3D(FVector{ 2.f });
-	SpawningBoundsVisualizer->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SpawningBoundsVisualizer->SetHiddenInGame(true);
-	SpawningBoundsVisualizer->SetGenerateOverlapEvents(false);
-	
 	DespawningBounds = CreateDefaultSubobject<UBoxComponent>("DespawningBounds");
 	DespawningBounds->SetupAttachment(GetRootComponent());
 	DespawningBounds->InitBoxExtent(FVector{ 100.f });
 	DespawningBounds->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	DespawningBounds->SetCollisionResponseToAllChannels(ECR_Ignore);
 	DespawningBounds->SetCollisionResponseToChannel(ECC_Enemy, ECR_Overlap);
-	
-	DespawningBoundsVisualizer = CreateDefaultSubobject<UStaticMeshComponent>("DespawningBoundsVisualizer");
-	DespawningBoundsVisualizer->SetupAttachment(DespawningBounds);
-	DespawningBoundsVisualizer->SetWorldScale3D(FVector{ 2.f });
-	DespawningBoundsVisualizer->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	DespawningBoundsVisualizer->SetHiddenInGame(true);
-	DespawningBoundsVisualizer->SetGenerateOverlapEvents(false);
+	DespawningBounds->SetLineThickness(3.f);
+	DespawningBounds->ShapeColor = FColor::Red;
 }
 
 void AEncounterSpawnVolume::LoadActor_Implementation()
@@ -125,6 +108,18 @@ void AEncounterSpawnVolume::UpdateSpawnPoints()
 	}
 }
 
+void AEncounterSpawnVolume::SetTriggerBoundaryToRoomSize() const
+{
+	TriggerVolume->SetWorldLocation(TileMapBounds.Origin);
+	TriggerVolume->SetWorldScale3D(FVector{ TileMapBounds.BoxExtent.X / 100.f - 0.2f, 1.f, TileMapBounds.BoxExtent.Z / 100.f - 0.2f });
+}
+
+void AEncounterSpawnVolume::SetDespawnBoundaryToRoomSize() const
+{
+	DespawningBounds->SetWorldLocation(TileMapBounds.Origin);
+	DespawningBounds->SetWorldScale3D(FVector{ TileMapBounds.BoxExtent.X / 100.f + 0.2f, 1.f, TileMapBounds.BoxExtent.Z / 100.f + 0.2f });
+}
+
 void AEncounterSpawnVolume::BeginPlay()
 {
 	Super::BeginPlay();
@@ -172,12 +167,12 @@ void AEncounterSpawnVolume::HandlePlayerLeaving()
 	{
 		if (SpawnPoint) SpawnPoint->DespawnEncounter();
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Red, FString::Printf(TEXT("HandlePlayerLeaving")));
+	// GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Red, FString::Printf(TEXT("HandlePlayerLeaving")));
 }
 
 void AEncounterSpawnVolume::HandlePlayerEntering()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Green, FString::Printf(TEXT("HandlePlayerEntering")));
+	// GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Green, FString::Printf(TEXT("HandlePlayerEntering")));
 }
 
 void AEncounterSpawnVolume::ClearSpawnPoints()
