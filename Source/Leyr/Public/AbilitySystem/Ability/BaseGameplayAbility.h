@@ -97,13 +97,18 @@ public:
 
 protected:
 	void TryActivateAbilityOnSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const;
-	
+	bool FetchAnimInstances();
+	void InitializeDefaultAbilityData();
+	void InitializeItemAbilityData();
+	void DeterminePoise();
+
 	UFUNCTION(BlueprintCallable)
 	virtual void InitAbility();
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void InitAbilityWithParams(FInitAbilityParams Params);
-	
+	void RemovePoise() const;
+
 	UFUNCTION(BlueprintCallable)
 	virtual void PrepareToEndAbility();
 	
@@ -160,6 +165,6 @@ protected:
 
 private:
 	FActiveGameplayEffectHandle ActiveSourceObjectEffectHandle;
-	bool bPoiseWasApplied = false;
+	FActiveGameplayEffectHandle ActivePoiseEffectHandle;
 	bool bResetPitch = true;
 };

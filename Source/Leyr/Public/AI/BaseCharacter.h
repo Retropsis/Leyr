@@ -29,6 +29,7 @@ class LEYR_API ABaseCharacter : public APaperCharacter, public IAbilitySystemInt
 
 public:
 	ABaseCharacter();
+	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; } 
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
@@ -52,6 +53,7 @@ protected:
 	virtual void InitializeDefaultAttributes() const {}
 	virtual void InitializeCharacterInfo() {}
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) {}
+	virtual void HitReactFlashTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 	virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 	virtual void BurnTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& GameplayEffectClass, float Level) const;
@@ -178,7 +180,7 @@ protected:
 
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath(const FVector& DeathImpulse, EDefeatState InDefeatState);
-
+	
 	UPROPERTY(BlueprintReadOnly)
 	EDefeatState DefeatState = EDefeatState::None;
 
@@ -228,4 +230,19 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStatusEffectNiagaraComponent> StunStatusEffectComponent;
+
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr< UMaterialInstanceDynamic> DynamicSpriteInstance = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, Category="Character|HitReact")
+	float HitReactFlashStrength = 1.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Character|HitReact")
+	float HitReactFlashPlayRate = 1.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Character|HitReact")
+	FLinearColor HitReactFlashColor = FLinearColor::Red;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void PlayFlashEffect(float Strength, float PlayRate, FLinearColor Color);
 };

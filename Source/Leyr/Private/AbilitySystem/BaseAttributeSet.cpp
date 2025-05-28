@@ -228,7 +228,17 @@ void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 		{
 			if (Props.TargetCharacter && Props.TargetCharacter->Implements<UCombatInterface>() && !ICombatInterface::Execute_IsElectrocuted(Props.TargetCharacter))
 			{
-				Props.TargetASC->TryActivateAbilitiesByTag(FBaseGameplayTags::Get().StatusEffect_HitReact.GetSingleTagContainer());
+				Props.TargetASC->AddLooseGameplayTag(FBaseGameplayTags::Get().VisualEffect_HitReactFlash);
+				
+				const float PoiseChance = Props.TargetASC->GetNumericAttribute(GetPoiseAttribute());
+				if(FMath::RandRange(1, 100) < PoiseChance)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Target has resisted and kept its balance");
+				}
+				else
+				{
+					Props.TargetASC->TryActivateAbilitiesByTag(FBaseGameplayTags::Get().StatusEffect_HitReact.GetSingleTagContainer());
+				}
 			}
 			const FVector& AirborneForce = ULeyrAbilitySystemLibrary::GetAirborneForce(Props.EffectContextHandle);
 			if (!AirborneForce.IsNearlyZero(1.f))

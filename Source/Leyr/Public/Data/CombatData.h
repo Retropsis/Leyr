@@ -66,8 +66,6 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite)
 	bool bResetMovementMode = true;
-
-	bool bPreviousState = false;
 	
 	EMovementMode NewMovementMode = MOVE_None;
 };
@@ -77,7 +75,6 @@ enum class ECombatState : uint8
 {
 	Unoccupied UMETA(DisplayName="Unoccupied"),
 	Crouching UMETA(DisplayName="Crouching"),
-	Attacking UMETA(DisplayName="Attacking"),
 	Falling UMETA(DisplayName="Falling"),
 	HangingLedge UMETA(DisplayName="Hanging Ledge"),
 	HangingRope UMETA(DisplayName="Hanging Rope"),
@@ -99,7 +96,6 @@ enum class ECombatState : uint8
 	/* Locked Animations */
 	Dodging UMETA(DisplayName="Dodging"),
 	Rolling UMETA(DisplayName="Rolling"),
-	HitReact UMETA(DisplayName="HitReact"),
 	Stunned UMETA(DisplayName="Stunned"),
 	ClimbingRope UMETA(DisplayName="Climbing Rope"),
 	UnCrouching UMETA(DisplayName="UnCrouching"),

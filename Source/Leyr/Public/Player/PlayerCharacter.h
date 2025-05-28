@@ -98,7 +98,6 @@ public:
 	virtual ECombatState GetCombatState_Implementation() const override { return CombatState; }
 	virtual void SetCombatState_Implementation(ECombatState NewState) override;
 	virtual void SetCombatStateToHandle_Implementation(ECombatState NewState, const FCombatStateParams& Params) override;
-	virtual void SetMovementEnabled_Implementation(bool Enabled) override;
 	virtual void SetComboWindow_Implementation(bool bOpen) override { bIsComboWindowOpen = bOpen; }
 	virtual bool IsComboWindowOpen_Implementation() override { return bIsComboWindowOpen; }
 	virtual void ResetAttacking_Implementation() override {}
@@ -168,7 +167,6 @@ public:
 	virtual void HandleSwimming_Implementation(float MinZ, float EnvironmentSwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap) override;
 	virtual void HandleElevator_Implementation(APawn* InElevator, bool bEndOverlap) override;
 	virtual void HandleOverlapZone_Implementation(ECombatState NewState, bool bEndOverlap) override;
-	virtual void SetSpriteRelativeLocation_Implementation(FVector NewLocation) override;
 	virtual void ReduceWalkSpeed_Implementation(float AmountToReduce) override;
 	virtual void SetWalkSpeed_Implementation(float NewSpeed) override;
 	virtual void ToggleAiming_Implementation(bool bAiming) override;

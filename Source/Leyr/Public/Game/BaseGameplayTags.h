@@ -568,6 +568,11 @@ FGameplayTag Spawn_Left;
 FGameplayTag Spawn_Right;
 FGameplayTag Spawn_Above;
 FGameplayTag Spawn_Below;
+
+/*
+ * Visual Effects
+ */
+FGameplayTag VisualEffect_HitReactFlash;
  
 private:
 	static FBaseGameplayTags GameplayTags;

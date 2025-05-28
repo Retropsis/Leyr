@@ -148,9 +148,6 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetCombatStateToHandle(ECombatState NewState, const FCombatStateParams& Params);
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void SetMovementEnabled(bool Enabled);
 
 	/*
 	 *
@@ -193,9 +190,6 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetMovementTarget(FVector Target);
-	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void SetSpriteRelativeLocation(FVector NewLocation);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	float GetOverridePitch();

@@ -49,9 +49,19 @@ void UBaseGameplayAbility::TryActivateAbilityOnSpawn(const FGameplayAbilityActor
 
 void UBaseGameplayAbility::InitAbility()
 {
-	if (!GetAvatarActorFromActorInfo()->Implements<UCombatInterface>()) return;
+	if (FetchAnimInstances()) return;
 	
 	GameplayCueDefinition = NewObject<UGameplayCueDefinition>();
+	DamageType = FBaseGameplayTags::Get().Damage_Physical;
+	
+	InitializeDefaultAbilityData();
+	InitializeItemAbilityData();
+	DeterminePoise();
+}
+
+bool UBaseGameplayAbility::FetchAnimInstances()
+{
+	if (!GetAvatarActorFromActorInfo()->Implements<UCombatInterface>()) return true;
 	
 	if (bResetPitch) ICombatInterface::Execute_ResetAimingPitch(GetAvatarActorFromActorInfo());
 	PaperAnimInstance = ICombatInterface::Execute_GetPaperAnimInstance(GetAvatarActorFromActorInfo());
@@ -59,11 +69,14 @@ void UBaseGameplayAbility::InitAbility()
 	WeaponAnimInstance = ICombatInterface::Execute_GetWeaponAnimInstance(GetAvatarActorFromActorInfo());
 	if (WeaponAnimInstance) WeaponAnimInstance->StopAllAnimationOverrides();
 	
-	DamageType = FBaseGameplayTags::Get().Damage_Physical;
-	
-	/*
-	 * Initialize from Default Ability Data asset
-	 */
+	return false;
+}
+
+/*
+ * Initialize from Default Ability Data asset
+ */
+void UBaseGameplayAbility::InitializeDefaultAbilityData()
+{
 	if (AbilityData)
 	{
 		AbilityPower = AbilityData->AbilityPower.GetValueAtLevel(GetAbilityLevel());
@@ -76,10 +89,13 @@ void UBaseGameplayAbility::InitAbility()
 		SequenceType = AbilityData->SequenceType;
 		DamageType = AbilityData->DamageType;
 	}
+}
 
-	/*
-	 * Initialize from Item Data asset
-	 */
+/*
+ * Initialize from Item Data asset
+ */
+void UBaseGameplayAbility::InitializeItemAbilityData()
+{
 	if (AbilityItemData = Cast<UItemData>(GetSourceObjectFromAbilitySpec()); AbilityItemData)
 	{
 		if (AbilityItemData->AnimationInstance)
@@ -99,15 +115,35 @@ void UBaseGameplayAbility::InitAbility()
 			DamageType = AbilityData->DamageType;
 		}
 	}
-	
-	const float PoiseChance = GetAbilitySystemComponentFromActorInfo()->GetNumericAttribute(UBaseAttributeSet::GetPoiseAttribute());
-	const float EffectivePoiseChance = PoiseChance + AbilityPoise;
+}
 
-	if(FMath::RandRange(1, 100) < EffectivePoiseChance)
-	{
-		GetAbilitySystemComponentFromActorInfo()->AddLooseGameplayTag(FBaseGameplayTags::Get().Poise);
-		bPoiseWasApplied = true;
-	}
+void UBaseGameplayAbility::DeterminePoise()
+{	
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	FGameplayEffectContextHandle EffectContext = GetAbilitySystemComponentFromActorInfo()->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
+
+	FString EffectName = FString::Printf(TEXT("Ability_Poise"));
+	UGameplayEffect* Effect = NewObject<UGameplayEffect>(this, FName(EffectName));
+	Effect->DurationPolicy = EGameplayEffectDurationType::Infinite;
+	
+	// UTargetTagsGameplayEffectComponent& AssetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
+	// FInheritedTagContainer InheritedTagContainer;
+	// InheritedTagContainer.Added.AddTag(TagToApply);
+	// AssetTagsComponent.SetAndApplyTargetTagChanges(InheritedTagContainer);
+
+	FGameplayModifierInfo ModifierInfo;
+	ModifierInfo.Attribute = UBaseAttributeSet::GetPoiseAttribute();
+	ModifierInfo.ModifierOp = EGameplayModOp::Additive;
+	ModifierInfo.ModifierMagnitude = FScalableFloat(AbilityPoise);
+	Effect->Modifiers.Add(ModifierInfo);
+	
+	ActivePoiseEffectHandle = GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectToTarget(Effect, GetAbilitySystemComponentFromActorInfo(), GetAbilityLevel(), EffectContext);
+}
+
+void UBaseGameplayAbility::RemovePoise() const
+{
+	if (ActivePoiseEffectHandle.IsValid()) GetAbilitySystemComponentFromActorInfo()->RemoveActiveGameplayEffect(ActivePoiseEffectHandle);
 }
 
 void UBaseGameplayAbility::InitAbilityWithParams(FInitAbilityParams Params)
@@ -119,10 +155,7 @@ void UBaseGameplayAbility::InitAbilityWithParams(FInitAbilityParams Params)
 
 void UBaseGameplayAbility::PrepareToEndAbility()
 {
-	if(bPoiseWasApplied)
-	{
-		GetAbilitySystemComponentFromActorInfo()->RemoveLooseGameplayTag(FBaseGameplayTags::Get().Poise);
-	}
+	RemovePoise();
 }
 
 void UBaseGameplayAbility::PrepareToEndAbilityWithParams(FEndAbilityParams Params)

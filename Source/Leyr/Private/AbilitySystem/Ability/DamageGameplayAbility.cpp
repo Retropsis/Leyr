@@ -17,7 +17,6 @@ void UDamageGameplayAbility::InitAbility()
 {
 	Super::InitAbility();
 	bHasHitTarget = false;
-	// ICombatInterface::Execute_SetMovementEnabled(GetAvatarActorFromActorInfo(), false);
 	
 	if (AbilityData)
 	{
@@ -37,7 +36,6 @@ void UDamageGameplayAbility::InitAbility()
 void UDamageGameplayAbility::PrepareToEndAbility()
 {
 	Super::PrepareToEndAbility();
-	// ICombatInterface::Execute_SetMovementEnabled(GetAvatarActorFromActorInfo(), true);
 	HitActor = nullptr;
 	HitLocation = FVector::ZeroVector;
 }

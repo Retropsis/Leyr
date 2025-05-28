@@ -154,6 +154,7 @@ void AAICharacter::BeginPlay()
 			}
 		);
 		AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().StatusEffect_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAICharacter::HitReactTagChanged);
+		AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().VisualEffect_HitReactFlash, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAICharacter::HitReactFlashTagChanged);
 		AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Indicator_Execute, EGameplayTagEventType::NewOrRemoved).AddLambda([this] (const FGameplayTag CallbackTag, int32 NewCount)
 		{
 			OnGameplayTagAddedOrRemoved.Broadcast(CallbackTag, NewCount);

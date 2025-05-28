@@ -648,6 +648,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.AI_Pattern_Phase3_B = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase3.B"), FString("AI Pattern Phase 3 Set B"));
 	GameplayTags.AI_Pattern_Phase3_C = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase3.C"), FString("AI Pattern Phase 3 Set C"));
 	GameplayTags.AI_Pattern_Phase3_D = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("AI.Pattern.Phase3.D"), FString("AI Pattern Phase 3 Set D"));
+	
 	/*
 	 * Spawn Positions
 	*/
@@ -655,4 +656,9 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Spawn_Right = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Spawn.Right"), FString("Spawn Right"));
 	GameplayTags.Spawn_Above = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Spawn.Above"), FString("Spawn Above"));
 	GameplayTags.Spawn_Below = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Spawn.Below"), FString("Spawn Below"));
+
+	/*
+	 * Visual Effects
+	 */
+	GameplayTags.VisualEffect_HitReactFlash = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("VisualEffect.HitReactFlash"), FString("VisualEffect HitReactFlash"));
 }

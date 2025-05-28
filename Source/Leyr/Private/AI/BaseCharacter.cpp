@@ -74,6 +74,12 @@ ABaseCharacter::ABaseCharacter()
 	WeaponComponent = CreateDefaultSubobject<UPaperZDAnimationComponent>("WeaponComponent");
 }
 
+void ABaseCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	DynamicSpriteInstance = GetSprite()->CreateDynamicMaterialInstance(0);
+}
+
 void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -133,6 +139,12 @@ void ABaseCharacter::MakeAndApplyEffectToSelf(const FGameplayTag Tag, float Leve
 
 		GetAbilitySystemComponent()->ApplyGameplayEffectSpecToSelf(*MutableSpec);
 	}
+}
+
+void ABaseCharacter::HitReactFlashTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	AbilitySystemComponent->RemoveLooseGameplayTag(CallbackTag);
+	PlayFlashEffect(HitReactFlashStrength, HitReactFlashPlayRate, HitReactFlashColor);
 }
 
 void ABaseCharacter::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
