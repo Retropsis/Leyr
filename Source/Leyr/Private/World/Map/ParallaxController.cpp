@@ -20,14 +20,14 @@ AParallaxController::AParallaxController()
 	USceneComponent* Root = CreateDefaultSubobject<USceneComponent>("Root");
 	SetRootComponent(Root);
 	
-	CREATE_AND_SETUP_LAYER(Sky, -1000, -1000.f);
-	CREATE_AND_SETUP_LAYER(Sun, 0, -950.f);
-	CREATE_AND_SETUP_LAYER(FirstMoon, 0, -950.f);
-	CREATE_AND_SETUP_LAYER(SecondMoon, 0, -950.f);
-	CREATE_AND_SETUP_LAYER(BackClouds, 0, -900.f);
-	CREATE_AND_SETUP_LAYER(FrontClouds, -900, -800.f);
-	CREATE_AND_SETUP_LAYER(BackLayer, 0, -700.f);
-	CREATE_AND_SETUP_LAYER(FrontLayer, -400, -600.f);
+	CREATE_AND_SETUP_LAYER(Sky, -1000, -3000.f);
+	CREATE_AND_SETUP_LAYER(Sun, 0, -2950.f);
+	CREATE_AND_SETUP_LAYER(FirstMoon, 0, -2950.f);
+	CREATE_AND_SETUP_LAYER(SecondMoon, 0, -2950.f);
+	CREATE_AND_SETUP_LAYER(BackClouds, 0, -2900.f);
+	CREATE_AND_SETUP_LAYER(FrontClouds, -900, -2800.f);
+	CREATE_AND_SETUP_LAYER(BackLayer, 0, -2700.f);
+	CREATE_AND_SETUP_LAYER(FrontLayer, -400, -2600.f);
 	CREATE_AND_SETUP_LAYER(ForegroundFogLayer, 913, 200.f);
 	CREATE_AND_SETUP_LAYER(BackgroundFogLayer, 0, -100.f);
 	CREATE_AND_SETUP_LAYER(ForegroundLayer, -413, 100.f);

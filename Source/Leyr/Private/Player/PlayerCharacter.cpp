@@ -257,6 +257,14 @@ void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 	PreviousAdditiveOffset = AdditiveOffset.GetLocation();
 }
 
+FVector APlayerCharacter::GetCameraOffsetLocation() const
+{
+	FTransform Transform;
+	float FOV;
+	FollowCamera->GetAdditiveOffset(Transform, FOV);
+	return FollowCamera->GetComponentLocation() + FVector{ Transform.GetLocation().Y, 600.f, 0.f };
+}
+
 void APlayerCharacter::SetCameraInterpolation_Implementation(ACameraBoundary* CameraBoundary, ECameraInterpState NewState)
 {
 	if(NewState == ECameraInterpState::Leaving && CurrentCameraBoundary != CameraBoundary) return;

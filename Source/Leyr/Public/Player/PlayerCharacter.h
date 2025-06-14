@@ -67,6 +67,9 @@ public:
 	 */
 	void InterpCameraAdditiveOffset(float DeltaTime);
 	
+	UFUNCTION(BlueprintPure)
+	FVector GetCameraOffsetLocation() const;
+	
 	UPROPERTY() TObjectPtr<AActor> ActorToInterp;
 	FVector TargetToInterp;
 	float InterpCameraAlpha = 0.f;
