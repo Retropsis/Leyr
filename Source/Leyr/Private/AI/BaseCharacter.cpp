@@ -297,19 +297,19 @@ void ABaseCharacter::HitStop(const float Duration, const float Amount)
 void ABaseCharacter::Die(const FVector& DeathImpulse, bool bExecute)
 {
 	DefeatState = bExecute ? EDefeatState::Executed : EDefeatState::Defeated;
-	//TODO: for 3D meshes, could try also with 2D Weapon
+	//TODO: for 3D meshes, could try also with 2D Weapon.
 	// Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
 	MulticastHandleDeath(DeathImpulse, DefeatState);
 }
 
-void ABaseCharacter::HandleDeathCapsuleComponent(const FVector& DeathImpulse)
+void ABaseCharacter::HandleDeathCapsuleComponent(const FVector& DeathImpulse) const
 {
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Player, ECR_Ignore);
-	GetCapsuleComponent()->SetSimulatePhysics(true);
-	GetCapsuleComponent()->AddImpulse(DeathImpulse, NAME_None, true);
+	GetCapsuleComponent()->SetSimulatePhysics(bSimulatePhysicsOnDestroyed);
+	if (bSimulatePhysicsOnDestroyed) GetCapsuleComponent()->AddImpulse(DeathImpulse, NAME_None, true);
 }
 
 void ABaseCharacter::HandleDeath(EDefeatState InDefeatState)

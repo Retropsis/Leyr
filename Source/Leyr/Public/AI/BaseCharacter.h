@@ -163,7 +163,7 @@ protected:
 	virtual void BroadcastOnDeath_Implementation() override { OnDeath.Broadcast(this); }
 	
 	virtual void Die(const FVector& DeathImpulse, bool bExecute) override;
-	void HandleDeathCapsuleComponent(const FVector& DeathImpulse);
+	void HandleDeathCapsuleComponent(const FVector& DeathImpulse) const;
 	void HandleDeath(EDefeatState InDefeatState);
 	virtual EDefeatState GetDefeatState_Implementation() const override { return  DefeatState; }
 	virtual  bool IsDefeated_Implementation() const override { return DefeatState != EDefeatState::None; }
@@ -215,6 +215,8 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	TSoftObjectPtr<UAbilityData> DefaultAbilityData;
+
+	bool bSimulatePhysicsOnDestroyed = true;
 	
 	/* Minions */
 	int32 MinionCount = 0;

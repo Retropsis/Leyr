@@ -206,6 +206,7 @@ void AAICharacter::InitializeCharacterInfo()
 	LootData = EncounterData->LootData;
 	HitReactSequence = EncounterData->HitReactSequence;
 	AttackSequenceInfo = EncounterData->AttackSequenceInfo;
+	bSimulatePhysicsOnDestroyed = EncounterData->bSimulatePhysicsOnDestroyed;
 	
 	BehaviorTree = EncounterData->BehaviourData->BehaviorTree;
 	BehaviourType = EncounterData->BehaviourData->BehaviourType;

@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Abilities/GameplayAbility.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "AI/AIData.h"
 #include "Engine/DataAsset.h"
+#include "GameplayTagContainer.h"
 #include "EncounterData.generated.h"
 
-class UAttributeData;
 enum class ECharacterClass : uint8;
+class UAttributeData;
 class ULootDataSet;
 class UAbilitySet;
 class AAICharacter;
@@ -45,6 +45,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	bool bShouldDespawn = true;
+	
+	UPROPERTY(EditDefaultsOnly)
+	bool bSimulatePhysicsOnDestroyed = true;
 	
 	UPROPERTY(EditDefaultsOnly) // Encounter Size for Max Health and other purposes ?
 	EEncounterSize EncounterSize = EEncounterSize::Default;
