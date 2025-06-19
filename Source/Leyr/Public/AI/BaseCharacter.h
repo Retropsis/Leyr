@@ -206,6 +206,7 @@ protected:
 	 * Data Asset
 	 */
 	UPROPERTY() TObjectPtr<UNiagaraSystem> ImpactEffect;
+	UPROPERTY() TObjectPtr<UNiagaraSystem> DestroyedEffectLoaded;
 	UPROPERTY() TObjectPtr<USoundBase> ImpactSoundLoaded;
 	UPROPERTY() TObjectPtr<USoundBase> DefeatedSoundLoaded;
 	UPROPERTY() TSoftObjectPtr<UPaperZDAnimSequence> HitReactSequence;

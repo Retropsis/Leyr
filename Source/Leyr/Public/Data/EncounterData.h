@@ -65,6 +65,9 @@ public:
 	TSoftObjectPtr<UNiagaraSystem> ImpactEffect;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Asset")
+	TSoftObjectPtr<UNiagaraSystem> DestroyedEffect;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Asset")
 	TSoftObjectPtr<USoundBase> DeathSound;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Asset")

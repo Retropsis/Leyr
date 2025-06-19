@@ -331,6 +331,7 @@ FGameplayTag GameplayCue_Lightning_Bolt_1;
 FGameplayTag GameplayCue_Noxious_Bio_1;
 FGameplayTag GameplayCue_Cosmos_Meteor_1;
 FGameplayTag GameplayCue_Weapon;
+FGameplayTag GameplayCue_Weapon_Monk;
 FGameplayTag GameplayCue_Weapon_Sword_Slash;
 FGameplayTag GameplayCue_Weapon_Bow_Shot;
 FGameplayTag GameplayCue_Execute;

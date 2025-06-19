@@ -3,6 +3,7 @@
 #include "AI/BaseCharacter.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectTypes.h"
+#include "NiagaraFunctionLibrary.h"
 #include "PaperFlipbookComponent.h"
 #include "PaperZDAnimInstance.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
@@ -302,6 +303,13 @@ void ABaseCharacter::Die(const FVector& DeathImpulse, bool bExecute)
 	MulticastHandleDeath(DeathImpulse, DefeatState);
 }
 
+void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImpulse, EDefeatState InDefeatState)
+{
+	HandleDeathCapsuleComponent(DeathImpulse);
+	// UAssetManager::GetStreamableManager().RequestAsyncLoad(DefeatedSound.ToSoftObjectPath(), FStreamableDelegate::CreateUObject(this, &ABaseCharacter::PlayDeathSound), FStreamableManager::DefaultAsyncLoadPriority);
+	HandleDeath(InDefeatState);
+}
+
 void ABaseCharacter::HandleDeathCapsuleComponent(const FVector& DeathImpulse) const
 {
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
@@ -315,19 +323,13 @@ void ABaseCharacter::HandleDeathCapsuleComponent(const FVector& DeathImpulse) co
 void ABaseCharacter::HandleDeath(EDefeatState InDefeatState)
 {
 	UGameplayStatics::PlaySoundAtLocation(this, DefeatedSoundLoaded, GetActorLocation(), GetActorRotation());
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, DestroyedEffectLoaded, GetActorLocation(), GetActorRotation());
 	
 	GetAbilitySystemComponent()->AddLooseGameplayTag(FBaseGameplayTags::Get().Defeated);
 	DefeatState = InDefeatState;
 	BurnStatusEffectComponent->DeactivateImmediate();
 	StunStatusEffectComponent->DeactivateImmediate();
 	OnDeath.Broadcast(this);
-}
-
-void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImpulse, EDefeatState InDefeatState)
-{
-	HandleDeathCapsuleComponent(DeathImpulse);
-	// UAssetManager::GetStreamableManager().RequestAsyncLoad(DefeatedSound.ToSoftObjectPath(), FStreamableDelegate::CreateUObject(this, &ABaseCharacter::PlayDeathSound), FStreamableManager::DefaultAsyncLoadPriority);
-	HandleDeath(InDefeatState);
 }
 
 void ABaseCharacter::SetGravityScale_Implementation(float GravityValue)

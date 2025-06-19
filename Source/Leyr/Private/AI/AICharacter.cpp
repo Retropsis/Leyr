@@ -239,6 +239,13 @@ void AAICharacter::InitializeCharacterInfo()
 			ImpactEffect = LoadedAsset;
 		}
 	}, FStreamableManager::DefaultAsyncLoadPriority);
+	UAssetManager::GetStreamableManager().RequestAsyncLoad(EncounterData->ImpactEffect.ToSoftObjectPath(), [this] () {
+		UNiagaraSystem* LoadedAsset = EncounterData->DestroyedEffect.Get();
+		if (IsValid(LoadedAsset))
+		{
+			DestroyedEffectLoaded = LoadedAsset;
+		}
+	}, FStreamableManager::DefaultAsyncLoadPriority);
 	UAssetManager::GetStreamableManager().RequestAsyncLoad(EncounterData->DeathSound.ToSoftObjectPath(), [this] () {
 		USoundBase* LoadedAsset = EncounterData->DeathSound.Get();
 		if (IsValid(LoadedAsset))
