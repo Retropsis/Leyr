@@ -162,6 +162,15 @@ public:
 	UPROPERTY(EditInstanceOnly, Category = "Character|AI")
 	TObjectPtr<AArena> Arena = nullptr;
 
+	/*
+	 * Spawning
+	 */
+	UFUNCTION(BlueprintCallable)
+	void SpawnFromEgg();
+
+	UPROPERTY(EditDefaultsOnly, Category = "Character|AI")
+	TSubclassOf<AActor> ActorClassToSpawn;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAbilityActorInfo() override;

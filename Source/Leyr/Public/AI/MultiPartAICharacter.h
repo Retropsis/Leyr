@@ -42,10 +42,6 @@ public:
 protected:
 	virtual void MulticastHandleDeath(const FVector& DeathImpulse, EDefeatState InDefeatState) override;
 
-public:
-	
-
-protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USkeletalMeshComponent> MultiPartFlipbook;
 

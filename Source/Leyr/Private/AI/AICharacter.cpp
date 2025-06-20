@@ -368,6 +368,26 @@ void AAICharacter::HandleBeginOverlap(AActor* OtherActor)
 	}
 }
 
+void AAICharacter::SpawnFromEgg()
+{
+	if (ActorClassToSpawn == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ActorClassToSpawn is null in [%hs]"), __FUNCTION__);
+		return;
+	}
+	
+	FTransform SpawnTransform = GetActorTransform();
+	SpawnTransform.SetLocation(FVector{ GetActorLocation().X, 5.f, GetActorLocation().Z });
+	AAICharacter* Encounter = GetWorld()->SpawnActorDeferred<AAICharacter>(ActorClassToSpawn, SpawnTransform, this, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	// Encounter->SetEncounterLevel(Level);
+	// Encounter->SetEncounterData(EncounterData);
+	Encounter->SplineComponentActor = SplineComponentActor;
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	// IAIInterface::Execute_SetSpawningBounds(Encounter, SpawningBounds);					
+	Encounter->SpawnDefaultController();
+	Encounter->FinishSpawning(SpawnTransform);
+}
+
 /*
  * Combat Interface
  */
