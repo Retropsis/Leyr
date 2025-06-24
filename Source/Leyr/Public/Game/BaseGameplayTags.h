@@ -334,6 +334,7 @@ FGameplayTag GameplayCue_Weapon;
 FGameplayTag GameplayCue_Weapon_Monk;
 FGameplayTag GameplayCue_Weapon_Sword_Slash;
 FGameplayTag GameplayCue_Weapon_Bow_Shot;
+FGameplayTag GameplayCue_Bite;
 FGameplayTag GameplayCue_Execute;
 FGameplayTag GameplayCue_Weapon_Throw;
 FGameplayTag GameplayCue_Shield;

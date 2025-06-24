@@ -415,7 +415,8 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.GameplayCue_Weapon = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon"), FString("GameplayCue Weapon"));
 	GameplayTags.GameplayCue_Weapon_Monk = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Monk"), FString("GameplayCue Monk Weapon"));
 	GameplayTags.GameplayCue_Weapon_Sword_Slash = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Sword.Slash"), FString("GameplayCue Weapon Sword Slash"));
-	GameplayTags.GameplayCue_Weapon_Bow_Shot = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Bow.Shot"), FString("GameplayCue Weapon Bow Shot"));
+	GameplayTags.GameplayCue_Weapon_Bow_Shot = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Bite"), FString("GameplayCue Bite"));
+	GameplayTags.GameplayCue_Bite = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Bow.Shot"), FString("GameplayCue Weapon Bow Shot"));
 	GameplayTags.GameplayCue_Alteration_Berserk_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Alteration.Berserk.1"), FString("GameplayCue Alteration Berserk 1"));
 	GameplayTags.GameplayCue_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Execute"), FString("GameplayCue Execute"));
 	GameplayTags.GameplayCue_WaterSplash_Small = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.WaterSplash.Small"), FString("GameplayCue WaterSplash_Small"));
