@@ -114,7 +114,12 @@ void UDamageGameplayAbility::ForEachHitTryCausingDamage(TArray<FHitResult> HitRe
 			{
 				CauseDamage(TargetASC);
 				FVector Loc = Hit.GetComponent() ? Hit.GetComponent()->GetComponentLocation() : Hit.GetActor() ? Hit.GetActor()->GetActorLocation() : Hit.ImpactPoint;
-				HitLocation = (Loc + Hit.ImpactPoint) / 2.f;
+				if (Hit.GetActor()->Implements<UCombatInterface>())
+				{
+					GameplayCueDefinition->PreferredHitLocation = ICombatInterface::Execute_GetPreferredHitLocation(Hit.GetActor());
+				}
+				// HitLocation = (Loc + Hit.ImpactPoint) / 2.f;
+				HitLocation = Hit.Location;
 				HitLocation.Y = 0.f;
 				HitActors.AddUnique(HitActor);
 			}

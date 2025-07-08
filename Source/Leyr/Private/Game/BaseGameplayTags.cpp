@@ -192,6 +192,8 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Abilities_Lightning_Electrocute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Lightning.Electrocute"), FString("Lightning Element Electrocute Ability"));
 	GameplayTags.Abilities_Lightning_Bolt_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Lightning.Bolt.1"), FString("Abilities Lightning Bolt 1"));
 	GameplayTags.Abilities_Noxious_Bio_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Noxious.Bio.1"), FString("Abilities Noxious Bio 1"));
+	GameplayTags.Abilities_Noxious_Dart = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Noxious.Dart"), FString("Abilities Noxious Dart"));
+	GameplayTags.Abilities_Noxious_Orb = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Noxious.Orb"), FString("Abilities Noxious Orb"));
 	GameplayTags.Abilities_Cosmos_Meteor_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Cosmos.Meteor.1"), FString("Abilities Cosmos Meteor 1"));
 	GameplayTags.Abilities_Earth_Earthquake = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Earth.Earthquake"), FString("Earth Element Earthquake Ability"));
 	GameplayTags.Abilities_Sorcery = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Sorcery"), FString("Sorcery Ability"));

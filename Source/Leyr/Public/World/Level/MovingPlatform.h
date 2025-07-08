@@ -54,6 +54,9 @@ public:
 	UPaperSprite* LastTile = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
+	UPaperSprite* LoneTile = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Plaform|Mechanics")
 	TArray<UPaperSprite*> Tiles;
 
 

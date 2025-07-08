@@ -170,10 +170,12 @@ FGameplayTag Abilities_Lightning_Bolt_1;
 FGameplayTag Abilities_Earth_Earthquake;
 FGameplayTag Abilities_Cosmos_Meteor_1;
 FGameplayTag Abilities_Noxious_Bio_1;
- FGameplayTag Abilities_Sorcery;
- 
- FGameplayTag Abilities_Throw_1;
- FGameplayTag Abilities_Throw_2;
+FGameplayTag Abilities_Noxious_Dart;
+FGameplayTag Abilities_Noxious_Orb;
+FGameplayTag Abilities_Sorcery;
+
+FGameplayTag Abilities_Throw_1;
+FGameplayTag Abilities_Throw_2;
  
 FGameplayTag Abilities_ClimbingRope;
 FGameplayTag Abilities_SwimImpulse;

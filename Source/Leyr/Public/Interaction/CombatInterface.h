@@ -67,7 +67,10 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UNiagaraSystem* GetImpactEffect();
-
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FVector GetPreferredHitLocation();
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	USoundBase* ImpactSoundFromTag(const FGameplayTag& MontageTag, ESequenceType SequenceType);
 

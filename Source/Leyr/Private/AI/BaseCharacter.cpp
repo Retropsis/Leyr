@@ -73,6 +73,9 @@ ABaseCharacter::ABaseCharacter()
 	WeaponFlipbook->SetGenerateOverlapEvents(false);
 
 	WeaponComponent = CreateDefaultSubobject<UPaperZDAnimationComponent>("WeaponComponent");
+
+	HitLocationPoint = CreateDefaultSubobject<USceneComponent>("HitLocationPoint");
+	HitLocationPoint->SetupAttachment(GetRootComponent());
 }
 
 void ABaseCharacter::BeginPlay()

@@ -21,4 +21,7 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, meta=(ExposeOnSpawn))
 	UNiagaraSystem* ImpactEffect = nullptr;
+	
+	UPROPERTY(BlueprintReadOnly, meta=(ExposeOnSpawn))
+	FVector PreferredHitLocation;
 };

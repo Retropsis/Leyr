@@ -25,6 +25,7 @@ enum class EBehaviourState : uint8
 	Timeline UMETA(DisplayName="Timeline"),
 	Fall UMETA(DisplayName="Fall"),
 	Search UMETA(DisplayName="Search"),
+	Duck UMETA(DisplayName="Duck"),
 };
 
 UENUM(BlueprintType)

@@ -61,6 +61,9 @@ void UFireBolt::SpawnProjectiles(const FVector& ProjectileTargetLocation, const 
 	FRotator Rotation = bHasTarget ? (ProjectileTargetLocation - SocketLocation).Rotation() : GetAvatarActorFromActorInfo()->GetActorForwardVector().Rotation();
 	// FRotator Rotation = bHasTarget ? UKismetMathLibrary::FindLookAtRotation(SocketLocation, ProjectileTargetLocation) : GetAvatarActorFromActorInfo()->GetActorForwardVector().Rotation();
 	// FRotator Rotation = (ProjectileTargetLocation - SocketLocation).Rotation();
+
+
+	
 	if (bOverridePitch) Rotation.Pitch = PitchOverride;
 	
 	const int32 EffectiveNumProjectiles = FMath::Min(NumProjectiles, GetAbilityLevel());
