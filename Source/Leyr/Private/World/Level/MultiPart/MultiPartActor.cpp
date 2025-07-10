@@ -1,6 +1,7 @@
 // @ Retropsis 2024-2025.
 
 #include "World/Level/MultiPart/MultiPartActor.h"
+#include "Components/PointLightComponent.h"
 #include "Leyr/Leyr.h"
 
 AMultiPartActor::AMultiPartActor()
@@ -17,6 +18,28 @@ AMultiPartActor::AMultiPartActor()
 	MultiPartFlipbook->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	MultiPartFlipbook->SetCollisionResponseToChannel(ECC_Player, ECR_Block);
 	MultiPartFlipbook->SetCollisionResponseToChannel(ECC_Enemy, ECR_Block);
+}
+
+void AMultiPartActor::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	StartLocation = GetActorLocation();
+}
+
+void AMultiPartActor::Extinguish()
+{
+	
+}
+
+void AMultiPartActor::HandleOnHit(const FHitResult& HitResult)
+{
+	
+}
+
+void AMultiPartActor::ResetState_Implementation()
+{
+	SetActorLocation(StartLocation);
 }
 
 void AMultiPartActor::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

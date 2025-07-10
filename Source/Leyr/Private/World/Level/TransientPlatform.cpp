@@ -3,7 +3,10 @@
 #include "World/Level/TransientPlatform.h"
 #include "Components/BoxComponent.h"
 #include "PaperFlipbookComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Interaction/PlayerInterface.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Player/PlayerCharacter.h"
 
 ATransientPlatform::ATransientPlatform()
 {
@@ -40,11 +43,25 @@ void ATransientPlatform::OnConstruction(const FTransform& Transform)
 	FlipbookComponent->Stop();
 }
 
+void ATransientPlatform::ResetState_Implementation()
+{
+	BoxCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
+	FlipbookComponent->SetPlaybackPosition(0.f, true);
+	FlipbookComponent->Stop();
+	FlipbookComponent->SetVisibility(true);
+	bCanOverlap = true;
+	CycleCount = 0;
+}
+
 void ATransientPlatform::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (OtherActor && OtherActor->Implements<UPlayerInterface>() && bCanOverlap)
+	if (OtherActor && OtherActor->Implements<UPlayerInterface>() && bCanOverlap && ShouldPlayerTriggerTransientTime(Cast<APlayerCharacter>(OtherActor)))
 	{
-		if (const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(PlatformTimer, this, &ATransientPlatform::HandlePlatformTimeEnd, PlatformTime);
+		if (bDelayTransientTime)
+		{
+			GetWorld()->GetTimerManager().SetTimer(PlatformTimer, this, &ATransientPlatform::StartCollapsing, PlatformTime);
+		}
+		else FlipbookComponent->Play();
 		bCanOverlap = false;
 	}
 }
@@ -55,43 +72,66 @@ void ATransientPlatform::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, 
 	
 	if (OtherActor && OtherActor->Implements<UPlayerInterface>())
 	{
+		if (!bDelayTransientTime)
+		{
+			FlipbookComponent->Stop();
+			bCanOverlap = true;
+		}
 		bCanSafelyBlock = true;
 	}
 }
 
-void ATransientPlatform::HandlePlatformTimeEnd()
+void ATransientPlatform::StartCollapsing()
 {
-	FlipbookComponent->PlayFromStart();
+	FlipbookComponent->Play();
+}
+
+void ATransientPlatform::HandleOnFinishedPlaying()
+{
+	FlipbookComponent->Stop();
+		
 	if(bFallingPlatform)
 	{
+		FTimerHandle VisibilityTimer;
+		GetWorld()->GetTimerManager().SetTimer(VisibilityTimer, FTimerDelegate::CreateLambda([this]{ FlipbookComponent->SetVisibility(false); }), 0.1f, false);
 		BoxCollision->SetEnableGravity(true);
 		BoxCollision->SetSimulatePhysics(true);
 		BoxCollision->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 		BoxCollision->SetCollisionResponseToAllChannels(ECR_Ignore);
 	}
 	else
-	{
+	{		
+		CheckForEndOfCycle();
 		BoxCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-        bCanSafelyBlock = false;
+		bCanSafelyBlock = false;
 	}
 }
 
-void ATransientPlatform::HandleOnFinishedPlaying()
+void ATransientPlatform::CheckForEndOfCycle()
 {
-	if(bFallingPlatform) SetLifeSpan(.1f);
+	CycleCount++;
+	if (CycleCount >= CycleAmount)
+	{
+		FlipbookComponent->SetVisibility(false);
+	}
 	else
 	{
-		if (const UWorld* World = GetWorld())
-		{
-			World->GetTimerManager().SetTimer(OffCycleTimer, this, &ATransientPlatform::HandleOffCycleEnd, OffCycleDuration);
-		}
-		FlipbookComponent->Stop();
+		GetWorld()->GetTimerManager().SetTimer(OffCycleTimer, this, &ATransientPlatform::ResetCycle, OffCycleDuration);
 	}
 }
 
-void ATransientPlatform::HandleOffCycleEnd()
+void ATransientPlatform::ResetCycle()
 {
 	BoxCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	FlipbookComponent->SetPlaybackPosition(0.f, true);
+	FlipbookComponent->Stop();
 	bCanOverlap = true;
+}
+
+bool ATransientPlatform::ShouldPlayerTriggerTransientTime(const APlayerCharacter* PlayerCharacter) const
+{
+	if (PlayerCharacter == nullptr) return false;
+	
+	const FVector Extrema = PlayerCharacter->GetCapsuleComponent()->Bounds.GetBoxExtrema(0);
+	return UKismetMathLibrary::IsPointInBox(Extrema, OverlapBox->GetComponentLocation(), OverlapBox->GetScaledBoxExtent());
 }

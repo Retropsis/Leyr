@@ -6,6 +6,7 @@
 #include "World/Level/Platform.h"
 #include "TransientPlatform.generated.h"
 
+class APlayerCharacter;
 class UPaperFlipbookComponent;
 
 /**
@@ -18,25 +19,31 @@ class LEYR_API ATransientPlatform : public APlatform
 
 public:
 	ATransientPlatform();
+	
+	//~ LevelActorInterface
+	virtual void ResetState_Implementation() override;
+	//~ LevelActorInterface
 
 protected:
 	virtual void BeginPlay() override;
+	bool ShouldPlayerTriggerTransientTime(const APlayerCharacter* PlayerCharacter) const;
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	UFUNCTION()
 	virtual void HandleOnFinishedPlaying();
 
 	UFUNCTION()
-	void HandleOffCycleEnd();
+	void ResetCycle();
 	
 	UFUNCTION()
-	virtual void HandlePlatformTimeEnd();
-	
+	virtual void StartCollapsing();
+	void CheckForEndOfCycle();
+
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+	                            int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
-	
+
 	UPROPERTY(VisibleAnywhere, Category="Platform")
 	TObjectPtr<UPaperFlipbookComponent> FlipbookComponent;
 	
@@ -51,6 +58,14 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category="Platform")
 	float OffCycleDuration = 2.f;
+	
+	UPROPERTY(EditAnywhere, Category="Platform")
+	int32 CycleAmount = 1;
+	
+	int32 CycleCount = 0;
+	
+	UPROPERTY(EditAnywhere, Category="Platform")
+	bool bDelayTransientTime = false;
 	
 	UPROPERTY(EditAnywhere, Category="Platform")
 	float PlatformTime = 1.f;

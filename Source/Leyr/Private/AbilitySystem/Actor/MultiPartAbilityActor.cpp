@@ -34,3 +34,7 @@ void AMultiPartAbilityActor::OnBeginOverlap(UPrimitiveComponent* OverlappedCompo
 		HandleBeginOverlap();
 	}
 }
+
+void AMultiPartAbilityActor::DestroyActor_Implementation()
+{
+}

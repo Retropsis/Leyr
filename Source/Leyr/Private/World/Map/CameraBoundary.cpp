@@ -187,6 +187,7 @@ void ACameraBoundary::ToggleLevelActorActivity(bool bActivate) const
 		if (Overlap.GetActor() && Overlap.GetActor()->Implements<ULevelActorInterface>())
 		{
 			ILevelActorInterface::Execute_ToggleActivate(Overlap.GetActor(), bActivate);
+			if (bActivate) ILevelActorInterface::Execute_ResetState(Overlap.GetActor());
 		}
 	}
 }

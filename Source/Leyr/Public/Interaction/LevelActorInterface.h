@@ -24,4 +24,7 @@ class LEYR_API ILevelActorInterface
 public:
 	UFUNCTION(BlueprintNativeEvent)
 	void ToggleActivate(bool bActivate);
+	
+	UFUNCTION(BlueprintNativeEvent)
+	void ResetState();
 };

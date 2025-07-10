@@ -3,37 +3,32 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "PaperFlipbookActor.h"
 #include "GameFramework/Actor.h"
 #include "Interaction/InteractionInterface.h"
 #include "Interaction/LevelActorInterface.h"
-#include "MultiPartActor.generated.h"
+#include "BreakableLight.generated.h"
 
-class UPaperFlipbookComponent;
 class UPointLightComponent;
 class UPaperFlipbook;
+class UBoxComponent;
 class UNiagaraSystem;
 
 UCLASS()
-class LEYR_API AMultiPartActor : public AActor, public IInteractionInterface, public ILevelActorInterface
+class LEYR_API ABreakableLight : public APaperFlipbookActor, public IInteractionInterface, public ILevelActorInterface
 {
 	GENERATED_BODY()
 	
 public:	
-	AMultiPartActor();
+	ABreakableLight();
 	virtual void InteractHit_Implementation(AActor* InteractingActor, FName BoneName) override {}
-	
-	//~ LevelActorInterface
-	virtual void ResetState_Implementation() override;
-	//~ LevelActorInterface
-	
-	UFUNCTION()
-	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	
-	UFUNCTION()
-	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	//~ LevelActorInterface
+	virtual void ResetState_Implementation() override;
+	//~ LevelActorInterface
 
 protected:
 	virtual void BeginPlay() override;
@@ -44,27 +39,31 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void HandleOnHit(const FHitResult& HitResult);
 	
-	UPROPERTY(EditDefaultsOnly)
-	float ImpactImpulse = 100.f;
-	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	bool bCanBreak = false;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	bool bHit = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UBoxComponent> BoxComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UPaperFlipbookComponent> HaloComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UPointLightComponent> PointLightComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<UPaperFlipbook> ExtinguishFlipbook;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TArray<FName> UnbreakableBones;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	TObjectPtr<USkeletalMeshComponent> MultiPartFlipbook;
-	
-		UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UNiagaraSystem> ImpactEffect;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<USoundBase> ImpactSound;
-	
+
 private:
 	FVector StartLocation;
+	UPaperFlipbook* ActiveFlipbook;
 };
