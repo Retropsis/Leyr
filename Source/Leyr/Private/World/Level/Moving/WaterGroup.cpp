@@ -32,7 +32,11 @@ void AWaterGroup::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActo
 	if(OtherComp && OtherComp->ComponentHasTag("SwimmingCollision"))
 	{
 		ActiveActors.AddUnique(OtherActor);
-		IPlayerInterface::Execute_HandleSwimming(OtherActor, MinZ, SwimmingSpeed, SwimmingGravityScale, false);
+		if (OtherActor->Implements<UPlayerInterface>())
+		{
+			IPlayerInterface::Execute_HandleSwimming(OtherActor, MinZ, SwimmingSpeed, SwimmingGravityScale, false);
+		}
+		
 		FVector Location{ OtherComp->GetComponentLocation().X, 0.f, OverlapBox->GetComponentLocation().Z + OverlapBox->GetScaledBoxExtent().Z + 32.f };
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, WaterSplash, Location);
 	}
@@ -43,7 +47,11 @@ void AWaterGroup::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor*
 	if(OtherComp && OtherComp->ComponentHasTag("SwimmingCollision") && ActiveActors.Contains(OtherActor))
 	{
 		ActiveActors.Remove(OtherActor);
-		IPlayerInterface::Execute_HandleSwimming(OtherActor, 0.f, 0.f, 0.f, true);
+		if (OtherActor->Implements<UPlayerInterface>())
+		{
+			IPlayerInterface::Execute_HandleSwimming(OtherActor, 0.f, 0.f, 0.f, true);
+		}
+		
 		FVector Location{ OtherComp->GetComponentLocation().X, 0.f, OverlapBox->GetComponentLocation().Z + OverlapBox->GetScaledBoxExtent().Z + 32.f };
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, WaterSplash, Location);
 	}
