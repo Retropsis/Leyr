@@ -33,6 +33,12 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void SelectFlicker();
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateFlicker(float Alpha, float Scale);
+
 	UFUNCTION(BlueprintCallable)
 	void Extinguish();
 	
@@ -62,6 +68,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<USoundBase> ImpactSound;
+
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UMaterialInstanceDynamic> MID_Halo;
 
 private:
 	FVector StartLocation;

@@ -5,6 +5,7 @@
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Leyr/Leyr.h"
 
 ABreakable::ABreakable()
 {	
@@ -44,6 +45,7 @@ void ABreakable::BeginPlay()
 	FlipbookComponent->Stop();
 	TopFlipbookComponent->SetPlayRate(1.f);
 	TopFlipbookComponent->Stop();
+	LifeSpan = FlipbookComponent->GetFlipbookLength();
 
 	if (const UBaseAttributeSet* BaseAS = Cast<UBaseAttributeSet>(AttributeSet))
 	{

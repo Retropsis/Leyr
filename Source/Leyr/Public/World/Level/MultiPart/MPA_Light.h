@@ -17,6 +17,12 @@ class LEYR_API AMPA_Light : public AMultiPartActor
 
 public:
 	AMPA_Light();
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void SelectFlicker();
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateFlicker(float Alpha, float Scale);
 	
 	//~ LevelActorInterface
 	virtual void ResetState_Implementation() override;
@@ -39,6 +45,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UPaperFlipbook> ExtinguishFlipbook;
+
+	UPROPERTY(BlueprintReadOnly)
+	TObjectPtr<UMaterialInstanceDynamic> MID_Halo;
 
 private:
 	UPaperFlipbook* ActiveFlipbook;

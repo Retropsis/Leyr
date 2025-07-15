@@ -25,6 +25,7 @@ ABreakableLight::ABreakableLight()
 	HaloComponent =  CreateDefaultSubobject<UPaperFlipbookComponent>("HaloComponent");
 	HaloComponent->SetupAttachment(BoxComponent);
 	HaloComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HaloComponent->SetRelativeLocation(FVector(0, -5.f, 0));
 
 	GetRenderComponent()->SetupAttachment(BoxComponent);
 }
@@ -36,15 +37,28 @@ void ABreakableLight::BeginPlay()
 	StartLocation = GetActorLocation();
 	ActiveFlipbook = GetRenderComponent()->GetFlipbook();
 	BoxComponent->OnComponentHit.AddUniqueDynamic(this, &ABreakableLight::OnHit);
+	MID_Halo = HaloComponent->CreateDynamicMaterialInstance(0);
+	SelectFlicker();
+}
+
+void ABreakableLight::UpdateFlicker(float Alpha, float Scale)
+{
+	if (MID_Halo == nullptr) return;
+	
+	MID_Halo->SetScalarParameterValue(FName("FlickeringAlpha"), Alpha);
+	MID_Halo->SetScalarParameterValue(FName("FlickeringStrength"), Alpha);
+	HaloComponent->SetRelativeScale3D(FVector{ Scale, 1.f, Scale });
 }
 
 void ABreakableLight::Extinguish()
 {
+	BoxComponent->OnComponentHit.RemoveAll(this);
 	BoxComponent->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	BoxComponent->SetSimulatePhysics(true);
 	GetRenderComponent()->SetFlipbook(ExtinguishFlipbook);
 	GetRenderComponent()->SetLooping(false);
-	BoxComponent->OnComponentHit.RemoveAll(this);
+	PointLightComponent->SetVisibility(false);
+	HaloComponent->SetVisibility(false);
 }
 
 void ABreakableLight::HandleOnHit(const FHitResult& HitResult)
@@ -67,6 +81,7 @@ void ABreakableLight::ResetState_Implementation()
 	BoxComponent->SetRelativeLocation(FVector:: ZeroVector);
 	
 	HaloComponent->SetVisibility(true);
+	PointLightComponent->SetVisibility(true);
 	
 	GetRenderComponent()->SetFlipbook(ActiveFlipbook);
 	GetRenderComponent()->Play();

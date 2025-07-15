@@ -25,6 +25,23 @@ AMPA_Light::AMPA_Light()
 	HaloComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
+void AMPA_Light::BeginPlay()
+{
+	Super::BeginPlay();
+	ActiveFlipbook = TorchComponent->GetFlipbook();
+	MID_Halo = HaloComponent->CreateDynamicMaterialInstance(0);
+	SelectFlicker();
+}
+
+void AMPA_Light::UpdateFlicker(float Alpha, float Scale)
+{
+	if (MID_Halo == nullptr) return;
+	
+	MID_Halo->SetScalarParameterValue(FName("FlickeringAlpha"), Alpha);
+	MID_Halo->SetScalarParameterValue(FName("FlickeringStrength"), Alpha);
+	HaloComponent->SetRelativeScale3D(FVector{ Scale, 1.f, Scale });
+}
+
 void AMPA_Light::ResetState_Implementation()
 {
 	Super::ResetState_Implementation();
@@ -38,10 +55,6 @@ void AMPA_Light::ResetState_Implementation()
 	TorchComponent->Play();
 	HaloComponent->SetLooping(true);
 	HaloComponent->Play();
-}
-
-void AMPA_Light::BeginPlay()
-{
-	Super::BeginPlay();
-	ActiveFlipbook = TorchComponent->GetFlipbook();
+	HaloComponent->SetVisibility(true);
+	PointLightComponent->SetVisibility(true);
 }
