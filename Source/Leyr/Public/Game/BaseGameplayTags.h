@@ -332,14 +332,25 @@ FGameplayTag GameplayCue_Healing_Cure_2;
 FGameplayTag GameplayCue_Lightning_Bolt_1;
 FGameplayTag GameplayCue_Noxious_Bio_1;
 FGameplayTag GameplayCue_Cosmos_Meteor_1;
+	
 FGameplayTag GameplayCue_Weapon;
+FGameplayTag GameplayCue_Weapon_Throw;
 FGameplayTag GameplayCue_Weapon_Monk;
 FGameplayTag GameplayCue_Weapon_Sword_Slash;
 FGameplayTag GameplayCue_Weapon_Bow_Shot;
+FGameplayTag GameplayCue_Weapon_Impact_Small;
+FGameplayTag GameplayCue_Weapon_Impact_Average;
+FGameplayTag GameplayCue_Weapon_Impact_Large;
+FGameplayTag GameplayCue_Weapon_Impact_Ground;
+
+FGameplayTag GameplayCue_Wound_Impact_Small;
+FGameplayTag GameplayCue_Wound_Impact_Average;
+FGameplayTag GameplayCue_Wound_Impact_Large;
+	
 FGameplayTag GameplayCue_Bite;
 FGameplayTag GameplayCue_Execute;
-FGameplayTag GameplayCue_Weapon_Throw;
 FGameplayTag GameplayCue_Shield;
+	
 FGameplayTag GameplayCue_WaterSplash_Small;
 FGameplayTag GameplayCue_WaterSplash_Regular;
 FGameplayTag GameplayCue_WaterSplash_Large;

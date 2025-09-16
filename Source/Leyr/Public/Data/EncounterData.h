@@ -65,6 +65,9 @@ public:
 	TSoftObjectPtr<UNiagaraSystem> ImpactEffect;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Asset")
+	TMap<FGameplayTag, TSoftObjectPtr<UNiagaraSystem>> WoundImpactEffects;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Asset")
 	TSoftObjectPtr<UNiagaraSystem> DestroyedEffect;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Asset")

@@ -424,6 +424,11 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.GameplayCue_WaterSplash_Small = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.WaterSplash.Small"), FString("GameplayCue WaterSplash_Small"));
 	GameplayTags.GameplayCue_WaterSplash_Regular = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.WaterSplash.Regular"), FString("GameplayCue WaterSplash_Regular"));
 	GameplayTags.GameplayCue_WaterSplash_Large = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.WaterSplash.Large"), FString("GameplayCue WaterSplash_Large"));
+	GameplayTags.GameplayCue_Weapon_Impact_Small = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Impact.Small"), FString("GameplayCue Weapon Small Impact."));
+	GameplayTags.GameplayCue_Weapon_Impact_Average = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Impact.Average"), FString("GameplayCue Weapon Average Impact."));
+	GameplayTags.GameplayCue_Weapon_Impact_Large = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Impact.Large"), FString("GameplayCue Weapon Large Impact."));
+	GameplayTags.GameplayCue_Weapon_Impact_Ground = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Impact.Ground"), FString("GameplayCue Weapon Ground Impact."));
+	
 	
 	/*
 	 * Asset Cues

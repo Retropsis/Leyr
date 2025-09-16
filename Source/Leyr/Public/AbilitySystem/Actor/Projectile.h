@@ -59,8 +59,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USphereComponent> Sphere;
 
-	UPROPERTY()
-	TObjectPtr<USceneComponent> HomingTargetComponent;
+	UPROPERTY() TObjectPtr<USceneComponent> HomingTargetComponent;
+	UPROPERTY() TObjectPtr<UAudioComponent> LoopingSoundComponent;
+	UPROPERTY() TObjectPtr<USoundBase> LoopingSound;
+	UPROPERTY() TObjectPtr<UNiagaraSystem> ImpactEffect;
+	UPROPERTY() TObjectPtr<USoundBase> ImpactSound;
+	
+	UPROPERTY(EditDefaultsOnly)
+	float LifeSpan = 15.f;
 	
 	bool bHit = false;
 	
@@ -77,12 +83,4 @@ protected:
 private:
 	UFUNCTION()
 	void OnHomingTargetDeath(AActor* DeadActor);
-	
-	UPROPERTY(EditDefaultsOnly)
-	float LifeSpan = 15.f;
-	
-	UPROPERTY() TObjectPtr<UNiagaraSystem> ImpactEffect;
-	UPROPERTY() TObjectPtr<USoundBase> ImpactSound;
-	UPROPERTY() TObjectPtr<USoundBase> LoopingSound;
-	UPROPERTY() TObjectPtr<UAudioComponent> LoopingSoundComponent;
 };

@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "GameplayCueDefinition.generated.h"
 
 class UNiagaraSystem;
@@ -24,4 +23,7 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, meta=(ExposeOnSpawn))
 	FVector PreferredHitLocation;
+	
+	UPROPERTY(BlueprintReadOnly, meta=(ExposeOnSpawn))
+	AActor* HitActor = nullptr;
 };

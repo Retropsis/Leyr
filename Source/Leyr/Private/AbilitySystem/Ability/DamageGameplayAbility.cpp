@@ -119,7 +119,7 @@ void UDamageGameplayAbility::ForEachHitTryCausingDamage(TArray<FHitResult> HitRe
 					GameplayCueDefinition->PreferredHitLocation = ICombatInterface::Execute_GetPreferredHitLocation(Hit.GetActor());
 				}
 				// HitLocation = (Loc + Hit.ImpactPoint) / 2.f;
-				HitLocation = Hit.Location;
+				HitLocation = Hit.ImpactPoint;
 				HitLocation.Y = 0.f;
 				HitActors.AddUnique(HitActor);
 			}
@@ -200,8 +200,9 @@ void UDamageGameplayAbility::SelectMontageTagFromCombatState()
 
 void UDamageGameplayAbility::ExecuteDamageGameplayCue(FGameplayTag GameplayCueTag)
 {
-	if (HitActor->Implements<UCombatInterface>())
+	if (HitActor && HitActor->Implements<UCombatInterface>())
 	{
+		GameplayCueDefinition->HitActor = HitActor;
 		GameplayCueDefinition->ImpactEffect = ICombatInterface::Execute_GetImpactEffect(HitActor);
 	}
 	GameplayCueDefinition->ImpactSound = ICombatInterface::Execute_ImpactSoundFromTag(GetAvatarActorFromActorInfo(), MontageTag, SequenceType);

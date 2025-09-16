@@ -60,6 +60,12 @@ public:
 	UFUNCTION(BlueprintPure)
 	FAdditionalEffectParams MakeAdditionalEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
 	
+	UFUNCTION(BlueprintCallable)
+	void SetHitLocation(const FVector NewHitLocation) { HitLocation = NewHitLocation; }
+	
+	UFUNCTION(BlueprintCallable)
+	void ResetHasHit() { bHasHitTarget = false; }
+	
 protected:		
 	UPROPERTY(BlueprintReadOnly)
 	bool bHasHitTarget = false;
