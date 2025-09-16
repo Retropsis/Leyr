@@ -29,8 +29,10 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 #include "Data/AbilitySet.h"
 #include "Data/InventoryCostData.h"
+#include "Engine/AssetManager.h"
 #include "Game/LeyrGameMode.h"
 #include "Game/LoadMenuSaveGame.h"
 #include "Game/BaseGameplayTags.h"
@@ -347,6 +349,21 @@ void APlayerCharacter::InitializeCharacterInfo()
 	
 	const FCharacterDefaultInfo Info = CharacterInfo->GetCharacterDefaultInfo(CharacterTag);
 	ImpactEffect = Info.ImpactEffect;
+	// WoundImpactEffects = Info.WoundImpactEffects;
+
+	for (TTuple<FGameplayTag, TSoftObjectPtr<UNiagaraSystem>> WoundImpactEffect :  Info.WoundImpactEffects)
+	{
+		if (WoundImpactEffect.Value == nullptr || !WoundImpactEffect.Key.IsValid()) continue;
+		
+		UAssetManager::GetStreamableManager().RequestAsyncLoad(WoundImpactEffect.Value.ToSoftObjectPath(), [this, WoundImpactEffect] () {
+			UNiagaraSystem* LoadedAsset = WoundImpactEffect.Value.Get();
+			if (IsValid(LoadedAsset))
+			{
+				WoundImpactEffects.Add(WoundImpactEffect.Key, LoadedAsset);
+			}
+		}, FStreamableManager::DefaultAsyncLoadPriority);
+	}
+	
 	DefeatedSoundLoaded = Info.DeathSound;
 	HitReactSequence = Info.HitReactSequence;
 	AttackSequenceInfo = Info.AttackSequenceInfo;

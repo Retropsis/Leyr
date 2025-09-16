@@ -198,12 +198,12 @@ void UDamageGameplayAbility::SelectMontageTagFromCombatState()
 	if (OwnedTags.HasTagExact(GameplayTags.CombatState_Condition_Swimming )) { MontageTag = GameplayTags.Montage_Swim_Attack; }
 }
 
-void UDamageGameplayAbility::ExecuteDamageGameplayCue(FGameplayTag GameplayCueTag)
+void UDamageGameplayAbility::ExecuteDamageGameplayCue(FGameplayTag GameplayCueTag, const FGameplayTag WoundImpactTag)
 {
 	if (HitActor && HitActor->Implements<UCombatInterface>())
 	{
 		GameplayCueDefinition->HitActor = HitActor;
-		GameplayCueDefinition->ImpactEffect = ICombatInterface::Execute_GetImpactEffect(HitActor);
+		GameplayCueDefinition->ImpactEffect = ICombatInterface::Execute_GetWoundImpactEffect(HitActor, WoundImpactTag);
 	}
 	GameplayCueDefinition->ImpactSound = ICombatInterface::Execute_ImpactSoundFromTag(GetAvatarActorFromActorInfo(), MontageTag, SequenceType);
 		

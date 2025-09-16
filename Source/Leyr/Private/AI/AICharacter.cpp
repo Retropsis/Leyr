@@ -232,6 +232,7 @@ void AAICharacter::InitializeCharacterInfo()
 		DamageEffectClass = EncounterData->BehaviourData->DamageEffectClass;
 		DamageType = EncounterData->BehaviourData->DamageType;
 	}
+	
 	UAssetManager::GetStreamableManager().RequestAsyncLoad(EncounterData->ImpactEffect.ToSoftObjectPath(), [this] () {
 		UNiagaraSystem* LoadedAsset = EncounterData->ImpactEffect.Get();
 		if (IsValid(LoadedAsset))
@@ -239,6 +240,20 @@ void AAICharacter::InitializeCharacterInfo()
 			ImpactEffect = LoadedAsset;
 		}
 	}, FStreamableManager::DefaultAsyncLoadPriority);
+
+	for (TTuple<FGameplayTag, TSoftObjectPtr<UNiagaraSystem>> WoundImpactEffect : EncounterData->WoundImpactEffects)
+	{
+		if (WoundImpactEffect.Value.Get() == nullptr || !WoundImpactEffect.Key.IsValid()) continue;
+		
+		UAssetManager::GetStreamableManager().RequestAsyncLoad(WoundImpactEffect.Value.ToSoftObjectPath(), [this, WoundImpactEffect] () {
+			UNiagaraSystem* LoadedAsset = WoundImpactEffect.Value.Get();
+			if (IsValid(LoadedAsset))
+			{
+				WoundImpactEffects.Add(WoundImpactEffect.Key, LoadedAsset);
+			}
+		}, FStreamableManager::DefaultAsyncLoadPriority);
+	}
+	
 	UAssetManager::GetStreamableManager().RequestAsyncLoad(EncounterData->ImpactEffect.ToSoftObjectPath(), [this] () {
 		UNiagaraSystem* LoadedAsset = EncounterData->DestroyedEffect.Get();
 		if (IsValid(LoadedAsset))
@@ -351,6 +366,8 @@ void AAICharacter::HandleBehaviourState(EBehaviourState NewState)
 		break;
 	case EBehaviourState::Dive:
 		GetCharacterMovement()->MaxFlySpeed = DivingSpeed;
+		break;
+	case EBehaviourState::Duck: // TODO: Could be Crouch?
 		break;
 	}
 }

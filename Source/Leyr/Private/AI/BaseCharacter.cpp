@@ -249,6 +249,78 @@ USoundBase* ABaseCharacter::ImpactSoundFromTag_Implementation(const FGameplayTag
 	return GetTaggedMontageInfoByTag(MontageTag, SequenceType).ImpactSound;
 }
 
+UNiagaraSystem* ABaseCharacter::GetWoundImpactEffect_Implementation(const FGameplayTag WoundImpactTag)
+{
+	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+	// FGameplayTag EffectSizeTag = FGameplayTag();
+	// bool bRandom = false;
+	
+	// if (WoundImpactTag.MatchesTag(GameplayTags.GameplayCue_Wound_Impact_Small)) EffectSizeTag = GameplayTags.GameplayCue_Wound_Impact_Small;
+	// if (WoundImpactTag.MatchesTag(GameplayTags.GameplayCue_Wound_Impact_Average)) EffectSizeTag = GameplayTags.GameplayCue_Wound_Impact_Average;
+	// if (WoundImpactTag.MatchesTag(GameplayTags.GameplayCue_Wound_Impact_Large)) EffectSizeTag = GameplayTags.GameplayCue_Wound_Impact_Large;
+	// if (WoundImpactTag.ToString().Contains("Random")) bRandom = true;
+	
+	if (WoundImpactTag.ToString().Contains("Random"))
+	{
+		TArray<UNiagaraSystem*> Effects;
+		for (TTuple<FGameplayTag, UNiagaraSystem*> WoundImpactEffect : WoundImpactEffects)
+		{
+			if (WoundImpactEffect.Key.MatchesTag(WoundImpactTag.RequestDirectParent())) Effects.Add(WoundImpactEffect.Value);
+		}
+		return Effects[FMath::RandRange(0, Effects.Num() - 1)];
+	}
+	return WoundImpactEffects.Contains(WoundImpactTag) ? WoundImpactEffects[WoundImpactTag] : nullptr;
+	
+
+	// Small Effects
+	// if (WoundImpactTag.MatchesTagExact(GameplayTags.GameplayCue_Wound_Impact_Small_Random))
+	// {
+	// 	TArray<UNiagaraSystem*> Effects;
+	// 	for (TTuple<FGameplayTag, UNiagaraSystem*> WoundImpactEffect : WoundImpactEffects)
+	// 	{
+	// 		if (WoundImpactEffect.Key.MatchesTag(GameplayTags.GameplayCue_Wound_Impact_Small)) Effects.Add(WoundImpactEffect.Value);
+	// 	}
+	// 	return Effects[FMath::RandRange(0, Effects.Num() - 1)];
+	// }
+	// else if (WoundImpactTag.MatchesTag(GameplayTags.GameplayCue_Wound_Impact_Small))
+	// {
+	// 	return WoundImpactEffects.Contains(WoundImpactTag) ? WoundImpactEffects[WoundImpactTag] : nullptr;
+	// }
+	
+	// Average Effects
+	// if (WoundImpactTag.MatchesTagExact(GameplayTags.GameplayCue_Wound_Impact_Average_Random))
+	// {
+	// 	TArray<UNiagaraSystem*> Effects;
+	// 	for (TTuple<FGameplayTag, UNiagaraSystem*> WoundImpactEffect : WoundImpactEffects)
+	// 	{
+	// 		if (WoundImpactEffect.Key.MatchesTag(GameplayTags.GameplayCue_Wound_Impact_Average)) Effects.Add(WoundImpactEffect.Value);
+	// 	}
+	// 	return Effects[FMath::RandRange(0, Effects.Num() - 1)];
+	// }
+	// else if (WoundImpactTag.MatchesTag(GameplayTags.GameplayCue_Wound_Impact_Average))
+	// {
+	// 	return WoundImpactEffects.Contains(WoundImpactTag) ? WoundImpactEffects[WoundImpactTag] : nullptr;
+	// }
+	
+	// Large Effects
+	// if (WoundImpactTag.MatchesTagExact(GameplayTags.GameplayCue_Wound_Impact_Large_Random))
+	// {
+	// 	TArray<UNiagaraSystem*> Effects;
+	// 	for (TTuple<FGameplayTag, UNiagaraSystem*> WoundImpactEffect : WoundImpactEffects)
+	// 	{
+	// 		if (WoundImpactEffect.Key.MatchesTag(GameplayTags.GameplayCue_Wound_Impact_Large)) Effects.Add(WoundImpactEffect.Value);
+	// 	}
+	// 	return Effects[FMath::RandRange(0, Effects.Num() - 1)];
+	// }
+	// else if (WoundImpactTag.MatchesTag(GameplayTags.GameplayCue_Wound_Impact_Large))
+	// {
+	// 	return WoundImpactEffects.Contains(WoundImpactTag) ? WoundImpactEffects[WoundImpactTag] : nullptr;
+	// }
+
+	GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Red, FString::Printf(TEXT("Failed to find a wound impact effect on [%s]"), *GetName()));
+	return nullptr;
+}
+
 void ABaseCharacter::GetAttackAnimationData_Implementation(FVector& InBoxTraceStart, FVector& InBoxTraceEnd)
 {
 	InBoxTraceStart = BoxTraceStart->GetComponentLocation();

@@ -22,16 +22,19 @@ struct FCharacterDefaultInfo
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Behaviour")
+	UPROPERTY(EditDefaultsOnly, Category = "Assets")
 	TObjectPtr<UNiagaraSystem> ImpactEffect;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Behaviour")
+	UPROPERTY(EditDefaultsOnly, Category="Assets")
+	TMap<FGameplayTag, UNiagaraSystem*> WoundImpactEffects;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Assets")
 	TObjectPtr<USoundBase> DeathSound;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "Behaviour")
+	UPROPERTY(EditDefaultsOnly, Category = "Assets")
 	TObjectPtr<UPaperZDAnimSequence> HitReactSequence;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Behaviour")
+	UPROPERTY(EditDefaultsOnly, Category = "Assets")
 	TObjectPtr<UAttackSequenceInfo> AttackSequenceInfo;
 };
 

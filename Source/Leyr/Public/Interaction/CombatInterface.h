@@ -66,7 +66,7 @@ public:
 	TSoftObjectPtr<UPaperZDAnimSequence> GetHitReactSequence();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	UNiagaraSystem* GetImpactEffect();
+	UNiagaraSystem* GetWoundImpactEffect(const FGameplayTag WoundImpactTag);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FVector GetPreferredHitLocation();

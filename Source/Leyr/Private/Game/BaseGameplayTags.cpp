@@ -414,21 +414,40 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.GameplayCue_Lightning_Bolt_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Lightning.Bolt.1"), FString("GameplayCue Lightning Bolt 1"));
 	GameplayTags.GameplayCue_Noxious_Bio_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Noxious.Bio.1"), FString("GameplayCue Noxious Bio 1"));
 	GameplayTags.GameplayCue_Cosmos_Meteor_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Cosmos.Meteor.1"), FString("GameplayCue Cosmos Meteor 1"));
+	
 	GameplayTags.GameplayCue_Weapon = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon"), FString("GameplayCue Weapon"));
 	GameplayTags.GameplayCue_Weapon_Monk = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Monk"), FString("GameplayCue Monk Weapon"));
 	GameplayTags.GameplayCue_Weapon_Sword_Slash = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Sword.Slash"), FString("GameplayCue Weapon Sword Slash"));
 	GameplayTags.GameplayCue_Weapon_Bow_Shot = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Bite"), FString("GameplayCue Bite"));
-	GameplayTags.GameplayCue_Bite = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Bow.Shot"), FString("GameplayCue Weapon Bow Shot"));
-	GameplayTags.GameplayCue_Alteration_Berserk_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Alteration.Berserk.1"), FString("GameplayCue Alteration Berserk 1"));
-	GameplayTags.GameplayCue_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Execute"), FString("GameplayCue Execute"));
-	GameplayTags.GameplayCue_WaterSplash_Small = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.WaterSplash.Small"), FString("GameplayCue WaterSplash_Small"));
-	GameplayTags.GameplayCue_WaterSplash_Regular = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.WaterSplash.Regular"), FString("GameplayCue WaterSplash_Regular"));
-	GameplayTags.GameplayCue_WaterSplash_Large = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.WaterSplash.Large"), FString("GameplayCue WaterSplash_Large"));
+	GameplayTags.GameplayCue_Weapon_Impact_Ground = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Impact.Ground"), FString("GameplayCue Weapon Ground Impact."));
 	GameplayTags.GameplayCue_Weapon_Impact_Small = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Impact.Small"), FString("GameplayCue Weapon Small Impact."));
 	GameplayTags.GameplayCue_Weapon_Impact_Average = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Impact.Average"), FString("GameplayCue Weapon Average Impact."));
 	GameplayTags.GameplayCue_Weapon_Impact_Large = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Impact.Large"), FString("GameplayCue Weapon Large Impact."));
-	GameplayTags.GameplayCue_Weapon_Impact_Ground = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Impact.Ground"), FString("GameplayCue Weapon Ground Impact."));
 	
+	GameplayTags.GameplayCue_Wound_Impact_Random = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Random"), FString("GameplayCue Wound Random Impact."));
+	GameplayTags.GameplayCue_Wound_Impact_Small = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Small"), FString("GameplayCue Wound Small Impact."));
+	GameplayTags.GameplayCue_Wound_Impact_Small_Random = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Small.Random"), FString("GameplayCue Wound Small Random Impact."));
+	GameplayTags.GameplayCue_Wound_Impact_Small_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Small.1"), FString("GameplayCue Wound Small 1 Impact."));
+	GameplayTags.GameplayCue_Wound_Impact_Small_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Small.2"), FString("GameplayCue Wound Small 2 Impact."));
+	GameplayTags.GameplayCue_Wound_Impact_Small_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Small.3"), FString("GameplayCue Wound Small 3 Impact."));
+	GameplayTags.GameplayCue_Wound_Impact_Average = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Average"), FString("GameplayCue Wound Average Impact."));
+	GameplayTags.GameplayCue_Wound_Impact_Average_Random = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Average.Random"), FString("GameplayCue Wound Average Random Impact."));
+	GameplayTags.GameplayCue_Wound_Impact_Average_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Average.1"), FString("GameplayCue Wound Average 1 Impact."));
+	GameplayTags.GameplayCue_Wound_Impact_Average_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Average.2"), FString("GameplayCue Wound Average 2 Impact."));
+	GameplayTags.GameplayCue_Wound_Impact_Average_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Average.3"), FString("GameplayCue Wound Average 3 Impact."));
+	GameplayTags.GameplayCue_Wound_Impact_Large = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Large"), FString("GameplayCue Wound Large Impact."));
+	GameplayTags.GameplayCue_Wound_Impact_Large_Random = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Large.Random"), FString("GameplayCue Wound Large Random Impact."));
+	GameplayTags.GameplayCue_Wound_Impact_Large_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Large.1"), FString("GameplayCue Wound Large 1 Impact."));
+	GameplayTags.GameplayCue_Wound_Impact_Large_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Large.2"), FString("GameplayCue Wound Large 2 Impact."));
+	GameplayTags.GameplayCue_Wound_Impact_Large_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Large.3"), FString("GameplayCue Wound Large 3 Impact."));
+	
+	GameplayTags.GameplayCue_Bite = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Bow.Shot"), FString("GameplayCue Weapon Bow Shot"));
+	GameplayTags.GameplayCue_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Execute"), FString("GameplayCue Execute"));
+	GameplayTags.GameplayCue_Alteration_Berserk_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Alteration.Berserk.1"), FString("GameplayCue Alteration Berserk 1"));
+	
+	GameplayTags.GameplayCue_WaterSplash_Small = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.WaterSplash.Small"), FString("GameplayCue WaterSplash_Small"));
+	GameplayTags.GameplayCue_WaterSplash_Regular = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.WaterSplash.Regular"), FString("GameplayCue WaterSplash_Regular"));
+	GameplayTags.GameplayCue_WaterSplash_Large = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.WaterSplash.Large"), FString("GameplayCue WaterSplash_Large"));
 	
 	/*
 	 * Asset Cues
