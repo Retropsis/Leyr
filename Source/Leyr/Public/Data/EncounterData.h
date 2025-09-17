@@ -62,9 +62,6 @@ public:
 	FGameplayTag WeaponSocketTag = FGameplayTag();
 	
 	UPROPERTY(EditDefaultsOnly, Category="Asset")
-	TSoftObjectPtr<UNiagaraSystem> ImpactEffect;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Asset")
 	TMap<FGameplayTag, TSoftObjectPtr<UNiagaraSystem>> WoundImpactEffects;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Asset")
@@ -74,7 +71,7 @@ public:
 	TSoftObjectPtr<USoundBase> DeathSound;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Asset")
-	TSoftObjectPtr<UPaperZDAnimSequence> HitReactSequence;
+	TMap<FGameplayTag, TSoftObjectPtr<UPaperZDAnimSequence>> HitReactSequences;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Asset")
 	TObjectPtr<UAttackSequenceInfo> AttackSequenceInfo;

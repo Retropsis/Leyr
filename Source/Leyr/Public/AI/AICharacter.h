@@ -39,6 +39,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
+	virtual void WeakenedTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 	void InitializeNavigationBounds();
 	void HandleBehaviourState(EBehaviourState NewState);
 	void HandlePlayerOverlappingArena(AActor* Player, bool bIsEntering);

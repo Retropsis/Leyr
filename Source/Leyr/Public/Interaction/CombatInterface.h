@@ -63,7 +63,7 @@ public:
 	FVector GetRelativeCombatSocketLocation(const FGameplayTag& MontageTag);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	TSoftObjectPtr<UPaperZDAnimSequence> GetHitReactSequence();
+	UPaperZDAnimSequence* GetHitReactSequence(const FGameplayTag& SequenceTag);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UNiagaraSystem* GetWoundImpactEffect(const FGameplayTag WoundImpactTag);

@@ -335,6 +335,7 @@ void APlayerCharacter::InitAbilityActorInfo()
 	//TODO: Move this to some other (PlayerState, BeginPlay)
 	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
 	AbilitySystemComponent->RegisterGameplayTagEvent(GameplayTags.StatusEffect_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::HitReactTagChanged);
+	AbilitySystemComponent->RegisterGameplayTagEvent(GameplayTags.StatusEffect_Weakened, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::WeakenedTagChanged);
 	AbilitySystemComponent->RegisterGameplayTagEvent(GameplayTags.VisualEffect_HitReactFlash, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::HitReactFlashTagChanged);
  	AbilitySystemComponent->RegisterGameplayTagEvent(GameplayTags.StatusEffect_Stun, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::StunTagChanged);
 	AbilitySystemComponent->RegisterGameplayTagEvent(GameplayTags.StatusEffect_Burn, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &APlayerCharacter::BurnTagChanged);
@@ -348,12 +349,23 @@ void APlayerCharacter::InitializeCharacterInfo()
 	if(!HasAuthority()) return;
 	
 	const FCharacterDefaultInfo Info = CharacterInfo->GetCharacterDefaultInfo(CharacterTag);
-	ImpactEffect = Info.ImpactEffect;
-	// WoundImpactEffects = Info.WoundImpactEffects;
-
+	
+	for (TTuple<FGameplayTag, TSoftObjectPtr<UPaperZDAnimSequence>> HitReactSequence :  Info.HitReactSequences)
+	{
+		if (!HitReactSequence.Key.IsValid()) continue;
+		
+		UAssetManager::GetStreamableManager().RequestAsyncLoad(HitReactSequence.Value.ToSoftObjectPath(), [this, HitReactSequence] () {
+			UPaperZDAnimSequence* LoadedAsset = HitReactSequence.Value.Get();
+			if (IsValid(LoadedAsset))
+			{
+				HitReactSequences.Add(HitReactSequence.Key, LoadedAsset);
+			}
+		}, FStreamableManager::DefaultAsyncLoadPriority);
+	}
+	
 	for (TTuple<FGameplayTag, TSoftObjectPtr<UNiagaraSystem>> WoundImpactEffect :  Info.WoundImpactEffects)
 	{
-		if (WoundImpactEffect.Value == nullptr || !WoundImpactEffect.Key.IsValid()) continue;
+		if (!WoundImpactEffect.Key.IsValid()) continue;
 		
 		UAssetManager::GetStreamableManager().RequestAsyncLoad(WoundImpactEffect.Value.ToSoftObjectPath(), [this, WoundImpactEffect] () {
 			UNiagaraSystem* LoadedAsset = WoundImpactEffect.Value.Get();
@@ -365,7 +377,6 @@ void APlayerCharacter::InitializeCharacterInfo()
 	}
 	
 	DefeatedSoundLoaded = Info.DeathSound;
-	HitReactSequence = Info.HitReactSequence;
 	AttackSequenceInfo = Info.AttackSequenceInfo;
 }
 

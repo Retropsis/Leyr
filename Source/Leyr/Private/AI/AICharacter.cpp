@@ -154,6 +154,7 @@ void AAICharacter::BeginPlay()
 			}
 		);
 		AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().StatusEffect_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAICharacter::HitReactTagChanged);
+		AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().StatusEffect_Weakened, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAICharacter::WeakenedTagChanged);
 		AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().VisualEffect_HitReactFlash, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAICharacter::HitReactFlashTagChanged);
 		AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Indicator_Execute, EGameplayTagEventType::NewOrRemoved).AddLambda([this] (const FGameplayTag CallbackTag, int32 NewCount)
 		{
@@ -204,7 +205,6 @@ void AAICharacter::InitializeCharacterInfo()
 	WeaponSocketName = EncounterData->WeaponSocketTag.GetTagName();
 
 	LootData = EncounterData->LootData;
-	HitReactSequence = EncounterData->HitReactSequence;
 	AttackSequenceInfo = EncounterData->AttackSequenceInfo;
 	bSimulatePhysicsOnDestroyed = EncounterData->bSimulatePhysicsOnDestroyed;
 	
@@ -232,18 +232,25 @@ void AAICharacter::InitializeCharacterInfo()
 		DamageEffectClass = EncounterData->BehaviourData->DamageEffectClass;
 		DamageType = EncounterData->BehaviourData->DamageType;
 	}
-	
-	UAssetManager::GetStreamableManager().RequestAsyncLoad(EncounterData->ImpactEffect.ToSoftObjectPath(), [this] () {
-		UNiagaraSystem* LoadedAsset = EncounterData->ImpactEffect.Get();
-		if (IsValid(LoadedAsset))
-		{
-			ImpactEffect = LoadedAsset;
-		}
-	}, FStreamableManager::DefaultAsyncLoadPriority);
 
+	// Loading Hit React Sequences Effect
+	for (TTuple<FGameplayTag, TSoftObjectPtr<UPaperZDAnimSequence>> HitReactSequence : EncounterData->HitReactSequences)
+	{
+		if (!HitReactSequence.Key.IsValid()) continue;
+		
+		UAssetManager::GetStreamableManager().RequestAsyncLoad(HitReactSequence.Value.ToSoftObjectPath(), [this, HitReactSequence] () {
+			UPaperZDAnimSequence* LoadedAsset = HitReactSequence.Value.Get();
+			if (IsValid(LoadedAsset))
+			{
+				HitReactSequences.Add(HitReactSequence.Key, LoadedAsset);
+			}
+		}, FStreamableManager::DefaultAsyncLoadPriority);
+	}
+
+	// Loading Wound Impact Effects
 	for (TTuple<FGameplayTag, TSoftObjectPtr<UNiagaraSystem>> WoundImpactEffect : EncounterData->WoundImpactEffects)
 	{
-		if (WoundImpactEffect.Value.Get() == nullptr || !WoundImpactEffect.Key.IsValid()) continue;
+		if (!WoundImpactEffect.Key.IsValid()) continue;
 		
 		UAssetManager::GetStreamableManager().RequestAsyncLoad(WoundImpactEffect.Value.ToSoftObjectPath(), [this, WoundImpactEffect] () {
 			UNiagaraSystem* LoadedAsset = WoundImpactEffect.Value.Get();
@@ -253,14 +260,17 @@ void AAICharacter::InitializeCharacterInfo()
 			}
 		}, FStreamableManager::DefaultAsyncLoadPriority);
 	}
-	
-	UAssetManager::GetStreamableManager().RequestAsyncLoad(EncounterData->ImpactEffect.ToSoftObjectPath(), [this] () {
+
+	// Loading Destroyed Effect
+	UAssetManager::GetStreamableManager().RequestAsyncLoad(EncounterData->DestroyedEffect.ToSoftObjectPath(), [this] () {
 		UNiagaraSystem* LoadedAsset = EncounterData->DestroyedEffect.Get();
 		if (IsValid(LoadedAsset))
 		{
 			DestroyedEffectLoaded = LoadedAsset;
 		}
 	}, FStreamableManager::DefaultAsyncLoadPriority);
+	
+	// Loading Destroyed Sound
 	UAssetManager::GetStreamableManager().RequestAsyncLoad(EncounterData->DeathSound.ToSoftObjectPath(), [this] () {
 		USoundBase* LoadedAsset = EncounterData->DeathSound.Get();
 		if (IsValid(LoadedAsset))
@@ -292,6 +302,11 @@ void AAICharacter::HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewC
 	{
 		BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), bHitReacting);
 	}
+}
+
+void AAICharacter::WeakenedTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	HitReactTagChanged(CallbackTag, NewCount);
 }
 
 void AAICharacter::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)

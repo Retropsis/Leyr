@@ -53,6 +53,7 @@ protected:
 	virtual void InitializeDefaultAttributes() const {}
 	virtual void InitializeCharacterInfo() {}
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) {}
+	virtual void WeakenedTagChanged(const FGameplayTag CallbackTag, int32 NewCount) {}
 	virtual void HitReactFlashTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 	virtual void StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 	virtual void BurnTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
@@ -132,7 +133,7 @@ protected:
 	//~ Combat Interface
 	virtual UAbilityData* LoadAndGetDefaultAbilityData_Implementation() override;
 
-	virtual TSoftObjectPtr<UPaperZDAnimSequence> GetHitReactSequence_Implementation() override { return HitReactSequence; }
+	virtual UPaperZDAnimSequence* GetHitReactSequence_Implementation(const FGameplayTag& SequenceTag) override;
 	virtual USoundBase* ImpactSoundFromTag_Implementation(const FGameplayTag& MontageTag, ESequenceType SequenceType) override;
 	virtual UNiagaraSystem* GetWoundImpactEffect_Implementation(const FGameplayTag WoundImpactTag) override;
 	virtual FVector GetPreferredHitLocation_Implementation() override { return HitLocationPoint->GetComponentLocation(); }
@@ -206,12 +207,11 @@ protected:
 	/*
 	 * Data Asset
 	 */
-	UPROPERTY() TObjectPtr<UNiagaraSystem> ImpactEffect;
 	UPROPERTY() TMap<FGameplayTag, UNiagaraSystem*> WoundImpactEffects;
+	UPROPERTY() TMap<FGameplayTag, UPaperZDAnimSequence*> HitReactSequences;
 	UPROPERTY() TObjectPtr<UNiagaraSystem> DestroyedEffectLoaded;
 	UPROPERTY() TObjectPtr<USoundBase> ImpactSoundLoaded;
 	UPROPERTY() TObjectPtr<USoundBase> DefeatedSoundLoaded;
-	UPROPERTY() TSoftObjectPtr<UPaperZDAnimSequence> HitReactSequence;
 
 	UPROPERTY(EditAnywhere, Category="Character|Combat")
 	TObjectPtr<UAttackSequenceInfo> AttackSequenceInfo;

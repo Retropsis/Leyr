@@ -123,6 +123,9 @@ FGameplayTag Healing_Mana;
   * Status Effects
   */
 FGameplayTag StatusEffect_HitReact;
+FGameplayTag StatusEffect_HitReact_1;
+FGameplayTag StatusEffect_HitReact_2;
+FGameplayTag StatusEffect_Weakened;
 FGameplayTag StatusEffect_Burn;
 FGameplayTag StatusEffect_Stun;
 FGameplayTag StatusEffect_Poison;

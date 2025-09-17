@@ -122,6 +122,9 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	 * Status Effects
 	 */
 	GameplayTags.StatusEffect_HitReact = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("StatusEffect.HitReact"), FString("Hit Reacting Status Effect"));
+	GameplayTags.StatusEffect_HitReact_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("StatusEffect.HitReact.1"), FString("First Hit Reacting Status Effect"));
+	GameplayTags.StatusEffect_HitReact_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("StatusEffect.HitReact.2"), FString("Second Hit Reacting Status Effect"));
+	GameplayTags.StatusEffect_Weakened = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("StatusEffect.Weakened"), FString("Weakened Status Effect"));
 	GameplayTags.StatusEffect_Burn = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("StatusEffect.Burn"), FString("Status Effect from Fire"));
 	GameplayTags.StatusEffect_Stun = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("StatusEffect.Stun"), FString("Status Effect from Ice"));
 	GameplayTags.StatusEffect_Sleep = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("StatusEffect.Sleep"), FString("Status Effect"));
