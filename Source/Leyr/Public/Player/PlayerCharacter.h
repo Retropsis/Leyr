@@ -72,10 +72,12 @@ public:
 	
 	UPROPERTY() TObjectPtr<AActor> ActorToInterp;
 	FVector TargetToInterp;
+	FVector LastActorToFollowInterpLocation;
 	float InterpCameraAlpha = 0.f;
 	float CurrentTargetDistance = 0.f;
 	bool bShouldUseCameraExtents = false;
 	FCameraBounds CameraBounds;
+	FBoxSphereBounds CameraEnteringBounds;
 	ECameraInterpState CameraInterpState = ECameraInterpState::None;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -189,6 +191,7 @@ protected:
 	void HandleHangingOnLedge(const FVector& HangingTarget);
 	void InitializeCameraBoundary();
 	void ClampToCameraBounds(FVector& PreferredCameraLocation) const;
+	bool IsWithinCameraBounds(const FVector& InLocation) const;
 	virtual void BeginPlay() override;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Player", meta=(Categories=Player))

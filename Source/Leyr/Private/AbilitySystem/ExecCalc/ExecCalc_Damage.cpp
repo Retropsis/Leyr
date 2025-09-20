@@ -214,7 +214,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	// const float EffectivePhysicalAttackCoefficient = EffectivePhysicalAttackCurve->Eval(TargetCharacterLevel);
 	// GEngine->AddOnScreenDebugMessage(445577, 5.f, FColor::Cyan, FString::Printf(TEXT("EffectivePAtk: [%f]"), EffectivePhysicalAttack));
 	Damage += Damage * EffectivePhysicalAttack * PhysicalAttackMastery;
-	GEngine->AddOnScreenDebugMessage(123457, 30.f, FColor::Cyan, FString::Printf(TEXT("Damage: %f including [P.Atk %f - P.Atk Mastery %f]"), Damage, SourcePhysicalAttack, PhysicalAttackMastery));
+	// GEngine->AddOnScreenDebugMessage(123457, 30.f, FColor::Cyan, FString::Printf(TEXT("Damage: %f including [P.Atk %f - P.Atk Mastery %f]"), Damage, SourcePhysicalAttack, PhysicalAttackMastery));
 		
 	// Capture BlockChance on Target, and determine if there was a successful Block
 	float TargetBlockChance = 0.f;
@@ -245,7 +245,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	
 	// Armor ignores a percentage of incoming Damage.
 	Damage *= ( 100 - EffectivePhysicalDefense * EffectivePhysicalDefenseCoefficient ) / 100.f;
-	GEngine->AddOnScreenDebugMessage(123458, 30.f, FColor::Cyan, FString::Printf(TEXT("Damage reduction: %f [P.Def %f]"), EffectivePhysicalDefense * EffectivePhysicalDefenseCoefficient, EffectivePhysicalDefense));
+	// GEngine->AddOnScreenDebugMessage(123458, 30.f, FColor::Cyan, FString::Printf(TEXT("Damage reduction: %f [P.Def %f]"), EffectivePhysicalDefense * EffectivePhysicalDefenseCoefficient, EffectivePhysicalDefense));
 	
 	float SourceCriticalHitChance = 0.f;
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(GetDamageStatics().CriticalHitChanceDef, EvaluationParameters, SourceCriticalHitChance);

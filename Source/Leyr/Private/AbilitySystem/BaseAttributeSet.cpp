@@ -232,31 +232,44 @@ void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 				Props.TargetASC->AddLooseGameplayTag(GameplayTags.VisualEffect_HitReactFlash);
 				
 				const float PoiseChance = Props.TargetASC->GetNumericAttribute(GetPoiseAttribute());
-				if(FMath::RandRange(1, 100) < PoiseChance)
+				if(/*FMath::RandRange(1, 100) < PoiseChance*/false)
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, "Target has resisted and kept its balance");
+					GEngine->AddOnScreenDebugMessage(777, 5.f, FColor::Green, "Target has resisted and kept its balance");
 				}
 				else
 				{
+					Props.TargetASC->TryActivateAbilitiesByTag(GameplayTags.StatusEffect_HitReact.GetSingleTagContainer());
 					// Count Hit React Tags
-					FGameplayEffectQuery Query;
-					Query.MakeQuery_MatchAnyEffectTags(GameplayTags.StatusEffect_HitReact.GetSingleTagContainer());
-					int32 StackCount = Props.TargetASC->GetAggregatedStackCount(Query);
-					// Props.TargetASC->RemoveActiveEffectsWithGrantedTags(GameplayTags.StatusEffect_HitReact.GetSingleTagContainer());
-					GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Magenta, FString::Printf(TEXT("Hit React count: %d "), StackCount) );
-					
-					// Depending on result, choose:
-					if (StackCount < 2)
-					{
-						// 1. Hit Reacting (Which step might be determined in the ability)
-						Props.TargetASC->TryActivateAbilitiesByTag(GameplayTags.StatusEffect_HitReact.GetSingleTagContainer());
-					}
-					else
-					{
-						// 2. Weakened (How long might be determined in the ability)
-                        Props.TargetASC->TryActivateAbilitiesByTag(GameplayTags.StatusEffect_Weakened.GetSingleTagContainer());
-						Props.TargetASC->RemoveLooseGameplayTag(GameplayTags.StatusEffect_HitReact);
-					}
+					// const FGameplayEffectQuery Query;
+					// Query.EffectTagQuery.MakeQuery_MatchTag(GameplayTags.StatusEffect_HitReact);
+					// const int32 HitReactStackCount = Props.TargetASC->GetAggregatedStackCount(Query);
+     //
+					// TArray<FActiveGameplayEffectHandle> EffectHandles = Props.TargetASC->GetActiveEffectsWithAllTags(GameplayTags.StatusEffect_HitReact.GetSingleTagContainer());
+					// GEngine->AddOnScreenDebugMessage(777, 8.f, FColor::Magenta, FString::Printf(TEXT("Hit React count: %d "), EffectHandles.Num()));
+					//
+					// const FGameplayEffectQuery WeakenedQuery;
+					// // WeakenedQuery.MakeQuery_MatchAnyEffectTags(GameplayTags.StatusEffect_Weakened.GetSingleTagContainer());		
+					// WeakenedQuery.EffectTagQuery.MakeQuery_MatchTag(GameplayTags.StatusEffect_Weakened);							
+					// const int32 WeakenedStackCount = Props.TargetASC->GetAggregatedStackCount(WeakenedQuery);
+					// // GEngine->AddOnScreenDebugMessage(778, 8.f, FColor::Magenta, FString::Printf(TEXT("Weakened Stack count: %d "), WeakenedStackCount));
+					//
+					// TArray<FActiveGameplayEffectHandle> WeakenedEffectHandles = Props.TargetASC->GetActiveEffectsWithAllTags(GameplayTags.StatusEffect_Weakened.GetSingleTagContainer());
+					// GEngine->AddOnScreenDebugMessage(778, 8.f, FColor::Magenta, FString::Printf(TEXT("Hit React count: %d "), WeakenedEffectHandles.Num()));
+					//
+					// // Depending on result, choose:
+					// if (HitReactStackCount < 2)
+					// {
+					// 	// 1. Hit Reacting (Which step might be determined in the ability)
+					// 	Props.TargetASC->TryActivateAbilitiesByTag(GameplayTags.StatusEffect_HitReact.GetSingleTagContainer());
+					// }
+					// else if (WeakenedStackCount == 0)
+					// {
+					// 	// 2. Weakened (How long might be determined in the ability)
+					// 	Props.TargetASC->RemoveActiveEffectsWithGrantedTags(GameplayTags.StatusEffect_HitReact.GetSingleTagContainer());
+					// 	// Props.TargetASC->RemoveLooseGameplayTag(GameplayTags.StatusEffect_HitReact);
+     //                    Props.TargetASC->TryActivateAbilitiesByTag(GameplayTags.StatusEffect_Weakened.GetSingleTagContainer());
+					// 	GEngine->AddOnScreenDebugMessage(779, 8.f, FColor::Magenta, FString::Printf(TEXT("TryActivateAbilitiesByTag Weakened")));
+					// }
 				}
 			}
 			const FVector& AirborneForce = ULeyrAbilitySystemLibrary::GetAirborneForce(Props.EffectContextHandle);
