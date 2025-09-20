@@ -178,7 +178,7 @@ public:
 
 	virtual void SaveProgress_Implementation(const FName& SavePointTag) override;
 	/** end Player Interface */
-	void LoadProgress();
+	virtual void LoadProgress();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UNiagaraComponent> LevelUpNiagaraComponent;

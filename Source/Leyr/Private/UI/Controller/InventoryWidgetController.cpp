@@ -118,7 +118,9 @@ void UInventoryWidgetController::AssignButtonPressed(const FInventoryItemData It
 	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : GetActionSlots())
 	{
 		// Item was found
-		if (ItemData.Asset.Get() == EquippedItem.Value.ItemData.Asset.Get())
+		GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Emerald, FString::Printf(TEXT("Item to Add: %s"), *ItemData.Asset.ToSoftObjectPath().ToString()));
+		GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Red, FString::Printf(TEXT("Item to Compare: %s"), *EquippedItem.Value.ItemData.Asset.ToSoftObjectPath().ToString()));
+		if (ItemData.Asset.LoadSynchronous() == EquippedItem.Value.ItemData.Asset.LoadSynchronous())
 		{
 			// Remove it
 			EquippedItem.Value.OutGrantedHandles.TakeFromAbilitySystem(AbilitySystemComponent);
