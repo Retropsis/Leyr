@@ -31,48 +31,48 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSoftClassPtr<AAICharacter> EncounterClass = nullptr;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Data")
 	TObjectPtr<UAbilitySet> AbilitySet;
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Data")
 	TObjectPtr<UAttributeData> AttributeData;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Data")
 	TObjectPtr<UBehaviourData> BehaviourData = nullptr;
-	
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<ULootDataSet> LootData = nullptr;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Setup")
 	bool bShouldDespawn = true;
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Setup")
 	bool bSimulatePhysicsOnDestroyed = true;
 	
-	UPROPERTY(EditDefaultsOnly) // Encounter Size for Max Health and other purposes ?
+	UPROPERTY(EditDefaultsOnly, Category="Setup") // Encounter Size for Max Health and other purposes ?
 	EEncounterSize EncounterSize = EEncounterSize::Default;
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Setup")
 	ECharacterClass CharacterClass = ECharacterClass::Warrior;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Reward")
 	FScalableFloat XPReward = FScalableFloat();
+	
+	UPROPERTY(EditDefaultsOnly, Category="Reward")
+	TObjectPtr<ULootDataSet> LootData = nullptr;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="VFX / SFX")
 	FGameplayTag WeaponSocketTag = FGameplayTag();
 	
-	UPROPERTY(EditDefaultsOnly, Category="Asset")
+	UPROPERTY(EditDefaultsOnly, Category="VFX / SFX")
 	TMap<FGameplayTag, TSoftObjectPtr<UNiagaraSystem>> WoundImpactEffects;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Asset")
-	TSoftObjectPtr<UNiagaraSystem> DestroyedEffect;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Asset")
-	TSoftObjectPtr<USoundBase> DeathSound;
-	
-	UPROPERTY(EditDefaultsOnly, Category="Asset")
+	UPROPERTY(EditDefaultsOnly, Category="VFX / SFX")
 	TMap<FGameplayTag, TSoftObjectPtr<UPaperZDAnimSequence>> HitReactSequences;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Asset")
+	UPROPERTY(EditDefaultsOnly, Category="VFX / SFX")
+	TSoftObjectPtr<UNiagaraSystem> DestroyedEffect;
+	
+	UPROPERTY(EditDefaultsOnly, Category="VFX / SFX")
+	TSoftObjectPtr<USoundBase> DeathSound;
+	
+	UPROPERTY(EditDefaultsOnly, Category="VFX / SFX")
 	TObjectPtr<UAttackSequenceInfo> AttackSequenceInfo;
 };

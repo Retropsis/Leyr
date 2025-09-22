@@ -67,18 +67,18 @@ public:
 	UPROPERTY(EditDefaultsOnly, meta=(EditCondition="bEditValues", EditConditionHides)) // How fast to chase the player
 	float BaseFlySpeed = 120.f;
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Collision Damage")
 	bool bCollisionCauseDamage = false;
 
-	UPROPERTY(EditDefaultsOnly, meta=(EditCondition="bCollisionCauseDamage", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, meta=(EditCondition="bCollisionCauseDamage", EditConditionHides), Category="Collision Damage")
 	FScalableFloat AbilityPower;
 	
-	UPROPERTY(EditDefaultsOnly, meta=(EditCondition="bCollisionCauseDamage", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, meta=(EditCondition="bCollisionCauseDamage", EditConditionHides), Category="Collision Damage")
 	TSubclassOf<UGameplayEffect> DamageEffectClass;
 	
-	UPROPERTY(EditDefaultsOnly, meta=(Categories="Damage", EditCondition="bCollisionCauseDamage", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, meta=(Categories="Damage", EditCondition="bCollisionCauseDamage", EditConditionHides), Category="Collision Damage")
 	FGameplayTag DamageType;
 	
-	UPROPERTY(EditDefaultsOnly, meta=(EditCondition="bCollisionCauseDamage", EditConditionHides))
+	UPROPERTY(EditDefaultsOnly, meta=(EditCondition="bCollisionCauseDamage", EditConditionHides), Category="Collision Damage")
 	bool bShouldApplyInvincibility = false;	
 };

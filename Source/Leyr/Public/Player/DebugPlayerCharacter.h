@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Player/PlayerCharacter.h"
-#include "UI/Controller/InventoryWidgetController.h"
 #include "DebugPlayerCharacter.generated.h"
 
 /**

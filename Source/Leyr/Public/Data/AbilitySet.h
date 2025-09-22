@@ -38,7 +38,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	int32 LevelRequirement = 1;
 
-	UPROPERTY(EditDefaultsOnly, Meta=(Categories = "InputTag"))
+	UPROPERTY(EditDefaultsOnly, Meta=(Categories = "InputTag"), Category="Player Ability")
 	FGameplayTag InputTag = FGameplayTag();
 
 	UPROPERTY(EditDefaultsOnly, meta=(Categories="Abilities"))
@@ -47,19 +47,19 @@ public:
 	UPROPERTY(EditDefaultsOnly, meta=(Categories="Abilities.Type"))
 	FGameplayTag AbilityType = FGameplayTag();
 
-	UPROPERTY(EditDefaultsOnly, meta=(Categories="Cooldown"))
+	UPROPERTY(EditDefaultsOnly, meta=(Categories="Cooldown"), Category="Player Ability")
 	FGameplayTag CooldownTag = FGameplayTag();
 
 	UPROPERTY(BlueprintReadOnly)
 	FGameplayTag StatusTag = FGameplayTag();
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Player Ability")
 	TObjectPtr<const UTexture2D> Icon = nullptr;
 	
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Player Ability")
 	TObjectPtr<const UTexture2D> LockedIcon = nullptr;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category="Player Ability")
 	FAbilityDescription Descriptions = FAbilityDescription();
 };
 
@@ -127,20 +127,20 @@ public:
 	void GiveToAbilitySystem(UAbilitySystemComponent* ASC, FAbilitySet_GrantedHandles* OutGrantedHandles, FGameplayTag InputTag = FGameplayTag(), float Level = 1.f, UObject* SourceObject = nullptr) const;
 	FGameplayAbilitySpecHandle ActivateMenuAbility(UAbilitySystemComponent* ASC, UObject* SourceObject) const;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Gameplay Abilities", meta=(Categories="Abilities"))
+	UPROPERTY(EditDefaultsOnly, meta=(Categories="Abilities"), Category="Gameplay Abilities")
 	FGameplayTag AbilityTag = FGameplayTag();
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category="Gameplay Abilities", meta=(TitleProperty=Ability))
+	UPROPERTY(EditDefaultsOnly, meta=(TitleProperty=Ability), Category="Gameplay Abilities")
 	TArray<FAbilitySet_GameplayAbility> GrantedGameplayAbilities;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Gameplay Abilities", meta=(TitleProperty=Ability))
-	FAbilitySet_GameplayAbility MenuAbility;
+	UPROPERTY(EditDefaultsOnly, meta=(TitleProperty=Ability), Category="Gameplay Abilities")
+	FAbilitySet_GameplayAbility GrantedMenuAbility;
 
 	// These abilities are always loaded and not saved, non-UI, necessary gameplay, level 1
-	UPROPERTY(EditDefaultsOnly, Category="Gameplay Abilities", meta=(TitleProperty=Ability))
+	UPROPERTY(EditDefaultsOnly, meta=(TitleProperty=Ability), Category="Gameplay Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> CommonGameplayAbilities;
 
-	UPROPERTY(EditDefaultsOnly, Category="Gameplay Effects", meta=(TitleProperty=GameplayEffect))
+	UPROPERTY(EditDefaultsOnly, meta=(TitleProperty=GameplayEffect), Category="Gameplay Effects")
 	TArray<FAbilitySet_GameplayEffect> GrantedGameplayEffects;
 };

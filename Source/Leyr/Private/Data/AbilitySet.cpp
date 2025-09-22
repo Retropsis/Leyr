@@ -173,12 +173,12 @@ void UAbilitySet::GiveToAbilitySystem(UAbilitySystemComponent* ASC, FAbilitySet_
 FGameplayAbilitySpecHandle UAbilitySet::ActivateMenuAbility(UAbilitySystemComponent* ASC, UObject* SourceObject) const
 {
 	if (ASC == nullptr) return FGameplayAbilitySpecHandle();
-	if (MenuAbility.Ability == nullptr)
+	if (GrantedMenuAbility.Ability == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("MenuAbility.Ability on ability set [%s] is not valid"), *GetNameSafe(this));
 		return FGameplayAbilitySpecHandle();
 	}
-	FGameplayAbilitySpec AbilitySpec(MenuAbility.Ability, MenuAbility.Level);
+	FGameplayAbilitySpec AbilitySpec(GrantedMenuAbility.Ability, GrantedMenuAbility.Level);
 	AbilitySpec.SourceObject = SourceObject;
 	return ASC->GiveAbilityAndActivateOnce(AbilitySpec);
 }
