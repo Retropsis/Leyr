@@ -94,11 +94,11 @@ void ACameraBoundary::InitializeSpawnVolumes()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		
 	FVector Offset = FVector{ 100.f, 0.f, 0.f };
-	for (int i = 0; i < LevelAreaData->SpawningVolumes.Num(); i++)
+	for (int i = 0; i < LevelAreaData->EncounterSpawns.Num(); i++)
 	{
 		FVector Location = FVector{ GetActorLocation().X, 0.f, GetActorLocation().Z } + Offset;
 		AEncounterSpawnVolume* SpawningVolume = GetWorld()->SpawnActor<AEncounterSpawnVolume>(SpawningVolumeClass, Location, FRotator::ZeroRotator, SpawnParams);
-		SpawningVolume->SetEncounterSpawnData(LevelAreaData->SpawningVolumes[i]);
+		SpawningVolume->SetEncounterSpawnData(LevelAreaData->EncounterSpawns[i]);
 		SpawningVolume->InitializeSpawnPoints();
 		SpawningVolume->TileMapBounds = TileMapBounds;
 		SpawningVolumes.Add(SpawningVolume);

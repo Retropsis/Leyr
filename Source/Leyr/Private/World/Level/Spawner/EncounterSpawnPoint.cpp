@@ -3,6 +3,7 @@
 #include "World/Level/Spawner/EncounterSpawnPoint.h"
 #include "AbilitySystem/Actor/PointCollection.h"
 #include "AI/AICharacter.h"
+#include "Components/BillboardComponent.h"
 #include "Data/EncounterData.h"
 #include "Engine/AssetManager.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -11,6 +12,7 @@
 AEncounterSpawnPoint::AEncounterSpawnPoint()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	GetSpriteComponent()->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
 }
 
 void AEncounterSpawnPoint::SpawnEncounter()

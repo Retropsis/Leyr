@@ -177,7 +177,7 @@ void UBaseGameplayAbility::MakeAndApplyExecuteEffectToTarget(const FGameplayTag&
 	Effect->DurationPolicy = EGameplayEffectDurationType::HasDuration;
 	Effect->DurationMagnitude = FGameplayEffectModifierMagnitude{ 1.75f };
 	Effect->StackingType = EGameplayEffectStackingType::AggregateByTarget;
-	Effect->StackLimitCount = 6;
+	Effect->StackLimitCount = 3;
 	Effect->StackExpirationPolicy = EGameplayEffectStackingExpirationPolicy::RemoveSingleStackAndRefreshDuration;
 	
 	UTargetTagsGameplayEffectComponent& AssetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();

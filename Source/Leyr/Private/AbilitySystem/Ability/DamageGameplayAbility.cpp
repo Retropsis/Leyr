@@ -27,6 +27,9 @@ void UDamageGameplayAbility::InitAbility()
 		DeathImpulseMagnitude = AbilityData->DeathImpulseMagnitude;
 		AirborneChance = AbilityData->AirborneChance;
 		AirborneForceMagnitude = AbilityData->AirborneForceMagnitude;
+		AbilityLevelRatio = AbilityData->AbilityLevelRatio;
+		CharacterLevelRatio = AbilityData->CharacterLevelRatio;
+		AbilityPower = AbilityData->AbilityPower;
 		
 		// bShouldApplyExecute = AbilityData->bShouldApplyExecute;
 		// bShouldExecute = AbilityData->bShouldExecute;
@@ -74,7 +77,10 @@ void UDamageGameplayAbility::CauseDamage(UAbilitySystemComponent* TargetASC)
 {
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
 	const FGameplayEffectSpecHandle DamageSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass, GetAbilityLevel());
-	const float ScaledDamage = AbilityPower.GetValueAtLevel(GetAbilityLevel());
+	const float CharacterLevel = ICombatInterface::Execute_GetCharacterLevel(GetAvatarActorFromActorInfo());
+	const float Value = GetAbilityLevel() * AbilityLevelRatio + CharacterLevel * CharacterLevelRatio;
+	const float ScaledDamage = AbilityPower.GetValueAtLevel(Value);
+	GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Emerald, FString::Printf(TEXT("AbilityLevel: %d, AbilityLevelRatio: %f, CharacterLevel: %f, CharacterLevelRatio: %f"),GetAbilityLevel(), AbilityLevelRatio, CharacterLevel, CharacterLevelRatio));
 	
 	if (bShouldExecute)
 	{
@@ -114,7 +120,11 @@ void UDamageGameplayAbility::ForEachHitTryCausingDamage(TArray<FHitResult> HitRe
 			{
 				CauseDamage(TargetASC);
 				FVector Loc = Hit.GetComponent() ? Hit.GetComponent()->GetComponentLocation() : Hit.GetActor() ? Hit.GetActor()->GetActorLocation() : Hit.ImpactPoint;
-				if (Hit.GetActor()->Implements<UCombatInterface>())
+				if (Hit.GetActor() == nullptr)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Red, FString::Printf(TEXT("HIT ACTOR WAS NULL IN %s"), *GetName()));
+				}
+				if (Hit.GetActor() && Hit.GetActor()->Implements<UCombatInterface>())
 				{
 					GameplayCueDefinition->PreferredHitLocation = ICombatInterface::Execute_GetPreferredHitLocation(Hit.GetActor());
 				}

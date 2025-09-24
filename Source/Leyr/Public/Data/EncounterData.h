@@ -75,4 +75,7 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category="VFX / SFX")
 	TObjectPtr<UAttackSequenceInfo> AttackSequenceInfo;
+
+	UPROPERTY(EditDefaultsOnly, Category="Editor")
+	TObjectPtr<UTexture2D> EncounterIcon = nullptr;
 };

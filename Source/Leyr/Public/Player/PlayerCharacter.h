@@ -156,6 +156,7 @@ public:
 	virtual void LevelUp_Implementation() override;
 	virtual int32 GetXP_Implementation() const override;
 	virtual int32 FindLevelForXP_Implementation(int32 InXP) const override;
+	virtual int32 FindXPForLevel_Implementation(int32 InLevel) const override;
 	virtual int32 GetAttributePointsReward_Implementation(int32 Level) const override;
 	virtual int32 GetSkillPointsReward_Implementation(int32 Level) const override;
 	virtual void AddToPlayerLevel_Implementation(int32 InPlayerLevel) override;

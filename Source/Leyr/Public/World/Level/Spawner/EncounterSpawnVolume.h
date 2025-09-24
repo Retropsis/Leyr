@@ -46,7 +46,10 @@ public:
 	void HandlePlayerEntering();
 	
 	void ClearSpawnPoints();
-	void SetEncounterSpawnData(UEncounterSpawnData* Data) { EncounterSpawnData = Data; }
+	void SetEncounterSpawnData(const FEncounterSpawn& Data) { EncounterSpawnData = Data; }
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void UpdateEncounterIcon(UTexture2D* Icon);
 	
 	FBoxSphereBounds TileMapBounds;
 
@@ -60,7 +63,7 @@ protected:
 	virtual void OnDespawnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UPROPERTY(EditAnywhere, Category="Spawner")
-	TObjectPtr<UEncounterSpawnData> EncounterSpawnData;
+	FEncounterSpawn EncounterSpawnData;
 	
 	UPROPERTY(EditAnywhere, Category="Spawner")
 	TArray<AEncounterSpawnPoint*> SpawnPoints;

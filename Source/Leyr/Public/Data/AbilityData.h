@@ -45,6 +45,12 @@ public:
 	float AbilityPoise = 0.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability")
+	float CharacterLevelRatio = 1.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Ability")
+	float AbilityLevelRatio = 1.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Ability")
 	bool bShouldApplyExecute = false;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability")

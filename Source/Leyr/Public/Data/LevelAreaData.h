@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "LevelAreaData.generated.h"
 
+struct FEncounterSpawn;
 class UGameplayEffect;
 class UEncounterSpawnData;
 /**
@@ -16,9 +17,9 @@ class LEYR_API ULevelAreaData : public UPrimaryDataAsset
 {
 	GENERATED_BODY()
 
-public:
+public:	
 	UPROPERTY(EditDefaultsOnly)
-	TArray<TObjectPtr<UEncounterSpawnData>> SpawningVolumes;
+	TArray<FEncounterSpawn> EncounterSpawns;
 
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSubclassOf<UGameplayEffect>> GrantedGameplayEffects;

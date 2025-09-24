@@ -167,8 +167,8 @@ protected:
 	virtual void Die(const FVector& DeathImpulse, bool bExecute) override;
 	void HandleDeathCapsuleComponent(const FVector& DeathImpulse) const;
 	void HandleDeath(EDefeatState InDefeatState);
-	virtual EDefeatState GetDefeatState_Implementation() const override { return  DefeatState; }
-	virtual  bool IsDefeated_Implementation() const override { return DefeatState != EDefeatState::None; }
+	virtual EDefeatState GetDefeatState_Implementation() const override { return DefeatState; }
+	virtual bool IsDefeated_Implementation() const override { return DefeatState != EDefeatState::None; }
 	virtual void SetGravityScale_Implementation(float GravityValue) override;
 	virtual float GetGravityScale_Implementation() override;
 	virtual void ResetGravityScale_Implementation() override;
@@ -248,9 +248,21 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category="Character|HitReact")
 	FLinearColor HitReactFlashColor = FLinearColor::Red;
 
+	UPROPERTY(EditDefaultsOnly, Category="Character|HitReact")
+	float ShakingStrength = 10.f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Character|HitReact")
+	float ShakingPlayRate = 5.f;
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void PlayFlashEffect(float Strength, float PlayRate, FLinearColor Color);
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void PlayShakeEffect(float Strength, float PlayRate);
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USceneComponent> HitLocationPoint;
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector SpriteLocation = FVector::ZeroVector;;
 };

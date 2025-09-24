@@ -75,8 +75,4 @@ UCLASS(BlueprintType)
 class LEYR_API UEncounterSpawnData : public UDataAsset
 {
 	GENERATED_BODY()
-
-public:	
-	UPROPERTY(EditDefaultsOnly)
-	TArray<FEncounterSpawn> EncounterSpawns;
 };

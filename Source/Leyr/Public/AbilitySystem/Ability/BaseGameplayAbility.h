@@ -162,6 +162,8 @@ protected:
 	ESequenceType SequenceType = ESequenceType::Default;
 	FScalableFloat AbilityPower;
 	float AbilityPoise = 0.f;
+	float AbilityLevelRatio = 1.f;
+	float CharacterLevelRatio = 1.f;
 
 private:
 	FActiveGameplayEffectHandle ActiveSourceObjectEffectHandle;

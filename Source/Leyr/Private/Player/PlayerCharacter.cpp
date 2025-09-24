@@ -1506,6 +1506,13 @@ int32 APlayerCharacter::FindLevelForXP_Implementation(int32 InXP) const
 	return PlayerCharacterState->LevelUpInfo->FindLevelForXP(InXP);
 }
 
+int32 APlayerCharacter::FindXPForLevel_Implementation(int32 InLevel) const
+{
+	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();
+	check(PlayerCharacterState);
+	return PlayerCharacterState->LevelUpInfo->FindXPForLevel(InLevel);
+}
+
 int32 APlayerCharacter::GetAttributePointsReward_Implementation(int32 Level) const
 {
 	const APlayerCharacterState* PlayerCharacterState = GetPlayerState<APlayerCharacterState>();

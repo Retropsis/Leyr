@@ -20,4 +20,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug", meta=(Categories=Equipment))
 	TArray<FDataTableRowHandle> DebugEquippedItems;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Debug")
+	int32 DebugLevel = 1;
 };

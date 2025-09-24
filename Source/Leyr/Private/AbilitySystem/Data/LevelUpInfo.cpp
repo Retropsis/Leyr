@@ -23,3 +23,8 @@ int32 ULevelUpInfo::FindLevelForXP(int32 XP) const
 	}
 	return Level;
 }
+
+int32 ULevelUpInfo::FindXPForLevel(int32 Level) const
+{
+	return LevelUpInformation[Level].LevelUpRequirement;
+}

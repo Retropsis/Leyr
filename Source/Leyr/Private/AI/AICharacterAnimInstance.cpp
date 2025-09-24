@@ -28,10 +28,14 @@ void UAICharacterAnimInstance::Tick(float DeltaTime)
 	bIsDiving = AICharacter->GetBehaviourState() == EBehaviourState::Dive;
 	
 	DefeatState = AICharacter->Execute_GetDefeatState(AICharacter);
-	
-	// if(AICharacter->Execute_GetDefeatState(AICharacter) ==  && !DefeatState)
+	// DefeatState = ICombatInterface::Execute_GetDefeatState(AICharacter);
+	// if(AICharacter->Implements<UCombatInterface>())
 	// {
-	// 	DefeatState = AICharacter->Execute_GetDefeatState(AICharacter);
-	// 	// JumpToNode("Defeat");
+	// 	GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Red, FString::Printf(TEXT("%s"), *UEnum::GetValueAsString(AICharacter->Execute_GetDefeatState(AICharacter))));
 	// }
+	
+	if(DefeatState == EDefeatState::Defeated)
+	{
+		JumpToNode("Destroyed");
+	}
 }

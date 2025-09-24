@@ -131,6 +131,7 @@ FGameplayTag StatusEffect_Stun;
 FGameplayTag StatusEffect_Poison;
 FGameplayTag StatusEffect_Sleep;
 FGameplayTag StatusEffect_Silence;
+FGameplayTag StatusEffect_Bleed;
  
 FGameplayTag StatusEffect_Chance;
 FGameplayTag StatusEffect_Damage;

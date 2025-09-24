@@ -442,6 +442,8 @@ void AAICharacter::Die(const FVector& DeathImpulse, bool bExecute)
 		IPlayerInterface::Execute_SetCameraInterpolation(CombatTarget, Arena, ECameraInterpState::Following);
 	}
 	
+	// DefeatState = bExecute ? EDefeatState::Executed : EDefeatState::Defeated;
+	// MulticastHandleDeath(DeathImpulse, DefeatState);
 	SpawnLoot();
 	Super::Die(DeathImpulse, bExecute);
 }

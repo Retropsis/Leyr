@@ -2,6 +2,7 @@
 
 #include "World/Level/Spawner/EncounterSpawnVolume.h"
 #include "AI/AICharacter.h"
+#include "Components/BillboardComponent.h"
 #include "Components/BoxComponent.h"
 #include "Data/EncounterData.h"
 #include "Interaction/PlayerInterface.h"
@@ -48,63 +49,84 @@ void AEncounterSpawnVolume::LoadActor_Implementation()
 
 void AEncounterSpawnVolume::InitializeSpawnPoints()
 {
-	for (AEncounterSpawnPoint* SpawnPoint : SpawnPoints)
-	{
-		if (IsValid(SpawnPoint)) SpawnPoint->Destroy();
-	}
-	SpawnPoints.Empty();
+	ClearSpawnPoints();
 	
-	if (EncounterSpawnData)
+	if (EncounterSpawnData.EncounterClass)
 	{
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		bool bUniqueSpawnLocationType = EncounterSpawnData.SpawnLocationType == ESpawnLocationType::Point || EncounterSpawnData.SpawnLocationType == ESpawnLocationType::AroundPoint;
 		
 		FVector Offset = FVector{ 100.f, 0.f, 0.f};
-		for (FEncounterSpawn Spawn : EncounterSpawnData->EncounterSpawns)
+		
+		for (int i = 0; i < EncounterSpawnData.Count; ++i)
 		{
 			AEncounterSpawnPoint* SpawnPoint = GetWorld()->SpawnActor<AEncounterSpawnPoint>(AEncounterSpawnPoint::StaticClass(), GetActorLocation() + Offset, FRotator::ZeroRotator, SpawnParams);
-			if(Spawn.OverrideBehaviourData) Spawn.EncounterData->BehaviourData = Spawn.OverrideBehaviourData;
+			if(EncounterSpawnData.OverrideBehaviourData) EncounterSpawnData.EncounterData->BehaviourData = EncounterSpawnData.OverrideBehaviourData;
 				
-			SpawnPoint->EncounterClass = Spawn.EncounterClass;
-			SpawnPoint->EncounterLevel = Spawn.Level;
-			SpawnPoint->EncounterData = Spawn.EncounterData;
-			SpawnPoint->OverrideBehaviourData = Spawn.OverrideBehaviourData;
-			SpawnPoint->RespawnTime = Spawn.RespawnTime;
-			SpawnPoint->SpawnerType = Spawn.SpawnerType;
-			SpawnPoint->SpawnLocationType = Spawn.SpawnLocationType;
-			SpawnPoint->PreferredSpawningRange = Spawn.PreferredSpawningRange;
-			SpawnPoint->PointCollectionClass = Spawn.PointCollectionClass;
-			SpawnPoint->Count = Spawn.Count;
+			SpawnPoint->EncounterClass = EncounterSpawnData.EncounterClass;
+			SpawnPoint->EncounterLevel = EncounterSpawnData.Level;
+			SpawnPoint->EncounterData = EncounterSpawnData.EncounterData;
+			SpawnPoint->OverrideBehaviourData = EncounterSpawnData.OverrideBehaviourData;
+			SpawnPoint->RespawnTime = EncounterSpawnData.RespawnTime;
+			SpawnPoint->SpawnerType = EncounterSpawnData.SpawnerType;
+			SpawnPoint->SpawnLocationType = EncounterSpawnData.SpawnLocationType;
+			SpawnPoint->PreferredSpawningRange = EncounterSpawnData.PreferredSpawningRange;
+			SpawnPoint->PointCollectionClass = EncounterSpawnData.PointCollectionClass;
+			SpawnPoint->Count = bUniqueSpawnLocationType ? 1 : EncounterSpawnData.Count;
+			if (EncounterSpawnData.EncounterData->EncounterIcon)
+			{
+				SpawnPoint->GetSpriteComponent()->SetSprite(EncounterSpawnData.EncounterData->EncounterIcon);
+				UpdateEncounterIcon(EncounterSpawnData.EncounterData->EncounterIcon);
+			}
 			SpawnPoints.Add(SpawnPoint);
 			Offset.X += 50.f;
+
+			if (!bUniqueSpawnLocationType)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *UEnum::GetValueAsString(EncounterSpawnData.SpawnLocationType));
+				return;
+			}
 		}
 	}
 }
 
 void AEncounterSpawnVolume::UpdateSpawnPoints()
 {
-	if (SpawnPoints.IsEmpty() || !IsValid(EncounterSpawnData)) return;
+	// if (!IsValid(EncounterSpawnData.EncounterClass)) return;
+	if (SpawnPoints.IsEmpty())
+	{
+		InitializeSpawnPoints();
+		return;
+	}
 	
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-	for (int i = 0; i < EncounterSpawnData->EncounterSpawns.Num(); ++i)
+	bool bUniqueSpawnLocationType = EncounterSpawnData.SpawnLocationType == ESpawnLocationType::Point || EncounterSpawnData.SpawnLocationType == ESpawnLocationType::AroundPoint;
+	
+	for (int i = 0; i < EncounterSpawnData.Count; ++i)
 	{
-		FEncounterSpawn Spawn = EncounterSpawnData->EncounterSpawns[i];
 		AEncounterSpawnPoint* SpawnPoint = SpawnPoints[i];
 
 		if (SpawnPoint == nullptr) continue;
 		
-		if(Spawn.OverrideBehaviourData) Spawn.EncounterData->BehaviourData = Spawn.OverrideBehaviourData;
-		SpawnPoint->EncounterClass = Spawn.EncounterClass;
-		SpawnPoint->EncounterLevel = Spawn.Level;
-		SpawnPoint->EncounterData = Spawn.EncounterData;
-		SpawnPoint->RespawnTime = Spawn.RespawnTime;
-		SpawnPoint->SpawnerType = Spawn.SpawnerType;
-		SpawnPoint->SpawnLocationType = Spawn.SpawnLocationType;
-		SpawnPoint->PreferredSpawningRange = Spawn.PreferredSpawningRange;
-		SpawnPoint->PointCollectionClass = Spawn.PointCollectionClass;
-		SpawnPoint->Count = Spawn.Count;
+		if(EncounterSpawnData.OverrideBehaviourData) EncounterSpawnData.EncounterData->BehaviourData = EncounterSpawnData.OverrideBehaviourData;
+		SpawnPoint->EncounterClass = EncounterSpawnData.EncounterClass;
+		SpawnPoint->EncounterLevel = EncounterSpawnData.Level;
+		SpawnPoint->EncounterData = EncounterSpawnData.EncounterData;
+		SpawnPoint->RespawnTime = EncounterSpawnData.RespawnTime;
+		SpawnPoint->SpawnerType = EncounterSpawnData.SpawnerType;
+		SpawnPoint->SpawnLocationType = EncounterSpawnData.SpawnLocationType;
+		SpawnPoint->PreferredSpawningRange = EncounterSpawnData.PreferredSpawningRange;
+		SpawnPoint->PointCollectionClass = EncounterSpawnData.PointCollectionClass;
+		SpawnPoint->Count = bUniqueSpawnLocationType ? 1 : EncounterSpawnData.Count;
+		if (EncounterSpawnData.EncounterData && EncounterSpawnData.EncounterData->EncounterIcon)
+		{
+			SpawnPoint->GetSpriteComponent()->SetSprite(EncounterSpawnData.EncounterData->EncounterIcon);
+			UpdateEncounterIcon(EncounterSpawnData.EncounterData->EncounterIcon);
+		}
+		
+		if (!bUniqueSpawnLocationType) return;
 	}
 }
 
@@ -155,7 +177,13 @@ void AEncounterSpawnVolume::OnDespawnOverlap(UPrimitiveComponent* OverlappedComp
 	{
 		for (AEncounterSpawnPoint* SpawnPoint : SpawnPoints)
 		{
-			if (SpawnPoint->RequestRespawnEncounter(Encounter)) return;
+			if (SpawnPoint->RequestRespawnEncounter(Encounter))
+			{
+				// Encounter->Destroy();
+				// TODO: Meditate on this, other part is in ABaseCharacter::HandleDeathCapsuleComponent, Capsule deactivated triggers this too soon
+				Encounter->SetLifeSpan(Encounter->LifeSpan);
+				return;
+			}
 		}
 	}
 }
@@ -167,7 +195,6 @@ void AEncounterSpawnVolume::HandlePlayerLeaving()
 	{
 		if (SpawnPoint) SpawnPoint->DespawnEncounter();
 	}
-	// GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Red, FString::Printf(TEXT("HandlePlayerLeaving")));
 }
 
 void AEncounterSpawnVolume::HandlePlayerEntering()

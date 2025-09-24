@@ -130,6 +130,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.StatusEffect_Sleep = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("StatusEffect.Sleep"), FString("Status Effect"));
 	GameplayTags.StatusEffect_Poison = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("StatusEffect.Poison"), FString("Status Effect"));
 	GameplayTags.StatusEffect_Silence = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("StatusEffect.Silence"), FString("Status Effect"));
+	GameplayTags.StatusEffect_Bleed = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("StatusEffect.Bleed"), FString("Status Effect"));
 
 	GameplayTags.StatusEffect_Chance = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("StatusEffect.Chance"), FString("Status Effect Chance"));
 	GameplayTags.StatusEffect_Duration = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("StatusEffect.Duration"), FString("Status Effect Duration"));
@@ -142,24 +143,28 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.DamageTypesToStatusEffects.Add(GameplayTags.Damage_Ice, GameplayTags.StatusEffect_Silence);
 	GameplayTags.DamageTypesToStatusEffects.Add(GameplayTags.Damage_Wind, GameplayTags.StatusEffect_Sleep);
 	GameplayTags.DamageTypesToStatusEffects.Add(GameplayTags.Damage_Noxious, GameplayTags.StatusEffect_Poison);
+	GameplayTags.DamageTypesToStatusEffects.Add(GameplayTags.Damage_Cutting, GameplayTags.StatusEffect_Bleed);
 
 	GameplayTags.StatusEffectsToDamageTypes.Add(GameplayTags.StatusEffect_Burn, GameplayTags.Damage_Fire);
 	GameplayTags.StatusEffectsToDamageTypes.Add(GameplayTags.StatusEffect_Stun, GameplayTags.Damage_Blunt);
 	GameplayTags.StatusEffectsToDamageTypes.Add(GameplayTags.StatusEffect_Silence, FGameplayTag());
 	GameplayTags.StatusEffectsToDamageTypes.Add(GameplayTags.StatusEffect_Sleep, FGameplayTag());
 	GameplayTags.StatusEffectsToDamageTypes.Add(GameplayTags.StatusEffect_Poison, GameplayTags.Damage_Noxious);
+	GameplayTags.StatusEffectsToDamageTypes.Add(GameplayTags.StatusEffect_Bleed, GameplayTags.Damage_Cutting);
 	
 	GameplayTags.StatusEffectsToResistances.Add(GameplayTags.StatusEffect_Burn, GameplayTags.Attributes_Resistance_Fire);
 	GameplayTags.StatusEffectsToResistances.Add(GameplayTags.StatusEffect_Stun, GameplayTags.Attributes_Resistance_Blunt);
 	GameplayTags.StatusEffectsToResistances.Add(GameplayTags.StatusEffect_Silence, GameplayTags.Attributes_Resistance_Ice);
 	GameplayTags.StatusEffectsToResistances.Add(GameplayTags.StatusEffect_Sleep, GameplayTags.Attributes_Resistance_Wind);
 	GameplayTags.StatusEffectsToResistances.Add(GameplayTags.StatusEffect_Poison, GameplayTags.Attributes_Resistance_Noxious);
+	GameplayTags.StatusEffectsToResistances.Add(GameplayTags.StatusEffect_Bleed, GameplayTags.Attributes_Resistance_Cutting);
 	
-	GameplayTags.StatusEffectToPeriodicEffectOnApplicationPolicy.Add(GameplayTags.StatusEffect_Burn, false);
 	GameplayTags.StatusEffectToPeriodicEffectOnApplicationPolicy.Add(GameplayTags.StatusEffect_Stun, true);
 	GameplayTags.StatusEffectToPeriodicEffectOnApplicationPolicy.Add(GameplayTags.StatusEffect_Silence, true);
 	GameplayTags.StatusEffectToPeriodicEffectOnApplicationPolicy.Add(GameplayTags.StatusEffect_Sleep, true);
 	GameplayTags.StatusEffectToPeriodicEffectOnApplicationPolicy.Add(GameplayTags.StatusEffect_Poison, false);
+	GameplayTags.StatusEffectToPeriodicEffectOnApplicationPolicy.Add(GameplayTags.StatusEffect_Burn, false);
+	GameplayTags.StatusEffectToPeriodicEffectOnApplicationPolicy.Add(GameplayTags.StatusEffect_Bleed, false);
 		
 	/*
 	 * Alteration

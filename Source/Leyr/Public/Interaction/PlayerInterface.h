@@ -56,6 +56,9 @@ public:
 	int32 FindLevelForXP(int32 InXP) const;
 
 	UFUNCTION(BlueprintNativeEvent)
+	int32 FindXPForLevel(int32 InLevel) const;
+	
+	UFUNCTION(BlueprintNativeEvent)
 	int32 GetXP() const;
 
 	UFUNCTION(BlueprintNativeEvent)

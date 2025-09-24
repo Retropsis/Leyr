@@ -82,6 +82,7 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	DynamicSpriteInstance = GetSprite()->CreateDynamicMaterialInstance(0);
+	SpriteLocation = GetSprite()->GetRelativeLocation();
 }
 
 void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -149,6 +150,7 @@ void ABaseCharacter::HitReactFlashTagChanged(const FGameplayTag CallbackTag, int
 {
 	AbilitySystemComponent->RemoveLooseGameplayTag(CallbackTag);
 	PlayFlashEffect(HitReactFlashStrength, HitReactFlashPlayRate, HitReactFlashColor);
+	PlayShakeEffect(ShakingStrength, ShakingPlayRate);
 }
 
 void ABaseCharacter::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
@@ -339,6 +341,7 @@ void ABaseCharacter::HandleDeathCapsuleComponent(const FVector& DeathImpulse) co
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Player, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Enemy, ECR_Ignore);
 	GetCapsuleComponent()->SetSimulatePhysics(bSimulatePhysicsOnDestroyed);
 	if (bSimulatePhysicsOnDestroyed) GetCapsuleComponent()->AddImpulse(DeathImpulse, NAME_None, true);
 }

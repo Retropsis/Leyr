@@ -118,8 +118,8 @@ void UInventoryWidgetController::AssignButtonPressed(const FInventoryItemData It
 	for (TTuple<FGameplayTag, FEquippedItem> EquippedItem : GetActionSlots())
 	{
 		// Item was found
-		GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Emerald, FString::Printf(TEXT("Item to Add: %s"), *ItemData.Asset.ToSoftObjectPath().ToString()));
-		GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Red, FString::Printf(TEXT("Item to Compare: %s"), *EquippedItem.Value.ItemData.Asset.ToSoftObjectPath().ToString()));
+		// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Emerald, FString::Printf(TEXT("Item to Add: %s"), *ItemData.Asset.ToSoftObjectPath().ToString()));
+		// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Red, FString::Printf(TEXT("Item to Compare: %s"), *EquippedItem.Value.ItemData.Asset.ToSoftObjectPath().ToString()));
 		if (ItemData.Asset.LoadSynchronous() == EquippedItem.Value.ItemData.Asset.LoadSynchronous())
 		{
 			// Remove it
@@ -210,8 +210,9 @@ void UInventoryWidgetController::Equip(const FInventoryItemData& ItemData)
 				// Remove the item already here
 				if (Slot.MatchesTagExact(EquippedItem.Key))
 				{
-					if (const FEquippedItem* FoundItem = EquippedItems.Find(Slot))
+					if (FEquippedItem* FoundItem = EquippedItems.Find(Slot))
 					{
+						FoundItem->OutGrantedHandles.TakeFromAbilitySystem(AbilitySystemComponent);
 						OnItemUnequipped.Broadcast(Slot, FoundItem->ItemData.Asset);	
 						EquippedItems.Add(Slot, FEquippedItem{});
 						UpdateEquipmentEffect();
@@ -224,6 +225,7 @@ void UInventoryWidgetController::Equip(const FInventoryItemData& ItemData)
 			
 			FEquippedItem ItemToEquip{ItemData };	
 			ItemToEquip.Modifiers = LoadedAsset->Modifiers;
+			if (ItemToEquip.ItemData.Asset.Get()->AbilitySet) ItemToEquip.ItemData.Asset.Get()->AbilitySet->GiveToAbilitySystem(AbilitySystemComponent, &ItemToEquip.OutGrantedHandles);
 			OnItemEquipped.Broadcast(Slot, ItemData);
 			EquippedItems.Add(Slot, ItemToEquip);
 			UpdateEquipmentEffect();
