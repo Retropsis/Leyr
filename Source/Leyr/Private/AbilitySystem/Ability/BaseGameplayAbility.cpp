@@ -7,6 +7,7 @@
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "AbilitySystem/Cue/GameplayCueDefinition.h"
 #include "AI/BaseCharacter.h"
+#include "Components/CapsuleComponent.h"
 #include "Data/AbilityData.h"
 #include "Data/ItemData.h"
 #include "Game/BaseGameplayTags.h"
@@ -208,6 +209,14 @@ UObject* UBaseGameplayAbility::GetSourceObjectFromAbilitySpec()
 {
 	FGameplayAbilitySpec* AbilitySpec = GetCurrentAbilitySpec();
 	return AbilitySpec->SourceObject.Get();
+}
+
+void UBaseGameplayAbility::SetOwningCharacterCapsuleCollision(const ECollisionChannel Channel, const ECollisionResponse Response) const
+{
+	if (const ACharacter* Character = Cast<ACharacter>(GetAvatarActorFromActorInfo()))
+	{
+		Character->GetCapsuleComponent()->SetCollisionResponseToChannel(Channel, Response);
+	}
 }
 
 void UBaseGameplayAbility::SetGCDImpactSound(UObject* Object) const

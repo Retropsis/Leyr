@@ -66,6 +66,8 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void AssignButtonPressed(FInventoryItemData ItemData, const FGameplayTag InputTag);
+
+	void AssignOrEquip(const FInventoryItemData& ItemData);
 	
 	UFUNCTION(BlueprintCallable)
 	void EquipButtonPressed(FInventoryItemData ItemData);

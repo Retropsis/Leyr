@@ -77,6 +77,9 @@ public:
 	ESequenceType GetSequenceType() const { return SequenceType; }
 	
 	UFUNCTION(BlueprintCallable)
+	void SetOwningCharacterCapsuleCollision(ECollisionChannel Channel, ECollisionResponse Response) const;
+	
+	UFUNCTION(BlueprintCallable)
 	void SetGCDImpactSound(UObject* Object) const;
 	
 	UFUNCTION(BlueprintPure)

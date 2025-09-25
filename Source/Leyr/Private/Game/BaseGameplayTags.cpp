@@ -352,6 +352,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatState_Rule_Block_All = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Block.All"), FString("CombatState Rule Block All"));
 	GameplayTags.CombatState_Rule_Block_Movement = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Block.Movement"), FString("CombatState Rule Block Movement"));
 	GameplayTags.CombatState_Rule_Block_Ability = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Block.Ability"), FString("CombatState Rule Block Ability"));
+	GameplayTags.CombatState_Rule_Block_Direction = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Block.Direction"), FString("CombatState Rule Block Direction"));
 	GameplayTags.CombatState_Rule_Stop = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Stop"), FString("CombatState Rule Stop"));
 	GameplayTags.CombatState_Rule_Stop_All = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Stop.All"), FString("CombatState Rule Stop All"));
 	GameplayTags.CombatState_Rule_Stop_Movement = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Stop.Movement"), FString("CombatState Rule Stop Movement"));
@@ -561,6 +562,8 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Montage_Parry_Begin = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Parry.Begin"), FString("Montage Parry Begin"));
 	GameplayTags.Montage_Parry_End = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Parry.End"), FString("Montage Parry End"));
 	GameplayTags.Montage_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Execute"), FString("Montage Execute"));
+	GameplayTags.Montage_Execute_Success = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Execute.Success"), FString("Montage Execute Succeed"));
+	GameplayTags.Montage_Execute_Failure = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Execute.Failure"), FString("Montage Execute Failed"));
 	GameplayTags.Montage_HitStop = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.HitStop"), FString("Montage HitStop"));
 	GameplayTags.Montage_Impulse = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Montage.Impulse"), FString("Montage Impulse"));
 	

@@ -483,7 +483,7 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	// TODO: Remove this line when Root Motion Abilities are handling rules
 	if(CombatState >= ECombatState::Dodging) return;
 	
-	if(CombatState < ECombatState::Aiming) RotateController();
+	if(CombatState < ECombatState::Aiming && !AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Rule_Block_Direction)) RotateController();
 	
 	PreviousCombatDirection = CombatDirection;
 	CombatDirection = GetCombatDirectionFromVector2D(MovementVector);
@@ -519,8 +519,11 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 		break;
 	case ECombatState::HangingLadder:
 		AddMovementInput(FVector(0.f, 0.f, 1.f), FMath::RoundToFloat(MovementVector.Y));
-		if(MovementVector.X > 0.f) GetController()->SetControlRotation(FRotator::ZeroRotator);
-		if(MovementVector.X < 0.f) GetController()->SetControlRotation(FRotator(0.f, 180.f, 0.f));
+		if(!AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Rule_Block_Direction))
+		{
+			if(MovementVector.X > 0.f) GetController()->SetControlRotation(FRotator::ZeroRotator);
+			if(MovementVector.X < 0.f) GetController()->SetControlRotation(FRotator(0.f, 180.f, 0.f));
+		}
 		break;
 	case ECombatState::Entangled:
 		AddMovementInput(FVector(1.f, 0.f, 0.f), FMath::RoundToFloat(MovementVector.X));

@@ -313,6 +313,7 @@ FGameplayTag CombatState_Rule_Block;
 FGameplayTag CombatState_Rule_Block_All;
 FGameplayTag CombatState_Rule_Block_Movement;
 FGameplayTag CombatState_Rule_Block_Ability;
+FGameplayTag CombatState_Rule_Block_Direction;
 FGameplayTag CombatState_Rule_Stop;
 FGameplayTag CombatState_Rule_Stop_All;
 FGameplayTag CombatState_Rule_Stop_Movement;
@@ -491,6 +492,8 @@ FGameplayTag Montage_Parry;
 FGameplayTag Montage_Parry_Begin;
 FGameplayTag Montage_Parry_End;
 FGameplayTag Montage_Execute;
+FGameplayTag Montage_Execute_Success;
+FGameplayTag Montage_Execute_Failure;
 FGameplayTag Montage_HitStop;
 FGameplayTag Montage_Impulse;
  

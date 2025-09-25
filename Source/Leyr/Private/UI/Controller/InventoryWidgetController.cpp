@@ -180,8 +180,8 @@ void UInventoryWidgetController::AsyncUpdateAbilities(FEquippedItem& ItemToEquip
 
 /*
  * Equipping
- */
-void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData)
+*/
+void UInventoryWidgetController::EquipButtonPressed(const FInventoryItemData ItemData)
 {
 	if(ItemData.Asset.Get() == nullptr)
 	{
@@ -190,18 +190,27 @@ void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData)
 			UItemData* LoadedAsset = AssetToLoad.Get();
 			if (IsValid(LoadedAsset))
 			{
-				const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-				if (ItemData.Asset.Get()->EquipmentSlot.MatchesTag(GameplayTags.Equipment_ActionSlot))
-				{
-					const FGameplayTag InputTag = GameplayTags.EquipmentSlotToInputTags[ItemData.Asset.Get()->EquipmentSlot];
-					AssignButtonPressed(ItemData, InputTag);
-				}
-				else
-				{
-					Equip(ItemData);
-				}
+				AssignOrEquip(ItemData);
 			}
 		}, FStreamableManager::AsyncLoadHighPriority);
+	}
+	else
+	{
+		AssignOrEquip(ItemData);
+	}
+}
+
+void UInventoryWidgetController::AssignOrEquip(const FInventoryItemData& ItemData)
+{
+	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+	if (ItemData.Asset.Get()->EquipmentSlot.MatchesTag(GameplayTags.Equipment_ActionSlot))
+	{
+		const FGameplayTag InputTag = GameplayTags.EquipmentSlotToInputTags[ItemData.Asset.Get()->EquipmentSlot];
+		AssignButtonPressed(ItemData, InputTag);
+	}
+	else
+	{
+		Equip(ItemData);
 	}
 }
 
@@ -452,10 +461,10 @@ void UInventoryWidgetController::GetDescription(FString Description)
 /*
  * Experience Points
  */
-void UInventoryWidgetController::OnXPChanged(int32 NewXP)
+void UInventoryWidgetController::OnXPChanged(const int32 NewXP)
 {
 	const ULevelUpInfo* LevelUpInfo = GetBasePS()->LevelUpInfo;
-	checkf(LevelUpInfo, TEXT("Unabled to find LevelUpInfo. Please fill out BasePlayerState Blueprint"));
+	checkf(LevelUpInfo, TEXT("Unable to find LevelUpInfo. Please fill out BasePlayerState Blueprint"));
 
 	const int32 Level = LevelUpInfo->FindLevelForXP(NewXP);
 	const int32 MaxLevel = LevelUpInfo->LevelUpInformation.Num();
