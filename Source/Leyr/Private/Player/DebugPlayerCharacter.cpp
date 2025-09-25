@@ -17,9 +17,9 @@ void ADebugPlayerCharacter::BeginPlay()
 	{
 		if(UInventoryWidgetController* IC = PlayerCharacterController->GetInventoryWidgetController())
 		{
-			for (FDataTableRowHandle DebugEquippedItem : DebugEquippedItems)
+			for (const FDataTableRowHandle DebugEquippedItem : DebugEquippedItems)
 			{
-				FInventoryItemData ItemToEquip = LeyrGameMode->FindItemDataByRowName(DebugEquippedItem.RowName);
+				const FInventoryItemData ItemToEquip = LeyrGameMode->FindItemDataByRowName(DebugEquippedItem.RowName);
 				GetPlayerInventory()->ServerAddItem(ItemToEquip);
 				IC->EquipButtonPressed(ItemToEquip);
 			}

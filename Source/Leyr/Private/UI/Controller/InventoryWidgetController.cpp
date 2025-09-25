@@ -183,17 +183,25 @@ void UInventoryWidgetController::AsyncUpdateAbilities(FEquippedItem& ItemToEquip
  */
 void UInventoryWidgetController::EquipButtonPressed(FInventoryItemData ItemData)
 {
-	if(ItemData.Asset.Get() == nullptr) return;
-	
-	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
-	if (ItemData.Asset.Get()->EquipmentSlot.MatchesTag(GameplayTags.Equipment_ActionSlot))
+	if(ItemData.Asset.Get() == nullptr)
 	{
-		const FGameplayTag InputTag = GameplayTags.EquipmentSlotToInputTags[ItemData.Asset.Get()->EquipmentSlot];
-		AssignButtonPressed(ItemData, InputTag);
-	}
-	else
-	{
-		Equip(ItemData);
+		TSoftObjectPtr<UItemData> AssetToLoad = ItemData.Asset;
+		UAssetManager::GetStreamableManager().RequestAsyncLoad(AssetToLoad.ToSoftObjectPath(), [this, AssetToLoad, ItemData] () {
+			UItemData* LoadedAsset = AssetToLoad.Get();
+			if (IsValid(LoadedAsset))
+			{
+				const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();
+				if (ItemData.Asset.Get()->EquipmentSlot.MatchesTag(GameplayTags.Equipment_ActionSlot))
+				{
+					const FGameplayTag InputTag = GameplayTags.EquipmentSlotToInputTags[ItemData.Asset.Get()->EquipmentSlot];
+					AssignButtonPressed(ItemData, InputTag);
+				}
+				else
+				{
+					Equip(ItemData);
+				}
+			}
+		}, FStreamableManager::AsyncLoadHighPriority);
 	}
 }
 
