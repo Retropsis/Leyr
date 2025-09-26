@@ -70,6 +70,10 @@ public:
 	ASplineComponentActor* FindSplineForTag(const FGameplayTag& Tag);
 
 	virtual void SetMultiPartAnimInstance(TSubclassOf<UAnimInstance> NewInstance) {}
+
+	
+	UPROPERTY()
+	TObjectPtr<AActor> OwningSummoner = nullptr;
 	
 	/** AI Interface */
 	virtual void ChangePaperAnimInstance_Implementation(TSubclassOf<UPaperZDAnimInstance> NewInstance) override;
@@ -107,6 +111,7 @@ public:
 	virtual void SetSpawningBounds_Implementation(const FBoundLocations NewBounds) override { SpawningBounds = NewBounds; }
 	virtual bool IsTargetWithinEnteringBounds_Implementation(const FVector& Location) override;
 	virtual bool ShouldDespawn_Implementation() override { return bShouldDespawn; }
+	virtual void SetOwningSummoner_Implementation(AActor* NewSummoner) override { OwningSummoner = NewSummoner; }
 	/** end AI Interface */
 	
 	bool IsTargetWithinEnteringBounds(const FVector& TargetLocation) const;

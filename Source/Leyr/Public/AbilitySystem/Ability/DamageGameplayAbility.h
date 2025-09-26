@@ -48,8 +48,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetCurrentComboSequence();
 	
-	UFUNCTION(BlueprintCallable)
-	void SetCurrentSequence();
+	virtual void SetCurrentSequence() override;
 	
 	UFUNCTION(BlueprintCallable)
 	void SelectMontageTagFromCombatState();

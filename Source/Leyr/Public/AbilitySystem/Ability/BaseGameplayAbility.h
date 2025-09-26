@@ -118,6 +118,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	virtual void PrepareToEndAbilityWithParams(FEndAbilityParams Params);
 	
+	UFUNCTION(BlueprintCallable)
+	virtual void SetCurrentSequence();
+	
 	float GetManaCost(float InLevel = 1.f) const;
 	float GetCooldown(float InLevel = 1.f) const;
 

@@ -173,9 +173,8 @@ void UDamageGameplayAbility::SetCurrentComboSequence()
 
 void UDamageGameplayAbility::SetCurrentSequence()
 {
-	TaggedMontage = ICombatInterface::Execute_GetTaggedMontageByTag(GetAvatarActorFromActorInfo(), MontageTag, SequenceType);
-	SelectedMontage = TaggedMontage.Montage;
-
+	Super::SetCurrentSequence();
+	
 	if (AbilityItemData)
 	{
 		WeaponTaggedMontage = AbilityItemData->FindSequenceInfoForTag(MontageTag);

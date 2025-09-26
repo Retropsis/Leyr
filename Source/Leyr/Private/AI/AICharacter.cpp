@@ -77,6 +77,7 @@ void AAICharacter::PossessedBy(AController* NewController)
 	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("HitReacting"), false);
 	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("RangedAttacker"), CharacterClass != ECharacterClass::Warrior);
 	BaseAIController->GetBlackboardComponent()->SetValueAsVector(FName("StartLocation"), StartLocation);
+	BaseAIController->GetBlackboardComponent()->SetValueAsObject(FName("OwningSummoner"), OwningSummoner);
 	BaseAIController->SetPawn(this);
 
 	if (Arena)

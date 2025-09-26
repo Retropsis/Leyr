@@ -151,4 +151,7 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool RequestJump();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetOwningSummoner(AActor* NewSummoner);
 };

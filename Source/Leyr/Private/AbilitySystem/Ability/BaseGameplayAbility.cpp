@@ -166,6 +166,12 @@ void UBaseGameplayAbility::PrepareToEndAbilityWithParams(FEndAbilityParams Param
 	PrepareToEndAbility();
 }
 
+void UBaseGameplayAbility::SetCurrentSequence()
+{
+	TaggedMontage = ICombatInterface::Execute_GetTaggedMontageByTag(GetAvatarActorFromActorInfo(), MontageTag, SequenceType);
+	SelectedMontage = TaggedMontage.Montage;
+}
+
 void UBaseGameplayAbility::MakeAndApplyExecuteEffectToTarget(const FGameplayTag& TagToApply, UAbilitySystemComponent* TargetASC, int32 Level)
 {
 	const FBaseGameplayTags& GameplayTags = FBaseGameplayTags::Get();

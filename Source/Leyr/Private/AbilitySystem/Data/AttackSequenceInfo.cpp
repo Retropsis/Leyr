@@ -24,6 +24,10 @@ FTaggedMontage UAttackSequenceInfo::FindSequenceInfoForTag(const FGameplayTag& M
 		break;
 	case ESequenceType::Use: return UseSequence;
 	case ESequenceType::Throw: return ThrowSequence;
+	case ESequenceType::Casting: Sequences =  CastingSequences;
+		break;
+	case ESequenceType::Shielding: Sequences = ShieldingSequences;
+		break;
 	}
 	
 	for (const FTaggedMontage& Info : Sequences)
@@ -54,6 +58,8 @@ TArray<FTaggedMontage> UAttackSequenceInfo::GetSequencesByType(ESequenceType Seq
 	case ESequenceType::Piercing: return PiercingSequences;
 	case ESequenceType::Use: return TArray{ UseSequence };
 	case ESequenceType::Throw: return TArray{ ThrowSequence };
+	case ESequenceType::Casting: return CastingSequences;
+	case ESequenceType::Shielding: return ShieldingSequences;
 	}
 	return DefaultSequences;
 }
