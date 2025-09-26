@@ -438,7 +438,7 @@ void AAICharacter::Die(const FVector& DeathImpulse, bool bExecute)
 	PassiveIndicatorComponent->DestroyComponent();
 	HealthBar->DestroyComponent();
 	
-	if(CombatTarget)
+	if(CombatTarget && CombatTarget->Implements<UPlayerInterface>())
 	{
 		IPlayerInterface::Execute_SetCameraInterpolation(CombatTarget, Arena, ECameraInterpState::Following);
 	}
@@ -622,11 +622,7 @@ bool AAICharacter::ChaseTargetWithinWater_Implementation(AActor* TargetToChase)
 			if(FVector::DotProduct(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetToChase->GetActorLocation()).Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
 			return false;
 		}
-		else
-		{
-			UKismetSystemLibrary::DrawDebugSphere(this, PreferredLocation, 15.f, 12, FLinearColor::Red);
-			GetCharacterMovement()->StopMovementImmediately();
-		}
+		GetCharacterMovement()->StopMovementImmediately();
 		return true;
 	}
 	if (GetDistanceTo(TargetToChase) < CloseRange)
@@ -640,11 +636,7 @@ bool AAICharacter::ChaseTargetWithinWater_Implementation(AActor* TargetToChase)
 			if(FVector::DotProduct(UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), TargetToChase->GetActorLocation()).Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();
 			return false;
 		}
-		else
-		{
-			UKismetSystemLibrary::DrawDebugSphere(this, PreferredLocation, 15.f, 12, FLinearColor::Red);
-			GetCharacterMovement()->StopMovementImmediately();
-		}
+		GetCharacterMovement()->StopMovementImmediately();
 		return true;
 	}
 	return true;

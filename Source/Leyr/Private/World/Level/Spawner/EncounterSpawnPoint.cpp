@@ -6,7 +6,6 @@
 #include "Components/BillboardComponent.h"
 #include "Data/EncounterData.h"
 #include "Engine/AssetManager.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "Player/PlayerCharacter.h"
 
 AEncounterSpawnPoint::AEncounterSpawnPoint()
@@ -29,76 +28,80 @@ void AEncounterSpawnPoint::SpawnEncounter()
 			const TSubclassOf<AAICharacter> LoadedAsset = EncounterData->EncounterClass.Get();
 			if (IsValid(LoadedAsset))
 			{
-				TArray<FVector> SpawnLocations;
-				if (PointCollectionClass)
-				{
-					FActorSpawnParameters SpawnParams;
-					SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-					APointCollection* PointCollection = GetWorld()->SpawnActor<APointCollection>(PointCollectionClass, GetActorTransform(), SpawnParams);
-					// if (SpawnLocationType == ESpawnLocationType::PointCollection)
-					// {
-					// 	SpawnLocations = PointCollection->GetGroundLocations(Count);
-					// }
-					if (Target && (SpawnLocationType == ESpawnLocationType::PointCollectionRandom || SpawnLocationType == ESpawnLocationType::PointCollection))
-					{
-						PointCollection->SetActorLocation(FVector{ PointCollection->GetActorLocation().X, 0.f, Target->GetActorLocation().Z });
-
-						FName Tag;
-						if (Target)
-						{
-							Tag = Target->GetActorLocation().X > PointCollection->GetActorLocation().X ? FName("Left") : FName("Right");
-						}
-						SpawnLocations = PointCollection->GetLocationsWithTag(Tag);
-						PointCollection->Destroy();
-					}
-				}
-				
-				for (int i = 0; i < Count; ++i)
-				{
-					SpawnTransform = GetActorTransform();
-					switch (SpawnLocationType) {
-					case ESpawnLocationType::Point:
-						break;
-					case ESpawnLocationType::AroundPoint:
-						SpawnTransform.SetLocation(FindRandomPointWithinBounds(GetActorLocation()));
-						break;
-					case ESpawnLocationType::PointCollection:
-						SpawnTransform.SetLocation(SpawnLocations[i] + FVector{ 0.f, 0.f, 75.f });
-						UKismetSystemLibrary::DrawDebugSphere(this, SpawnTransform.GetLocation(), 18.f, 12, FLinearColor::White, 12.f);
-						break;
-					case ESpawnLocationType::PointCollectionRandom:
-						SpawnTransform.SetLocation(SpawnLocations[FMath::RandRange(0, SpawnLocations.Num() - 1)]);
-						break;
-					case ESpawnLocationType::Random:
-						SpawnTransform.SetLocation(FVector{ FMath::FRandRange(SpawningBounds.Left.X, SpawningBounds.Right.X), 0.f, SpawningBounds.Left.Z });
-						break;
-					case ESpawnLocationType::RandomCloseToPlayer:
-						SpawnTransform.SetLocation(FindRandomPointWithinBounds(PreferredLocation));
-						break;
-					case ESpawnLocationType::OutOfBounds:
-						break;
-					case ESpawnLocationType::OutOfBoundsFixed:
-						break;
-					}
-
-					// Spawn An Encounter
-					AAICharacter* Encounter = GetWorld()->SpawnActorDeferred<AAICharacter>(LoadedAsset, SpawnTransform, this, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
-					Encounter->SetEncounterLevel(EncounterLevel);
-					Encounter->SetEncounterData(EncounterData);
-					if (OverrideBehaviourData) Encounter->SetBehaviourData(OverrideBehaviourData);
-					IAIInterface::Execute_SetSpawningBounds(Encounter, SpawningBounds);					
-					Encounter->SpawnDefaultController();
-					Encounter->FinishSpawning(SpawnTransform);
-					CurrentSpawns.Add(Encounter);
-
-					if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Encounter); CombatInterface && SpawnerType == ESpawnerType::Infinite)
-					{
-						CurrentCount++;
-						CombatInterface->GetOnDeath().AddDynamic(this, &AEncounterSpawnPoint::Respawn);
-					}
-				}
+				SpawnSingleEncounter(LoadedAsset);
 			}
 		}, FStreamableManager::AsyncLoadHighPriority);
+	}
+}
+
+void AEncounterSpawnPoint::SpawnSingleEncounter(UClass* EncounterToSpawn)
+{
+	TArray<FVector> SpawnLocations;
+	if (PointCollectionClass)
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		APointCollection* PointCollection = GetWorld()->SpawnActor<APointCollection>(PointCollectionClass, GetActorTransform(), SpawnParams);
+		// if (SpawnLocationType == ESpawnLocationType::PointCollection)
+		// {
+		// 	SpawnLocations = PointCollection->GetGroundLocations(Count);
+		// }
+		if (Target && (SpawnLocationType == ESpawnLocationType::PointCollectionRandom || SpawnLocationType == ESpawnLocationType::PointCollection))
+		{
+			PointCollection->SetActorLocation(FVector{ PointCollection->GetActorLocation().X, 0.f, Target->GetActorLocation().Z });
+
+			FName Tag;
+			if (Target)
+			{
+				Tag = Target->GetActorLocation().X > PointCollection->GetActorLocation().X ? FName("Left") : FName("Right");
+			}
+			SpawnLocations = PointCollection->GetLocationsWithTag(Tag);
+			PointCollection->Destroy();
+		}
+	}
+	
+	for (int i = 0; i < Count; ++i)
+	{
+		SpawnTransform = GetActorTransform();
+		switch (SpawnLocationType) {
+		case ESpawnLocationType::Point:
+			break;
+		case ESpawnLocationType::AroundPoint:
+			SpawnTransform.SetLocation(FindRandomPointWithinBounds(GetActorLocation()));
+			break;
+		case ESpawnLocationType::PointCollection:
+			SpawnTransform.SetLocation(SpawnLocations[i] + FVector{ 0.f, 0.f, 75.f });
+			break;
+		case ESpawnLocationType::PointCollectionRandom:
+			SpawnTransform.SetLocation(SpawnLocations[FMath::RandRange(0, SpawnLocations.Num() - 1)]);
+			break;
+		case ESpawnLocationType::Random:
+			SpawnTransform.SetLocation(FVector{ FMath::FRandRange(SpawningBounds.Left.X, SpawningBounds.Right.X), 0.f, SpawningBounds.Left.Z });
+			break;
+		case ESpawnLocationType::RandomCloseToPlayer:
+			SpawnTransform.SetLocation(FindRandomPointWithinBounds(PreferredLocation));
+			break;
+		case ESpawnLocationType::OutOfBounds:
+			break;
+		case ESpawnLocationType::OutOfBoundsFixed:
+			break;
+		}
+
+		// Spawn An Encounter
+		AAICharacter* Encounter = GetWorld()->SpawnActorDeferred<AAICharacter>(EncounterToSpawn, SpawnTransform, this, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+		Encounter->SetEncounterLevel(EncounterLevel);
+		Encounter->SetEncounterData(EncounterData);
+		if (OverrideBehaviourData) Encounter->SetBehaviourData(OverrideBehaviourData);
+		IAIInterface::Execute_SetSpawningBounds(Encounter, SpawningBounds);					
+		Encounter->SpawnDefaultController();
+		Encounter->FinishSpawning(SpawnTransform);
+		CurrentSpawns.Add(Encounter);
+
+		if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Encounter); CombatInterface && SpawnerType == ESpawnerType::Infinite)
+		{
+			CurrentCount++;
+			CombatInterface->GetOnDeath().AddDynamic(this, &AEncounterSpawnPoint::Respawn);
+		}
 	}
 }
 

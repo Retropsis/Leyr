@@ -27,6 +27,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SpawnEncounter();
 
+	void SpawnSingleEncounter(UClass* EncounterToSpawn);
+
 	UFUNCTION()
 	void Respawn(AActor* DefeatedEncounter);
 

@@ -84,8 +84,14 @@ public:
 	AActor* GetTargetActor() { return TargetActor; }
 	void SetTargetActor(AActor* InTargetActor) { TargetActor = InTargetActor; }
 	virtual void HandleOnBeginOverlap(AActor* OtherActor);
+
+	UFUNCTION(BlueprintCallable)
 	FBoxSphereBounds GetBounds() const { return CameraBoundary->Bounds; }
+	
+	UFUNCTION(BlueprintCallable)
 	FBoxSphereBounds GetEnteringBounds() const { return EnteringBoundary->Bounds; }
+	
+	UFUNCTION(BlueprintCallable)
 	FBoxSphereBounds GetNavigationBounds() const { return NavigationBoundary->Bounds; }
 	
 	FOnPlayerLeaving OnPlayerLeaving;

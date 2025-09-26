@@ -231,8 +231,6 @@ void APlayerCharacter::InterpCameraAdditiveOffset(float DeltaTime)
 		}
 		break;
 	}
-	UKismetSystemLibrary::DrawDebugSphere(this, PreferredCameraLocation, 25.f, 12, FLinearColor::White);
-	UKismetSystemLibrary::DrawDebugSphere(this, LastActorToFollowInterpLocation, 23.f, 12, FLinearColor::Red);
 	
 	// Clamp Camera to Bounds First
 	if(bClampFirst)
