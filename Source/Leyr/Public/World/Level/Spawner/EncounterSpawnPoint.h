@@ -25,9 +25,12 @@ public:
 	AEncounterSpawnPoint();
 	
 	UFUNCTION(BlueprintCallable)
-	void SpawnEncounter();
+	void SpawnEncounterGroup();
 
-	void SpawnSingleEncounter(UClass* EncounterToSpawn);
+	void SpawnEncounter(UClass* EncounterToSpawn, const FTransform& InSpawnTransform);
+
+	void GetSpawnLocations();
+	void DetermineSpawnTransform(int32 SpawnLocationIndex = 0);
 
 	UFUNCTION()
 	void Respawn(AActor* DefeatedEncounter);
@@ -59,15 +62,16 @@ public:
 	UPROPERTY() ESpawnerType SpawnerType = ESpawnerType::Once;
 	UPROPERTY() FBoundLocations SpawningBounds;
 	UPROPERTY() int32 Count = 1;
+	UPROPERTY(EditAnywhere) float SpawnDelay = 1.f;
 	UPROPERTY() FVector LeftBound = FVector::ZeroVector;
 	UPROPERTY() FVector RightBound = FVector::ZeroVector;
 	UPROPERTY() FVector PreferredLocation = FVector::ZeroVector;
 	UPROPERTY() FTransform SpawnTransform = FTransform::Identity;
+	UPROPERTY() TArray<FVector> SpawnLocations;
 	UPROPERTY(EditDefaultsOnly) float PreferredSpawningRange = 750.f;
 	UPROPERTY() TObjectPtr<AActor> Target = nullptr;
 
 private:
 	UPROPERTY() TArray<TObjectPtr<AActor>> CurrentSpawns;
-	FTimerHandle RespawnTimer;
-	int32 CurrentCount = 0;
+	TArray<FTimerHandle> RespawnTimers;
 };

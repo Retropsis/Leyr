@@ -163,7 +163,7 @@ void AEncounterSpawnVolume::OnBeginOverlap(UPrimitiveComponent* OverlappedCompon
 				SpawnPoint->PreferredLocation = FVector{ OtherActor->GetActorLocation().X, 0.f, GetActorLocation().Z };
 				SpawnPoint->SpawningBounds = CalculateBounds();
 				SpawnPoint->Target = OtherActor;
-				SpawnPoint->SpawnEncounter();
+				SpawnPoint->SpawnEncounterGroup();
 			}
 		}
 		if (SpawnerType == ESpawnerType::Once) bActivated = true;
@@ -177,7 +177,7 @@ void AEncounterSpawnVolume::OnDespawnOverlap(UPrimitiveComponent* OverlappedComp
 	{
 		for (AEncounterSpawnPoint* SpawnPoint : SpawnPoints)
 		{
-			if (SpawnPoint->RequestRespawnEncounter(Encounter))
+			if (!ICombatInterface::Execute_IsDefeated(Encounter) && SpawnPoint->RequestRespawnEncounter(Encounter))
 			{
 				// Encounter->Destroy();
 				// TODO: Meditate on this, other part is in ABaseCharacter::HandleDeathCapsuleComponent, Capsule deactivated triggers this too soon
