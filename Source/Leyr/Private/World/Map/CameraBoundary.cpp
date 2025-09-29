@@ -106,6 +106,20 @@ void ACameraBoundary::InitializeSpawnVolumes()
 	}
 }
 
+void ACameraBoundary::UpdateSpawnVolumes()
+{
+	if (SpawningVolumes.Num() == 0) return;
+
+	for (int i = 0; i < SpawningVolumes.Num(); ++i)
+	{
+		if (IsValid(SpawningVolumes[i]))
+		{
+			SpawningVolumes[i]->SetEncounterSpawnData(LevelAreaData->EncounterSpawns[i]);
+			SpawningVolumes[i]->UpdateSpawnPoints();
+		}
+	}
+}
+
 void ACameraBoundary::ClearSpawnVolumes()
 {
 	if (SpawningVolumes.Num() == 0) return;

@@ -42,6 +42,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category="Setup")
 	bool bShouldDespawn = true;
+
+	UPROPERTY(EditDefaultsOnly, Category="Setup", meta=(EditCondition="bShouldDespawn"))
+	TSoftObjectPtr<UPaperZDAnimSequence> DespawnSequence = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Setup")
 	bool bSimulatePhysicsOnDestroyed = true;

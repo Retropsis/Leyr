@@ -126,10 +126,16 @@ public:
 	void SetIsElectrocuted(bool InIsElectrocuted);
 
 	/*
-	 *
+	 * Base Character Interface
 	 */
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	EObjectTypeQuery GetTraceObjectType();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetCharacterCapsuleCollisionResponse(const ECollisionChannel Channel, const ECollisionResponse Response);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetCharacterCapsuleCollision(const ECollisionEnabled::Type CollisionType);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	EDefeatState GetDefeatState() const;

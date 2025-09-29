@@ -320,6 +320,16 @@ void ABaseCharacter::HitStop(const float Duration, const float Amount)
 	GetWorld()->GetTimerManager().SetTimer(HitStopTimer, FTimerDelegate::CreateLambda([this] () { CustomTimeDilation = 1.f; }), Duration, false);
 }
 
+void ABaseCharacter::SetCharacterCapsuleCollisionResponse_Implementation(const ECollisionChannel Channel, const ECollisionResponse Response)
+{
+	GetCapsuleComponent()->SetCollisionResponseToChannel(Channel, Response);
+}
+
+void ABaseCharacter::SetCharacterCapsuleCollision_Implementation(const ECollisionEnabled::Type CollisionType)
+{
+	GetCapsuleComponent()->SetCollisionEnabled(CollisionType);
+}
+
 void ABaseCharacter::Die(const FVector& DeathImpulse, bool bExecute)
 {
 	DefeatState = bExecute ? EDefeatState::Executed : EDefeatState::Defeated;

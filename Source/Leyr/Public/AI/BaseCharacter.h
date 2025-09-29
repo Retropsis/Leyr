@@ -163,6 +163,9 @@ protected:
 	virtual FOnASCRegistered& GetOnASCRegistered() override { return OnASCRegistered; }
 	virtual FOnDeath& GetOnDeath() override { return OnDeath; }
 	virtual void BroadcastOnDeath_Implementation() override { OnDeath.Broadcast(this); }
+
+	virtual void SetCharacterCapsuleCollisionResponse_Implementation(const ECollisionChannel Channel, const ECollisionResponse Response) override;
+	virtual void SetCharacterCapsuleCollision_Implementation(const ECollisionEnabled::Type CollisionType) override;
 	
 	virtual void Die(const FVector& DeathImpulse, bool bExecute) override;
 	void HandleDeathCapsuleComponent(const FVector& DeathImpulse) const;

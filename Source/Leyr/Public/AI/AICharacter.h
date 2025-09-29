@@ -81,6 +81,9 @@ public:
 	virtual UPaperZDAnimInstance* FindPaperAnimInstanceForTagName_Implementation(const FName& TagName) override;
 	virtual ASplineComponentActor* FindSplineForTagName_Implementation(const FName& TagName) override;
 	virtual void FindAndApplyPatternParamsForPattern_Implementation(const FName& PatternName) override;
+	virtual UPaperZDAnimSequence* GetDespawnSequence_Implementation() override;
+	virtual void Despawn_Implementation() override;
+	virtual void DespawnFinished_Implementation() override;
 	
 	virtual FVector FindRandomLocation_Implementation() override;
 	virtual bool MoveToLocation_Implementation(FVector TargetLocation, float Threshold, bool bBackward = false) override;

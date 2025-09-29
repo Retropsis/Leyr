@@ -7,6 +7,7 @@
 #include "Components/BillboardComponent.h"
 #include "Data/EncounterData.h"
 #include "Engine/AssetManager.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Player/PlayerCharacter.h"
 
 AEncounterSpawnPoint::AEncounterSpawnPoint()
@@ -84,20 +85,19 @@ void AEncounterSpawnPoint::GetSpawnLocations()
 		const FVector SpawnBoundsOrigin = ( SpawningBounds.Left + SpawningBounds.Right ) / 2.f;
 		if (Target && (SpawnLocationType == ESpawnLocationType::PointCollectionRandom || SpawnLocationType == ESpawnLocationType::PointCollection))
 		{
+			FName Tag;	
 			if (Target->GetActorLocation().X < SpawnBoundsOrigin.X)
 			{
-				const FVector ToTheRight =  ( SpawnBoundsOrigin + SpawningBounds.Right ) / 2.f;
-				PointCollection->SetActorLocation(FVector{ ToTheRight.X, 0.f, Target->GetActorLocation().Z });
+				PointCollection->SetActorLocation(FVector{ Target->GetActorLocation().X, 0.f, SpawnBoundsOrigin.Z });
+				Tag = FName("Right");
 			}
 			else
 			{
-				const FVector ToTheLeft =  ( SpawnBoundsOrigin + SpawningBounds.Left ) / 2.f;
-				PointCollection->SetActorLocation(FVector{ ToTheLeft.X, 0.f, Target->GetActorLocation().Z });
+				PointCollection->SetActorLocation(FVector{ Target->GetActorLocation().X, 0.f, SpawnBoundsOrigin.Z });
+				Tag = FName("Left");
 			}
 			
-			const FName Tag = Target->GetActorLocation().X > PointCollection->GetActorLocation().X ? FName("Left") : FName("Right");
-			// SpawnLocations = PointCollection->GetLocationsWithTag(Tag);
-			SpawnLocations = PointCollection->GetLocations();
+			SpawnLocations = PointCollection->GetLocationsWithTag(Tag);
 			Algo::RandomShuffle(SpawnLocations);
 			PointCollection->Destroy();
 		}
@@ -192,6 +192,22 @@ FVector AEncounterSpawnPoint::FindRandomPointWithinBounds(const FVector& Origin)
 {
 	const float PreferredLeftX = FMath::Clamp(Origin.X - PreferredSpawningRange, SpawningBounds.Left.X, SpawningBounds.Right.X);
 	const float PreferredRightX = FMath::Clamp(Origin.X + PreferredSpawningRange, SpawningBounds.Left.X, SpawningBounds.Right.X);
-	const float RandomX = FMath::FRandRange(PreferredLeftX, PreferredRightX);
-	return  FVector{ RandomX, 0.f, SpawningBounds.Left.Z };
+	const bool bSweepLeftToRight = Origin.X > (SpawningBounds.Left.X +  SpawningBounds.Right.X) / 2.f;
+
+	const float Delta = PreferredRightX - PreferredLeftX;
+	const int32 MaxTries = static_cast<int32>(Delta / 80.f);
+	FVector ChosenLocation = FVector::ZeroVector;
+	int32 Tries = 0;
+	while (Tries < MaxTries)
+	{
+		ChosenLocation = bSweepLeftToRight ? FVector{ PreferredLeftX + Tries * 80.f, 0.f, SpawningBounds.Left.Z } : FVector{ PreferredRightX - Tries * 80.f, 0.f, SpawningBounds.Left.Z };
+		// ChosenLocation = FVector{ FMath::FRandRange(PreferredLeftX, PreferredRightX), 0.f, SpawningBounds.Left.Z };
+		FHitResult Hit;
+		UKismetSystemLibrary::BoxTraceSingle(this, ChosenLocation - FVector{ 0.f, 0.f, 50.f }, ChosenLocation + FVector{ 0.f, 0.f, 50.f }, 
+			{ 80.f, 50.f, 20.f }, FRotator::ZeroRotator,
+			TraceTypeQuery3, false, TArray<AActor*>(), EDrawDebugTrace::None, Hit, true);
+		if (!Hit.bBlockingHit) return ChosenLocation;
+		Tries++;
+	}
+	return  ChosenLocation;
 }

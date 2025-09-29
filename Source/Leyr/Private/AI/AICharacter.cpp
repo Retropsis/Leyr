@@ -7,6 +7,7 @@
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
+#include "AbilitySystem/Effect/StatusEffectNiagaraComponent.h"
 #include "AI/AICharacterAnimInstance.h"
 #include "AI/BaseAIController.h"
 #include "AI/SplineComponentActor.h"
@@ -983,4 +984,43 @@ void AAICharacter::FindAndApplyPatternParamsForPattern_Implementation(const FNam
 			SetMultiPartAnimInstance(Params.MultiPartAnimInstance);
 		}		
 	}
+}
+
+UPaperZDAnimSequence* AAICharacter::GetDespawnSequence_Implementation()
+{
+	if (EncounterData == nullptr) return nullptr;
+	
+	if (EncounterData->DespawnSequence.Get() == nullptr)
+	{
+		UAssetManager::GetStreamableManager().RequestAsyncLoad(EncounterData->DespawnSequence.ToSoftObjectPath(), [this] () {
+			return EncounterData->DespawnSequence.Get();
+		}, FStreamableManager::AsyncLoadHighPriority);
+	}
+	else
+	{
+		return EncounterData->DespawnSequence.Get();
+	}
+	return nullptr;
+}
+
+void AAICharacter::Despawn_Implementation()
+{
+	if (BaseAIController) BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("Dead"), true);
+	BaseAIController->StopMovement();
+	PassiveIndicatorComponent->DestroyComponent();
+	HealthBar->DestroyComponent();
+	BurnStatusEffectComponent->DeactivateImmediate();
+	StunStatusEffectComponent->DeactivateImmediate();
+	
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Player, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Enemy, ECR_Ignore);
+}
+
+void AAICharacter::DespawnFinished_Implementation()
+{
+	// OnDeath.Broadcast(this);
+	Destroy();
 }

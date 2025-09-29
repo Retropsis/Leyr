@@ -49,6 +49,15 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void FindAndApplyPatternParamsForPattern(const FName& PatternName);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UPaperZDAnimSequence* GetDespawnSequence();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void Despawn();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void DespawnFinished();
 	
 	/*
 	 * Movement

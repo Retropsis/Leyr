@@ -10,7 +10,7 @@ TArray<FLootData> ULootDataSet::GetLootItems()
 	{
 		for (int i = 0; i < Item.MaxNumberToSpawn; ++i)
 		{
-			if (FMath::FRandRange(1.f, 100.f) < Item.SpawningChance)
+			if (FMath::FRandRange(1.f, 100.f) <= Item.SpawningChance)
 			{
 				FLootData LootItem;				
 				LootItem.ItemClass = Item.ItemClass;

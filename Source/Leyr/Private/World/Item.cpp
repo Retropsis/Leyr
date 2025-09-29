@@ -13,12 +13,14 @@ AItem::AItem()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
-
+	
 	Sphere = CreateDefaultSubobject<USphereComponent>("Sphere");
-	Sphere->SetupAttachment(GetRootComponent());
-	Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
+	SetRootComponent(Sphere);
+	// Sphere->SetupAttachment(GetRootComponent());
+	Sphere->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	
 	GetRenderComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetRenderComponent()->SetupAttachment(GetRootComponent());
 }
 
 void AItem::Tick(float DeltaSeconds)
@@ -92,7 +94,11 @@ void AItem::BeginPlay()
 			ItemData = ULeyrAbilitySystemLibrary::FindItemDataByRowName(this, ItemRowHandle.RowName);
 		}
 		// Sphere->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnBeginOverlap);
-		Sphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		Sphere->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		Sphere->SetSimulatePhysics(true);
+		Sphere->SetEnableGravity(true);
+		Sphere->SetNotifyRigidBodyCollision(true);
+		Sphere->OnComponentHit.AddDynamic(this, &AItem::HandleOnHit);
 	
 		if(ItemData.ID == 0)
 		{
@@ -107,6 +113,14 @@ void AItem::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 	// {
 	// 	// if (InventoryComponent->TryAddItem(ItemData)) Destroy();
 	// }
+}
+
+void AItem::HandleOnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	Sphere->SetSimulatePhysics(false);
+	Sphere->SetEnableGravity(false);
+	Sphere->SetNotifyRigidBodyCollision(false);
+	Sphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }
 
 void AItem::Interact_Implementation(AActor* InteractingActor)

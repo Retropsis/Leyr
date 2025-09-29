@@ -79,6 +79,9 @@ public:
 	virtual void InitializeSpawnVolumes();
 	
 	UFUNCTION(CallInEditor, Category="00 - Camera Boundary")
+	virtual void UpdateSpawnVolumes();
+	
+	UFUNCTION(CallInEditor, Category="00 - Camera Boundary")
 	virtual void ClearSpawnVolumes();
 	
 	AActor* GetTargetActor() { return TargetActor; }

@@ -22,7 +22,7 @@ ABreakableLight::ABreakableLight()
 	PointLightComponent = CreateDefaultSubobject<UPointLightComponent>("PointLightComponent");
 	PointLightComponent->SetupAttachment(BoxComponent);
 
-	HaloComponent =  CreateDefaultSubobject<UPaperFlipbookComponent>("HaloComponent");
+	HaloComponent = CreateDefaultSubobject<UPaperFlipbookComponent>("HaloComponent");
 	HaloComponent->SetupAttachment(BoxComponent);
 	HaloComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	HaloComponent->SetRelativeLocation(FVector(0, -5.f, 0));
@@ -54,11 +54,20 @@ void ABreakableLight::Extinguish()
 {
 	BoxComponent->OnComponentHit.RemoveAll(this);
 	BoxComponent->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	BoxComponent->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	BoxComponent->SetSimulatePhysics(true);
 	GetRenderComponent()->SetFlipbook(ExtinguishFlipbook);
 	GetRenderComponent()->SetLooping(false);
 	PointLightComponent->SetVisibility(false);
 	HaloComponent->SetVisibility(false);
+	bHasInteracted = true;
+
+	FTimerHandle ResetCollisionTimer;
+	GetWorld()->GetTimerManager().SetTimer(ResetCollisionTimer, FTimerDelegate::CreateLambda([this] ()
+	{
+		BoxComponent->SetSimulatePhysics(false);
+		BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	}), 2.f, false);
 }
 
 void ABreakableLight::HandleOnHit(const FHitResult& HitResult)
@@ -76,10 +85,14 @@ void ABreakableLight::ResetState_Implementation()
 {
 	BoxComponent->OnComponentHit.AddUniqueDynamic(this, &ABreakableLight::OnHit);
 	BoxComponent->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Ignore);
+	// BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	BoxComponent->SetSimulatePhysics(false);
 	BoxComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 	BoxComponent->SetRelativeLocation(FVector:: ZeroVector);
+	BoxComponent->SetRelativeRotation(FRotator::ZeroRotator);
+	// BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	
+	bHasInteracted = false;
 	HaloComponent->SetVisibility(true);
 	PointLightComponent->SetVisibility(true);
 	

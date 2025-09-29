@@ -9,6 +9,7 @@
 #include "Interaction/LevelActorInterface.h"
 #include "BreakableLight.generated.h"
 
+class ULootDataSet;
 class UPointLightComponent;
 class UPaperFlipbook;
 class UBoxComponent;
@@ -26,6 +27,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void SpawnLoot();
+	
 	//~ LevelActorInterface
 	virtual void ResetState_Implementation() override;
 	//~ LevelActorInterface
@@ -71,6 +75,13 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UMaterialInstanceDynamic> MID_Halo;
+	
+	UPROPERTY(BlueprintReadOnly)
+	bool bHasInteracted = false;
+	
+	//~ LootData
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TObjectPtr<ULootDataSet> LootData = nullptr;
 
 private:
 	FVector StartLocation;
