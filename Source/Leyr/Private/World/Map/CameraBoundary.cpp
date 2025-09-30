@@ -158,7 +158,7 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>() && OtherActor->Implements<UCombatInterface>() && ICombatInterface::Execute_GetDefeatState(OtherActor) == EDefeatState::None)
 	{
 		OnPlayerLeaving.Broadcast();
-		// DestroyOutOfBoundsEncounters();
+		DestroyOutOfBoundsEncounters();
 		ToggleLevelActorActivity(false);
 		LevelArea_GrantedHandles.TakeFromAbilitySystem(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor));
 	}
@@ -183,7 +183,8 @@ void ACameraBoundary::DestroyOutOfBoundsEncounters() const
 	{
 		if (IsValid(OverlapActor) && OverlapActor->Implements<UAIInterface>() && IAIInterface::Execute_ShouldDespawn(OverlapActor))
 		{
-			OverlapActor->Destroy();
+			// OverlapActor->Destroy();
+			OverlapActor->SetLifeSpan(.5f);
 		}
 	}
 }
@@ -207,7 +208,7 @@ void ACameraBoundary::ToggleLevelActorActivity(bool bActivate) const
 		}
 		if (AItem* Item = Cast<AItem>(Overlap.GetActor()))
 		{
-			if (IInteractionInterface::Execute_ShouldDespawn(Item)) Overlap.GetActor()->Destroy();
+			if (!bActivate && IInteractionInterface::Execute_ShouldDespawn(Item)) Overlap.GetActor()->Destroy();
 		}
 	}
 }

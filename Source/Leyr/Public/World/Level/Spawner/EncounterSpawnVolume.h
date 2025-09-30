@@ -22,6 +22,7 @@ public:
 	AEncounterSpawnVolume();
 	void DisableVolume() const;
 	void EnableVolume() const;
+	void ToggleOnDespawnOverlap(bool bEnable) const;
 
 	//~ Save Interface
 	virtual void LoadActor_Implementation() override;

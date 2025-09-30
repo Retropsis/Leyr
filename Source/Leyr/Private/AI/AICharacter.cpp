@@ -506,11 +506,17 @@ FVector AAICharacter::FindRandomLocation_Implementation()
 	return StartLocation;
 }
 
-bool AAICharacter::MoveToLocation_Implementation(FVector TargetLocation, float Threshold, bool bBackward)
+bool AAICharacter::MoveToLocation_Implementation(FVector TargetLocation, float Threshold, bool bBackward, bool bIgnoreZ)
 {
-	if ((GetActorLocation() - TargetLocation).Size() > Threshold)
+	FVector ActorLocation = GetActorLocation();
+	if (bIgnoreZ)
 	{
-		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), FVector(TargetLocation.X, GetActorLocation().Y, TargetLocation.Z));
+		ActorLocation = FVector{ ActorLocation.X, 0.f, TargetLocation.Z };
+		TargetLocation = FVector{ TargetLocation.X, 0.f, TargetLocation.Z };
+	}
+	if ((ActorLocation - TargetLocation).Size() > Threshold)
+	{
+		const FRotator LookAtRotation = UKismetMathLibrary::FindLookAtRotation(ActorLocation, FVector(TargetLocation.X, ActorLocation.Y, TargetLocation.Z));
 		// const FRotator WorldDirection = FRotator(LookAtRotation.Pitch, 0.f, 0.f);
 		AddMovementInput(LookAtRotation.Vector(), 1.f, true);
 		if(!bBackward && FVector::DotProduct(LookAtRotation.Vector(), GetActorForwardVector()) < 0.f) ChangeDirections();

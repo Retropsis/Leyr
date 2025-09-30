@@ -147,8 +147,8 @@ void AEncounterSpawnVolume::BeginPlay()
 	Super::BeginPlay();
 	if (HasAuthority())
 	{
-		TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &AEncounterSpawnVolume::OnBeginOverlap);
-		DespawningBounds->OnComponentEndOverlap.AddDynamic(this, &AEncounterSpawnVolume::OnDespawnOverlap);
+		TriggerVolume->OnComponentBeginOverlap.AddUniqueDynamic(this, &AEncounterSpawnVolume::OnBeginOverlap);
+		DespawningBounds->OnComponentEndOverlap.AddUniqueDynamic(this, &AEncounterSpawnVolume::OnDespawnOverlap);
 	}
 }
 
@@ -179,6 +179,10 @@ void AEncounterSpawnVolume::OnDespawnOverlap(UPrimitiveComponent* OverlappedComp
 		{
 			if (!ICombatInterface::Execute_IsDefeated(Encounter) && SpawnPoint->RequestRespawnEncounter(Encounter))
 			{
+				if (Encounter->IsActorBeingDestroyed())
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Red, FString::Printf(TEXT("%s is being destroyed"), *Encounter->GetName()));
+				}
 				// Encounter->Destroy();
 				// TODO: Meditate on this, other part is in ABaseCharacter::HandleDeathCapsuleComponent, Capsule deactivated triggers this too soon
 				Encounter->SetLifeSpan(Encounter->LifeSpan);
@@ -191,6 +195,7 @@ void AEncounterSpawnVolume::OnDespawnOverlap(UPrimitiveComponent* OverlappedComp
 void AEncounterSpawnVolume::HandlePlayerLeaving()
 {
 	EnableVolume();
+	ToggleOnDespawnOverlap(false);
 	for (AEncounterSpawnPoint* SpawnPoint : SpawnPoints)
 	{
 		if (SpawnPoint) SpawnPoint->DespawnEncounter();
@@ -199,6 +204,7 @@ void AEncounterSpawnVolume::HandlePlayerLeaving()
 
 void AEncounterSpawnVolume::HandlePlayerEntering()
 {
+	ToggleOnDespawnOverlap(true);
 	// GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Green, FString::Printf(TEXT("HandlePlayerEntering")));
 }
 
@@ -234,4 +240,16 @@ void AEncounterSpawnVolume::EnableVolume() const
 	TriggerVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	TriggerVolume->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	TriggerVolume->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
+}
+
+void AEncounterSpawnVolume::ToggleOnDespawnOverlap(const bool bEnable) const
+{
+	if (bEnable)
+	{
+		DespawningBounds->OnComponentEndOverlap.AddUniqueDynamic(this, &AEncounterSpawnVolume::OnDespawnOverlap);
+	}
+	else
+	{
+		DespawningBounds->OnComponentEndOverlap.RemoveAll(this);
+	}
 }

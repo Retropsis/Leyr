@@ -86,7 +86,7 @@ public:
 	virtual void DespawnFinished_Implementation() override;
 	
 	virtual FVector FindRandomLocation_Implementation() override;
-	virtual bool MoveToLocation_Implementation(FVector TargetLocation, float Threshold, bool bBackward = false) override;
+	virtual bool MoveToLocation_Implementation(FVector TargetLocation, float Threshold, bool bBackward = false, bool bIgnoreZ = true) override;
 	virtual FVector FindTargetLocation_Implementation(AActor* TargetActor, float DistanceToKeep) override;
 	virtual bool CheckForObstacle_Implementation(float TraceDistance = 50.f, bool bBackward = false) override;
 	virtual bool CheckForGround_Implementation(float TraceDistance = 175.f, bool bBackward = false) override;
