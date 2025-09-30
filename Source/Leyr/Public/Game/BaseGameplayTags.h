@@ -439,6 +439,9 @@ FGameplayTag CombatSocket_RightFeet;
  FGameplayTag Message_Potion_Health_Duration;
  FGameplayTag Message_Potion_Mana_Instant;
  FGameplayTag Message_Potion_Mana_Duration;
+ FGameplayTag Message_Pickup_Feather;
+ FGameplayTag Message_Pickup_Skull;
+ FGameplayTag Message_Pickup_Lantern;
  
  /*
   * Indicators

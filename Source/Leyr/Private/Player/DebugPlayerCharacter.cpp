@@ -1,6 +1,8 @@
 // @ Retropsis 2024-2025.
 
 #include "Player/DebugPlayerCharacter.h"
+
+#include "AbilitySystem/BaseAttributeSet.h"
 #include "Game/LeyrGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/PlayerCharacterController.h"
@@ -46,4 +48,14 @@ void ADebugPlayerCharacter::BeginPlay()
 		Execute_AddToSkillPoints(this, SkillPointReward);
 	}
 	Execute_AddToXP(this, XPToReward);
+
+	FTimerHandle RefillTimer;
+	GetWorld()->GetTimerManager().SetTimer(RefillTimer, FTimerDelegate::CreateLambda([this] ()
+	{
+		if (UBaseAttributeSet* BaseAttributeSet = Cast<UBaseAttributeSet>(GetAttributeSet()))
+		{
+			BaseAttributeSet->SetHealth(BaseAttributeSet->GetMaxHealth());
+			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, FString::Printf(TEXT("Health: %f / %f"), BaseAttributeSet->GetHealth(), BaseAttributeSet->GetMaxHealth()));
+		}
+	}), .1f, false);
 }

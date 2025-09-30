@@ -509,6 +509,9 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Message_Potion_Health_Duration = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Message.Potion.Health.Duration"), FString("Message Potion Health Duration"));
 	GameplayTags.Message_Potion_Mana_Instant = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Message.Potion.Mana.Instant"), FString("Message Potion Mana Instant"));
 	GameplayTags.Message_Potion_Mana_Duration = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Message.Potion.Mana.Duration"), FString("Message Potion Mana Duration"));
+	GameplayTags.Message_Pickup_Feather = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Message.Pickup.Feather"), FString("Message Pickup Feather"));
+	GameplayTags.Message_Pickup_Skull = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Message.Pickup.Skull"), FString("Message Pickup Skull"));
+	GameplayTags.Message_Pickup_Lantern = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Message.Pickup.Lantern"), FString("Message Pickup Lantern"));
 	
 	/*
 	 * Indicators

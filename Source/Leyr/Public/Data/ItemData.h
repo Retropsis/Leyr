@@ -26,6 +26,7 @@ enum class EItemType : uint8
 	Equipment UMETA(DisplayName="Equipment"),
 	Armor UMETA(DisplayName="Armor"),
 	Consumable UMETA(DisplayName="Consumable"),
+	ActivateOnPickup UMETA(DisplayName="ActivateOnPickup"),
 };
 
 /**

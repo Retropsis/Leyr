@@ -1,6 +1,8 @@
 // @ Retropsis 2024-2025.
 
 #include "World/Item.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 #include "PaperFlipbookComponent.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "Components/SphereComponent.h"
@@ -61,6 +63,7 @@ void AItem::InitializeItemFromDataTable(const FName& RowName, const bool bDespaw
 				GetRenderComponent()->SetFlipbook(Asset->PickupFlipbook);
 				ItemData.bStackable = Asset->bIsStackable;
 				ItemData.EquipmentSlot = Asset->EquipmentSlot;
+				if (Asset->ItemType == EItemType::ActivateOnPickup) Sphere->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnBeginOverlap);
 			}
 			ItemData = ItemDataRow->ItemData;
 			bShouldDespawn = bDespawn;
@@ -94,10 +97,7 @@ void AItem::BeginPlay()
 		{
 			ItemData = ULeyrAbilitySystemLibrary::FindItemDataByRowName(this, ItemRowHandle.RowName);
 		}
-		// Sphere->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnBeginOverlap);
 		Sphere->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		// Sphere->SetSimulatePhysics(true);
-		// Sphere->SetEnableGravity(true);
 		Sphere->SetNotifyRigidBodyCollision(true);
 		Sphere->OnComponentHit.AddDynamic(this, &AItem::HandleOnHit);
 	
@@ -114,6 +114,20 @@ void AItem::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 	// {
 	// 	// if (InventoryComponent->TryAddItem(ItemData)) Destroy();
 	// }
+	if (UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor))
+	{
+		for (const TSubclassOf<UGameplayEffect> Effect : ItemData.Asset.Get()->Effects)
+		{
+			if (IsValid(Effect))
+			{
+				const UGameplayEffect* GameplayEffect = Effect->GetDefaultObject<UGameplayEffect>();
+				FGameplayEffectContextHandle ContextHandle =TargetASC->MakeEffectContext();
+				ContextHandle.AddSourceObject(TargetASC->GetAvatarActor());
+				TargetASC->ApplyGameplayEffectToSelf(GameplayEffect, 1.f, ContextHandle);
+			}
+		}
+		Destroy();
+	}
 }
 
 void AItem::HandleOnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
