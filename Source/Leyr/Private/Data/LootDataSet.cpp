@@ -16,6 +16,7 @@ TArray<FLootData> ULootDataSet::GetLootItems()
 				LootItem.ItemClass = Item.ItemClass;
 				LootItem.ItemRowHandle = Item.ItemRowHandle;
 				LootItem.bLootLevelOverride = Item.bLootLevelOverride;
+				LootItem.bShouldDespawn = Item.bShouldDespawn;
 				ItemsToDrop.Add(LootItem);
 			}
 		}

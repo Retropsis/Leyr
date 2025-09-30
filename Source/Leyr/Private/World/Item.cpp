@@ -49,7 +49,7 @@ void AItem::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 }
 #endif
 
-void AItem::InitializeItemFromDataTable(const FName& RowName)
+void AItem::InitializeItemFromDataTable(const FName& RowName, const bool bDespawn)
 {
 	if(ItemDataTable)
 	{
@@ -63,6 +63,7 @@ void AItem::InitializeItemFromDataTable(const FName& RowName)
 				ItemData.EquipmentSlot = Asset->EquipmentSlot;
 			}
 			ItemData = ItemDataRow->ItemData;
+			bShouldDespawn = bDespawn;
 #if WITH_EDITOR
 			SetActorLabel(FString::Printf(TEXT("BP_%s"), *ItemData.Asset.GetAssetName()));
 #endif
@@ -95,8 +96,8 @@ void AItem::BeginPlay()
 		}
 		// Sphere->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnBeginOverlap);
 		Sphere->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		Sphere->SetSimulatePhysics(true);
-		Sphere->SetEnableGravity(true);
+		// Sphere->SetSimulatePhysics(true);
+		// Sphere->SetEnableGravity(true);
 		Sphere->SetNotifyRigidBodyCollision(true);
 		Sphere->OnComponentHit.AddDynamic(this, &AItem::HandleOnHit);
 	
@@ -121,6 +122,9 @@ void AItem::HandleOnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, U
 	Sphere->SetEnableGravity(false);
 	Sphere->SetNotifyRigidBodyCollision(false);
 	Sphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	bSinusoidalMovement = true;
+	InitialLocation = GetActorLocation();
+	CalculatedLocation = InitialLocation;
 }
 
 void AItem::Interact_Implementation(AActor* InteractingActor)
@@ -137,9 +141,9 @@ void AItem::Interact_Implementation(AActor* InteractingActor)
 
 void AItem::StartSinusoidalMovement()
 {
-	bSinusoidalMovement = true;
-	InitialLocation = GetActorLocation();
-	CalculatedLocation = InitialLocation;
+	Sphere->SetSimulatePhysics(true);
+	Sphere->SetEnableGravity(true);
+	// bSinusoidalMovement = true;
 }
 
 void AItem::StartRotation()

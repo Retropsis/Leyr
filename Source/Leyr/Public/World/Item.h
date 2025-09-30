@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "PaperFlipbookActor.h"
+#include "Components/SphereComponent.h"
 #include "GameFramework/Actor.h"
 #include "Interaction/InteractionInterface.h"
 #include "Interaction/SaveInterface.h"
@@ -26,7 +27,7 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 	UFUNCTION(BlueprintCallable)
-	void InitializeItemFromDataTable(const FName& RowName);
+	void InitializeItemFromDataTable(const FName& RowName, bool bDespawn = false);
 
 #if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
@@ -39,7 +40,8 @@ public:
 	void HandleOnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	
 	virtual void Interact_Implementation(AActor* InteractingActor) override;
-
+	virtual bool ShouldDespawn_Implementation() override { return bShouldDespawn; }
+	
 	//~ Save Interface
 	virtual void LoadActor_Implementation() override;
 	//~ Save Interface
@@ -70,6 +72,12 @@ public:
  
 	UFUNCTION(BlueprintCallable)
 	void StartRotation();
+	
+	UFUNCTION(BlueprintPure)
+	bool IsSimulatingPhysics() const { return Sphere->IsSimulatingPhysics(); }
+	
+	UFUNCTION(BlueprintPure)
+	bool ShouldBounce() const { return bShouldBounce; }
 	
 	UPROPERTY(BlueprintReadWrite)
 	FVector CalculatedLocation;
@@ -107,4 +115,6 @@ private:
 	
 	void ItemMovement(float DeltaTime);
 	float RunningTime = 0.f;
+	bool bShouldDespawn = false;
+	bool bShouldBounce = false;
 };

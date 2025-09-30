@@ -25,6 +25,9 @@ struct FLootData
  
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Loot")
 	bool bLootLevelOverride = true;
+ 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Loot")
+	bool bShouldDespawn = false;
 };
 
 /**

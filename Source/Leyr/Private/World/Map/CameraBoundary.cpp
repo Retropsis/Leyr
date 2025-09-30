@@ -9,8 +9,10 @@
 #include "AI/AICharacter.h"
 #include "Data/LevelAreaData.h"
 #include "Engine/OverlapResult.h"
+#include "Interaction/InteractionInterface.h"
 #include "Interaction/LevelActorInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "World/Item.h"
 #include "World/Data/CameraData.h"
 #include "World/Level/Spawner/EncounterSpawnVolume.h"
 
@@ -202,6 +204,10 @@ void ACameraBoundary::ToggleLevelActorActivity(bool bActivate) const
 		{
 			ILevelActorInterface::Execute_ToggleActivate(Overlap.GetActor(), bActivate);
 			if (bActivate) ILevelActorInterface::Execute_ResetState(Overlap.GetActor());
+		}
+		if (AItem* Item = Cast<AItem>(Overlap.GetActor()))
+		{
+			if (IInteractionInterface::Execute_ShouldDespawn(Item)) Overlap.GetActor()->Destroy();
 		}
 	}
 }

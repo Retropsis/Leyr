@@ -56,6 +56,8 @@ void ABreakableLight::Extinguish()
 	BoxComponent->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	BoxComponent->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	BoxComponent->SetSimulatePhysics(true);
+	BoxComponent->SetBoxExtent(FVector{ 14.f });
+	BoxComponent->AddImpulse(FVector{ FMath::RandRange(-150.f, 150.f), 0.f, 0.f }, NAME_None, true);
 	GetRenderComponent()->SetFlipbook(ExtinguishFlipbook);
 	GetRenderComponent()->SetLooping(false);
 	PointLightComponent->SetVisibility(false);
@@ -85,12 +87,11 @@ void ABreakableLight::ResetState_Implementation()
 {
 	BoxComponent->OnComponentHit.AddUniqueDynamic(this, &ABreakableLight::OnHit);
 	BoxComponent->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Ignore);
-	// BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	BoxComponent->SetSimulatePhysics(false);
 	BoxComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 	BoxComponent->SetRelativeLocation(FVector:: ZeroVector);
 	BoxComponent->SetRelativeRotation(FRotator::ZeroRotator);
-	// BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	BoxComponent->SetBoxExtent(FVector{ 32.f });
 	
 	bHasInteracted = false;
 	HaloComponent->SetVisibility(true);

@@ -34,4 +34,7 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool ShouldBlockProjectile();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool ShouldDespawn();
 };
