@@ -14,6 +14,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "World/Item.h"
 #include "World/Data/CameraData.h"
+#include "World/Level/Spawner/EncounterSpawnPoint.h"
 #include "World/Level/Spawner/EncounterSpawnVolume.h"
 
 ACameraBoundary::ACameraBoundary()
@@ -103,6 +104,8 @@ void ACameraBoundary::InitializeSpawnVolumes()
 		SpawningVolume->SetEncounterSpawnData(LevelAreaData->EncounterSpawns[i]);
 		SpawningVolume->InitializeSpawnPoints();
 		SpawningVolume->TileMapBounds = TileMapBounds;
+		FString NewLabel = LevelAreaData->EncounterSpawns[i].EncounterClass->GetName().Replace(TEXT("BP"), TEXT("SpawningVolume"));
+		SpawningVolume->SetActorLabel(NewLabel);
 		SpawningVolumes.Add(SpawningVolume);
 		Offset.X += 50.f;
 	}
@@ -118,6 +121,8 @@ void ACameraBoundary::UpdateSpawnVolumes()
 		{
 			SpawningVolumes[i]->SetEncounterSpawnData(LevelAreaData->EncounterSpawns[i]);
 			SpawningVolumes[i]->UpdateSpawnPoints();
+			FString NewLabel = LevelAreaData->EncounterSpawns[i].EncounterClass->GetName().Replace(TEXT("BP"), TEXT("SpawningVolume"));
+			SpawningVolumes[i]->SetActorLabel(NewLabel);
 		}
 	}
 }
@@ -149,6 +154,14 @@ void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 	}
 }
 
+void ACameraBoundary::HandleOnBeginOverlap(AActor* OtherActor)
+{
+	if (OtherActor->Implements<UPlayerInterface>())
+	{
+		IPlayerInterface::Execute_SetCameraInterpolation(OtherActor, this, ECameraInterpState::Entering);
+	}
+}
+
 /*
  * Encounters from the previous Boundary are destroyed when the player leaves
  * (doesn't handle case where encounter destroyed if itself leaves)
@@ -159,19 +172,27 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	{
 		OnPlayerLeaving.Broadcast();
 		DestroyOutOfBoundsEncounters();
+		
+		FTimerHandle DestroyTimer;
+		GetWorld()->GetTimerManager().SetTimer(DestroyTimer, FTimerDelegate::CreateLambda([this] ()
+		{
+			for (const TObjectPtr<AEncounterSpawnVolume> SpawningVolume : SpawningVolumes)
+			{
+				for (AEncounterSpawnPoint* SpawnPoint : SpawningVolume->GetSpawnPoints())
+				{
+					SpawnPoint->DespawnEncounter();
+				}
+			}
+		}), 2.f, false);
+
 		ToggleLevelActorActivity(false);
 		LevelArea_GrantedHandles.TakeFromAbilitySystem(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor));
 	}
 }
 
-void ACameraBoundary::HandleOnBeginOverlap(AActor* OtherActor)
-{
-	if (OtherActor->Implements<UPlayerInterface>())
-	{
-		IPlayerInterface::Execute_SetCameraInterpolation(OtherActor, this, ECameraInterpState::Entering);
-	}
-}
-
+/*
+ *  Handles the case when player leaves, despawn all ?
+ */
 void ACameraBoundary::DestroyOutOfBoundsEncounters() const
 {
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;

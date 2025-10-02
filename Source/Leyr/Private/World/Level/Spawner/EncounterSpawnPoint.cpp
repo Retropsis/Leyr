@@ -29,10 +29,12 @@ void AEncounterSpawnPoint::SpawnEncounterGroup()
 				{
 					GetSpawnLocations();
 					FTimerHandle SpawnTimer;
-					GetWorld()->GetTimerManager().SetTimer(SpawnTimer, FTimerDelegate::CreateLambda([this, LoadedAsset, i] ()
+					SpawnTimers.Add(SpawnTimer);
+					GetWorld()->GetTimerManager().SetTimer(SpawnTimer, FTimerDelegate::CreateLambda([this, LoadedAsset, i, SpawnTimer] ()
 					{
 						DetermineSpawnTransform(i);
 						SpawnEncounter(LoadedAsset, SpawnTransform);
+						SpawnTimers.Remove(SpawnTimer);
 					}), SpawnDelay * (i + 1), false);
 				}
 			}
@@ -44,10 +46,12 @@ void AEncounterSpawnPoint::SpawnEncounterGroup()
 		{
 			GetSpawnLocations();
 			FTimerHandle SpawnTimer;
-			GetWorld()->GetTimerManager().SetTimer(SpawnTimer, FTimerDelegate::CreateLambda([this, i] ()
+			SpawnTimers.Add(SpawnTimer);
+			GetWorld()->GetTimerManager().SetTimer(SpawnTimer, FTimerDelegate::CreateLambda([this, i, SpawnTimer] ()
 			{
 				DetermineSpawnTransform(i);
 				SpawnEncounter(EncounterData->EncounterClass.Get(), SpawnTransform);
+				SpawnTimers.Remove(SpawnTimer);
 			}), SpawnDelay * (i + 1), false);
 		}
 	}
@@ -128,7 +132,17 @@ void AEncounterSpawnPoint::DetermineSpawnTransform(int32 SpawnLocationIndex)
 	case ESpawnLocationType::OutOfBounds:
 		if (Target && SpawnLocationType == ESpawnLocationType::OutOfBounds)
 		{
-			SetActorLocation(FVector{ GetActorLocation().X, 0.f, Target->GetActorLocation().Z });
+			const FVector SpawnBoundsOrigin = (SpawningBounds.Left + SpawningBounds.Right) / 2.f;
+			if (SpawnBoundsOrigin.X < Target->GetActorLocation().X)
+			{
+				SetActorLocation(FVector{ SpawningBounds.Left.X - 50.f, 0.f, Target->GetActorLocation().Z });
+				UKismetSystemLibrary::DrawDebugSphere(this, GetActorLocation(), 25.f, 20, FColor::White, true);
+			}
+			else
+			{
+				SetActorLocation(FVector{ SpawningBounds.Right.X + 50.f, 0.f, Target->GetActorLocation().Z });
+				UKismetSystemLibrary::DrawDebugSphere(this, GetActorLocation(), 25.f, 20, FColor::White, true);
+			}
 			SpawnTransform = GetActorTransform();
 		}
 		break;
@@ -143,7 +157,7 @@ void AEncounterSpawnPoint::Respawn(AActor* DefeatedEncounter)
 	if(SpawnerType == ESpawnerType::Infinite)
 	{
 		FTimerHandle RespawnTimer;
-		RespawnTimers.Add(RespawnTimer);
+		SpawnTimers.Add(RespawnTimer);
 		GetWorldTimerManager().SetTimer(RespawnTimer, [this] ()
 		{
 			if (SpawnLocationType == ESpawnLocationType::OutOfBounds)
@@ -163,6 +177,16 @@ void AEncounterSpawnPoint::Respawn(AActor* DefeatedEncounter)
 	}
 }
 
+void AEncounterSpawnPoint::ClearSpawnTimers()
+{
+	for (FTimerHandle RespawnTimer : SpawnTimers)
+	{
+		GetWorldTimerManager().ClearTimer(RespawnTimer);
+		RespawnTimer.Invalidate();
+	}
+	SpawnTimers.Empty();
+}
+
 /*
  * Despawn encounter when player leaves
  * (not killed, it doesn't respawn and timer is invalidated)
@@ -177,11 +201,7 @@ void AEncounterSpawnPoint::DespawnEncounter()
 			CurrentSpawns.Shrink();
 		}
 	}
-	for (FTimerHandle RespawnTimer : RespawnTimers)
-	{
-		GetWorldTimerManager().ClearTimer(RespawnTimer);
-		RespawnTimer.Invalidate();
-	}
+	ClearSpawnTimers();
 }
 
 /*

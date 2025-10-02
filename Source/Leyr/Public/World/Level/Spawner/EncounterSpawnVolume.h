@@ -47,6 +47,7 @@ public:
 	void HandlePlayerEntering();
 	
 	void ClearSpawnPoints();
+	TArray<AEncounterSpawnPoint*> GetSpawnPoints() { return SpawnPoints; }
 	void SetEncounterSpawnData(const FEncounterSpawn& Data) { EncounterSpawnData = Data; }
 
 	UFUNCTION(BlueprintImplementableEvent)

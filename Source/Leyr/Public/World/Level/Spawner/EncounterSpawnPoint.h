@@ -34,6 +34,7 @@ public:
 
 	UFUNCTION()
 	void Respawn(AActor* DefeatedEncounter);
+	void ClearSpawnTimers();
 
 	void DespawnEncounter();
 	bool RequestRespawnEncounter(AAICharacter* Encounter);
@@ -73,5 +74,5 @@ public:
 
 private:
 	UPROPERTY() TArray<TObjectPtr<AActor>> CurrentSpawns;
-	TArray<FTimerHandle> RespawnTimers;
+	TArray<FTimerHandle> SpawnTimers;
 };
