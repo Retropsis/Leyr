@@ -146,9 +146,18 @@ void AEncounterSpawnPoint::Respawn(AActor* DefeatedEncounter)
 		RespawnTimers.Add(RespawnTimer);
 		GetWorldTimerManager().SetTimer(RespawnTimer, [this] ()
 		{
-			// DetermineSpawnTransform();
-			if (Target) SpawnTransform.SetLocation(FindRandomPointWithinBounds(Target->GetActorLocation()));
-			else SpawnTransform.SetLocation(FindRandomPointWithinBounds(GetActorLocation()));
+			if (SpawnLocationType == ESpawnLocationType::OutOfBounds)
+			{
+				DetermineSpawnTransform();
+			}
+			else if (Target)
+			{
+				SpawnTransform.SetLocation(FindRandomPointWithinBounds(Target->GetActorLocation()));
+			}
+			else
+			{
+				SpawnTransform.SetLocation(FindRandomPointWithinBounds(GetActorLocation()));
+			}
 			SpawnEncounter(EncounterData->EncounterClass.Get(), SpawnTransform);
 		}, RespawnTime, false);
 	}
