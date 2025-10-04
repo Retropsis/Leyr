@@ -6,6 +6,7 @@
 #include "World/Level/Platform.h"
 #include "TransientPlatform.generated.h"
 
+class UNiagaraSystem;
 class APlayerCharacter;
 class UPaperFlipbookComponent;
 
@@ -46,6 +47,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category="Platform")
 	TObjectPtr<UPaperFlipbookComponent> FlipbookComponent;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Platform")
+	TObjectPtr<UNiagaraSystem> RubblesEffect;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Platform")
+	FVector RubblesEffectOffset = FVector(0, 0, 0);
 	
 	UPROPERTY(EditAnywhere, Category="Platform")
 	bool bFallingPlatform = false;

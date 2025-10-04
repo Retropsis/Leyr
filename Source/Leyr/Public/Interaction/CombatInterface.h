@@ -69,7 +69,7 @@ public:
 	UNiagaraSystem* GetWoundImpactEffect(const FGameplayTag WoundImpactTag);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	FVector GetPreferredHitLocation();
+	FVector GetPreferredHitLocation(FVector ImpactLocation = FVector::ZeroVector);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	USoundBase* ImpactSoundFromTag(const FGameplayTag& MontageTag, ESequenceType SequenceType);

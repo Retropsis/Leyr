@@ -5,6 +5,7 @@
 #include "AI/MultiPartAnimInstance.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 AMultiPartAICharacter::AMultiPartAICharacter()
 {
@@ -50,6 +51,28 @@ void AMultiPartAICharacter::SetMultiPartAnimInstance(const TSubclassOf<UAnimInst
 	{
 		MultiPartFlipbook->SetAnimInstanceClass(NewInstance);
 	}
+}
+
+FVector AMultiPartAICharacter::GetPreferredHitLocation_Implementation(FVector ImpactLocation)
+{
+	// UKismetSystemLibrary::DrawDebugSphere(this, ImpactLocation, 22.f, 12, FLinearColor::Blue, 8.f);
+	// FVector ClosestHitLocation;
+	// float ClosestDistance = FLT_MAX;
+	// TArray<FTransform> BoneTransforms = MultiPartFlipbook->GetBoneSpaceTransforms();
+	// for (FTransform BoneSpaceTransform : BoneTransforms)
+	// {
+	// 	FVector BoneWorldLocation = GetActorLocation() + BoneSpaceTransform.GetLocation();
+	// 	UKismetSystemLibrary::DrawDebugSphere(this, GetActorLocation() + BoneSpaceTransform.GetLocation(), 29.f, 12, FLinearColor::Red, 8.f);
+	// 	const float BoneDistance = FVector::Distance(ImpactLocation, BoneWorldLocation);
+	// 	if (ClosestDistance > BoneDistance)
+	// 	{
+	// 		ClosestHitLocation = BoneWorldLocation;
+	// 		ClosestDistance = BoneDistance;
+	// 	}
+	// }
+	// UKismetSystemLibrary::DrawDebugSphere(this, ClosestHitLocation, 33.f, 12, FLinearColor::Green, 8.f);
+	// return ClosestHitLocation;
+	return ImpactLocation;
 }
 
 void AMultiPartAICharacter::MulticastHandleDeath(const FVector& DeathImpulse, EDefeatState InDefeatState)

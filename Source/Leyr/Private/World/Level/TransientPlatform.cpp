@@ -1,6 +1,8 @@
 // @ Retropsis 2024-2025.
 
 #include "World/Level/TransientPlatform.h"
+
+#include "NiagaraFunctionLibrary.h"
 #include "Components/BoxComponent.h"
 #include "PaperFlipbookComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -62,6 +64,7 @@ void ATransientPlatform::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent
 			GetWorld()->GetTimerManager().SetTimer(PlatformTimer, this, &ATransientPlatform::StartCollapsing, PlatformTime);
 		}
 		else FlipbookComponent->Play();
+		if (RubblesEffect) UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, RubblesEffect, GetActorLocation() + RubblesEffectOffset);
 		bCanOverlap = false;
 	}
 }
@@ -89,6 +92,7 @@ void ATransientPlatform::StartCollapsing()
 void ATransientPlatform::HandleOnFinishedPlaying()
 {
 	FlipbookComponent->Stop();
+	if (RubblesEffect) UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, RubblesEffect, GetActorLocation() + RubblesEffectOffset);
 		
 	if(bFallingPlatform)
 	{

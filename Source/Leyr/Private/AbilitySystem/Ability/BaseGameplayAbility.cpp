@@ -259,6 +259,30 @@ bool UBaseGameplayAbility::CommitInventoryCost(bool bIsSelfCost)
 	return false;
 }
 
+void UBaseGameplayAbility::ExecuteAbilityGameplayCue(FGameplayTag GameplayCueTag, const FGameplayTag AdditionalTag)
+{
+	/*
+	 * Things I need here:
+	 * Forward Direction
+	 * Effect To Play
+	 * Sound To Play
+	 */
+	GameplayCueDefinition->HitActor = GetAvatarActorFromActorInfo();
+	// GameplayCueDefinition->ImpactEffect = ICombatInterface::Execute_GetWoundImpactEffect(HitActor, WoundImpactTag);
+	// GameplayCueDefinition->ImpactSound = ICombatInterface::Execute_ImpactSoundFromTag(GetAvatarActorFromActorInfo(), MontageTag, SequenceType);
+		
+	FGameplayCueParameters GameplayCueParameters;
+	GameplayCueParameters.Location = GetAvatarActorFromActorInfo()->GetActorLocation();
+	GameplayCueParameters.EffectCauser = GetAvatarActorFromActorInfo();
+	GameplayCueParameters.SourceObject = GameplayCueDefinition;
+	GameplayCueParameters.AggregatedSourceTags = MontageTag.GetSingleTagContainer();
+
+	if (UAbilitySystemComponent* const AbilitySystemComponent = GetAbilitySystemComponentFromActorInfo())
+	{
+		AbilitySystemComponent->ExecuteGameplayCue(GameplayCueTag, GameplayCueParameters);
+	}
+}
+
 FString UBaseGameplayAbility::GetDescription(int32 Level)
 {
 	return FString::Printf(TEXT("<Default>%s, </><Level>%d</>"), L"Default Ability Name - LoremIpsum LoremIpsum LoremIpsum LoremIpsum LoremIpsum LoremIpsum LoremIpsum LoremIpsum LoremIpsum LoremIpsum LoremIpsum LoremIpsum LoremIpsum LoremIpsum LoremIpsum LoremIpsum", Level);

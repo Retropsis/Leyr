@@ -88,6 +88,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool CommitInventoryCost(bool bIsSelfCost = true);
 	
+	UFUNCTION(BlueprintCallable, meta=(GameplayTagFilter="GameplayCue"))
+	void ExecuteAbilityGameplayCue(FGameplayTag GameplayCueTag, const FGameplayTag AdditionalTag);
+	
 	virtual FString GetDescription(int32 Level);
 	virtual FString GetNextLevelDescription(int32 Level);
 	static FString GetLockedDescription(int32 Level);

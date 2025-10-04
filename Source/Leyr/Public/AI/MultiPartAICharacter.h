@@ -27,6 +27,10 @@ public:
 	virtual void SetMultiPartAnimInstance(TSubclassOf<UAnimInstance> NewInstance) override;
 	//~ IMultiPartAIInterface
 	
+	//~ CombatInterface
+	virtual FVector GetPreferredHitLocation_Implementation(FVector ImpactLocation = FVector::ZeroVector) override;
+	//~ CombatInterface
+	
 	UFUNCTION(BlueprintImplementableEvent)
 	void PlayHitReactMontage();
 

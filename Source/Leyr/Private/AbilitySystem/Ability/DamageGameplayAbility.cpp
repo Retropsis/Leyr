@@ -80,7 +80,7 @@ void UDamageGameplayAbility::CauseDamage(UAbilitySystemComponent* TargetASC)
 	const float CharacterLevel = ICombatInterface::Execute_GetCharacterLevel(GetAvatarActorFromActorInfo());
 	const float Value = GetAbilityLevel() * AbilityLevelRatio + CharacterLevel * CharacterLevelRatio;
 	const float ScaledDamage = AbilityPower.GetValueAtLevel(Value);
-	GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Emerald, FString::Printf(TEXT("AbilityLevel: %d, AbilityLevelRatio: %f, CharacterLevel: %f, CharacterLevelRatio: %f"),GetAbilityLevel(), AbilityLevelRatio, CharacterLevel, CharacterLevelRatio));
+	// GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Emerald, FString::Printf(TEXT("AbilityLevel: %d, AbilityLevelRatio: %f, CharacterLevel: %f, CharacterLevelRatio: %f"),GetAbilityLevel(), AbilityLevelRatio, CharacterLevel, CharacterLevelRatio));
 	
 	if (bShouldExecute)
 	{
@@ -126,7 +126,7 @@ void UDamageGameplayAbility::ForEachHitTryCausingDamage(TArray<FHitResult> HitRe
 				}
 				if (Hit.GetActor() && Hit.GetActor()->Implements<UCombatInterface>())
 				{
-					GameplayCueDefinition->PreferredHitLocation = ICombatInterface::Execute_GetPreferredHitLocation(Hit.GetActor());
+					GameplayCueDefinition->PreferredHitLocation = ICombatInterface::Execute_GetPreferredHitLocation(Hit.GetActor(), Hit.ImpactPoint);
 				}
 				// HitLocation = (Loc + Hit.ImpactPoint) / 2.f;
 				HitLocation = Hit.ImpactPoint;

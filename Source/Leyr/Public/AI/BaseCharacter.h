@@ -136,7 +136,7 @@ protected:
 	virtual UPaperZDAnimSequence* GetHitReactSequence_Implementation(const FGameplayTag& SequenceTag) override;
 	virtual USoundBase* ImpactSoundFromTag_Implementation(const FGameplayTag& MontageTag, ESequenceType SequenceType) override;
 	virtual UNiagaraSystem* GetWoundImpactEffect_Implementation(const FGameplayTag WoundImpactTag) override;
-	virtual FVector GetPreferredHitLocation_Implementation() override { return HitLocationPoint->GetComponentLocation(); }
+	virtual FVector GetPreferredHitLocation_Implementation(FVector ImpactLocation = FVector::ZeroVector) override { return HitLocationPoint->GetComponentLocation(); }
 	virtual void SetImpactSoundLoaded_Implementation(USoundBase* ImpactSound) override { ImpactSoundLoaded = ImpactSound; }
 	virtual USoundBase* GetImpactSoundLoaded_Implementation() override { return ImpactSoundLoaded; }
 
