@@ -31,6 +31,7 @@ public:
 	ABaseCharacter();
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void Landed(const FHitResult& Hit) override;
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; } 
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	UPaperZDAnimInstance* SetWeaponAnimInstance(const TSubclassOf<UPaperZDAnimInstance>& AnimInstance) const;
@@ -241,6 +242,9 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr< UMaterialInstanceDynamic> DynamicSpriteInstance = nullptr;
+
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UNiagaraSystem> LandingEffect = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category="Character|HitReact")
 	float HitReactFlashStrength = 1.f;

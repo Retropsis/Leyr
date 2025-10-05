@@ -26,4 +26,7 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, meta=(ExposeOnSpawn))
 	AActor* HitActor = nullptr;
+	
+	UPROPERTY(BlueprintReadOnly, meta=(ExposeOnSpawn))
+	FVector ActorForwardVector;
 };

@@ -368,6 +368,9 @@ FGameplayTag GameplayCue_Wound_Impact_Large_Random;
 FGameplayTag GameplayCue_Bite;
 FGameplayTag GameplayCue_Execute;
 FGameplayTag GameplayCue_Shield;
+FGameplayTag GameplayCue_Dodge_Dust;
+FGameplayTag GameplayCue_Dodge_AfterImage;
+FGameplayTag GameplayCue_Slide;
 	
 FGameplayTag GameplayCue_WaterSplash_Small;
 FGameplayTag GameplayCue_WaterSplash_Regular;

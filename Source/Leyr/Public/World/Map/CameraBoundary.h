@@ -8,6 +8,8 @@
 #include "Components/BoxComponent.h"
 #include "CameraBoundary.generated.h"
 
+class UNiagaraComponent;
+class UNiagaraSystem;
 struct FActiveGameplayEffectHandle;
 class UGameplayEffect;
 class UAbilitySystemComponent;
@@ -153,9 +155,16 @@ protected:
 		
 	UPROPERTY(EditAnywhere, Category="00 - Camera Boundary|Gameplay Effects", meta=(TitleProperty=GameplayEffect))
 	TArray<FLevelArea_GameplayEffect> GrantedGameplayEffects;
+	
+	UPROPERTY()
+	TArray<TObjectPtr<UNiagaraSystem>> EnvironmentEffects;
+	
+	UPROPERTY()
+	TArray<UNiagaraComponent*> SpawnedEnvironmentEffects;
 
 private:
 	UPROPERTY() TObjectPtr<AActor> TargetActor;
 	UPROPERTY() FLevelArea_GrantedHandles LevelArea_GrantedHandles;
 	FBoxSphereBounds TileMapBounds;
+	bool bEnvironmentEffectsInitialized = false;
 };

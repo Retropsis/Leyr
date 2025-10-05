@@ -3,6 +3,8 @@
 #include "World/Map/CameraBoundary.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Components/BoxComponent.h"
 #include "Interaction/PlayerInterface.h"
 #include "PaperTileMapComponent.h"
@@ -62,6 +64,11 @@ void ACameraBoundary::BeginPlay()
 		if (SpawningVolume == nullptr) continue;
 		OnPlayerLeaving.AddUObject(SpawningVolume, &AEncounterSpawnVolume::HandlePlayerLeaving);
 		OnPlayerEntering.AddUObject(SpawningVolume, &AEncounterSpawnVolume::HandlePlayerEntering);
+	}
+
+	if (LevelAreaData != nullptr)
+	{
+		EnvironmentEffects.Append(LevelAreaData->EnvironmentEffects);
 	}
 }
 
@@ -151,6 +158,27 @@ void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 		OnPlayerEntering.Broadcast();
 		ToggleLevelActorActivity(true);
 		GiveToAbilitySystem(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor), &LevelArea_GrantedHandles);
+
+		if (!bEnvironmentEffectsInitialized)
+		{
+			for (TObjectPtr<UNiagaraSystem> EnvironmentEffect : EnvironmentEffects)
+            {
+            	 UNiagaraComponent* SpawnedEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, EnvironmentEffect, GetActorLocation(),
+            		FRotator::ZeroRotator, FVector(1), false, false);
+				SpawnedEffect->Activate();
+				SpawnedEffect->SetVariableVec3(FName("ShapeLocation"), FVector{ CameraBoundary->GetScaledBoxExtent() });
+            	SpawnedEnvironmentEffects.Add(SpawnedEffect);
+            }
+            bEnvironmentEffectsInitialized = true;
+		}
+		else
+		{
+			for (UNiagaraComponent* SpawnedEnvironmentEffect : SpawnedEnvironmentEffects)
+			{
+				SpawnedEnvironmentEffect->Activate();
+			}
+		}
+
 	}
 }
 
@@ -187,6 +215,14 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 
 		ToggleLevelActorActivity(false);
 		LevelArea_GrantedHandles.TakeFromAbilitySystem(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor));
+		
+		if (bEnvironmentEffectsInitialized)
+		{
+			for (UNiagaraComponent* SpawnedEnvironmentEffect : SpawnedEnvironmentEffects)
+			{
+				SpawnedEnvironmentEffect->DeactivateImmediate();
+			}
+		}
 	}
 }
 

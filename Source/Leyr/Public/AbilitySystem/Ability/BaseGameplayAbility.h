@@ -100,6 +100,12 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Ability|Input", meta=(Categories="InputTag"))
 	FGameplayTag StartupInputTag;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Assets")
+	TObjectPtr<USoundBase>  AbilitySound = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Ability|Assets")
+	TObjectPtr<UNiagaraSystem>  AbilityEffect = nullptr;
 
 protected:
 	void TryActivateAbilityOnSpawn(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) const;

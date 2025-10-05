@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "LevelAreaData.generated.h"
 
+class UNiagaraSystem;
 struct FEncounterSpawn;
 class UGameplayEffect;
 class UEncounterSpawnData;
@@ -23,4 +24,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSubclassOf<UGameplayEffect>> GrantedGameplayEffects;
+
+	UPROPERTY(EditDefaultsOnly)
+	TArray<TObjectPtr<UNiagaraSystem>> EnvironmentEffects;
 };

@@ -264,12 +264,11 @@ void UBaseGameplayAbility::ExecuteAbilityGameplayCue(FGameplayTag GameplayCueTag
 	/*
 	 * Things I need here:
 	 * Forward Direction
-	 * Effect To Play
-	 * Sound To Play
 	 */
 	GameplayCueDefinition->HitActor = GetAvatarActorFromActorInfo();
-	// GameplayCueDefinition->ImpactEffect = ICombatInterface::Execute_GetWoundImpactEffect(HitActor, WoundImpactTag);
-	// GameplayCueDefinition->ImpactSound = ICombatInterface::Execute_ImpactSoundFromTag(GetAvatarActorFromActorInfo(), MontageTag, SequenceType);
+	GameplayCueDefinition->ImpactEffect = AbilityEffect;
+	GameplayCueDefinition->ImpactSound = AbilitySound;
+	GameplayCueDefinition->ActorForwardVector = GetAvatarActorFromActorInfo()->GetActorForwardVector();
 		
 	FGameplayCueParameters GameplayCueParameters;
 	GameplayCueParameters.Location = GetAvatarActorFromActorInfo()->GetActorLocation();
