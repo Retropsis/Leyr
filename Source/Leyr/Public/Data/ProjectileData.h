@@ -56,6 +56,9 @@ public:
 	TObjectPtr<UNiagaraSystem> ImpactEffect = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Projectile")
+	TObjectPtr<UNiagaraSystem> GhostTrailEffect = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Projectile")
 	TObjectPtr<USoundBase> ImpactSound = nullptr;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Projectile")

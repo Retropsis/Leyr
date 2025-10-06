@@ -29,6 +29,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
 #include "Data/AbilitySet.h"
 #include "Data/InventoryCostData.h"
@@ -1597,6 +1598,8 @@ void APlayerCharacter::Die(const FVector& DeathImpulse, bool bExecute)
 	HandleCombatState(ECombatState::Defeated);
 	if (PreviousCombatState == ECombatState::Swimming) GetCharacterMovement()->GravityScale = 0.f;
 	if (PreviousCombatState == ECombatState::Entangled) GetCharacterMovement()->GravityScale = 0.f;
+	const FVector SpawnLocation = FVector{  0.f, 0.f, /*- GetCapsuleComponent()->GetScaledCapsuleHalfHeight(*/0.f };
+	UNiagaraFunctionLibrary::SpawnSystemAttached(DefeatedAfterImageEffect, GetRootComponent(), FName(), SpawnLocation, FRotator::ZeroRotator, EAttachLocation::KeepRelativeOffset, true, true);
 
 	FTimerDelegate DefeatTimerDelegate;
 	DefeatTimerDelegate.BindLambda([this] ()

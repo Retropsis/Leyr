@@ -184,6 +184,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<UNiagaraComponent> LevelUpNiagaraComponent;
 
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UNiagaraSystem> DefeatedAfterImageEffect = nullptr;
+
 protected:
 	virtual void InitAbilityActorInfo() override;
 	virtual void InitializeCharacterInfo() override;

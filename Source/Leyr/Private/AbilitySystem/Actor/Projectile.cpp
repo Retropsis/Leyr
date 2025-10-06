@@ -3,6 +3,7 @@
 #include "AbilitySystem/Actor/Projectile.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
 #include "Components/AudioComponent.h"
@@ -37,6 +38,9 @@ AProjectile::AProjectile()
 	ProjectileMovement->InitialSpeed = 800.f;
 	ProjectileMovement->MaxSpeed = 800.f;
 	ProjectileMovement->ProjectileGravityScale = 1.f;
+
+	GhostTrail = CreateDefaultSubobject<UNiagaraComponent>("GhostTrail");
+	GhostTrail->SetupAttachment(Sphere);
 }
 
 bool AProjectile::InitProjectileData()
@@ -57,6 +61,7 @@ bool AProjectile::InitProjectileData()
 			bPlayOnHitTimeline = ResponseToStatic == EResponseToStatic::Destroy;
 		}
 		SetImpactEffect(ProjectileData->ImpactEffect);
+		SetGhostTrailEffect(ProjectileData->GhostTrailEffect);
 		SetImpactSound(ProjectileData->ImpactSound);
 		SetLoopingSound(ProjectileData->LoopingSound);
 		return true;
@@ -75,6 +80,12 @@ void AProjectile::BeginPlay()
 	{
 		LoopingSoundComponent = UGameplayStatics::SpawnSoundAttached(LoopingSound, GetRootComponent());
 		LoopingSoundComponent->bStopWhenOwnerDestroyed = true;
+	}
+
+	if (GhostTrailEffect)
+	{
+		GhostTrail = UNiagaraFunctionLibrary::SpawnSystemAttached(GhostTrailEffect, Sphere, FName(), FVector::ZeroVector, FRotator::ZeroRotator,
+			EAttachLocation::KeepRelativeOffset, true, true);
 	}
 	
 	if (HasAuthority() && ProjectileMovement->HomingTargetComponent.IsValid())
@@ -119,6 +130,7 @@ void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AAct
 	
 	if (OtherComp && OtherComp->GetCollisionObjectType() == ECC_WorldStatic)
 	{
+		GhostTrail->DeactivateImmediate();
 		if (ResponseToStatic == EResponseToStatic::Destroy)
 		{
 			if (bPlayOnHitTimeline)

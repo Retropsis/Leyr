@@ -454,7 +454,8 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.GameplayCue_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Execute"), FString("GameplayCue Execute"));
 	GameplayTags.GameplayCue_Dodge_Dust = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Dodge.Dust"), FString("GameplayCue Dodge Dust"));
 	GameplayTags.GameplayCue_Dodge_AfterImage = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Dodge.AfterImage"), FString("GameplayCue Dodge AfterImage"));
-	GameplayTags.GameplayCue_Slide = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Slide"), FString("GameplayCue Slide"));
+	GameplayTags.GameplayCue_Slide_Dust = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Slide.Dust"), FString("GameplayCue Slide Dust"));
+	GameplayTags.GameplayCue_Slide_AfterImage = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Slide.AfterImage"), FString("GameplayCue Slide AfterImage"));
 	GameplayTags.GameplayCue_Alteration_Berserk_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Alteration.Berserk.1"), FString("GameplayCue Alteration Berserk 1"));
 	
 	GameplayTags.GameplayCue_WaterSplash_Small = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.WaterSplash.Small"), FString("GameplayCue WaterSplash_Small"));

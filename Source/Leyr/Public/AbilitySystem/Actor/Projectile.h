@@ -8,6 +8,7 @@
 #include "GameFramework/Actor.h"
 #include "Projectile.generated.h"
 
+class UNiagaraComponent;
 class UProjectileMovementComponent;
 class USphereComponent;
 class UNiagaraSystem;
@@ -22,6 +23,7 @@ public:
 	virtual bool InitProjectileData();
 	virtual bool IsValidOverlap(const AActor* OtherActor);
 	void SetImpactEffect(UNiagaraSystem* Effect) { ImpactEffect = Effect; }
+	void SetGhostTrailEffect(UNiagaraSystem* Effect) { GhostTrailEffect = Effect; }
 	void SetImpactSound(USoundBase* Sound) { ImpactSound = Sound; }
 	void SetLoopingSound(USoundBase* Sound) { LoopingSound = Sound; }
 
@@ -58,11 +60,15 @@ public:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USphereComponent> Sphere;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<UNiagaraComponent> GhostTrail;
 
 	UPROPERTY() TObjectPtr<USceneComponent> HomingTargetComponent;
 	UPROPERTY() TObjectPtr<UAudioComponent> LoopingSoundComponent;
 	UPROPERTY() TObjectPtr<USoundBase> LoopingSound;
 	UPROPERTY() TObjectPtr<UNiagaraSystem> ImpactEffect;
+	UPROPERTY() TObjectPtr<UNiagaraSystem> GhostTrailEffect;
 	UPROPERTY() TObjectPtr<USoundBase> ImpactSound;
 	
 	UPROPERTY(EditDefaultsOnly)
