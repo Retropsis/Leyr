@@ -364,6 +364,7 @@ FGameplayTag GameplayCue_Wound_Impact_Large_1;
 FGameplayTag GameplayCue_Wound_Impact_Large_2;
 FGameplayTag GameplayCue_Wound_Impact_Large_3;
 FGameplayTag GameplayCue_Wound_Impact_Large_Random;
+FGameplayTag GameplayCue_Wound_Impact_AfterImage;
 	
 FGameplayTag GameplayCue_Bite;
 FGameplayTag GameplayCue_Execute;

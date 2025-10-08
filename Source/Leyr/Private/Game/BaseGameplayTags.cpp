@@ -449,6 +449,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.GameplayCue_Wound_Impact_Large_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Large.1"), FString("GameplayCue Wound Large 1 Impact."));
 	GameplayTags.GameplayCue_Wound_Impact_Large_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Large.2"), FString("GameplayCue Wound Large 2 Impact."));
 	GameplayTags.GameplayCue_Wound_Impact_Large_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Large.3"), FString("GameplayCue Wound Large 3 Impact."));
+	GameplayTags.GameplayCue_Wound_Impact_AfterImage = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.AfterImage"), FString("GameplayCue Wound Impact AfterImage."));
 	
 	GameplayTags.GameplayCue_Bite = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Bow.Shot"), FString("GameplayCue Weapon Bow Shot"));
 	GameplayTags.GameplayCue_Execute = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Execute"), FString("GameplayCue Execute"));
