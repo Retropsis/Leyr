@@ -66,5 +66,8 @@ protected:
 	bool bDestroyed = false;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Combat")
+	UNiagaraSystem* InteractEffect;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Combat")
 	USoundBase* DestructionSound;
 };

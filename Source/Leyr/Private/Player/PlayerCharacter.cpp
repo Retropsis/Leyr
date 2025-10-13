@@ -969,6 +969,8 @@ void APlayerCharacter::HandleHangingOnLedge(const FVector& HangingTarget)
 	{
 		SetActorLocation(FVector(HangingTarget.X, 0.f, HangingTarget.Z));
 		HandleCombatState(ECombatState::HangingLedge);
+		
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClimbingLedgeEffect, HangingTarget);
 	}
 }
 

@@ -186,6 +186,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UNiagaraSystem> DefeatedAfterImageEffect = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UNiagaraSystem> ClimbingLedgeEffect = nullptr;
 
 protected:
 	virtual void InitAbilityActorInfo() override;
