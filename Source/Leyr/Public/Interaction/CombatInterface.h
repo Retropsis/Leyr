@@ -107,6 +107,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FTaggedMontage GetTaggedMontageByIndex(int32 Index);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	float GetHitReactDuration();
+	
 	/*
 	 * Spells
 	 */

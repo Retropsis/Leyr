@@ -155,9 +155,12 @@ void ABaseCharacter::MakeAndApplyEffectToSelf(const FGameplayTag Tag, float Leve
 
 void ABaseCharacter::HitReactFlashTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
+	if (HitReactFlashDuration <= 0.f) return;
 	AbilitySystemComponent->RemoveLooseGameplayTag(CallbackTag);
-	PlayFlashEffect(HitReactFlashStrength, HitReactFlashPlayRate, HitReactFlashColor);
-	PlayShakeEffect(ShakingStrength, ShakingPlayRate);
+	PlayFlashEffect(HitReactFlashStrength, 1 / HitReactFlashDuration, HitReactFlashColor);
+	
+	if (ShakingDuration <= 0.f) return;
+	PlayShakeEffect(ShakingStrength, 1 / ShakingDuration);
 }
 
 void ABaseCharacter::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
@@ -350,8 +353,8 @@ void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImp
 	HandleDeathCapsuleComponent(DeathImpulse);
 	// UAssetManager::GetStreamableManager().RequestAsyncLoad(DefeatedSound.ToSoftObjectPath(), FStreamableDelegate::CreateUObject(this, &ABaseCharacter::PlayDeathSound), FStreamableManager::DefaultAsyncLoadPriority);
 	HandleDeath(InDefeatState);
-	PlayFlashEffect(HitReactFlashStrength, HitReactFlashPlayRate, HitReactFlashColor);
-	PlayShakeEffect(ShakingStrength, ShakingPlayRate);
+	PlayFlashEffect(HitReactFlashStrength, HitReactFlashDuration, HitReactFlashColor);
+	PlayShakeEffect(ShakingStrength, ShakingDuration);
 }
 
 void ABaseCharacter::HandleDeathCapsuleComponent(const FVector& DeathImpulse) const

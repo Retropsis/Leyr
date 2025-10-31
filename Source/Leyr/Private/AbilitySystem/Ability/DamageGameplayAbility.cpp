@@ -209,6 +209,8 @@ void UDamageGameplayAbility::SelectMontageTagFromCombatState()
 
 void UDamageGameplayAbility::ExecuteDamageGameplayCue(FGameplayTag GameplayCueTag, const FGameplayTag WoundImpactTag)
 {
+	if (!IsValid(GetAvatarActorFromActorInfo())) return;
+	
 	if (HitActor && HitActor->Implements<UCombatInterface>())
 	{
 		GameplayCueDefinition->HitActor = HitActor;

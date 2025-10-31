@@ -180,6 +180,7 @@ protected:
 	virtual void SetMovementMode_Implementation(EMovementMode MovementMode,  float NewWalkingSpeed = -1.f, float GravityValue = -1.f) override;
 	virtual void AdjustDirectionToFaceTarget_Implementation(AActor* Target) override;
 	virtual void AddImpulse_Implementation(FVector Impulse) override;
+	virtual float GetHitReactDuration_Implementation() override { return HitReactFlashDuration; }
 	//~ Combat Interface
 	
 	FTaggedMontage GetTaggedMontageInfoByTag(const FGameplayTag& MontageTag, ESequenceType SequenceType) const;
@@ -250,7 +251,7 @@ protected:
 	float HitReactFlashStrength = 1.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Character|HitReact")
-	float HitReactFlashPlayRate = 1.f;
+	float HitReactFlashDuration = 1.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Character|HitReact")
 	FLinearColor HitReactFlashColor = FLinearColor::Red;
@@ -259,7 +260,7 @@ protected:
 	float ShakingStrength = 10.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Character|HitReact")
-	float ShakingPlayRate = 5.f;
+	float ShakingDuration = 5.f;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void PlayFlashEffect(float Strength, float PlayRate, FLinearColor Color);

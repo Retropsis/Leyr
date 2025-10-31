@@ -159,6 +159,7 @@ TArray<FGameplayTag> AlterationEffects;
   */
 FGameplayTag Abilities_None;
 FGameplayTag Abilities_Attack;
+FGameplayTag Abilities_Airborne;
 FGameplayTag Abilities_Dodge;
 FGameplayTag Abilities_Parry;
 FGameplayTag Abilities_Roll;
@@ -344,7 +345,9 @@ FGameplayTag GameplayCue_Weapon_Monk;
 FGameplayTag GameplayCue_Weapon_Sword_Slash;
 FGameplayTag GameplayCue_Weapon_Bow_Shot;
 FGameplayTag GameplayCue_Weapon_Impact_Small;
-FGameplayTag GameplayCue_Weapon_Impact_Average;
+FGameplayTag GameplayCue_Weapon_Impact_Average_1;
+FGameplayTag GameplayCue_Weapon_Impact_Average_2;
+FGameplayTag GameplayCue_Weapon_Impact_Average_3;
 FGameplayTag GameplayCue_Weapon_Impact_Large;
 FGameplayTag GameplayCue_Weapon_Impact_Ground;
 

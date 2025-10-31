@@ -182,6 +182,7 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	 */
 	GameplayTags.Abilities_None = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.None"), FString("None"));
 	GameplayTags.Abilities_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Attack"), FString("Melee Attack"));
+	GameplayTags.Abilities_Airborne = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Airborne"), FString("Melee Airborne"));
 	GameplayTags.Abilities_Dodge = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Dodge"), FString("Abilities Dodge"));
 	GameplayTags.Abilities_Roll = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Roll"), FString("Abilities Roll"));
 	GameplayTags.Abilities_Parry = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Abilities.Parry"), FString("Melee Parry"));
@@ -430,7 +431,9 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.GameplayCue_Weapon_Bow_Shot = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Bite"), FString("GameplayCue Bite"));
 	GameplayTags.GameplayCue_Weapon_Impact_Ground = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Impact.Ground"), FString("GameplayCue Weapon Ground Impact."));
 	GameplayTags.GameplayCue_Weapon_Impact_Small = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Impact.Small"), FString("GameplayCue Weapon Small Impact."));
-	GameplayTags.GameplayCue_Weapon_Impact_Average = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Impact.Average"), FString("GameplayCue Weapon Average Impact."));
+	GameplayTags.GameplayCue_Weapon_Impact_Average_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Impact.Average.1"), FString("GameplayCue Weapon Average Impact 1."));
+	GameplayTags.GameplayCue_Weapon_Impact_Average_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Impact.Average.2"), FString("GameplayCue Weapon Average Impact 2."));
+	GameplayTags.GameplayCue_Weapon_Impact_Average_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Impact.Average.3"), FString("GameplayCue Weapon Average Impact 3."));
 	GameplayTags.GameplayCue_Weapon_Impact_Large = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Weapon.Impact.Large"), FString("GameplayCue Weapon Large Impact."));
 	
 	GameplayTags.GameplayCue_Wound_Impact_Random = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("GameplayCue.Wound.Impact.Random"), FString("GameplayCue Wound Random Impact."));
