@@ -6,6 +6,8 @@
 #include "AbilitySystem/Actor/Projectile.h"
 #include "Pulsar.generated.h"
 
+class ACluster;
+class UBoxComponent;
 /**
  * 
  */
@@ -14,12 +16,18 @@ class LEYR_API APulsar : public AProjectile
 {
 	GENERATED_BODY()
 
+public:
+	APulsar();
+
 protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION() void OnPulse();
 	UFUNCTION() void OnSweep(const FVector& TraceStart);
 	UFUNCTION() void CauseDamage(AActor* OtherActor);
+		
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<ACluster> ClusterClass;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UNiagaraSystem> PulsingEffect;

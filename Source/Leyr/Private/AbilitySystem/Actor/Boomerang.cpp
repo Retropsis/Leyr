@@ -44,7 +44,7 @@ void ABoomerang::OnHit()
 	bHit = true;
 }
 
-void ABoomerang::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void ABoomerang::OnCollisionOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor && GetInstigator() == OtherActor) Destroy();
 	if (!IsValidOverlap(OtherActor)) return;

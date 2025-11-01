@@ -4,6 +4,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "NiagaraFunctionLibrary.h"
 #include "AbilitySystem/LeyrAbilitySystemLibrary.h"
+#include "AbilitySystem/Actor/Cluster.h"
 #include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
 #include "Data/StatusEffectData.h"
@@ -12,14 +13,18 @@
 #include "Kismet/GameplayStatics.h"
 #include "Leyr/Leyr.h"
 
+APulsar::APulsar()
+{
+	Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Sphere->SetCollisionResponseToAllChannels(ECR_Ignore);
+}
+
 void APulsar::BeginPlay()
 {
 	AActor::BeginPlay();
 	
 	SetLifeSpan(LifeSpan);
 	SetReplicateMovement(true);
-	Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	Sphere->SetCollisionResponseToAllChannels(ECR_Ignore);
 	
 	if(LoopingSoundComponent)
 	{
@@ -40,12 +45,19 @@ void APulsar::BeginPlay()
 
 void APulsar::OnPulse()
 {
+	if (!HasAuthority()) return;
+		
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, PulsingEffect, GetActorLocation() + StartOffset);
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	ACluster* Cluster = GetWorld()->SpawnActor<ACluster>(ClusterClass, GetActorLocation() + StartOffset, FRotator::ZeroRotator, SpawnParameters);
+	Cluster->InitializeCluster(DamageEffectParams, ProjectileData->StatusEffectData, ImpactEffect, ImpactSound);
+	
 	FTimerHandle SweepTimer;
 	FVector TraceStart = GetActorLocation() + StartOffset;
 	GetWorld()->GetTimerManager().SetTimer(SweepTimer, FTimerDelegate::CreateLambda([this, TraceStart]
 	{
-		OnSweep(TraceStart);
+		// OnSweep(TraceStart);
 	}), SweepDelay, false);
 }
 

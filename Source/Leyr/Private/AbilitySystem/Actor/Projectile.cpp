@@ -74,7 +74,7 @@ void AProjectile::BeginPlay()
 	Super::BeginPlay();
 	SetLifeSpan(LifeSpan);
 	SetReplicateMovement(true);
-	Sphere->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::OnSphereOverlap);
+	Sphere->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::OnCollisionOverlap);
 	
 	if(LoopingSoundComponent)
 	{
@@ -124,7 +124,7 @@ void AProjectile::PrepareToDestroyProjectile()
 	ProjectileMovement->ProjectileGravityScale = 0.3f;
 }
 
-void AProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AProjectile::OnCollisionOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if(!IsValidOverlap(OtherActor)) return;
 	
