@@ -6,6 +6,16 @@
 #include "UObject/Interface.h"
 #include "MultiPartAIInterface.generated.h"
 
+UENUM(BlueprintType)
+enum class EMultiPartAnimationState : uint8
+{
+	None,
+	Idle,
+	Leap,
+	Attack,
+	Destroyed,
+};
+
 enum class EDirection : uint8;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
@@ -28,4 +38,7 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ChangeMultiPartAnimInstance(TSubclassOf<UAnimInstance> NewInstance);
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void UpdateMultiPartAnimInstances(EMultiPartAnimationState State);
 };

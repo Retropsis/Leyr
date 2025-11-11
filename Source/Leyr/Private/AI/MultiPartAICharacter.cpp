@@ -5,7 +5,6 @@
 #include "AI/MultiPartAnimInstance.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
 
 AMultiPartAICharacter::AMultiPartAICharacter()
 {
@@ -51,6 +50,11 @@ void AMultiPartAICharacter::SetMultiPartAnimInstance(const TSubclassOf<UAnimInst
 	{
 		MultiPartFlipbook->SetAnimInstanceClass(NewInstance);
 	}
+}
+
+void AMultiPartAICharacter::UpdateMultiPartAnimInstances_Implementation(EMultiPartAnimationState State)
+{
+	// IMultiPartAIInterface::UpdateMultiPartAnimInstances_Implementation(EMultiPartAnimationState State);
 }
 
 FVector AMultiPartAICharacter::GetPreferredHitLocation_Implementation(FVector ImpactLocation)
