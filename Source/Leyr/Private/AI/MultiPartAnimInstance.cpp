@@ -24,10 +24,16 @@ void UMultiPartAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if(!IsValid(AICharacter)) return;
 
 	Velocity = AICharacter->GetCharacterMovement()->Velocity;
+	bIsMoving =  UKismetMathLibrary::VSize(Velocity) > 0.f;
 
 	const float Angle = UKismetMathLibrary::DegAcos(FVector::DotProduct(AICharacter->GetActorForwardVector().GetSafeNormal(), MovementDirection.GetSafeNormal()));
 	FVector Cross = FVector::CrossProduct(AICharacter->GetActorForwardVector().GetSafeNormal(), MovementDirection.GetSafeNormal());
 
+	// Relative Direction
+	PreviousRelativeDirection = RelativeDirection;
+	RelativeDirection = FMath::Sign(AICharacter->GetActorForwardVector().X) * FMath::Sign(Velocity.X) > 0 ? ERelativeDirection::Forward : ERelativeDirection::Backward;
+	
+	// World Direction
 	bRequestTurning = false;
 	PreviousDirection = Direction;
 	if (Angle > -45.f && Angle < 45.f) Direction = EDirection::Right;

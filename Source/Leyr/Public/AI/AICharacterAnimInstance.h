@@ -35,6 +35,12 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category="AICharacter")
 	bool bIsAccelerating;
+	
+	UPROPERTY(BlueprintReadWrite, Category="AICharacter")
+	ERelativeDirection RelativeDirection = ERelativeDirection::Forward;
+	
+	UPROPERTY(BlueprintReadWrite, Category="AICharacter")
+	ERelativeDirection PreviousRelativeDirection = ERelativeDirection::Forward;
 
 	UPROPERTY(BlueprintReadOnly, Category="AICharacter")
 	EDefeatState DefeatState = EDefeatState::None;

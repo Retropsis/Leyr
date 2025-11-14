@@ -39,6 +39,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category="Data")
 	TObjectPtr<UBehaviourData> BehaviourData = nullptr;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Setup")
+	bool bHasSpawningSequence = false;
+
+	UPROPERTY(EditDefaultsOnly, Category="Setup", meta=(EditCondition="bHasSpawningSequence"))
+	TSoftObjectPtr<UPaperZDAnimSequence> SpawningSequence = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category="Setup")
 	bool bShouldDespawn = true;

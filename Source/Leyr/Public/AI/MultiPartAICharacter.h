@@ -20,6 +20,8 @@ class LEYR_API AMultiPartAICharacter : public AAICharacter, public IMultiPartAII
 public:
 	AMultiPartAICharacter();
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
+	virtual void ChangeDirections() override;
+	virtual void MulticastHandleDeath_Implementation(const FVector& DeathImpulse, EDefeatState InDefeatState) override;
 
 	//~ IMultiPartAIInterface
 	virtual void ChangeDirection_Implementation(EDirection NewDirection) override;
@@ -43,13 +45,21 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void HandleDeathMultiParts();
+	
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void MultiPart_ChangeDirections(bool bIsFlipped, EMultiPartAnimationState State = EMultiPartAnimationState::Idle);
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeFlipbooksDirection(bool bIsFlipped, EMultiPartAnimationState State = EMultiPartAnimationState::Idle) const;
 
 protected:
-	virtual void MulticastHandleDeath(const FVector& DeathImpulse, EDefeatState InDefeatState) override;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TObjectPtr<USkeletalMeshComponent> MultiPartFlipbook;
 
 	UPROPERTY(EditDefaultsOnly)
 	FName SpriteSocket = FName("Tail");
+
+private:
+	UPROPERTY(EditDefaultsOnly)
+	TArray<FFlipbookPair> FlipbookPairs;
 };

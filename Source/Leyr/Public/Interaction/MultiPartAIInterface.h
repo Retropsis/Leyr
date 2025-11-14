@@ -6,14 +6,39 @@
 #include "UObject/Interface.h"
 #include "MultiPartAIInterface.generated.h"
 
+class UPaperFlipbook;
+class UPaperFlipbookComponent;
+
 UENUM(BlueprintType)
 enum class EMultiPartAnimationState : uint8
 {
 	None,
 	Idle,
 	Leap,
+	Swim,
 	Attack,
 	Destroyed,
+};
+
+USTRUCT(BlueprintType)
+struct FFlipbookPair
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	EMultiPartAnimationState State = EMultiPartAnimationState::None;
+
+	UPROPERTY(EditAnywhere)
+	bool bForeground = true;
+
+	UPROPERTY(EditAnywhere)
+	UPaperFlipbookComponent* FlipbookComponent = nullptr;
+	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UPaperFlipbook> ForwardFlipbook = nullptr;
+	
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UPaperFlipbook> FlippedFlipbook = nullptr;
 };
 
 enum class EDirection : uint8;

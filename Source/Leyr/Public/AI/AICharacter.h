@@ -40,6 +40,7 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 	virtual void WeakenedTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
+	virtual void HasFinishedSpawning() override;
 	void InitializeNavigationBounds();
 	void HandleBehaviourState(EBehaviourState NewState);
 	void HandlePlayerOverlappingArena(AActor* Player, bool bIsEntering);
@@ -288,6 +289,7 @@ protected:
 	TObjectPtr<ULootDataSet> LootData = nullptr;
 
 private:
+	void PlaySpawningSequence() const;
 	void ShouldAttack(bool InShouldAttack);
 	FTimerHandle ResetAttackTimer;
 	

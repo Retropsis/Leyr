@@ -23,6 +23,11 @@ void UAICharacterAnimInstance::Tick(float DeltaTime)
 
 	Velocity = AICharacter->GetCharacterMovement()->Velocity;
 	bIsMoving =  UKismetMathLibrary::VSize(Velocity) > 0.f || AICharacter->GetBehaviourState() == EBehaviourState::Timeline;
+	
+	// Relative Direction
+	PreviousRelativeDirection = RelativeDirection;
+	RelativeDirection = FMath::Sign(AICharacter->GetActorForwardVector().X) * FMath::Sign(Velocity.X) > 0 ? ERelativeDirection::Forward : ERelativeDirection::Backward;
+	
 	bAirborne = AICharacter->GetCharacterMovement()->IsFalling();
 	// bIsAccelerating = AICharacter->IsAccelerating();
 	bIsDiving = AICharacter->GetBehaviourState() == EBehaviourState::Dive;

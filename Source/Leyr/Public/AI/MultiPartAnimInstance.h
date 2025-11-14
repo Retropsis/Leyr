@@ -4,17 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "AICharacterAnimInstance.h"
+#include "Data/CombatData.h"
 #include "MultiPartAnimInstance.generated.h"
-
-UENUM(Blueprintable, BlueprintType)
-enum class EDirection : uint8
-{
-	None,
-	Left,
-	Right,
-	Downward,
-	Upward,
-};
 
 class AAICharacter;
 /**
@@ -55,6 +46,12 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite, Category="AICharacter")
 	EDirection PreviousDirection = EDirection::Downward;
+	
+	UPROPERTY(BlueprintReadWrite, Category="AICharacter")
+	ERelativeDirection RelativeDirection = ERelativeDirection::Forward;
+	
+	UPROPERTY(BlueprintReadWrite, Category="AICharacter")
+	ERelativeDirection PreviousRelativeDirection = ERelativeDirection::Forward;
 
 	UPROPERTY(BlueprintReadOnly, Category="AICharacter")
 	bool bRequestTurning = false;

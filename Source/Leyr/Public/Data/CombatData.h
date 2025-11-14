@@ -134,3 +134,23 @@ enum class EDefeatState : uint8
 	Executed UMETA(DisplayName="Executed"),
 	KnockedOut UMETA(DisplayName="KnockedOut"),
 };
+
+UENUM(Blueprintable, BlueprintType)
+enum class EDirection : uint8
+{
+	None,
+	Left,
+	Right,
+	Downward,
+	Upward,
+};
+
+UENUM(Blueprintable, BlueprintType)
+enum class ERelativeDirection : uint8
+{
+	None,
+	Backward,
+	Forward,
+	Downward,
+	Upward,
+};

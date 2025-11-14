@@ -22,11 +22,33 @@ void AMultiPartAICharacter::HitReactTagChanged(const FGameplayTag CallbackTag, i
 	PlayHitReactMontage();
 }
 
+void AMultiPartAICharacter::ChangeDirections()
+{
+	Super::ChangeDirections();
+	MultiPart_ChangeDirections(GetActorForwardVector().X < 0.f);
+}
+
 void AMultiPartAICharacter::PlayMultiPartMontage(UAnimationAsset* AnimToPlay)
 {
 	if (MultiPartFlipbook)
 	{
 		MultiPartFlipbook->PlayAnimation(AnimToPlay, false);
+	}
+}
+
+void AMultiPartAICharacter::ChangeFlipbooksDirection(bool bIsFlipped, EMultiPartAnimationState State) const
+{
+	TArray<FFlipbookPair> FilteredPairs = FlipbookPairs.FilterByPredicate([State] (const FFlipbookPair& Pair)
+	{
+		return Pair.State == State;
+	});
+	
+	for (const FFlipbookPair& Pair : FilteredPairs)
+	{
+		if (!IsValid(Pair.FlipbookComponent)) continue;
+		
+		Pair.FlipbookComponent->SetFlipbook(bIsFlipped ? Pair.FlippedFlipbook : Pair.ForwardFlipbook);
+		Pair.FlipbookComponent->SetTranslucentSortPriority((Pair.bForeground && !bIsFlipped) || (!Pair.bForeground && bIsFlipped) ? 200 : -200);
 	}
 }
 
@@ -79,8 +101,8 @@ FVector AMultiPartAICharacter::GetPreferredHitLocation_Implementation(FVector Im
 	return ImpactLocation;
 }
 
-void AMultiPartAICharacter::MulticastHandleDeath(const FVector& DeathImpulse, EDefeatState InDefeatState)
-{
+void AMultiPartAICharacter::MulticastHandleDeath_Implementation(const FVector& DeathImpulse, EDefeatState InDefeatState)
+{	
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Player, ECR_Ignore);
@@ -93,4 +115,7 @@ void AMultiPartAICharacter::MulticastHandleDeath(const FVector& DeathImpulse, ED
 	// MultiPartFlipbook->SetCollisionResponseToChannel(ECC_Player, ECR_Ignore);
 	HandleDeathMultiParts();
 	HandleDeath(InDefeatState);
+	
+	if (HitReactFlashDuration <= 0.f) return;
+	PlayFlashEffect(HitReactFlashStrength, 1 /HitReactFlashDuration, HitReactFlashColor);
 }

@@ -37,10 +37,13 @@ public:
 	UPaperZDAnimInstance* SetWeaponAnimInstance(const TSubclassOf<UPaperZDAnimInstance>& AnimInstance) const;
 
 	UFUNCTION(BlueprintCallable)
-	void ChangeDirections();
+	virtual void ChangeDirections();
 	
 	UFUNCTION(BlueprintCallable)
-	void HitStop(float Duration, float Amount = 0.f); 
+	void HitStop(float Duration, float Amount = 0.f);
+
+	UFUNCTION(BlueprintCallable)
+	virtual void HasFinishedSpawning() {}
 	
 	FOnDeath OnDeath;
 	FOnASCRegistered OnASCRegistered;

@@ -125,6 +125,7 @@ void AAICharacter::BeginPlay()
 	GetCharacterMovement()->GravityScale = BaseGravityScale;
 	InitAbilityActorInfo();
 	AddCharacterAbilities();
+	PlaySpawningSequence();
 
 	if(bCollisionCauseDamage)
 	{
@@ -311,6 +312,16 @@ void AAICharacter::WeakenedTagChanged(const FGameplayTag CallbackTag, int32 NewC
 	HitReactTagChanged(CallbackTag, NewCount);
 }
 
+void AAICharacter::HasFinishedSpawning()
+{
+	Super::HasFinishedSpawning();
+	
+	if (BaseAIController && BaseAIController->GetBlackboardComponent())
+	{
+		BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("HasFinishedSpawning"), true);
+	}
+}
+
 void AAICharacter::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 	Super::StunTagChanged(CallbackTag, NewCount);
@@ -445,7 +456,7 @@ void AAICharacter::Die(const FVector& DeathImpulse, bool bExecute)
 	}
 	
 	// DefeatState = bExecute ? EDefeatState::Executed : EDefeatState::Defeated;
-	// MulticastHandleDeath(DeathImpulse, DefeatState);
+	MulticastHandleDeath(DeathImpulse, DefeatState);
 	SpawnLoot();
 	Super::Die(DeathImpulse, bExecute);
 }
@@ -780,6 +791,23 @@ void AAICharacter::SetNewMovementSpeed_Implementation(EMovementMode InMovementMo
 void AAICharacter::SetShouldAttack_Implementation(bool InShouldAttack)
 {
 	ShouldAttack(InShouldAttack);
+}
+
+void AAICharacter::PlaySpawningSequence() const
+{
+	if (EncounterData == nullptr) return;
+	if (!EncounterData->bHasSpawningSequence) return;
+	
+	if (EncounterData->SpawningSequence.Get() == nullptr)
+	{
+		UAssetManager::GetStreamableManager().RequestAsyncLoad(EncounterData->SpawningSequence.ToSoftObjectPath(), [this] () {
+			AnimationComponent->GetAnimInstance()->PlayAnimationOverride(EncounterData->SpawningSequence.Get());
+		}, FStreamableManager::AsyncLoadHighPriority);
+	}
+	else
+	{
+		AnimationComponent->GetAnimInstance()->PlayAnimationOverride(EncounterData->SpawningSequence.Get());
+	}
 }
 
 void AAICharacter::ShouldAttack(bool InShouldAttack)

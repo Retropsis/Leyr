@@ -353,8 +353,9 @@ void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImp
 	HandleDeathCapsuleComponent(DeathImpulse);
 	// UAssetManager::GetStreamableManager().RequestAsyncLoad(DefeatedSound.ToSoftObjectPath(), FStreamableDelegate::CreateUObject(this, &ABaseCharacter::PlayDeathSound), FStreamableManager::DefaultAsyncLoadPriority);
 	HandleDeath(InDefeatState);
-	PlayFlashEffect(HitReactFlashStrength, HitReactFlashDuration, HitReactFlashColor);
-	PlayShakeEffect(ShakingStrength, ShakingDuration);
+	
+	if (HitReactFlashDuration <= 0.f) return;
+	PlayFlashEffect(HitReactFlashStrength, 1 /HitReactFlashDuration, HitReactFlashColor);
 }
 
 void ABaseCharacter::HandleDeathCapsuleComponent(const FVector& DeathImpulse) const
