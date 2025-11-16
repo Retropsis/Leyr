@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "PaperZDAnimInstance.h"
 #include "Data/CombatData.h"
+#include "Interaction/MultiPartAIInterface.h"
 #include "AICharacterAnimInstance.generated.h"
 
 enum class EDefeatState : uint8;
@@ -20,6 +21,12 @@ class LEYR_API UAICharacterAnimInstance : public UPaperZDAnimInstance
 public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void OnInit_Implementation() override;
+
+	UFUNCTION(BlueprintCallable)
+	void SetMultiPartAnimInstance(const EMultiPartAnimationState State) { MultiPartAnimationState = State; }
+	
+	UFUNCTION(BlueprintCallable)
+	void SetIsFlipped(const bool Flipped) { bIsFlipped = Flipped; }
 	
 	UPROPERTY(BlueprintReadOnly, Category="AICharacter")
 	TObjectPtr<AAICharacter> AICharacter;
@@ -44,10 +51,16 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category="AICharacter")
 	EDefeatState DefeatState = EDefeatState::None;
+
+	UPROPERTY(BlueprintReadOnly, Category="AICharacter")
+	EMultiPartAnimationState MultiPartAnimationState = EMultiPartAnimationState::Idle;
 	
 	UPROPERTY(BlueprintReadOnly, Category="AICharacter")
 	bool bIsDiving = false;
 	
 	UPROPERTY(BlueprintReadOnly, Category="AICharacter")
 	bool bIsCombatTargetDefeated = false;
+	
+	UPROPERTY(BlueprintReadOnly, Category="AICharacter")
+	bool bIsFlipped = false;
 };

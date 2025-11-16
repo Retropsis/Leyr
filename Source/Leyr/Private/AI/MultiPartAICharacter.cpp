@@ -66,6 +66,11 @@ void AMultiPartAICharacter::ChangeMultiPartAnimInstance_Implementation(const TSu
 	SetMultiPartAnimInstance(NewInstance);
 }
 
+UAnimInstance* AMultiPartAICharacter::GetMultiPartAnimInstance_Implementation()
+{
+	return MultiPartFlipbook ? MultiPartFlipbook->GetAnimInstance() : nullptr;
+}
+
 void AMultiPartAICharacter::SetMultiPartAnimInstance(const TSubclassOf<UAnimInstance> NewInstance)
 {
 	if (MultiPartFlipbook && NewInstance)

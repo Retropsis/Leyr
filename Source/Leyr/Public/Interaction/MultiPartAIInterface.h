@@ -60,6 +60,9 @@ class LEYR_API IMultiPartAIInterface
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ChangeDirection(EDirection NewDirection);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UAnimInstance* GetMultiPartAnimInstance();
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void ChangeMultiPartAnimInstance(TSubclassOf<UAnimInstance> NewInstance);

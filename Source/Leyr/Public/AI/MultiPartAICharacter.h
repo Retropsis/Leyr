@@ -26,6 +26,7 @@ public:
 	//~ IMultiPartAIInterface
 	virtual void ChangeDirection_Implementation(EDirection NewDirection) override;
 	virtual void ChangeMultiPartAnimInstance_Implementation(TSubclassOf<UAnimInstance> NewInstance) override;
+	virtual UAnimInstance* GetMultiPartAnimInstance_Implementation() override;
 	virtual void SetMultiPartAnimInstance(TSubclassOf<UAnimInstance> NewInstance) override;
 	virtual void UpdateMultiPartAnimInstances_Implementation(EMultiPartAnimationState State) override;
 	//~ IMultiPartAIInterface

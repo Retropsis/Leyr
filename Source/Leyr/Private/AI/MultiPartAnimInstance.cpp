@@ -9,8 +9,6 @@ void UMultiPartAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 	AICharacter = Cast<AAICharacter>(GetOwningActor());
-
-	
 }
 
 void UMultiPartAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
