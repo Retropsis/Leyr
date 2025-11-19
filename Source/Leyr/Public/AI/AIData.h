@@ -58,6 +58,14 @@ enum class EMovementType : uint8
 	Points UMETA(DisplayName="Points"),
 };
 
+UENUM(BlueprintType)
+enum class ETimelineMovementType : uint8
+{	
+	Vertical,
+	Horizontal,
+	Mixed,
+};
+
 USTRUCT(BlueprintType)
 struct FPatternParams
 {

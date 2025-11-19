@@ -8,6 +8,7 @@
 
 class UPaperFlipbook;
 class UPaperFlipbookComponent;
+struct FGameplayTag;
 
 UENUM(BlueprintType)
 enum class EMultiPartAnimationState : uint8
@@ -69,4 +70,7 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void UpdateMultiPartAnimInstances(EMultiPartAnimationState State);
+	
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void PlayMultiPartMontages(const FGameplayTag& MontageTag);
 };

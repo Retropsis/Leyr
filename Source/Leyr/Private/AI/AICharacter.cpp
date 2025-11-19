@@ -747,7 +747,7 @@ FVector AAICharacter::GetNextLocation_Implementation(const int32 SplineIndex)
 {
 	if(SplineComponentActor == nullptr) return GetActorLocation();
 	if(SplineComponent == nullptr) SplineComponent = SplineComponentActor->GetSplineComponent();
-	UKismetSystemLibrary::DrawDebugSphere(this, SplineComponent->GetLocationAtSplinePoint(SplineIndex, ESplineCoordinateSpace::World), 33.f, 12, FLinearColor::Red, 8.f);
+	// UKismetSystemLibrary::DrawDebugSphere(this, SplineComponent->GetLocationAtSplinePoint(SplineIndex, ESplineCoordinateSpace::World), 33.f, 12, FLinearColor::Red, 8.f);
 	return  SplineComponent->GetLocationAtSplinePoint(SplineIndex, ESplineCoordinateSpace::World);
 }
 

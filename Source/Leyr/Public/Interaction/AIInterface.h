@@ -7,8 +7,8 @@
 #include "World/Level/Zone/Arena.h"
 #include "AIInterface.generated.h"
 
-class ASplineComponentActor;
 struct FGameplayTag;
+class ASplineComponentActor;
 class UPaperZDAnimInstance;
 enum class EEncounterSize : uint8;
 enum class EMovementType : uint8;
@@ -78,7 +78,7 @@ public:
 	void StartTimelineMovement();
 	
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void TimelineMovement();
+	void TimelineMovement(FVector TargetDestination);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetJumpApex(float NewApex);

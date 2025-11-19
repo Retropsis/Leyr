@@ -70,7 +70,7 @@ void AWaterGroup::HandleActiveActors(float DeltaSeconds)
 			FHitResult Hit;
 			FVector Start = Actor->GetActorLocation();
 			const FVector End = Start + FVector::DownVector * 55.f;
-			UKismetSystemLibrary::SphereTraceSingle(Actor, Start, End, 18.f, TraceTypeQuery1, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, Hit, true);
+			UKismetSystemLibrary::SphereTraceSingle(Actor, Start, End, 18.f, TraceTypeQuery1, false, TArray<AActor*>(), EDrawDebugTrace::None, Hit, true);
 			
 			FVector CurrentBottom = Hit.bBlockingHit ? Hit.ImpactPoint : FVector(Start.X, 0.f, InterpTarget.Z);
 			UKismetSystemLibrary::DrawDebugPoint(this, InterpTarget, 15.f, FLinearColor::Red);
