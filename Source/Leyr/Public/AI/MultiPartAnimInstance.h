@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AICharacterAnimInstance.h"
 #include "Data/CombatData.h"
 #include "MultiPartAnimInstance.generated.h"
 

@@ -5,6 +5,7 @@
 #include "AI/MultiPartAnimInstance.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/WidgetComponent.h"
+#include "Game/BaseGameplayTags.h"
 
 AMultiPartAICharacter::AMultiPartAICharacter()
 {
@@ -120,6 +121,8 @@ void AMultiPartAICharacter::MulticastHandleDeath_Implementation(const FVector& D
 	// MultiPartFlipbook->SetCollisionResponseToChannel(ECC_Player, ECR_Ignore);
 	HandleDeathMultiParts();
 	HandleDeath(InDefeatState);
+
+	Execute_PlayMultiPartMontages(this, FBaseGameplayTags::Get().Defeated);
 	
 	if (HitReactFlashDuration <= 0.f) return;
 	PlayFlashEffect(HitReactFlashStrength, 1 /HitReactFlashDuration, HitReactFlashColor);

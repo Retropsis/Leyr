@@ -127,8 +127,16 @@ void AProjectile::PrepareToDestroyProjectile()
 void AProjectile::OnCollisionOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if(!IsValidOverlap(OtherActor)) return;
-	
-	if (OtherComp && OtherComp->GetCollisionObjectType() == ECC_WorldStatic)
+
+	TArray<ECollisionChannel> ValidChannels;
+	ValidChannels.Add(ECC_WorldStatic);
+	ValidChannels.Add(ECC_WorldDynamic);
+	ValidChannels.Add(ECC_OneWayPlatform);
+	if (OtherComp && ValidChannels.FindByPredicate([OtherComp] (const ECollisionChannel Channel)
+	{
+		return Channel == OtherComp->GetCollisionObjectType();
+	}))
+	// if (OtherComp && OtherComp->GetCollisionObjectType() == ECC_WorldStatic)
 	{
 		GhostTrail->DeactivateImmediate();
 		if (ResponseToStatic == EResponseToStatic::Destroy)
@@ -141,7 +149,11 @@ void AProjectile::OnCollisionOverlap(UPrimitiveComponent* OverlappedComponent, A
 				TargetLocation = GetActorLocation() + RandomRotation * FMath::FRandRange(45.f, 85.f);
 				Sphere->SetCollisionResponseToAllChannels(ECR_Ignore);
 				OnHitTimeline();
-			} else Destroy();
+			} else
+			{
+				if (!bHit) OnHit();
+				Destroy();
+			}
 			return;
 		}
 		if (ResponseToStatic == EResponseToStatic::Stop)
@@ -206,7 +218,7 @@ void AProjectile::OnHit()
 
 void AProjectile::Destroyed()
 {
-	if (!bHit && !HasAuthority()) OnHit();
+    	if (!bHit && !HasAuthority()) OnHit();
 	Super::Destroyed();
 }
 
