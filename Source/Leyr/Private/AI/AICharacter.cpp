@@ -127,11 +127,12 @@ void AAICharacter::BeginPlay()
 	AddCharacterAbilities();
 	PlaySpawningSequence();
 
-	if(bCollisionCauseDamage)
-	{
-		GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBeginOverlap);
-		SetupCollisionDamage();
-	}
+	// if(bCollisionCauseDamage)
+	// {
+	// 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBeginOverlap);
+	// 	SetupCollisionDamage();
+	// }
+	GEngine->AddOnScreenDebugMessage(-1, 300.f, FColor::Magenta, FString::Printf(TEXT("BeginPlay bCollisionCauseDamage %s"), *GetName()));
 	
 	if (UBaseUserWidget* BaseUserWidget = Cast<UBaseUserWidget>(HealthBar->GetUserWidgetObject()))
 	{
@@ -234,6 +235,10 @@ void AAICharacter::InitializeCharacterInfo()
 		AbilityPower = EncounterData->BehaviourData->AbilityPower.GetValueAtLevel(Level);
 		DamageEffectClass = EncounterData->BehaviourData->DamageEffectClass;
 		DamageType = EncounterData->BehaviourData->DamageType;
+
+		GEngine->AddOnScreenDebugMessage(-1, 300.f, FColor::Magenta, FString::Printf(TEXT("PossessedBy InitializeCharacterInfo %s"), *GetName()));
+		GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBeginOverlap);
+		SetupCollisionDamage();
 	}
 
 	// Loading Hit React Sequences Effect

@@ -2,7 +2,7 @@
 
 #include "AbilitySystem/Ability/SummonAbility.h"
 #include "Interaction/AIInterface.h"
-#include "Kismet/KismetSystemLibrary.h"
+#include "Interaction/CombatInterface.h"
 
 void USummonAbility::InitAbility()
 {
@@ -75,6 +75,15 @@ TArray<FVector> USummonAbility::GetSpawnLocations()
 		}
 	}
 	return SpawnLocations;
+}
+
+FVector USummonAbility::GetSingleSpawnLocationAtSocket(const FGameplayTag& SocketTag)
+{
+	if (GetAvatarActorFromActorInfo()->Implements<UCombatInterface>())
+	{
+		return ICombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), SocketTag);
+	}
+	return GetAvatarActorFromActorInfo()->GetActorLocation();
 }
 
 TSubclassOf<APawn> USummonAbility::GetRandomMinionClass()

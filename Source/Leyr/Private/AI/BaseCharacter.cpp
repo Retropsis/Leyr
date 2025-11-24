@@ -97,7 +97,6 @@ void ABaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 void ABaseCharacter::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
-	GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Green, GetVelocity().ToCompactString());
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, LandingEffect, Hit.ImpactPoint);
 }
 

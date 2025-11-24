@@ -17,6 +17,9 @@ class LEYR_API USummonAbility : public UBaseGameplayAbility
 public:
 	UFUNCTION(BlueprintCallable)
 	TArray<FVector> GetSpawnLocations();
+
+	UFUNCTION(BlueprintCallable)
+	FVector GetSingleSpawnLocationAtSocket(const FGameplayTag& SocketTag);
 	
 	UFUNCTION(BlueprintPure, Category="Summoning")
 	TSubclassOf<APawn> GetRandomMinionClass();
