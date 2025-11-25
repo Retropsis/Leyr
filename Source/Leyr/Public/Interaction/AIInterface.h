@@ -79,6 +79,9 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void TimelineMovement(FVector TargetDestination);
+	
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void TimelineMovementForTag(const FGameplayTag& Tag, const FVector& TargetDestination);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void SetJumpApex(float NewApex);

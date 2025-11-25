@@ -466,6 +466,13 @@ void AAICharacter::Die(const FVector& DeathImpulse, bool bExecute)
 	Super::Die(DeathImpulse, bExecute);
 }
 
+void AAICharacter::MulticastHandleDeath_Implementation(const FVector& DeathImpulse, EDefeatState InDefeatState)
+{
+	Super::MulticastHandleDeath_Implementation(DeathImpulse, InDefeatState);
+	FVector TargetDestination = GetActorLocation() + FVector(GetActorForwardVector().X * -75.f, 0, 0);
+	Execute_TimelineMovementForTag(this, FBaseGameplayTags::Get().Defeated, TargetDestination);
+}
+
 void AAICharacter::SetCombatTarget_Implementation(AActor* InCombatTarget)
 {
 	CombatTarget = InCombatTarget;

@@ -11,8 +11,8 @@ AVaultDownPlatform::AVaultDownPlatform()
 	OccupancyCollision->SetRelativeLocation(FVector(0.f, 0.f, 32.f));
 	OccupancyCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	OccupancyCollision->SetCollisionResponseToAllChannels(ECR_Ignore);
-	OccupancyCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	OccupancyCollision->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
+	OccupancyCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
+	OccupancyCollision->SetCollisionResponseToChannel(ECC_Player, ECR_Block);
 }
 
 void AVaultDownPlatform::OnConstruction(const FTransform& Transform)

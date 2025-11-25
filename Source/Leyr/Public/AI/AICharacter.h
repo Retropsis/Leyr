@@ -41,6 +41,7 @@ public:
 	virtual void HitReactTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 	virtual void WeakenedTagChanged(const FGameplayTag CallbackTag, int32 NewCount) override;
 	virtual void HasFinishedSpawning() override;
+	virtual void MulticastHandleDeath_Implementation(const FVector& DeathImpulse, EDefeatState InDefeatState) override;
 	void InitializeNavigationBounds();
 	void HandleBehaviourState(EBehaviourState NewState);
 	void HandlePlayerOverlappingArena(AActor* Player, bool bIsEntering);

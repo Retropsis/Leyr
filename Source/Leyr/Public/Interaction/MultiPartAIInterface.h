@@ -72,5 +72,5 @@ public:
 	void UpdateMultiPartAnimInstances(EMultiPartAnimationState State);
 	
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void PlayMultiPartMontages(const FGameplayTag& MontageTag);
+	void PlayMultiPartMontages(const FGameplayTag& MontageTag, const FVector& TargetLocation);
 };

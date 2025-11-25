@@ -122,7 +122,7 @@ void AMultiPartAICharacter::MulticastHandleDeath_Implementation(const FVector& D
 	HandleDeathMultiParts();
 	HandleDeath(InDefeatState);
 
-	Execute_PlayMultiPartMontages(this, FBaseGameplayTags::Get().Defeated);
+	Execute_PlayMultiPartMontages(this, FBaseGameplayTags::Get().Defeated, FVector::ZeroVector);
 	
 	if (HitReactFlashDuration <= 0.f) return;
 	PlayFlashEffect(HitReactFlashStrength, 1 /HitReactFlashDuration, HitReactFlashColor);

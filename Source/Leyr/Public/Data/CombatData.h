@@ -56,6 +56,19 @@ struct FBoxTraceData
 };
 
 USTRUCT(BlueprintType)
+struct FTimelineMovementData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadOnly) FGameplayTag Tag = FGameplayTag::EmptyTag;
+	UPROPERTY(BlueprintReadOnly) FVector TargetDestination = FVector::ZeroVector;
+	// UPROPERTY(BlueprintReadOnly) float ForwardPlayRate = 1.f;
+	// UPROPERTY(BlueprintReadOnly) float BackwardPlayRate = 1.f;
+	// UPROPERTY(BlueprintReadOnly) float TimelineRatioToCallAbility = 1.f;
+	// UPROPERTY(BlueprintReadOnly) float DelayBetweenTimelines = .1f;
+};
+
+USTRUCT(BlueprintType)
 struct FCombatStateParams
 {
 	GENERATED_BODY()
