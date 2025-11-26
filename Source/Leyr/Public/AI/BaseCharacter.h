@@ -260,6 +260,15 @@ protected:
 	FLinearColor HitReactFlashColor = FLinearColor::Red;
 
 	UPROPERTY(EditDefaultsOnly, Category="Character|HitReact")
+	float DestroyedFlashStrength = .2f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Character|HitReact")
+	float DestroyedFlashDuration = .2f;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Character|HitReact")
+	FLinearColor DestroyedFlashColor = FLinearColor::White;
+
+	UPROPERTY(EditDefaultsOnly, Category="Character|HitReact")
 	float ShakingStrength = 10.f;
 	
 	UPROPERTY(EditDefaultsOnly, Category="Character|HitReact")
