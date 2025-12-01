@@ -284,5 +284,5 @@ protected:
 	TObjectPtr<USceneComponent> HitLocationPoint;
 
 	UPROPERTY(BlueprintReadOnly)
-	FVector SpriteLocation = FVector::ZeroVector;;
+	FVector SpriteLocation = FVector::ZeroVector;
 };

@@ -55,7 +55,7 @@ void ADebugPlayerCharacter::BeginPlay()
 		if (UBaseAttributeSet* BaseAttributeSet = Cast<UBaseAttributeSet>(GetAttributeSet()))
 		{
 			BaseAttributeSet->SetHealth(BaseAttributeSet->GetMaxHealth());
-			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, FString::Printf(TEXT("Health: %f / %f"), BaseAttributeSet->GetHealth(), BaseAttributeSet->GetMaxHealth()));
+			// GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Green, FString::Printf(TEXT("Health: %f / %f"), BaseAttributeSet->GetHealth(), BaseAttributeSet->GetMaxHealth()));
 		}
 	}), .1f, false);
 }

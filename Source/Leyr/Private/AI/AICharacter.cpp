@@ -132,7 +132,7 @@ void AAICharacter::BeginPlay()
 	// 	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBeginOverlap);
 	// 	SetupCollisionDamage();
 	// }
-	GEngine->AddOnScreenDebugMessage(-1, 300.f, FColor::Magenta, FString::Printf(TEXT("BeginPlay bCollisionCauseDamage %s"), *GetName()));
+	// GEngine->AddOnScreenDebugMessage(-1, 300.f, FColor::Magenta, FString::Printf(TEXT("BeginPlay bCollisionCauseDamage %s"), *GetName()));
 	
 	if (UBaseUserWidget* BaseUserWidget = Cast<UBaseUserWidget>(HealthBar->GetUserWidgetObject()))
 	{
@@ -236,7 +236,7 @@ void AAICharacter::InitializeCharacterInfo()
 		DamageEffectClass = EncounterData->BehaviourData->DamageEffectClass;
 		DamageType = EncounterData->BehaviourData->DamageType;
 
-		GEngine->AddOnScreenDebugMessage(-1, 300.f, FColor::Magenta, FString::Printf(TEXT("PossessedBy InitializeCharacterInfo %s"), *GetName()));
+		// GEngine->AddOnScreenDebugMessage(-1, 300.f, FColor::Magenta, FString::Printf(TEXT("PossessedBy InitializeCharacterInfo %s"), *GetName()));
 		GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBeginOverlap);
 		SetupCollisionDamage();
 	}
