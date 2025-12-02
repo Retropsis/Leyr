@@ -96,4 +96,6 @@ void ABreakable::MulticastHandleDestruction_Implementation()
 	FlipbookComponent->Play();
 	TopFlipbookComponent->Play();
 	TopFlipbookComponent->SetVisibility(true);
+	HitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	HitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
 }

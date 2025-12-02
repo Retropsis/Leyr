@@ -21,6 +21,17 @@ enum class EDoorState : uint8
 	Closing,
 };
 
+UENUM(BlueprintType)
+enum class EDoorType : uint8
+{
+	None,
+	Proximity,
+	Lock,
+	Lever,
+	Event,
+	Timed,
+};
+
 UCLASS(Blueprintable, BlueprintType)
 class LEYR_API ADoor : public APaperFlipbookActor
 {
@@ -74,4 +85,5 @@ protected:
 
 private:
 	EDoorState DoorState = EDoorState::Close;
+	EDoorType DoorType = EDoorType::Lock;
 };
