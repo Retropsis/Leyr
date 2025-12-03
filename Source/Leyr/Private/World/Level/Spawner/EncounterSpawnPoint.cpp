@@ -17,7 +17,7 @@ AEncounterSpawnPoint::AEncounterSpawnPoint()
 }
 
 void AEncounterSpawnPoint::SpawnEncounterGroup()
-{	
+{
 	if (EncounterData->EncounterClass.Get() == nullptr)
 	{
 		UAssetManager::GetStreamableManager().RequestAsyncLoad(EncounterData->EncounterClass.ToSoftObjectPath(), [this] ()
@@ -46,13 +46,13 @@ void AEncounterSpawnPoint::SpawnEncounterGroup()
 		{
 			GetSpawnLocations();
 			FTimerHandle SpawnTimer;
-			SpawnTimers.Add(SpawnTimer);
 			GetWorld()->GetTimerManager().SetTimer(SpawnTimer, FTimerDelegate::CreateLambda([this, i, SpawnTimer] ()
 			{
 				DetermineSpawnTransform(i);
 				SpawnEncounter(EncounterData->EncounterClass.Get(), SpawnTransform);
 				SpawnTimers.Remove(SpawnTimer);
 			}), SpawnDelay * (i + 1), false);
+			SpawnTimers.Add(SpawnTimer);
 		}
 	}
 }
@@ -68,6 +68,8 @@ void AEncounterSpawnPoint::SpawnEncounter(UClass* EncounterToSpawn, const FTrans
 	Encounter->SpawnDefaultController();
 	Encounter->FinishSpawning(InSpawnTransform);
 	CurrentSpawns.Add(Encounter);
+
+	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Magenta, FString::Printf(TEXT("Spawning: %s"), *Encounter->GetName()));
 
 	if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Encounter); CombatInterface && SpawnerType == ESpawnerType::Infinite)
 	{
@@ -157,7 +159,6 @@ void AEncounterSpawnPoint::Respawn(AActor* DefeatedEncounter)
 	if(SpawnerType == ESpawnerType::Infinite)
 	{
 		FTimerHandle RespawnTimer;
-		SpawnTimers.Add(RespawnTimer);
 		GetWorldTimerManager().SetTimer(RespawnTimer, [this] ()
 		{
 			if (SpawnLocationType == ESpawnLocationType::OutOfBounds)
@@ -174,6 +175,7 @@ void AEncounterSpawnPoint::Respawn(AActor* DefeatedEncounter)
 			}
 			SpawnEncounter(EncounterData->EncounterClass.Get(), SpawnTransform);
 		}, RespawnTime, false);
+		SpawnTimers.Add(RespawnTimer);
 	}
 }
 

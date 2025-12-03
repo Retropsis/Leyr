@@ -3,9 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "PaperFlipbookActor.h"
-#include "Interaction/InteractionInterface.h"
-#include "Interaction/SaveInterface.h"
+#include "Event.h"
 #include "Lever.generated.h"
 
 class UBoxComponent;
@@ -19,22 +17,11 @@ enum class ELeverType : uint8
 	Weight,		// Stays On as long as has weight on
 };
 
-UENUM(BlueprintType)
-enum class ELeverState : uint8
-{
-	None,
-	On,
-	Off,
-	Timer,
-};
-
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnLeverStateChanged, ELeverState NewState);
-
 /**
  * 
  */
 UCLASS()
-class LEYR_API ALever : public APaperFlipbookActor, public IInteractionInterface, public ISaveInterface
+class LEYR_API ALever : public AEvent
 {
 	GENERATED_BODY()
 
@@ -42,8 +29,7 @@ public:
 	ALever();
 	virtual void Interact_Implementation(AActor* InteractingActor) override;
 	virtual bool ShouldBlockProjectile_Implementation() override { return bShouldBlockProjectile; }
-	void HandleLeverVisualState(ELeverState NewState);
-	ELeverState GetLeverState() const { return LeverState; }
+	void HandleLeverVisualState(EEventState NewState);
 
 	//~ Save Interface
 	virtual void LoadActor_Implementation() override;
@@ -54,8 +40,6 @@ public:
 	
 	UFUNCTION()
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-	FOnLeverStateChanged OnLeverStateChanged;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -66,9 +50,6 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category="Platform")
 	ELeverType LeverType = ELeverType::Switch;
-
-	UPROPERTY(SaveGame)
-	ELeverState LeverState = ELeverState::Off;
 
 	UPROPERTY(SaveGame)
 	FVector LastTransform;

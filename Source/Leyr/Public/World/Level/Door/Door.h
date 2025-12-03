@@ -7,7 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "Door.generated.h"
 
-class ALever;
+class AEvent;
 class UPaperSpriteComponent;
 class UBoxComponent;
 
@@ -39,31 +39,31 @@ class LEYR_API ADoor : public APaperFlipbookActor
 	
 public:	
 	ADoor();
-	void HandleDoorMoving(float DeltaSeconds) const;
+	void HandleDoorMoving(float DeltaSeconds);
 	virtual void Tick(float DeltaSeconds) override;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Platform")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Event")
 	TObjectPtr<UBoxComponent> DoorCollision;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Platform")
+	UPROPERTY(EditDefaultsOnly, Category="Event")
 	bool bIsProximityDoor = false;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Platform")
+	UPROPERTY(EditDefaultsOnly, Category="Event")
 	TObjectPtr<UBoxComponent> OverlapBox;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Platform")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Event")
 	TObjectPtr<UPaperSpriteComponent> Background;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Platform")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Event")
 	TObjectPtr<UPaperSpriteComponent> Foreground;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Platform")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Event")
 	TObjectPtr<USceneComponent> OpenPosition;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Platform")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Event")
 	FVector CloseLocation = FVector::ZeroVector;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Platform")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Event")
 	FVector OpenLocation = FVector::ZeroVector;	
 
 protected:
@@ -80,8 +80,8 @@ protected:
 	UFUNCTION()
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	UPROPERTY(EditAnywhere, Category="Platform")
-	TObjectPtr<ALever> Switch;
+	UPROPERTY(EditAnywhere, Category="Event")
+	TObjectPtr<AEvent> EventOwner;
 
 private:
 	EDoorState DoorState = EDoorState::Close;

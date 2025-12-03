@@ -1,6 +1,6 @@
 // @ Retropsis 2024-2025.
 
-#include "World/Level/Keylock/Keylock.h"
+#include "World/Level/Event/Keylock.h"
 #include "PaperFlipbookComponent.h"
 #include "Components/BoxComponent.h"
 #include "Engine/AssetManager.h"
@@ -31,7 +31,7 @@ AKeylock::AKeylock()
 void AKeylock::LoadActor_Implementation()
 {
 	Super::LoadActor_Implementation();
-	if (LeverState == ELeverState::On)
+	if (EventState == EEventState::On)
 	{
 		LockHitBox->SetRelativeLocation(LastTransform);
 		LockHitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -56,10 +56,10 @@ void AKeylock::Interact_Implementation(AActor* InteractingActor)
 		PlayerInterface->GetOnKeyItemUsed().AddLambda([this, InteractingActor] ()
 		{
 			// Open
-			LeverState = ELeverState::On;
-			HandleLeverVisualState(LeverState);
+			EventState = EEventState::On;
+			HandleLeverVisualState(EventState);
 			LockFlipbook->SetPlaybackPositionInFrames(2, true);
-			OnLeverStateChanged.Broadcast(LeverState);
+			OnEventStateChanged.Broadcast(EventState);
 			LockHitBox->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 			LockHitBox->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 			LockHitBox->SetEnableGravity(true);

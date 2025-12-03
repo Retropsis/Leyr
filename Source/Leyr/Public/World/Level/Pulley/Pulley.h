@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "World/Level/Lever.h"
+#include "World/Level/Event/Lever.h"
 #include "Pulley.generated.h"
 
 class UPhysicsConstraintComponent;

@@ -4,7 +4,8 @@
 #include "PaperFlipbookComponent.h"
 #include "Components/BoxComponent.h"
 #include "PaperSpriteComponent.h"
-#include "World/Level/Lever.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "World/Level/Event/Lever.h"
 
 ADoor::ADoor()
 {
@@ -37,23 +38,23 @@ void ADoor::Tick(float DeltaSeconds)
 void ADoor::BeginPlay()
 {
 	Super::BeginPlay();
-	GetRenderComponent()->OnFinishedPlaying.AddDynamic(this, &ADoor::HandleOnFinishedPlaying);
+	// GetRenderComponent()->OnFinishedPlaying.AddDynamic(this, &ADoor::HandleOnFinishedPlaying);
 	GetRenderComponent()->SetPlaybackPosition(0.f, true);
 	
-	if(IsValid(Switch))
+	if(IsValid(EventOwner))
 	{
 		bIsProximityDoor = false;
-		if(Switch->GetLeverState() == ELeverState::On)
+		if(EventOwner->GetEventState() == EEventState::On)
 		{
 			HandleDoorState(true);
 		}
 		else
 		{
-			Switch->OnLeverStateChanged.AddLambda([this] (const ELeverState NewState)
-			{
-				HandleDoorState(NewState == ELeverState::On);
-			});
 		}
+		EventOwner->OnEventStateChanged.AddLambda([this] (const EEventState NewState)
+		{
+			HandleDoorState(NewState == EEventState::On);
+		});
 	}
 	
 	if (HasAuthority() && bIsProximityDoor)
@@ -71,10 +72,14 @@ void ADoor::OnConstruction(const FTransform& Transform)
 	OpenLocation = OpenPosition->GetComponentLocation();
 }
 
-void ADoor::HandleDoorMoving(float DeltaSeconds) const
+void ADoor::HandleDoorMoving(float DeltaSeconds)
 {
 	const FVector TargetLocation = DoorState == EDoorState::Opening ? OpenLocation : CloseLocation;
 	DoorCollision->SetWorldLocation(FMath::VInterpTo(DoorCollision->GetComponentLocation(), TargetLocation, DeltaSeconds, 5.f));
+	if (FVector::PointsAreNear(DoorCollision->GetComponentLocation(), TargetLocation, 1.f))
+	{
+		HandleOnFinishedPlaying();
+	}
 }
 
 void ADoor::HandleOnFinishedPlaying()

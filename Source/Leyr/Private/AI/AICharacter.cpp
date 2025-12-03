@@ -126,6 +126,7 @@ void AAICharacter::BeginPlay()
 	InitAbilityActorInfo();
 	AddCharacterAbilities();
 	PlaySpawningSequence();
+	SetupCollisionDamage();
 
 	// if(bCollisionCauseDamage)
 	// {
@@ -238,7 +239,7 @@ void AAICharacter::InitializeCharacterInfo()
 
 		// GEngine->AddOnScreenDebugMessage(-1, 300.f, FColor::Magenta, FString::Printf(TEXT("PossessedBy InitializeCharacterInfo %s"), *GetName()));
 		GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &AAICharacter::OnBeginOverlap);
-		SetupCollisionDamage();
+		// SetupCollisionDamage();
 	}
 
 	// Loading Hit React Sequences Effect
@@ -461,7 +462,7 @@ void AAICharacter::Die(const FVector& DeathImpulse, bool bExecute)
 	}
 	
 	// DefeatState = bExecute ? EDefeatState::Executed : EDefeatState::Defeated;
-	MulticastHandleDeath(DeathImpulse, DefeatState);
+	// MulticastHandleDeath(DeathImpulse, DefeatState); // This called ABaseCharacter::MulticastHandleDeath a second time
 	SpawnLoot();
 	Super::Die(DeathImpulse, bExecute);
 }

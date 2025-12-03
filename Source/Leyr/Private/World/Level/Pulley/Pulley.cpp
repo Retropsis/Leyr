@@ -51,9 +51,9 @@ void APulley::InteractHit_Implementation(AActor* InteractingActor, FName BoneNam
 {
 	Super::InteractHit_Implementation(InteractingActor, BoneName);
 	
-	LeverState = ELeverState::On;
-	HandleLeverVisualState(LeverState);
-	OnLeverStateChanged.Broadcast(LeverState);
+	EventState = EEventState::On;
+	HandleLeverVisualState(EventState);
+	OnEventStateChanged.Broadcast(EventState);
 	
 	if(PhysicsConstraint)
 	{

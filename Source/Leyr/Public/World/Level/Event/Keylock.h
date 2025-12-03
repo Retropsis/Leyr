@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "World/Level/Lever.h"
+#include "World/Level/Event/Lever.h"
 #include "Keylock.generated.h"
 
 class UItemData;

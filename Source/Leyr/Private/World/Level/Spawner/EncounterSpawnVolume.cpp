@@ -177,8 +177,9 @@ void AEncounterSpawnVolume::OnDespawnOverlap(UPrimitiveComponent* OverlappedComp
 	{
 		for (AEncounterSpawnPoint* SpawnPoint : SpawnPoints)
 		{
-			if (!ICombatInterface::Execute_IsDefeated(Encounter) && SpawnPoint->RequestRespawnEncounter(Encounter))
+			if (!ICombatInterface::Execute_IsDefeated(Encounter))
 			{
+				bool bHasSpawned = SpawnPoint->RequestRespawnEncounter(Encounter);
 				if (Encounter->IsActorBeingDestroyed())
 				{
 					GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Red, FString::Printf(TEXT("%s is being destroyed"), *Encounter->GetName()));

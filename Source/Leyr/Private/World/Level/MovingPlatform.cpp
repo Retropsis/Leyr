@@ -3,7 +3,7 @@
 #include "World/Level/MovingPlatform.h"
 #include "Components/BoxComponent.h"
 #include "Components/SplineComponent.h"
-#include "World/Level/Lever.h"
+#include "World/Level/Event/Lever.h"
 
 AMovingPlatform::AMovingPlatform()
 {
@@ -43,9 +43,9 @@ void AMovingPlatform::BeginPlay()
 	Super::BeginPlay();
 	CurrentTarget = RouteSpline->GetLocationAtSplinePoint(CurrentIndex, ESplineCoordinateSpace::World);
 	bIsActivated = !IsValid(Switch);
-	if(IsValid(Switch)) Switch->OnLeverStateChanged.AddLambda([this] (const ELeverState NewState)
+	if(IsValid(Switch)) Switch->OnEventStateChanged.AddLambda([this] (const EEventState NewState)
 	{
-		bIsActivated = NewState == ELeverState::On;
+		bIsActivated = NewState == EEventState::On;
 	});
 }
 

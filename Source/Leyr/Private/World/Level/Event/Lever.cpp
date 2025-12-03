@@ -1,6 +1,6 @@
 // @ Retropsis 2024-2025.
 
-#include "World/Level/Lever.h"
+#include "World/Level/Event/Lever.h"
 #include "PaperFlipbookComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -15,10 +15,10 @@ ALever::ALever()
 
 void ALever::LoadActor_Implementation()
 {
-	if (LeverState == ELeverState::On)
+	if (EventState == EEventState::On)
 	{
-		HandleLeverVisualState(LeverState);
-		OnLeverStateChanged.Broadcast(LeverState);
+		HandleLeverVisualState(EventState);
+		OnEventStateChanged.Broadcast(EventState);
 	}
 }
 
@@ -34,11 +34,11 @@ void ALever::BeginPlay()
 
 void ALever::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if(LeverState == ELeverState::On) return;
+	if(EventState == EEventState::On) return;
 	
-	LeverState = ELeverState::On;
-	HandleLeverVisualState(LeverState);
-	OnLeverStateChanged.Broadcast(LeverState);
+	EventState = EEventState::On;
+	HandleLeverVisualState(EventState);
+	OnEventStateChanged.Broadcast(EventState);
 	if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(OnTimer, this, &ALever::HandleOnTimerEnd, OnTime);
 }
 
@@ -49,40 +49,40 @@ void ALever::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 
 void ALever::Interact_Implementation(AActor* InteractingActor)
 {
-	if(LeverType != ELeverType::Switch && LeverState == ELeverState::On) return;
+	if(LeverType != ELeverType::Switch && EventState == EEventState::On) return;
 	
 	switch (LeverType) {
 	case ELeverType::Switch:
-		LeverState = LeverState == ELeverState::Off ?  ELeverState::On : ELeverState::Off;
+		EventState = EventState == EEventState::Off ?  EEventState::On : EEventState::Off;
 		break;
 	case ELeverType::Timer:
-		LeverState = ELeverState::On;
+		EventState = EEventState::On;
 		if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(OnTimer, this, &ALever::HandleOnTimerEnd, OnTime);
 		break;
 	case ELeverType::SingleUse:
-		LeverState = ELeverState::On;
+		EventState = EEventState::On;
 		break;
 	case ELeverType::Weight:
 		break;
 	}
-	HandleLeverVisualState(LeverState);
-	OnLeverStateChanged.Broadcast(LeverState);
+	HandleLeverVisualState(EventState);
+	OnEventStateChanged.Broadcast(EventState);
 }
 
-void ALever::HandleLeverVisualState(ELeverState NewState)
+void ALever::HandleLeverVisualState(EEventState NewState)
 {
 	switch (NewState) {
-	case ELeverState::None:
+	case EEventState::None:
 		break;
-	case ELeverState::On:
+	case EEventState::On:
 		GetRenderComponent()->SetPlaybackPositionInFrames(2, true);
 		if(SwitchOnSound) UGameplayStatics::PlaySoundAtLocation(this, SwitchOnSound, GetActorLocation());
 		break;
-	case ELeverState::Off:
+	case EEventState::Off:
 		GetRenderComponent()->SetPlaybackPositionInFrames(1, true);
 		if(SwitchOffSound) UGameplayStatics::PlaySoundAtLocation(this, SwitchOffSound, GetActorLocation());
 		break;
-	case ELeverState::Timer:
+	case EEventState::Timer:
 		GetRenderComponent()->SetPlaybackPositionInFrames(2, true);
 		if(TimerTickSound) UGameplayStatics::PlaySoundAtLocation(this, TimerTickSound, GetActorLocation());
 		break;
@@ -91,7 +91,7 @@ void ALever::HandleLeverVisualState(ELeverState NewState)
 
 void ALever::HandleOnTimerEnd()
 {
-	LeverState = ELeverState::Off;
-	HandleLeverVisualState(LeverState);
-	OnLeverStateChanged.Broadcast(LeverState);
+	EventState = EEventState::Off;
+	HandleLeverVisualState(EventState);
+	OnEventStateChanged.Broadcast(EventState);
 }

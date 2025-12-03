@@ -201,17 +201,18 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 		OnPlayerLeaving.Broadcast();
 		DestroyOutOfBoundsEncounters();
 		
-		FTimerHandle DestroyTimer;
-		GetWorld()->GetTimerManager().SetTimer(DestroyTimer, FTimerDelegate::CreateLambda([this] ()
+		// FTimerHandle DestroyTimer;
+		// GetWorld()->GetTimerManager().SetTimer(DestroyTimer, FTimerDelegate::CreateLambda([this] ()
+		// {
+		// }), .1f, false);
+		
+		for (const TObjectPtr<AEncounterSpawnVolume> SpawningVolume : SpawningVolumes)
 		{
-			for (const TObjectPtr<AEncounterSpawnVolume> SpawningVolume : SpawningVolumes)
+			for (AEncounterSpawnPoint* SpawnPoint : SpawningVolume->GetSpawnPoints())
 			{
-				for (AEncounterSpawnPoint* SpawnPoint : SpawningVolume->GetSpawnPoints())
-				{
-					SpawnPoint->DespawnEncounter();
-				}
+				SpawnPoint->DespawnEncounter();
 			}
-		}), 2.f, false);
+		}
 
 		ToggleLevelActorActivity(false);
 		LevelArea_GrantedHandles.TakeFromAbilitySystem(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor));

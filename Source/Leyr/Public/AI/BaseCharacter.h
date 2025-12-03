@@ -193,7 +193,7 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly)
 	EDefeatState DefeatState = EDefeatState::None;
-
+	
 	/*
 	 * Animation
 	 */

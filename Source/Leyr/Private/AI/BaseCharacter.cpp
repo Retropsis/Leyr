@@ -342,6 +342,7 @@ void ABaseCharacter::SetCharacterCapsuleCollision_Implementation(const ECollisio
 void ABaseCharacter::Die(const FVector& DeathImpulse, bool bExecute)
 {
 	DefeatState = bExecute ? EDefeatState::Executed : EDefeatState::Defeated;
+	OnDeath.Broadcast(this);
 	//TODO: for 3D meshes, could try also with 2D Weapon.
 	// Weapon->DetachFromComponent(FDetachmentTransformRules(EDetachmentRule::KeepWorld, true));
 	MulticastHandleDeath(DeathImpulse, DefeatState);
@@ -349,23 +350,12 @@ void ABaseCharacter::Die(const FVector& DeathImpulse, bool bExecute)
 
 void ABaseCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImpulse, EDefeatState InDefeatState)
 {
+	HandleDeath(InDefeatState);
 	HandleDeathCapsuleComponent(DeathImpulse);
 	// UAssetManager::GetStreamableManager().RequestAsyncLoad(DefeatedSound.ToSoftObjectPath(), FStreamableDelegate::CreateUObject(this, &ABaseCharacter::PlayDeathSound), FStreamableManager::DefaultAsyncLoadPriority);
-	HandleDeath(InDefeatState);
 	
 	if (DestroyedFlashDuration <= 0.f) return;
 	PlayFlashEffect(DestroyedFlashStrength, 1 /DestroyedFlashDuration, DestroyedFlashColor);
-}
-
-void ABaseCharacter::HandleDeathCapsuleComponent(const FVector& DeathImpulse) const
-{
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Player, ECR_Ignore);
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Enemy, ECR_Ignore);
-	GetCapsuleComponent()->SetSimulatePhysics(bSimulatePhysicsOnDestroyed);
-	if (bSimulatePhysicsOnDestroyed) GetCapsuleComponent()->AddImpulse(DeathImpulse, NAME_None, true);
 }
 
 void ABaseCharacter::HandleDeath(EDefeatState InDefeatState)
@@ -374,10 +364,21 @@ void ABaseCharacter::HandleDeath(EDefeatState InDefeatState)
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, DestroyedEffectLoaded, GetActorLocation(), GetActorRotation());
 	
 	GetAbilitySystemComponent()->AddLooseGameplayTag(FBaseGameplayTags::Get().Defeated);
-	DefeatState = InDefeatState;
 	BurnStatusEffectComponent->DeactivateImmediate();
 	StunStatusEffectComponent->DeactivateImmediate();
-	OnDeath.Broadcast(this);
+}
+
+void ABaseCharacter::HandleDeathCapsuleComponent(const FVector& DeathImpulse) const
+{
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Magenta, UEnum::GetValueAsString(DefeatState));
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Magenta, UEnum::GetValueAsString(GetLocalRole()));
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Player, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Enemy, ECR_Ignore);
+	GetCapsuleComponent()->SetSimulatePhysics(bSimulatePhysicsOnDestroyed);
+	if (bSimulatePhysicsOnDestroyed) GetCapsuleComponent()->AddImpulse(DeathImpulse, NAME_None, true);
 }
 
 void ABaseCharacter::SetGravityScale_Implementation(float GravityValue)

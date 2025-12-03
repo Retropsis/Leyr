@@ -86,4 +86,5 @@ protected:
 private:
 	FVector StartLocation;
 	UPaperFlipbook* ActiveFlipbook;
+	FTimerHandle ResetCollisionTimer;
 };

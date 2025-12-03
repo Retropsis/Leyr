@@ -54,7 +54,8 @@ void ABreakableLight::Extinguish()
 {
 	BoxComponent->OnComponentHit.RemoveAll(this);
 	BoxComponent->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
-	BoxComponent->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	// BoxComponent->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	BoxComponent->SetSimulatePhysics(true);
 	BoxComponent->SetBoxExtent(FVector{ 14.f });
 	BoxComponent->AddImpulse(FVector{ FMath::RandRange(-150.f, 150.f), 0.f, 0.f }, NAME_None, true);
@@ -64,11 +65,10 @@ void ABreakableLight::Extinguish()
 	HaloComponent->SetVisibility(false);
 	bHasInteracted = true;
 
-	FTimerHandle ResetCollisionTimer;
 	GetWorld()->GetTimerManager().SetTimer(ResetCollisionTimer, FTimerDelegate::CreateLambda([this] ()
 	{
 		BoxComponent->SetSimulatePhysics(false);
-		BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		// BoxComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	}), 2.f, false);
 }
 
@@ -85,6 +85,8 @@ void ABreakableLight::HandleOnHit(const FHitResult& HitResult)
 
 void ABreakableLight::ResetState_Implementation()
 {
+	GetWorldTimerManager().ClearTimer(ResetCollisionTimer);
+	ResetCollisionTimer.Invalidate();
 	BoxComponent->OnComponentHit.AddUniqueDynamic(this, &ABreakableLight::OnHit);
 	BoxComponent->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Ignore);
 	BoxComponent->SetSimulatePhysics(false);
