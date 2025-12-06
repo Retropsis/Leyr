@@ -10,6 +10,10 @@
 
 class UBehaviorTree;
 enum class EBehaviourType : uint8;
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnBehaviourDataPropertyChanged, FName /* PropertyName */);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMovementTypePropertyChanged, EMovementType /*  MovementType*/);
+
 /**
  * 
  */
@@ -19,6 +23,13 @@ class LEYR_API UBehaviourData : public UDataAsset
 	GENERATED_BODY()
 
 public:
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+
+	FOnBehaviourDataPropertyChanged OnBehaviourDataPropertyChanged;
+	FOnMovementTypePropertyChanged OnMovementTypePropertyChanged;
+	
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<UBehaviorTree> BehaviorTree = nullptr;
 	

@@ -19,6 +19,8 @@ class UNiagaraSystem;
 class UAttackSequenceInfo;
 class UBehaviourData;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnEncounterDataPropertyChanged, FName /* PropertyName */);
+
 /**
  * 
  */
@@ -28,6 +30,12 @@ class LEYR_API UEncounterData : public UDataAsset
 	GENERATED_BODY()
 
 public:
+#if WITH_EDITOR
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+#endif
+
+	FOnEncounterDataPropertyChanged OnEncounterDataPropertyChanged;
+	
 	UPROPERTY(EditDefaultsOnly)
 	TSoftClassPtr<AAICharacter> EncounterClass = nullptr;
 

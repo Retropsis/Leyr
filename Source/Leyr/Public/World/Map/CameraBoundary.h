@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "PaperTileMapActor.h"
 #include "Components/BoxComponent.h"
+#include "Data/EncounterSpawnData.h"
 #include "CameraBoundary.generated.h"
 
 class UNiagaraComponent;
@@ -73,17 +74,19 @@ class LEYR_API ACameraBoundary : public AActor
 	
 public:	
 	ACameraBoundary();
-
-	UFUNCTION(CallInEditor, Category="00 - Camera Boundary")
-	virtual void InitializeCameraExtent();
+	virtual void OnConstruction(const FTransform& Transform) override;
 	
-	UFUNCTION(CallInEditor, Category="00 - Camera Boundary")
+	UFUNCTION(CallInEditor, Category=" Camera Boundary")
+	virtual void InitializeCameraExtent();
+	void CreateSpawningVolume(const FActorSpawnParameters& SpawnParams, const FEncounterSpawn& Data, const FVector& Offset, const FString& Label);
+
+	UFUNCTION(CallInEditor, Category=" Camera Boundary")
 	virtual void InitializeSpawnVolumes();
 	
-	UFUNCTION(CallInEditor, Category="00 - Camera Boundary")
+	UFUNCTION(CallInEditor, Category=" Camera Boundary")
 	virtual void UpdateSpawnVolumes();
 	
-	UFUNCTION(CallInEditor, Category="00 - Camera Boundary")
+	UFUNCTION(CallInEditor, Category=" Camera Boundary")
 	virtual void ClearSpawnVolumes();
 	
 	AActor* GetTargetActor() { return TargetActor; }
@@ -104,6 +107,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	FBoxSphereBounds GetTileMapBounds() const;
 	void DestroyOutOfBoundsEncounters() const;
 	void ToggleLevelActorActivity(bool bActivate) const;
 	void GiveToAbilitySystem(UAbilitySystemComponent* ASC, FLevelArea_GrantedHandles* OutGrantedHandles, float Level = 1.f, UObject* SourceObject = nullptr) const;
@@ -113,7 +117,7 @@ protected:
 
 	UFUNCTION()
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
+	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBoxComponent> EnteringBoundary;
 	
@@ -126,19 +130,19 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> BoundaryVisualizer;
 	
-	UPROPERTY(EditAnywhere, Category="00 - Camera Boundary")
+	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
 	TObjectPtr<ULevelAreaData> LevelAreaData;
 	
-	UPROPERTY(EditAnywhere, Category="00 - Camera Boundary")
+	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
 	TObjectPtr<APaperTileMapActor> TileMap;
 	
-	UPROPERTY(EditAnywhere, Category="00 - Camera Boundary")
+	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
 	EBoundaryRule BoundaryRule = EBoundaryRule::Extent;
 
-	UPROPERTY(EditAnywhere, Category="00 - Camera Boundary")
+	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
 	bool bConstrainZ = true;
 	
-	UPROPERTY(EditAnywhere, Category="00 - Camera Boundary")
+	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
 	bool bConstrainX = true;
 
 	/*
@@ -147,13 +151,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AEncounterSpawnVolume> SpawningVolumeClass;
 	
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category=" Camera Boundary")
 	TArray<TObjectPtr<AEncounterSpawnVolume>> SpawningVolumes;
 
 	UPROPERTY()
 	TArray<TScriptInterface<ILevelActorInterface>> LevelActors;
 		
-	UPROPERTY(EditAnywhere, Category="00 - Camera Boundary|Gameplay Effects", meta=(TitleProperty=GameplayEffect))
+	UPROPERTY(EditAnywhere, Category=" Camera Boundary|Gameplay Effects", meta=(TitleProperty=GameplayEffect))
 	TArray<FLevelArea_GameplayEffect> GrantedGameplayEffects;
 	
 	UPROPERTY()

@@ -8,10 +8,13 @@
 #include "Leyr/Leyr.h"
 #include "EncounterSpawnPoint.generated.h"
 
+class ASplineComponentActor;
 class APointCollection;
 class UBehaviourData;
 class UEncounterData;
 class AAICharacter;
+
+DECLARE_MULTICAST_DELEGATE(FSplineComponentActorUpdated);
 
 /**
  * 
@@ -23,6 +26,7 @@ class LEYR_API AEncounterSpawnPoint : public ATargetPoint
 
 public:
 	AEncounterSpawnPoint();
+	virtual void OnConstruction(const FTransform& Transform) override;
 	
 	UFUNCTION(BlueprintCallable)
 	void SpawnEncounterGroup();
@@ -40,6 +44,10 @@ public:
 	bool RequestRespawnEncounter(AAICharacter* Encounter);
 
 	FVector FindRandomPointWithinBounds(const FVector& Origin) const;
+
+	void SetEncounterIcon(UTexture2D* Icon) const;
+
+	FSplineComponentActorUpdated SplineComponentActorUpdated;
 	
 	UPROPERTY()
 	float RespawnTime = 120.f;
@@ -55,6 +63,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category="Spawner")
 	int32 EncounterLevel = 1;
+
+	UPROPERTY(VisibleAnywhere, Category="Spawner")
+	TObjectPtr<ASplineComponentActor> SplineComponentActor;
 	
 	UPROPERTY()
 	TSubclassOf<APointCollection> PointCollectionClass;

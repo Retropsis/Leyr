@@ -3,8 +3,10 @@
 #include "World/Level/Spawner/EncounterSpawnPoint.h"
 #include "AbilitySystem/Actor/PointCollection.h"
 #include "AI/AICharacter.h"
+#include "AI/SplineComponentActor.h"
 #include "Algo/RandomShuffle.h"
 #include "Components/BillboardComponent.h"
+#include "Data/BehaviourData.h"
 #include "Data/EncounterData.h"
 #include "Engine/AssetManager.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -14,6 +16,31 @@ AEncounterSpawnPoint::AEncounterSpawnPoint()
 {
 	PrimaryActorTick.bCanEverTick = false;
 	GetSpriteComponent()->SetWorldScale3D(FVector(1.0f, 1.0f, 1.0f));
+}
+
+void AEncounterSpawnPoint::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	
+	if (IsValid(EncounterData) && IsValid(EncounterData->BehaviourData))
+	{
+		EncounterData->OnEncounterDataPropertyChanged.AddLambda([this] (FName PropertyName)
+		{
+			if (PropertyName == FName("EncounterIcon"))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Property Changed: %s"), *PropertyName.ToString());
+				if (PropertyName == FName("EncounterIcon"))
+				{
+					SetEncounterIcon(EncounterData->EncounterIcon);
+				}
+			}
+		});
+	}
+}
+
+void AEncounterSpawnPoint::SetEncounterIcon(UTexture2D* Icon) const
+{
+	GetSpriteComponent()->SetSprite(Icon);
 }
 
 void AEncounterSpawnPoint::SpawnEncounterGroup()
@@ -64,12 +91,18 @@ void AEncounterSpawnPoint::SpawnEncounter(UClass* EncounterToSpawn, const FTrans
 	Encounter->SetEncounterLevel(EncounterLevel);
 	Encounter->SetEncounterData(EncounterData);
 	if (OverrideBehaviourData) Encounter->SetBehaviourData(OverrideBehaviourData);
-	IAIInterface::Execute_SetSpawningBounds(Encounter, SpawningBounds);					
+	IAIInterface::Execute_SetSpawningBounds(Encounter, SpawningBounds);
+	
+	if (IsValid(SplineComponentActor))
+	{
+		Encounter->SplineComponentActor = SplineComponentActor;
+		Encounter->SplineComponent = SplineComponentActor->GetSplineComponent();
+		Encounter->SplineComponentActor->SetActorLocation(SplineComponentActor->GetActorLocation());
+	}
+	
 	Encounter->SpawnDefaultController();
 	Encounter->FinishSpawning(InSpawnTransform);
 	CurrentSpawns.Add(Encounter);
-
-	GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Magenta, FString::Printf(TEXT("Spawning: %s"), *Encounter->GetName()));
 
 	if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Encounter); CombatInterface && SpawnerType == ESpawnerType::Infinite)
 	{

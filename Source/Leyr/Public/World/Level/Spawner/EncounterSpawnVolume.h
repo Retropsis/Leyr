@@ -3,12 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Data/EncounterSpawnData.h"
 #include "GameFramework/Actor.h"
 #include "Interaction/SaveInterface.h"
 #include "Leyr/Leyr.h"
 #include "EncounterSpawnVolume.generated.h"
 
+class ASplineComponentActor;
 class UEncounterSpawnData;
 class AEncounterSpawnPoint;
 class UBoxComponent;
@@ -20,24 +22,30 @@ class LEYR_API AEncounterSpawnVolume : public AActor, public ISaveInterface
 	
 public:	
 	AEncounterSpawnVolume();
+	virtual void OnConstruction(const FTransform& Transform) override;
 	void DisableVolume() const;
 	void EnableVolume() const;
 	void ToggleOnDespawnOverlap(bool bEnable) const;
+	void CreateSpawnPoint(const FActorSpawnParameters& SpawnParams, bool bUniqueSpawnLocationType, const FVector& Offset, bool bFirstIndex);
+	void UpdateSpawnPointData(bool bUniqueSpawnLocationType, AEncounterSpawnPoint* SpawnPoint) const;
+	void UpdateSpawnPointLabel(AEncounterSpawnPoint* SpawnPoint);
+	void UpdateSpawnPointEncounterIcon(const AEncounterSpawnPoint* SpawnPoint) const;
+	void CreateSplineComponentActor();
 
 	//~ Save Interface
 	virtual void LoadActor_Implementation() override;
 	//~ Save Interface
 
-	UFUNCTION(CallInEditor)
+	UFUNCTION(CallInEditor, Category="Spawner")
 	void InitializeSpawnPoints();
-
-	UFUNCTION(CallInEditor)
+	
+	UFUNCTION(CallInEditor, Category="Spawner")
 	void UpdateSpawnPoints();
-
-	UFUNCTION(CallInEditor)
+	
+	UFUNCTION(CallInEditor, Category="Spawner")
 	void SetTriggerBoundaryToRoomSize() const;
-
-	UFUNCTION(CallInEditor)
+	
+	UFUNCTION(CallInEditor, Category="Spawner")
 	void SetDespawnBoundaryToRoomSize() const;
 	
 	UFUNCTION()
@@ -49,9 +57,14 @@ public:
 	void ClearSpawnPoints();
 	TArray<AEncounterSpawnPoint*> GetSpawnPoints() { return SpawnPoints; }
 	void SetEncounterSpawnData(const FEncounterSpawn& Data) { EncounterSpawnData = Data; }
+	void SetEncounterSpawnTag(const FGameplayTag& Tag) { EncounterSpawnTag = Tag; }
+	FGameplayTag GetEncounterSpawnTag() const { return EncounterSpawnTag; }
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void UpdateEncounterIcon(UTexture2D* Icon);
+	// UFUNCTION(BlueprintImplementableEvent)
+	// void UpdateEncounterIcon(UTexture2D* 
+
+	UPROPERTY(VisibleAnywhere, Category="Spawner")
+	TObjectPtr<ASplineComponentActor> SplineComponentActor;
 	
 	FBoxSphereBounds TileMapBounds;
 
@@ -72,6 +85,9 @@ protected:
 	
 private:
 	FBoundLocations CalculateBounds() const;
+
+	UPROPERTY(VisibleAnywhere)
+	FGameplayTag EncounterSpawnTag = FGameplayTag::EmptyTag;
 	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UBoxComponent> TriggerVolume;

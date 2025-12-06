@@ -711,4 +711,17 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	 * Visual Effects
 	 */
 	GameplayTags.VisualEffect_HitReactFlash = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("VisualEffect.HitReactFlash"), FString("VisualEffect HitReactFlash"));
+
+	/*
+	 * Encounter Spawns
+	 */
+	GameplayTags.EncounterSpawn_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("EncounterSpawn.1"), FString("EncounterSpawn 1"));
+	GameplayTags.EncounterSpawn_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("EncounterSpawn.2"), FString("EncounterSpawn 2"));
+	GameplayTags.EncounterSpawn_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("EncounterSpawn.3"), FString("EncounterSpawn 3"));
+	GameplayTags.EncounterSpawn_4 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("EncounterSpawn.4"), FString("EncounterSpawn 4"));
+	GameplayTags.EncounterSpawn_5 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("EncounterSpawn.5"), FString("EncounterSpawn 5"));
+	GameplayTags.EncounterSpawn_6 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("EncounterSpawn.6"), FString("EncounterSpawn 6"));
+	GameplayTags.EncounterSpawn_7 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("EncounterSpawn.7"), FString("EncounterSpawn 7"));
+	GameplayTags.EncounterSpawn_8 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("EncounterSpawn.8"), FString("EncounterSpawn 8"));
+	GameplayTags.EncounterSpawn_9 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("EncounterSpawn.9"), FString("EncounterSpawn 9"));
 }

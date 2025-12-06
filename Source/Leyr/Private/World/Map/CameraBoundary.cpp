@@ -53,6 +53,35 @@ ACameraBoundary::ACameraBoundary()
 	BoundaryVisualizer->bCastDynamicShadow = false;
 }
 
+void ACameraBoundary::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	
+	/*
+	 * Opening the map in editor is calling it as well.
+	 */
+	if (LevelAreaData != nullptr)
+	{
+		LevelAreaData->OnLevelAreaDataPropertyChanged.AddLambda([this] (FName PropertyName) {
+			UE_LOG(LogTemp, Warning, TEXT("Level Area Data Property Changed : %s"), *PropertyName.ToString());
+			UpdateSpawnVolumes();
+		});
+		LevelAreaData->OnEncounterSpawnsPropertyDeleted.AddLambda([this] (const FGameplayTag Tag) {
+			for (TObjectPtr<AEncounterSpawnVolume> SpawnVolume : SpawningVolumes)
+			{
+				if (IsValid(SpawnVolume) && SpawnVolume->GetEncounterSpawnTag().MatchesTagExact(Tag))
+				{
+					UE_LOG(LogTemp, Warning, TEXT("SpawnVolume with tag : %s, deleting with tag: %s"), *SpawnVolume->GetEncounterSpawnTag().ToString(), *Tag.ToString());
+					SpawningVolumes.Remove(SpawnVolume);
+					SpawnVolume->ClearSpawnPoints();
+					SpawnVolume->Destroy();
+					break;
+				}
+			}
+		});
+	}
+}
+
 void ACameraBoundary::BeginPlay()
 {
 	Super::BeginPlay();
@@ -76,8 +105,8 @@ void ACameraBoundary::InitializeCameraExtent()
 {
 	if (TileMap)
 	{
-		SetActorLocation(TileMap->GetRenderComponent()->Bounds.Origin);
-		TileMapBounds = TileMap->GetRenderComponent()->Bounds;
+		TileMapBounds = GetTileMapBounds();
+		SetActorLocation(TileMapBounds.Origin);
 		EnteringBoundary->SetBoxExtent(FVector{ TileMapBounds.BoxExtent.X - 18.f, TileMapBounds.BoxExtent.Y, TileMapBounds.BoxExtent.Z - 54.f });
 		NavigationBoundary->SetBoxExtent(FVector{ TileMapBounds.BoxExtent.X - 128.f, TileMapBounds.BoxExtent.Y, TileMapBounds.BoxExtent.Z - 128.f });
 		BoundaryVisualizer->SetWorldScale3D(FVector{ TileMapBounds.BoxExtent.X / 50.f, TileMapBounds.BoxExtent.Y / 50.f, TileMapBounds.BoxExtent.Z / 50.f });
@@ -104,23 +133,44 @@ void ACameraBoundary::InitializeSpawnVolumes()
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		
 	FVector Offset = FVector{ 100.f, 0.f, 0.f };
+	
 	for (int i = 0; i < LevelAreaData->EncounterSpawns.Num(); i++)
 	{
-		FVector Location = FVector{ GetActorLocation().X, 0.f, GetActorLocation().Z } + Offset;
-		AEncounterSpawnVolume* SpawningVolume = GetWorld()->SpawnActor<AEncounterSpawnVolume>(SpawningVolumeClass, Location, FRotator::ZeroRotator, SpawnParams);
-		SpawningVolume->SetEncounterSpawnData(LevelAreaData->EncounterSpawns[i]);
-		SpawningVolume->InitializeSpawnPoints();
-		SpawningVolume->TileMapBounds = TileMapBounds;
-		FString NewLabel = LevelAreaData->EncounterSpawns[i].EncounterClass->GetName().Replace(TEXT("BP"), TEXT("SpawningVolume"));
-		SpawningVolume->SetActorLabel(NewLabel);
-		SpawningVolumes.Add(SpawningVolume);
+		const FString NewLabel = LevelAreaData->EncounterSpawns[i].EncounterClass->GetName().Replace(TEXT("BP"), TEXT("SpawningVolume"));
+		CreateSpawningVolume(SpawnParams, LevelAreaData->EncounterSpawns[i], Offset, NewLabel);
 		Offset.X += 50.f;
 	}
+}
+
+void ACameraBoundary::CreateSpawningVolume(const FActorSpawnParameters& SpawnParams, const FEncounterSpawn& Data, const FVector& Offset, const FString& Label)
+{
+	FVector Location = FVector{ GetActorLocation().X, 0.f, GetActorLocation().Z } + Offset;
+	AEncounterSpawnVolume* SpawningVolume = GetWorld()->SpawnActor<AEncounterSpawnVolume>(SpawningVolumeClass, Location, FRotator::ZeroRotator, SpawnParams);
+	SpawningVolume->SetEncounterSpawnData(Data);
+	SpawningVolume->SetEncounterSpawnTag(Data.EncounterSpawnTag);
+	SpawningVolume->InitializeSpawnPoints();
+	SpawningVolume->TileMapBounds = GetTileMapBounds();
+	SpawningVolume->SetActorLabel(Label);
+	SpawningVolumes.Add(SpawningVolume);
 }
 
 void ACameraBoundary::UpdateSpawnVolumes()
 {
 	if (SpawningVolumes.Num() == 0) return;
+
+	if (SpawningVolumes.Num() < LevelAreaData->EncounterSpawns.Num())
+	{
+		for (int i = SpawningVolumes.Num(); i < LevelAreaData->EncounterSpawns.Num(); ++i)
+		{
+			// Create a new spawn volume
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+			FVector Offset = FVector{ 100.f + 50.f * i, 0.f, 0.f };
+			const FString NewLabel = LevelAreaData->EncounterSpawns[i].EncounterClass->GetName().Replace(TEXT("BP"), TEXT("SpawningVolume"));
+			CreateSpawningVolume(SpawnParams, LevelAreaData->EncounterSpawns[i], Offset, NewLabel);
+		}
+		return;
+	}
 
 	for (int i = 0; i < SpawningVolumes.Num(); ++i)
 	{
@@ -128,6 +178,11 @@ void ACameraBoundary::UpdateSpawnVolumes()
 		{
 			SpawningVolumes[i]->SetEncounterSpawnData(LevelAreaData->EncounterSpawns[i]);
 			SpawningVolumes[i]->UpdateSpawnPoints();
+			SpawningVolumes[i]->TileMapBounds = GetTileMapBounds();
+			if (!SpawningVolumes[i]->GetEncounterSpawnTag().IsValid())
+			{
+				SpawningVolumes[i]->SetEncounterSpawnTag(LevelAreaData->EncounterSpawns[i].EncounterSpawnTag);
+			}
 			FString NewLabel = LevelAreaData->EncounterSpawns[i].EncounterClass->GetName().Replace(TEXT("BP"), TEXT("SpawningVolume"));
 			SpawningVolumes[i]->SetActorLabel(NewLabel);
 		}
@@ -330,4 +385,9 @@ void FLevelArea_GrantedHandles::TakeFromAbilitySystem(UAbilitySystemComponent* A
 		}
 	}
 	GameplayEffectHandles.Reset();
+}
+
+FBoxSphereBounds ACameraBoundary::GetTileMapBounds() const
+{
+	return TileMap->GetRenderComponent()->Bounds;
 }

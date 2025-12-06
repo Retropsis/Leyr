@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Engine/DataAsset.h"
 #include "EncounterSpawnData.generated.h"
 
@@ -36,6 +37,9 @@ USTRUCT(BlueprintType)
 struct FEncounterSpawn
 {
 	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, meta = (Categories="EncounterSpawn"))
+	FGameplayTag EncounterSpawnTag = FGameplayTag::EmptyTag;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<AAICharacter> EncounterClass = nullptr;

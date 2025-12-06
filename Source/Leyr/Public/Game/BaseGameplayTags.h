@@ -619,6 +619,19 @@ FGameplayTag Spawn_Below;
  * Visual Effects
  */
 FGameplayTag VisualEffect_HitReactFlash;
+	
+/*
+ * Encounter Spawn Tags
+ */
+FGameplayTag EncounterSpawn_1;
+FGameplayTag EncounterSpawn_2;
+FGameplayTag EncounterSpawn_3;
+FGameplayTag EncounterSpawn_4;
+FGameplayTag EncounterSpawn_5;
+FGameplayTag EncounterSpawn_6;
+FGameplayTag EncounterSpawn_7;
+FGameplayTag EncounterSpawn_8;
+FGameplayTag EncounterSpawn_9;
  
 private:
 	static FBaseGameplayTags GameplayTags;

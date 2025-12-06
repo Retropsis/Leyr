@@ -79,6 +79,11 @@ void AAICharacter::PossessedBy(AController* NewController)
 	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("RangedAttacker"), CharacterClass != ECharacterClass::Warrior);
 	BaseAIController->GetBlackboardComponent()->SetValueAsVector(FName("StartLocation"), StartLocation);
 	BaseAIController->GetBlackboardComponent()->SetValueAsObject(FName("OwningSummoner"), OwningSummoner);
+	if (IsValid(SplineComponentActor))
+	{
+		SplineComponent = SplineComponentActor->SplineComponent;
+		BaseAIController->GetBlackboardComponent()->SetValueAsObject(FName("SplineComponent"), SplineComponent);
+	}
 	BaseAIController->SetPawn(this);
 
 	if (Arena)
@@ -760,7 +765,7 @@ FVector AAICharacter::GetNextLocation_Implementation(const int32 SplineIndex)
 {
 	if(SplineComponentActor == nullptr) return GetActorLocation();
 	if(SplineComponent == nullptr) SplineComponent = SplineComponentActor->GetSplineComponent();
-	// UKismetSystemLibrary::DrawDebugSphere(this, SplineComponent->GetLocationAtSplinePoint(SplineIndex, ESplineCoordinateSpace::World), 33.f, 12, FLinearColor::Red, 8.f);
+	// UKismetSystemLibrary::DrawDebugSphere(this, SplineComponent->GetLocationAtSplinePoint(SplineIndex, ESplineCoordinateSpace::World), 6.f, 12, FLinearColor::Red, 8.f);
 	return  SplineComponent->GetLocationAtSplinePoint(SplineIndex, ESplineCoordinateSpace::World);
 }
 
