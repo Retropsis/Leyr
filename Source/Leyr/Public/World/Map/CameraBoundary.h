@@ -75,6 +75,7 @@ class LEYR_API ACameraBoundary : public AActor
 public:	
 	ACameraBoundary();
 	virtual void OnConstruction(const FTransform& Transform) override;
+	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 	
 	UFUNCTION(CallInEditor, Category=" Camera Boundary")
 	virtual void InitializeCameraExtent();

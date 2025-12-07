@@ -82,6 +82,16 @@ void ACameraBoundary::OnConstruction(const FTransform& Transform)
 	}
 }
 
+void ACameraBoundary::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+	
+	if (PropertyChangedEvent.Property->GetName() == TEXT("TileMap"))
+	{
+		InitializeCameraExtent();
+	}
+}
+
 void ACameraBoundary::BeginPlay()
 {
 	Super::BeginPlay();
