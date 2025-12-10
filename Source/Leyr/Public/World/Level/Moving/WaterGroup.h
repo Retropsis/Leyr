@@ -18,7 +18,6 @@ class LEYR_API AWaterGroup : public AMovingGroup
 public:
 	AWaterGroup();
 	virtual void HandleActiveActors(float DeltaSeconds) override;
-	
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
 	
@@ -26,7 +25,6 @@ public:
 	TObjectPtr<UNiagaraSystem> WaterSplash = nullptr;
 	
 protected:
-	virtual void OnConstruction(const FTransform& Transform) override;
 	void CheckForPlayerOverlap();
 	virtual void BeginPlay() override;
 
@@ -35,7 +33,4 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category="Moving|Entangled")
 	float SwimmingGravityScale = .2f;
-
-private:
-	float SurfaceZ = 0.f;
 };

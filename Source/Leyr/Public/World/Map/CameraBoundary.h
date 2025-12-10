@@ -78,18 +78,24 @@ public:
 	virtual void OnConstruction(const FTransform& Transform) override;
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 	
-	UFUNCTION(CallInEditor, Category=" Camera Boundary")
+	UFUNCTION(CallInEditor, Category=" Camera Boundary", meta=(DisplayPriority = "1"))
 	virtual void InitializeCameraExtent();
 	void CreateSpawningVolume(const FActorSpawnParameters& SpawnParams, const FEncounterSpawn& Data, const FVector& Offset, const FString& Label);
 
-	UFUNCTION(CallInEditor, Category=" Camera Boundary")
+	UFUNCTION(CallInEditor, Category=" Camera Boundary", meta=(DisplayPriority = "1"))
 	virtual void InitializeSpawnVolumes();
 	
-	UFUNCTION(CallInEditor, Category=" Camera Boundary")
+	UFUNCTION(CallInEditor, Category=" Camera Boundary", meta=(DisplayPriority = "1"))
 	virtual void UpdateSpawnVolumes();
 	
-	UFUNCTION(CallInEditor, Category=" Camera Boundary")
+	UFUNCTION(CallInEditor, Category=" Camera Boundary", meta=(DisplayPriority = "1"))
 	virtual void ClearSpawnVolumes();
+	
+	UFUNCTION(CallInEditor, Category=" Camera Boundary", meta=(DisplayPriority = "1"))
+	void SpawnWaterVolume();
+	
+	UFUNCTION(CallInEditor, Category=" Camera Boundary", meta=(DisplayPriority = "1"))
+	void ClearWaterVolume();
 	
 	AActor* GetTargetActor() { return TargetActor; }
 	void SetTargetActor(AActor* InTargetActor) { TargetActor = InTargetActor; }
@@ -150,12 +156,15 @@ protected:
 	/*
 	 * Other Game Mechanics
 	 */
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category=" Camera Boundary")
 	TSubclassOf<AEncounterSpawnVolume> SpawningVolumeClass;
 	
 	UPROPERTY(VisibleAnywhere, Category=" Camera Boundary")
 	TArray<TObjectPtr<AEncounterSpawnVolume>> SpawningVolumes;
 
+	UPROPERTY(EditDefaultsOnly, Category=" Camera Boundary")
+	TSubclassOf<AWaterGroup> WaterVolumeClass;
+	
 	UPROPERTY(VisibleAnywhere, Category="Camera Boundary")
 	TObjectPtr<AWaterGroup> WaterVolume;
 

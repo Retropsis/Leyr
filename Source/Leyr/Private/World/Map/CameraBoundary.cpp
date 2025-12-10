@@ -16,6 +16,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "World/Item.h"
 #include "World/Data/CameraData.h"
+#include "World/Level/Moving/WaterGroup.h"
 #include "World/Level/Spawner/EncounterSpawnPoint.h"
 #include "World/Level/Spawner/EncounterSpawnVolume.h"
 
@@ -213,6 +214,27 @@ void ACameraBoundary::ClearSpawnVolumes()
 	}
 	OnPlayerLeaving.RemoveAll(this);
 	SpawningVolumes.Empty();
+}
+
+void ACameraBoundary::SpawnWaterVolume()
+{
+	if (IsValid(WaterVolumeClass) && !IsValid(WaterVolume))
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		if (WaterVolume = GetWorld()->SpawnActor<AWaterGroup>(WaterVolumeClass, GetActorLocation(), FRotator::ZeroRotator, SpawnParams); IsValid(WaterVolume))
+		{
+			WaterVolume->SetupWaterVolumeFromBounds(GetTileMapBounds());
+			WaterVolume->SetActorLabel(IsValid(LevelAreaData) ? LevelAreaData->GetName().Replace(TEXT("LevelAreaData"), TEXT("WaterVolume")) : TEXT("WaterVolume"));
+			WaterVolume->SetFolderPath(GetFolderPath());
+		}
+	}
+}
+
+void ACameraBoundary::ClearWaterVolume()
+{
+	WaterVolume->Destroy();
+	WaterVolume = nullptr; 
 }
 
 void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

@@ -1,7 +1,6 @@
 // @ Retropsis 2024-2025.
 
 #include "World/Level/Moving/WaterGroup.h"
-
 #include "NiagaraFunctionLibrary.h"
 #include "Components/BoxComponent.h"
 #include "Interaction/PlayerInterface.h"
@@ -12,13 +11,6 @@ AWaterGroup::AWaterGroup()
 {
 	OverlapBox->SetCollisionResponseToAllChannels(ECR_Overlap);
 	Tags.Add(FName("OverlapProjectiles"));
-}
-
-void AWaterGroup::OnConstruction(const FTransform& Transform)
-{
-	Super::OnConstruction(Transform);
-	OverlapBox->SetBoxExtent(FVector(Width * 32.f, 100.f, Depth * 32.f));
-	SurfaceZ = OverlapBox->GetComponentLocation().Z + OverlapBox->GetScaledBoxExtent().Z;
 }
 
 void AWaterGroup::BeginPlay()

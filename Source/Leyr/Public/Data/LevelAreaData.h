@@ -36,6 +36,9 @@ public:
 	FOnEncounterSpawnsPropertyDeleted OnEncounterSpawnsPropertyDeleted;
 	
 	UPROPERTY(EditDefaultsOnly)
+	FName LevelAreaName = FName("");
+	
+	UPROPERTY(EditDefaultsOnly)
 	TArray<FEncounterSpawn> EncounterSpawns;
 
 	UPROPERTY(EditDefaultsOnly)

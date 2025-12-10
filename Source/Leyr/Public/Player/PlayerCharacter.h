@@ -11,13 +11,13 @@
 #include "Inventory/Container/Container.h"
 #include "PlayerCharacter.generated.h"
 
-class AParallaxController;
 enum class ECharacterName : uint8;
+struct FInventoryItemData;
+class AParallaxController;
 class UCharacterInfo;
 class UBoxComponent;
 class UHotbarComponent;
 class UNiagaraComponent;
-struct FInventoryItemData;
 class UPlayerInventoryComponent;
 class UCameraComponent;
 class USpringArmComponent;

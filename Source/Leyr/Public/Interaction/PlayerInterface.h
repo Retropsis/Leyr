@@ -7,6 +7,7 @@
 #include "UObject/Interface.h"
 #include "PlayerInterface.generated.h"
 
+class AWaterGroup;
 class ACameraBoundary;
 class UBoxComponent;
 class UCameraComponent;

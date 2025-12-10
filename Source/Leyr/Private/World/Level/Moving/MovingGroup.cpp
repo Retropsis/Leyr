@@ -1,6 +1,8 @@
 // @ Retropsis 2024-2025.
 
 #include "World/Level/Moving/MovingGroup.h"
+
+#include "PaperSpriteComponent.h"
 #include "Components/BoxComponent.h"
 #include "Interaction/PlayerInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
@@ -12,6 +14,21 @@ AMovingGroup::AMovingGroup()
 
 	OverlapBox = CreateDefaultSubobject<UBoxComponent>("OverlapBox");
 	SetRootComponent(OverlapBox);
+
+	Sprite = CreateDefaultSubobject<UPaperSpriteComponent>("WaterSprite");
+	Sprite->SetupAttachment(OverlapBox);
+}
+
+void AMovingGroup::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+	
+	if (PropertyChangedEvent.Property->GetName() == TEXT("Width") || PropertyChangedEvent.Property->GetName() == TEXT("Depth"))
+	{
+		SetupWaterVolume(Width, Depth);
+		GEngine->AddOnScreenDebugMessage(-1, 95.f, FColor::Red, "PostEditChangeProperty");
+		UE_LOG(LogTemp, Warning, TEXT("Changing Width: %d - Depth: %d"), Width, Depth);
+	}
 }
 
 void AMovingGroup::Tick(float DeltaSeconds)
@@ -28,17 +45,46 @@ void AMovingGroup::BeginPlay()
 		OverlapBox->GetComponentLocation().X + (OverlapBox->GetScaledBoxExtent().X - 35.f * Direction.X),
 		0.f,
 		OverlapBox->GetComponentLocation().Z - OverlapBox->GetScaledBoxExtent().Z + 88.f);
-	if(HasAuthority())
-	{
-		OverlapBox->OnComponentBeginOverlap.AddDynamic(this, &AMovingGroup::OnBeginOverlap);
-		OverlapBox->OnComponentEndOverlap.AddDynamic(this, &AMovingGroup::OnEndOverlap);
-	}
 }
 
 void AMovingGroup::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 	OverlapBox->SetBoxExtent(FVector(Width * 32.f, 100.f, Depth * 32.f));
+}
+
+void AMovingGroup::SetupWaterVolumeFromBounds(const FBoxSphereBounds& Bounds)
+{
+	OverlapBox->SetBoxExtent(FVector(Bounds.BoxExtent.X, 100.f, Bounds.BoxExtent.Z));
+	SurfaceZ = OverlapBox->GetComponentLocation().Z + OverlapBox->GetScaledBoxExtent().Z;
+	Width = Bounds.BoxExtent.X / 32.f;
+	Depth = Bounds.BoxExtent.Z / 32.f;
+	Sprite->SetRelativeScale3D(FVector(Width, 1.f, Depth));
+}
+
+void AMovingGroup::SetupWaterVolume(const int32 NewWidth, const int32 NewDepth)
+{
+	Width = NewWidth;
+	Depth = NewDepth;
+	OverlapBox->SetBoxExtent(FVector(Width * 32.f, 100.f, Depth * 32.f));
+	SurfaceZ = OverlapBox->GetComponentLocation().Z + OverlapBox->GetScaledBoxExtent().Z;
+	Sprite->SetRelativeScale3D(FVector(Width, 1.f, Depth));
+}
+
+void AMovingGroup::ToggleActivate_Implementation(bool bActivate)
+{
+	if (!HasAuthority()) return;
+	
+	if (bActivate)
+	{
+		if (!OverlapBox->OnComponentBeginOverlap.IsAlreadyBound(this, &AMovingGroup::OnBeginOverlap)) OverlapBox->OnComponentBeginOverlap.AddDynamic(this, &AMovingGroup::OnBeginOverlap);
+		if (!OverlapBox->OnComponentEndOverlap.IsAlreadyBound(this, &AMovingGroup::OnEndOverlap)) OverlapBox->OnComponentEndOverlap.AddDynamic(this, &AMovingGroup::OnEndOverlap);
+	}
+	else
+	{
+		OverlapBox->OnComponentBeginOverlap.RemoveAll(this);
+		OverlapBox->OnComponentEndOverlap.RemoveAll(this);
+	}
 }
 
 void AMovingGroup::HandleActiveActors(float DeltaSeconds)
