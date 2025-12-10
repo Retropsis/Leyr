@@ -8,6 +8,7 @@
 #include "Data/BehaviourData.h"
 #include "Data/EncounterData.h"
 #include "Interaction/PlayerInterface.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "World/Level/Spawner/EncounterSpawnPoint.h"
 #include "Leyr/Leyr.h"
 
@@ -224,6 +225,12 @@ void AEncounterSpawnVolume::SetTriggerBoundaryToRoomSize() const
 	TriggerVolume->SetWorldScale3D(FVector{ TileMapBounds.BoxExtent.X / 100.f - 0.2f, 1.f, TileMapBounds.BoxExtent.Z / 100.f - 0.2f });
 }
 
+void AEncounterSpawnVolume::SetSpawnBoundaryToRoomSize() const
+{
+	SpawningBounds->SetWorldLocation(TileMapBounds.Origin);
+	SpawningBounds->SetWorldScale3D(FVector{ TileMapBounds.BoxExtent.X / 100.f + 0.2f, 1.f, TileMapBounds.BoxExtent.Z / 100.f + 0.2f });
+}
+
 void AEncounterSpawnVolume::SetDespawnBoundaryToRoomSize() const
 {
 	DespawningBounds->SetWorldLocation(TileMapBounds.Origin);
@@ -250,6 +257,8 @@ void AEncounterSpawnVolume::OnBeginOverlap(UPrimitiveComponent* OverlappedCompon
 			{
 				SpawnPoint->PreferredLocation = FVector{ OtherActor->GetActorLocation().X, 0.f, GetActorLocation().Z };
 				SpawnPoint->SpawningBounds = CalculateBounds();
+				UKismetSystemLibrary::DrawDebugPoint(this, SpawnPoint->SpawningBounds.Left, 25.f, FLinearColor::Green, 90.f);
+				UKismetSystemLibrary::DrawDebugPoint(this, SpawnPoint->SpawningBounds.Right, 25.f, FLinearColor::Green, 90.f);
 				SpawnPoint->Target = OtherActor;
 				SpawnPoint->SpawnEncounterGroup();
 			}

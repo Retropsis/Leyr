@@ -28,11 +28,7 @@ void AEncounterSpawnPoint::OnConstruction(const FTransform& Transform)
 		{
 			if (PropertyName == FName("EncounterIcon"))
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Property Changed: %s"), *PropertyName.ToString());
-				if (PropertyName == FName("EncounterIcon"))
-				{
-					SetEncounterIcon(EncounterData->EncounterIcon);
-				}
+				SetEncounterIcon(EncounterData->EncounterIcon);
 			}
 		});
 	}
@@ -171,12 +167,14 @@ void AEncounterSpawnPoint::DetermineSpawnTransform(int32 SpawnLocationIndex)
 			if (SpawnBoundsOrigin.X < Target->GetActorLocation().X)
 			{
 				SetActorLocation(FVector{ SpawningBounds.Left.X - 50.f, 0.f, Target->GetActorLocation().Z });
-				UKismetSystemLibrary::DrawDebugSphere(this, GetActorLocation(), 25.f, 20, FColor::White, true);
+				UKismetSystemLibrary::DrawDebugSphere(this, FVector{ SpawningBounds.Left.X - 50.f, 0.f, Target->GetActorLocation().Z }, 25.f, 20, FColor::Red, 90.f);
+				UKismetSystemLibrary::DrawDebugSphere(this, GetActorLocation(), 25.f, 20, FColor::White, 90.f);
 			}
 			else
 			{
 				SetActorLocation(FVector{ SpawningBounds.Right.X + 50.f, 0.f, Target->GetActorLocation().Z });
-				UKismetSystemLibrary::DrawDebugSphere(this, GetActorLocation(), 25.f, 20, FColor::White, true);
+				UKismetSystemLibrary::DrawDebugSphere(this, FVector{ SpawningBounds.Right.X + 50.f, 0.f, Target->GetActorLocation().Z }, 25.f, 20, FColor::Red, 90.f);
+				UKismetSystemLibrary::DrawDebugSphere(this, GetActorLocation(), 25.f, 20, FColor::White, 90.f);
 			}
 			SpawnTransform = GetActorTransform();
 		}

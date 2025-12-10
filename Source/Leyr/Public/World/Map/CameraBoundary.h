@@ -9,6 +9,7 @@
 #include "Data/EncounterSpawnData.h"
 #include "CameraBoundary.generated.h"
 
+class AWaterGroup;
 class UNiagaraComponent;
 class UNiagaraSystem;
 struct FActiveGameplayEffectHandle;
@@ -155,6 +156,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category=" Camera Boundary")
 	TArray<TObjectPtr<AEncounterSpawnVolume>> SpawningVolumes;
 
+	UPROPERTY(VisibleAnywhere, Category="Camera Boundary")
+	TObjectPtr<AWaterGroup> WaterVolume;
+
 	UPROPERTY()
 	TArray<TScriptInterface<ILevelActorInterface>> LevelActors;
 		
@@ -170,6 +174,6 @@ protected:
 private:
 	UPROPERTY() TObjectPtr<AActor> TargetActor;
 	UPROPERTY() FLevelArea_GrantedHandles LevelArea_GrantedHandles;
-	FBoxSphereBounds TileMapBounds;
-	bool bEnvironmentEffectsInitialized = false;
+	UPROPERTY() FBoxSphereBounds TileMapBounds;
+	UPROPERTY() bool bEnvironmentEffectsInitialized = false;
 };

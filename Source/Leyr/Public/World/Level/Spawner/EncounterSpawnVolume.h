@@ -46,6 +46,9 @@ public:
 	void SetTriggerBoundaryToRoomSize() const;
 	
 	UFUNCTION(CallInEditor, Category="Spawner")
+	void SetSpawnBoundaryToRoomSize() const;
+	
+	UFUNCTION(CallInEditor, Category="Spawner")
 	void SetDespawnBoundaryToRoomSize() const;
 	
 	UFUNCTION()
@@ -65,7 +68,8 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category="Spawner")
 	TObjectPtr<ASplineComponentActor> SplineComponentActor;
-	
+
+	UPROPERTY(VisibleAnywhere, Category="Spawner")
 	FBoxSphereBounds TileMapBounds;
 
 protected:
@@ -80,7 +84,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Spawner")
 	FEncounterSpawn EncounterSpawnData;
 	
-	UPROPERTY(EditAnywhere, Category="Spawner")
+	UPROPERTY(VisibleAnywhere, Category="Spawner")
 	TArray<AEncounterSpawnPoint*> SpawnPoints;
 	
 private:
