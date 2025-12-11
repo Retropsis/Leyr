@@ -65,6 +65,8 @@ void ACameraBoundary::OnConstruction(const FTransform& Transform)
 	 */
 	if (LevelAreaData != nullptr)
 	{
+		LevelAreaName = LevelAreaData->LevelAreaName;
+		RoomType = LevelAreaData->RoomType;
 		LevelAreaData->OnLevelAreaDataPropertyChanged.AddLambda([this] (FName PropertyName) {
 			UE_LOG(LogTemp, Warning, TEXT("Level Area Data Property Changed : %s"), *PropertyName.ToString());
 			UpdateSpawnVolumes();
@@ -112,8 +114,6 @@ void ACameraBoundary::BeginPlay()
 
 	if (LevelAreaData != nullptr)
 	{
-		LevelAreaName = LevelAreaData->LevelAreaName;
-		RoomType = LevelAreaData->RoomType;
 		EnvironmentEffects.Append(LevelAreaData->EnvironmentEffects);
 	}
 }
@@ -280,7 +280,7 @@ void ACameraBoundary::HandleOnBeginOverlap(AActor* OtherActor)
 	if (OtherActor->Implements<UPlayerInterface>())
 	{
 		IPlayerInterface::Execute_SetCameraInterpolation(OtherActor, this, ECameraInterpState::Entering);
-		RequestMapUpdate(EMapUpdateType::PlayerEntering);
+		RequestRoomUpdate(ERoomUpdateType::PlayerEntering);
 	}
 }
 
@@ -294,7 +294,7 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	{
 		OnPlayerLeaving.Broadcast();
 		DestroyOutOfBoundsEncounters();
-		RequestMapUpdate(EMapUpdateType::PlayerLeaving);
+		RequestRoomUpdate(ERoomUpdateType::PlayerLeaving);
 		
 		// FTimerHandle DestroyTimer;
 		// GetWorld()->GetTimerManager().SetTimer(DestroyTimer, FTimerDelegate::CreateLambda([this] ()
@@ -319,25 +319,6 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 				SpawnedEnvironmentEffect->DeactivateImmediate();
 			}
 		}
-	}
-}
-
-/*
- * Map Updates
- */
-void ACameraBoundary::RequestMapUpdate(const EMapUpdateType UpdateType) const
-{
-	if (!IsValid(PlayerController)) return;
-	if (!IsValid(TileMap)) return;
-
-	if (const UMapComponent* MapComponent = PlayerController->FindComponentByClass<UMapComponent>())
-	{
-		FMapUpdateData Data;
-		Data.RoomCoordinates = FIntPoint{ FMath::FloorToInt32(TileMap->GetActorLocation().X / 1280.f), FMath::FloorToInt32(TileMap->GetActorLocation().Z / 768.f)	};
-		Data.RoomName = !LevelAreaName.IsNone() ? LevelAreaName : *TileMap->GetActorLabel().Replace(TEXT("TM_"), TEXT(""));
-		Data.RoomType = RoomType;
-		Data.UpdateType = UpdateType;
-		MapComponent->UpdateMap(Data);
 	}
 }
 
@@ -446,12 +427,26 @@ void FLevelArea_GrantedHandles::TakeFromAbilitySystem(UAbilitySystemComponent* A
 	GameplayEffectHandles.Reset();
 }
 
+/*
+ * Map Updates
+ */
+void ACameraBoundary::RequestRoomUpdate(ERoomUpdateType UpdateType) const
+{
+	if (!IsValid(PlayerController) || !IsValid(TileMap)) return;
+
+	if (const UMapComponent* MapComponent = PlayerController->FindComponentByClass<UMapComponent>())
+	{
+		// TODO: LevelAreaName should always be valid, then i can get rid of the replace
+		MapComponent->UpdateRoom(!LevelAreaName.IsNone() ? LevelAreaName : GetTileMapName(), UpdateType);
+	}
+}
+
 FIntPoint ACameraBoundary::GetRoomSize() const
 {
 	return FIntPoint{ FMath::FloorToInt32(GetTileMapBounds().BoxExtent.X * 2.f / 1280.f), FMath::FloorToInt32(GetTileMapBounds().BoxExtent.Z * 2.f / 768.f) };
 }
 
-FIntPoint ACameraBoundary::GetRoomPosition() const
+FIntPoint ACameraBoundary::GetRoomCoordinates() const
 {
 	if (!IsValid(TileMap)) return FIntPoint{ 0 };
 	
@@ -460,7 +455,11 @@ FIntPoint ACameraBoundary::GetRoomPosition() const
 
 FName ACameraBoundary::GetTileMapName() const
 {
-	if (!IsValid(TileMap)) return FName();
+	if (!IsValid(TileMap))
+	{
+		UE_LOG(LogTemp, Error, TEXT("TileMap is invalid"));
+		return FName();
+	}
 	
 	return *TileMap->GetActorLabel().Replace(TEXT("TM_"), TEXT(""));
 }

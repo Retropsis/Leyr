@@ -724,4 +724,11 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.EncounterSpawn_7 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("EncounterSpawn.7"), FString("EncounterSpawn 7"));
 	GameplayTags.EncounterSpawn_8 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("EncounterSpawn.8"), FString("EncounterSpawn 8"));
 	GameplayTags.EncounterSpawn_9 = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("EncounterSpawn.9"), FString("EncounterSpawn 9"));
+	
+	/*
+	 * Map Tags
+	 */
+	GameplayTags.Map_Region_Dorn = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Map.Region.Dorn"), FString("Map Region Dorn"));
+	GameplayTags.Map_Region_Myre = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Map.Region.Myre"), FString("Map Region Myre"));
+	GameplayTags.Map_Region_Drei = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Map.Region.Drei"), FString("Map Region Drei"));
 }

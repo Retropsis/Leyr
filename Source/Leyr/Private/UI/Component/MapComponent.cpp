@@ -3,52 +3,95 @@
 #include "UI/Component/MapComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Data/MapData.h"
+#include "Game/BaseGameplayTags.h"
+#include "Kismet/GameplayStatics.h"
 #include "UI/Map/MapWidget.h"
+#include "World/Map/CameraBoundary.h"
 
 UMapComponent::UMapComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UMapComponent::UpdateMap(const FMapUpdateData& Data) const
+void UMapComponent::InitializeMap()
 {
-	switch (Data.UpdateType) {
-	case EMapUpdateType::None:
-		break;
-	case EMapUpdateType::PlayerEntering:
-		GEngine->AddOnScreenDebugMessage(1001, 30.f, FColor::Green, FString::Printf(TEXT("%s"), *Data.RoomName.ToString()));
-		GEngine->AddOnScreenDebugMessage(1002, 30.f, FColor::Green, FString::Printf(TEXT("%s"), *UEnum::GetValueAsString(Data.RoomType)));
-		GEngine->AddOnScreenDebugMessage(1003, 30.f, FColor::Green, FString::Printf(TEXT("%s"), *UEnum::GetValueAsString(Data.UpdateType)));
-		GEngine->AddOnScreenDebugMessage(1004, 30.f, FColor::Green, FString::Printf(TEXT("X: %d - Y: %d"), Data.RoomCoordinates.X, Data.RoomCoordinates.Y));
-		MapWidget->UpdateRoomTile(Data);
-		break;
-	case EMapUpdateType::PlayerLeaving:
-		GEngine->AddOnScreenDebugMessage(2001, 30.f, FColor::Orange, FString::Printf(TEXT("%s"), *Data.RoomName.ToString()));
-		GEngine->AddOnScreenDebugMessage(2002, 30.f, FColor::Orange, FString::Printf(TEXT("%s"), *UEnum::GetValueAsString(Data.UpdateType)));
-		GEngine->AddOnScreenDebugMessage(2003, 30.f, FColor::Orange, FString::Printf(TEXT("X: %d - Y: %d"), Data.RoomCoordinates.X, Data.RoomCoordinates.Y));
-		MapWidget->UpdateRoomTile(Data);
-		break;
-	case EMapUpdateType::PlayerDiscovering:
-		break;
-	}
+	ConstructMapRooms();
+	ConstructMapWidget();
 }
 
-void UMapComponent::BeginPlay()
-{
-	Super::BeginPlay();
-	ConstructMap();
-}
-
-void UMapComponent::ConstructMap()
+void UMapComponent::ConstructMapWidget()
 {
 	OwningController = Cast<APlayerController>(GetOwner());
 	checkf(OwningController.IsValid(), TEXT("Map Component should have PlayerController as Owner."));
 	if (!OwningController->IsLocalController()) return;
 
 	MapWidget = CreateWidget<UMapWidget>(OwningController.Get(), MapWidgetClass);
-	MapWidget->AddToViewport();
-	MapWidget->SetDesiredSizeInViewport(FVector2D{ 400.f, 400.f });
-	const FVector2D ViewportSize = GEngine->GameViewport->Viewport->GetSizeXY();
-	MapWidget->SetPositionInViewport(FVector2D{ ViewportSize.X /2.f + 600.f, ViewportSize.Y / 2.f + 200.f });
+	MapWidget->ConstructMapCanvas(FilterRoomsByRegion(FBaseGameplayTags::Get().Map_Region_Dorn));
 	// CloseInventoryMenu();
+}
+
+/*
+ * Find all CameraBoundary actors in the region and construct data
+ * This might be better the other way around where the CameraBoundary announces itself to the MapComponent
+ */
+void UMapComponent::ConstructMapRooms()
+{
+	TArray<AActor*> TempRooms;
+	UGameplayStatics::GetAllActorsOfClass(this, ACameraBoundary::StaticClass(), TempRooms);
+	Rooms.Empty();
+	for (AActor* TempRoom : TempRooms)
+	{
+		if (const ACameraBoundary* Boundary = Cast<ACameraBoundary>(TempRoom))
+		{
+			FRoomData Data {
+				!Boundary->GetLevelAreaName().IsNone() ? Boundary->GetLevelAreaName() : Boundary->GetTileMapName(),
+				FIntPoint{ Boundary->GetRoomCoordinates().X, Boundary->GetRoomCoordinates().Y },
+				FIntPoint(Boundary->GetRoomSize().X, Boundary->GetRoomSize().Y),
+				Boundary->GetRoomType()
+			};
+
+			if (Data.RoomName.IsNone()) continue;
+			
+			// UE_LOG(LogTemp, Warning, TEXT("Room created-> Name: %s size: (w%d, h%d), coords: (x%d, y%d) Type: %s"), *Data.RoomName.ToString(), Data.RoomSize.X, Data.RoomSize.Y, Data.RoomCoordinates.X, Data.RoomCoordinates.Y, *UEnum::GetValueAsString(Data.RoomType));
+			
+			Rooms.Add(Data.RoomName, Data);
+		}
+	}
+}
+
+void UMapComponent::UpdateRoom(const FName& RoomName, ERoomUpdateType& UpdateType) const
+{
+	if (UpdateType == ERoomUpdateType::PlayerEntering)
+	{
+		UpdateType =  !IsRoomDiscovered(RoomName) ? ERoomUpdateType::PlayerDiscovering : UpdateType;
+	}
+	MapWidget->UpdateRoomTile(RoomName, UpdateType);
+}
+
+TArray<FRoomData> UMapComponent::FilterRoomsByRegion(const FGameplayTag& RegionTag)
+{
+	TArray<FRoomData> RegionRooms;
+	for (const TTuple<FName, FRoomData>& Room : Rooms)
+	{
+		if (Room.Value.RegionTag.MatchesTagExact(RegionTag))
+		{
+			RegionRooms.Add(Room.Value);
+		}
+	}
+	return RegionRooms;
+}
+
+FRoomData UMapComponent::FindRoomByName(const FName& RoomName) const
+{
+	return Rooms.Contains(RoomName) ? *Rooms.Find(RoomName) : FRoomData();
+}
+
+bool UMapComponent::IsRoomDiscovered(const FName& RoomName) const
+{
+	return Rooms.Contains(RoomName) ? Rooms.Find(RoomName)->bWasDiscovered : false;
+}
+
+void UMapComponent::SetRoomDiscovered(const FName& RoomName, const bool bDiscovered)
+{
+	if (Rooms.Contains(RoomName)) Rooms.Find(RoomName)->bWasDiscovered = bDiscovered;
 }

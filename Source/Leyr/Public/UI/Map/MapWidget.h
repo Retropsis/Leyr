@@ -6,7 +6,8 @@
 #include "CommonUserWidget.h"
 #include "MapWidget.generated.h"
 
-struct FMapUpdateData;
+enum class ERoomUpdateType : uint8;
+struct FRoomData;
 class URoomTile;
 class UImage;
 class ACameraBoundary;
@@ -21,12 +22,15 @@ class LEYR_API UMapWidget : public UCommonUserWidget
 	GENERATED_BODY()
 	
 public:
-	virtual void NativeOnInitialized() override;
-	void UpdateRoomTile(const FMapUpdateData& Data);
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	void ConstructMapCanvas(const TArray<FRoomData>& MapData);
+	void StartInterpolation(const ERoomUpdateType& UpdateType, const FVector2D& RoomTilePosition);
+	void UpdateRoomTile(const FName& RoomName, const ERoomUpdateType& UpdateType);
+
+	UFUNCTION(BlueprintCallable)
+	void RedrawMap(float DeltaSecond);
 	
 private:
-	void ConstructMap();
-	
 	UPROPERTY(EditDefaultsOnly)
 	float RoomTileSize = 32.f;
 	
@@ -34,8 +38,12 @@ private:
 	TObjectPtr<UCanvasPanel> CanvasPanel;
 
 	UPROPERTY(VisibleAnywhere)
-	TMap<FName, URoomTile*> Rooms;
+	TMap<FName, URoomTile*> RoomTiles;
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<URoomTile> RoomTileClass = nullptr;
+	FVector2D CanvasCenter;
+	FVector2D CurrentRoomOffset = FVector2D::ZeroVector;
+	FVector2D TargetRoomOffset = FVector2D::ZeroVector;
+	bool bShouldInterpolate = false;
 };

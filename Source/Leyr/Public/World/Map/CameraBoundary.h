@@ -10,7 +10,7 @@
 #include "CameraBoundary.generated.h"
 
 enum class ERoomType : uint8;
-enum class EMapUpdateType : uint8;
+enum class ERoomUpdateType : uint8;
 class AWaterGroup;
 class UNiagaraComponent;
 class UNiagaraSystem;
@@ -80,23 +80,23 @@ public:
 	virtual void OnConstruction(const FTransform& Transform) override;
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 	
-	UFUNCTION(CallInEditor, Category=" Camera Boundary", meta=(DisplayPriority = "1"))
+	UFUNCTION(CallInEditor, Category=" Camera Boundary")
 	virtual void InitializeCameraExtent();
 	void CreateSpawningVolume(const FActorSpawnParameters& SpawnParams, const FEncounterSpawn& Data, const FVector& Offset, const FString& Label);
 
-	UFUNCTION(CallInEditor, Category=" Camera Boundary", meta=(DisplayPriority = "1"))
+	UFUNCTION(CallInEditor, Category=" Camera Boundary")
 	virtual void InitializeSpawnVolumes();
 	
-	UFUNCTION(CallInEditor, Category=" Camera Boundary", meta=(DisplayPriority = "1"))
+	UFUNCTION(CallInEditor, Category=" Camera Boundary")
 	virtual void UpdateSpawnVolumes();
 	
-	UFUNCTION(CallInEditor, Category=" Camera Boundary", meta=(DisplayPriority = "1"))
+	UFUNCTION(CallInEditor, Category=" Camera Boundary")
 	virtual void ClearSpawnVolumes();
 	
-	UFUNCTION(CallInEditor, Category=" Camera Boundary", meta=(DisplayPriority = "1"))
+	UFUNCTION(CallInEditor, Category=" Camera Boundary")
 	void SpawnWaterVolume();
 	
-	UFUNCTION(CallInEditor, Category=" Camera Boundary", meta=(DisplayPriority = "1"))
+	UFUNCTION(CallInEditor, Category=" Camera Boundary")
 	void ClearWaterVolume();
 	
 	AActor* GetTargetActor() { return TargetActor; }
@@ -113,10 +113,10 @@ public:
 	FBoxSphereBounds GetNavigationBounds() const { return NavigationBoundary->Bounds; }
 
 	FIntPoint GetRoomSize() const;
-	FIntPoint GetRoomPosition() const;
+	FIntPoint GetRoomCoordinates() const;
 	FName GetTileMapName() const;
 	FName GetLevelAreaName() const { return LevelAreaName; }
-	ERoomType GetRoomType() const { return RoomType; }
+	ERoomType GetRoomType() const { return RoomType; } 
 	
 	FOnPlayerLeaving OnPlayerLeaving;
 	FOnPlayerEntering OnPlayerEntering;
@@ -189,13 +189,15 @@ protected:
 	TArray<UNiagaraComponent*> SpawnedEnvironmentEffects;
 
 private:
-	void RequestMapUpdate(EMapUpdateType UpdateType) const;
+	void RequestRoomUpdate(ERoomUpdateType UpdateType) const;
 	APlayerController* GetPlayerController();
+	
+	UPROPERTY(VisibleAnywhere, Category="Camera Boundary") ERoomType RoomType;
+	UPROPERTY(VisibleAnywhere, Category="Camera Boundary") FName LevelAreaName = FName();;
+	
 	UPROPERTY() TObjectPtr<APlayerController> PlayerController;
 	UPROPERTY() TObjectPtr<AActor> TargetActor;
 	UPROPERTY() FLevelArea_GrantedHandles LevelArea_GrantedHandles;
 	UPROPERTY() FBoxSphereBounds TileMapBounds;
 	UPROPERTY() bool bEnvironmentEffectsInitialized = false;
-	ERoomType RoomType;
-	FName LevelAreaName = FName();;
 };

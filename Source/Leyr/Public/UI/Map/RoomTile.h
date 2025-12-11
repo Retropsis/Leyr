@@ -18,18 +18,21 @@ class LEYR_API URoomTile : public UCommonUserWidget
 public:
 	// virtual void NativeOnInitialized() override;
 
-	void SetUndiscoveredTexture();
-	void SetDiscoveredTexture();
-	void SetOccupiedTexture();
-	void RevealRoom(ERoomType NewType) const;
+	void UpdateRoomTile(const ERoomUpdateType& UpdateType);
+	void RevealRoom() const;
 
 	void SetRoomState(const ERoomState NewState) { RoomState = NewState; }
 	ERoomState GetRoomState() const { return RoomState; }
 	void SetRoomType(const ERoomType NewType) { RoomType = NewType; }
 	ERoomType GetRoomType() const { return RoomType; }
+	void SetOriginalPositionInCanvas(const FVector2D Position) { OriginalPositionInCanvas = Position; }
+	FVector2D GetOriginalPositionInCanvas() const { return OriginalPositionInCanvas; }
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void HandleOccupiedAnimation(bool bIsOccupied);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void HandleRevealAnimation();
 
 private:
 	UPROPERTY(meta=(BindWidget))
@@ -52,7 +55,11 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category="Map")
 	FSlateBrush Brush_BossRoom;
+	
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateBrush Brush_ExitRoom;
 
 	ERoomState RoomState = ERoomState::None;
 	ERoomType RoomType = ERoomType::None;
+	FVector2D OriginalPositionInCanvas = FVector2D::ZeroVector;
 };
