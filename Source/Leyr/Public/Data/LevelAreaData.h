@@ -3,12 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "MapData.h"
 #include "Engine/DataAsset.h"
 #include "LevelAreaData.generated.h"
 
 struct FGameplayTag;
-class UNiagaraSystem;
 struct FEncounterSpawn;
+class UNiagaraSystem;
 class UGameplayEffect;
 class UEncounterSpawnData;
 
@@ -16,9 +17,6 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelAreaDataPropertyChanged, FName /* Pr
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnEncounterSpawnsPropertyChanged, FName /* PropertyName */);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnEncounterSpawnsPropertyDeleted, FGameplayTag /* EncounterSpawnTag */);
 
-/**
- * 
- */
 UCLASS(BlueprintType)
 class LEYR_API ULevelAreaData : public UPrimaryDataAsset
 {
@@ -37,6 +35,9 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly)
 	FName LevelAreaName = FName("");
+	
+	UPROPERTY(EditDefaultsOnly)
+	ERoomType RoomType = ERoomType::None;
 	
 	UPROPERTY(EditDefaultsOnly)
 	TArray<FEncounterSpawn> EncounterSpawns;

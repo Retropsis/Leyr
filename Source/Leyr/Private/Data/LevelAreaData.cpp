@@ -38,9 +38,12 @@ void ULevelAreaData::PostEditChangeProperty(FPropertyChangedEvent& PropertyChang
 		}
 		// OnEncounterSpawnsPropertyChanged.Broadcast();
 	}
+	// else
+	// {
+	// 	const FName PropertyName = PropertyChangedEvent.Property->GetFName();
+	// 	OnLevelAreaDataPropertyChanged.Broadcast(PropertyName);
+	// }
 	
-	const FName PropertyName = PropertyChangedEvent.Property->GetFName();
-	// OnLevelAreaDataPropertyChanged.Broadcast(PropertyName);
 	
 	TempEncounterSpawns.Empty();
 }

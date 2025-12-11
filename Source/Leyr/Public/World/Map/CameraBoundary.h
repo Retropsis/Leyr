@@ -9,6 +9,8 @@
 #include "Data/EncounterSpawnData.h"
 #include "CameraBoundary.generated.h"
 
+enum class ERoomType : uint8;
+enum class EMapUpdateType : uint8;
 class AWaterGroup;
 class UNiagaraComponent;
 class UNiagaraSystem;
@@ -109,6 +111,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	FBoxSphereBounds GetNavigationBounds() const { return NavigationBoundary->Bounds; }
+
+	FIntPoint GetRoomSize() const;
+	FIntPoint GetRoomPosition() const;
+	FName GetTileMapName() const;
+	FName GetLevelAreaName() const { return LevelAreaName; }
+	ERoomType GetRoomType() const { return RoomType; }
 	
 	FOnPlayerLeaving OnPlayerLeaving;
 	FOnPlayerEntering OnPlayerEntering;
@@ -181,8 +189,13 @@ protected:
 	TArray<UNiagaraComponent*> SpawnedEnvironmentEffects;
 
 private:
+	void RequestMapUpdate(EMapUpdateType UpdateType) const;
+	APlayerController* GetPlayerController();
+	UPROPERTY() TObjectPtr<APlayerController> PlayerController;
 	UPROPERTY() TObjectPtr<AActor> TargetActor;
 	UPROPERTY() FLevelArea_GrantedHandles LevelArea_GrantedHandles;
 	UPROPERTY() FBoxSphereBounds TileMapBounds;
 	UPROPERTY() bool bEnvironmentEffectsInitialized = false;
+	ERoomType RoomType;
+	FName LevelAreaName = FName();;
 };

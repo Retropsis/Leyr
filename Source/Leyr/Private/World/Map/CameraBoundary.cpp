@@ -1,7 +1,6 @@
 // @ Retropsis 2024-2025.
 
 #include "World/Map/CameraBoundary.h"
-
 #include "AbilitySystemBlueprintLibrary.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
@@ -10,10 +9,13 @@
 #include "PaperTileMapComponent.h"
 #include "AI/AICharacter.h"
 #include "Data/LevelAreaData.h"
+#include "Data/MapData.h"
 #include "Engine/OverlapResult.h"
 #include "Interaction/InteractionInterface.h"
 #include "Interaction/LevelActorInterface.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "UI/Component/MapComponent.h"
 #include "World/Item.h"
 #include "World/Data/CameraData.h"
 #include "World/Level/Moving/WaterGroup.h"
@@ -96,6 +98,8 @@ void ACameraBoundary::PostEditChangeProperty(struct FPropertyChangedEvent& Prope
 void ACameraBoundary::BeginPlay()
 {
 	Super::BeginPlay();
+	PlayerController = GetPlayerController();
+	
 	EnteringBoundary->OnComponentBeginOverlap.AddDynamic(this, &ACameraBoundary::OnBeginOverlap);
 	EnteringBoundary->OnComponentEndOverlap.AddDynamic(this, &ACameraBoundary::OnEndOverlap);
 	
@@ -108,6 +112,8 @@ void ACameraBoundary::BeginPlay()
 
 	if (LevelAreaData != nullptr)
 	{
+		LevelAreaName = LevelAreaData->LevelAreaName;
+		RoomType = LevelAreaData->RoomType;
 		EnvironmentEffects.Append(LevelAreaData->EnvironmentEffects);
 	}
 }
@@ -274,6 +280,7 @@ void ACameraBoundary::HandleOnBeginOverlap(AActor* OtherActor)
 	if (OtherActor->Implements<UPlayerInterface>())
 	{
 		IPlayerInterface::Execute_SetCameraInterpolation(OtherActor, this, ECameraInterpState::Entering);
+		RequestMapUpdate(EMapUpdateType::PlayerEntering);
 	}
 }
 
@@ -287,6 +294,7 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	{
 		OnPlayerLeaving.Broadcast();
 		DestroyOutOfBoundsEncounters();
+		RequestMapUpdate(EMapUpdateType::PlayerLeaving);
 		
 		// FTimerHandle DestroyTimer;
 		// GetWorld()->GetTimerManager().SetTimer(DestroyTimer, FTimerDelegate::CreateLambda([this] ()
@@ -311,6 +319,25 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 				SpawnedEnvironmentEffect->DeactivateImmediate();
 			}
 		}
+	}
+}
+
+/*
+ * Map Updates
+ */
+void ACameraBoundary::RequestMapUpdate(const EMapUpdateType UpdateType) const
+{
+	if (!IsValid(PlayerController)) return;
+	if (!IsValid(TileMap)) return;
+
+	if (const UMapComponent* MapComponent = PlayerController->FindComponentByClass<UMapComponent>())
+	{
+		FMapUpdateData Data;
+		Data.RoomCoordinates = FIntPoint{ FMath::FloorToInt32(TileMap->GetActorLocation().X / 1280.f), FMath::FloorToInt32(TileMap->GetActorLocation().Z / 768.f)	};
+		Data.RoomName = !LevelAreaName.IsNone() ? LevelAreaName : *TileMap->GetActorLabel().Replace(TEXT("TM_"), TEXT(""));
+		Data.RoomType = RoomType;
+		Data.UpdateType = UpdateType;
+		MapComponent->UpdateMap(Data);
 	}
 }
 
@@ -419,7 +446,35 @@ void FLevelArea_GrantedHandles::TakeFromAbilitySystem(UAbilitySystemComponent* A
 	GameplayEffectHandles.Reset();
 }
 
+FIntPoint ACameraBoundary::GetRoomSize() const
+{
+	return FIntPoint{ FMath::FloorToInt32(GetTileMapBounds().BoxExtent.X * 2.f / 1280.f), FMath::FloorToInt32(GetTileMapBounds().BoxExtent.Z * 2.f / 768.f) };
+}
+
+FIntPoint ACameraBoundary::GetRoomPosition() const
+{
+	if (!IsValid(TileMap)) return FIntPoint{ 0 };
+	
+	return FIntPoint{ FMath::FloorToInt32(TileMap->GetActorLocation().X / 1280.f), FMath::FloorToInt32(TileMap->GetActorLocation().Z / 768.f) };
+}
+
+FName ACameraBoundary::GetTileMapName() const
+{
+	if (!IsValid(TileMap)) return FName();
+	
+	return *TileMap->GetActorLabel().Replace(TEXT("TM_"), TEXT(""));
+}
+
 FBoxSphereBounds ACameraBoundary::GetTileMapBounds() const
 {
-	return TileMap->GetRenderComponent()->Bounds;
+	return IsValid(TileMap) ? TileMap->GetRenderComponent()->Bounds : FBoxSphereBounds();
+}
+
+APlayerController* ACameraBoundary::GetPlayerController()
+{
+	if (!IsValid(PlayerController))
+	{
+		PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+	}
+	return PlayerController;
 }
