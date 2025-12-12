@@ -39,8 +39,15 @@ class LEYR_API ADoor : public APaperFlipbookActor
 	
 public:	
 	ADoor();
-	void HandleDoorMoving(float DeltaSeconds);
-	virtual void Tick(float DeltaSeconds) override;
+
+	UFUNCTION(BlueprintNativeEvent)
+	void HandleDoorMoving();
+	
+	UFUNCTION(BlueprintCallable)
+	virtual void HandleOnFinishedPlaying();
+
+	UFUNCTION(BlueprintCallable)
+	EDoorState GetDoorState() const { return DoorState; }
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Event")
 	TObjectPtr<UBoxComponent> DoorCollision;
@@ -64,14 +71,11 @@ public:
 	FVector CloseLocation = FVector::ZeroVector;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Event")
-	FVector OpenLocation = FVector::ZeroVector;	
+	FVector OpenLocation = FVector::ZeroVector;
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnConstruction(const FTransform& Transform) override;
-	
-	UFUNCTION()
-	virtual void HandleOnFinishedPlaying();
 	void HandleDoorState(bool bOpen);
 
 	UFUNCTION()

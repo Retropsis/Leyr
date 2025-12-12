@@ -4,12 +4,11 @@
 #include "PaperFlipbookComponent.h"
 #include "Components/BoxComponent.h"
 #include "PaperSpriteComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "World/Level/Event/Lever.h"
 
 ADoor::ADoor()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	
 	GetRenderComponent()->SetLooping(false);
 	
@@ -29,16 +28,18 @@ ADoor::ADoor()
 	OpenPosition->SetupAttachment(GetRootComponent());
 }
 
-void ADoor::Tick(float DeltaSeconds)
+void ADoor::OnConstruction(const FTransform& Transform)
 {
-	Super::Tick(DeltaSeconds);
-	if(DoorState == EDoorState::Opening || DoorState == EDoorState::Closing) HandleDoorMoving(DeltaSeconds);
+	Super::OnConstruction(Transform);
+	
+	GetRenderComponent()->SetPlaybackPosition(DoorState == EDoorState::Close ? 0.f : 1.f, true);
+	CloseLocation = DoorCollision->GetComponentLocation();
+	OpenLocation = OpenPosition->GetComponentLocation();
 }
 
 void ADoor::BeginPlay()
 {
 	Super::BeginPlay();
-	// GetRenderComponent()->OnFinishedPlaying.AddDynamic(this, &ADoor::HandleOnFinishedPlaying);
 	GetRenderComponent()->SetPlaybackPosition(0.f, true);
 	
 	if(IsValid(EventOwner))
@@ -64,22 +65,19 @@ void ADoor::BeginPlay()
 	}
 }
 
-void ADoor::OnConstruction(const FTransform& Transform)
+void ADoor::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	Super::OnConstruction(Transform);
-	GetRenderComponent()->SetPlaybackPosition(DoorState == EDoorState::Close ? 0.f : 1.f, true);
-	CloseLocation = DoorCollision->GetComponentLocation();
-	OpenLocation = OpenPosition->GetComponentLocation();
+	if(OtherActor && OtherActor->ActorHasTag("Player")) HandleDoorState(true);
 }
 
-void ADoor::HandleDoorMoving(float DeltaSeconds)
+void ADoor::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	const FVector TargetLocation = DoorState == EDoorState::Opening ? OpenLocation : CloseLocation;
-	DoorCollision->SetWorldLocation(FMath::VInterpTo(DoorCollision->GetComponentLocation(), TargetLocation, DeltaSeconds, 5.f));
-	if (FVector::PointsAreNear(DoorCollision->GetComponentLocation(), TargetLocation, 1.f))
-	{
-		HandleOnFinishedPlaying();
-	}
+	if(OtherActor && OtherActor->ActorHasTag("Player"))HandleDoorState(false);
+}
+
+void ADoor::HandleDoorMoving_Implementation()
+{
+	
 }
 
 void ADoor::HandleOnFinishedPlaying()
@@ -105,19 +103,10 @@ void ADoor::HandleOnFinishedPlaying()
 void ADoor::HandleDoorState(bool bOpen)
 {
 	DoorState = bOpen ? EDoorState::Opening : EDoorState::Closing;
+	HandleDoorMoving();
+	
 	GetRenderComponent()->SetPlayRate(1.f);
 	bOpen ? GetRenderComponent()->Play() : GetRenderComponent()->Reverse();
-	
 	if(!bOpen) GetRenderComponent()->SetPlaybackPosition(GetRenderComponent()->GetFlipbookLength(), true);
-}
-
-void ADoor::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if(OtherActor && OtherActor->ActorHasTag("Player")) HandleDoorState(true);
-}
-
-void ADoor::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	if(OtherActor && OtherActor->ActorHasTag("Player"))HandleDoorState(false);
 }
 
