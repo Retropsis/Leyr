@@ -8,7 +8,7 @@
 
 enum class ERoomUpdateType : uint8;
 struct FRoomData;
-class URoomTile;
+class URoom;
 class UImage;
 class ACameraBoundary;
 class UCanvasPanel;
@@ -25,7 +25,9 @@ public:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	void ConstructMapCanvas(const TArray<FRoomData>& MapData);
 	void StartInterpolation(const ERoomUpdateType& UpdateType, const FVector2D& RoomTilePosition);
-	void UpdateRoomTile(const FName& RoomName, const ERoomUpdateType& UpdateType);
+	void EnteringRoom(const FRoomData& RoomData, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates);
+	void LeavingRoom(const FRoomData& RoomData, const FIntPoint& PlayerCoordinates);
+	void UpdateRoomTileAt(const FRoomData& RoomData, const ERoomUpdateType& UpdateType, const FIntPoint& Coordinates);
 
 	UFUNCTION(BlueprintCallable)
 	void RedrawMap(float DeltaSecond);
@@ -38,10 +40,10 @@ private:
 	TObjectPtr<UCanvasPanel> CanvasPanel;
 
 	UPROPERTY(VisibleAnywhere)
-	TMap<FName, URoomTile*> RoomTiles;
+	TMap<FName, URoom*> Rooms;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<URoomTile> RoomTileClass = nullptr;
+	TSubclassOf<URoom> RoomClass = nullptr;
 	FVector2D CanvasCenter;
 	FVector2D CurrentRoomOffset = FVector2D::ZeroVector;
 	FVector2D TargetRoomOffset = FVector2D::ZeroVector;

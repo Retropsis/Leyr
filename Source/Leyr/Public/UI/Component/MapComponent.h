@@ -19,7 +19,9 @@ public:
 	UMapComponent();
 	void ConstructMapWidget();
 	void ConstructMapRooms();
-	void UpdateRoom(const FName& RoomName, ERoomUpdateType& UpdateType) const;
+	void EnteringRoom(const FName& RoomName, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates);
+	void LeavingRoom(const FName& RoomName, const FIntPoint& PlayerCoordinates);
+	void UpdateRoomAt(const FName& RoomName, const ERoomUpdateType& UpdateType, const FIntPoint& Coordinates);
 	
 	UFUNCTION(BlueprintCallable, Category="Map")
 	UMapWidget* GetMapWidget() const { return MapWidget; }
@@ -30,8 +32,12 @@ public:
 private:
 	TArray<FRoomData> FilterRoomsByRegion(const FGameplayTag& RegionTag);
 	FRoomData FindRoomByName(const FName& RoomName) const;
-	bool IsRoomDiscovered(const FName& RoomName) const;
-	void SetRoomDiscovered(const FName& RoomName, bool bDiscovered = true);
+	bool IsRoomUnveiled(const FName& RoomName) const;
+	void SetRoomUnveiled(const FName& RoomName, bool bUnveiled = true);
+	bool IsRoomTileExplored(const FName& RoomName, const FIntPoint& Coordinates) const;
+	void SetRoomTileExplored(const FName& RoomName, const FIntPoint& Coordinates);
+	void ExploreRoomTile(const FName& RoomName, const FIntPoint& Coordinates);
+	void UnveilRoom(const FName& RoomName);
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Map")
 	TSubclassOf<UMapWidget> MapWidgetClass;

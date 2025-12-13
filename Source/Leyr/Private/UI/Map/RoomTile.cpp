@@ -8,27 +8,55 @@ void URoomTile::UpdateRoomTile(const ERoomUpdateType& UpdateType)
 	switch (UpdateType) {
 	case ERoomUpdateType::None:
 		break;
-	case ERoomUpdateType::PlayerDiscovering:
-		SetVisibility(ESlateVisibility::HitTestInvisible);
-		RevealRoom();
-		HandleRevealAnimation();
-		HandleOccupiedAnimation(true);
-		SetRoomState(ERoomState::Discovered);
+	case ERoomUpdateType::Unveiling:
+		UnveilRoomTile();
 		break;
-	case ERoomUpdateType::PlayerEntering:
-		HandleOccupiedAnimation(true);
+	case ERoomUpdateType::Exploring:
+		ExploreRoomTile();
 		break;
-	case ERoomUpdateType::PlayerLeaving:
-		HandleOccupiedAnimation(false);
+	case ERoomUpdateType::Entering:
+		EnterRoomTile();
+		break;
+	case ERoomUpdateType::Leaving:
+		LeaveRoomTile();
 		break;
 	}
 }
 
-void URoomTile::RevealRoom() const
+void URoomTile::EnterRoomTile()
 {
+	HandleOccupiedAnimation(true);
+}
+
+void URoomTile::LeaveRoomTile()
+{
+	HandleOccupiedAnimation(false);
+}
+
+void URoomTile::UnveilRoomTile()
+{
+	Image_Room->SetBrush(Brush_Unexplored);
+	SetBordersUnexplored(RoomCoordinates, RoomSize);
+	SetVisibility(ESlateVisibility::HitTestInvisible);
+	SetRoomState(ERoomState::Unexplored);
+}
+
+void URoomTile::ExploreRoomTile()
+{
+	HandleOccupiedAnimation(true);
+	SetBorders(RoomCoordinates, RoomSize);
+	SetVisibility(ESlateVisibility::HitTestInvisible);
+	SetRoomState(ERoomState::Explored);
+	RevealRoomTile();
+}
+
+void URoomTile::RevealRoomTile()
+{
+	HandleRevealAnimation();
+	
 	switch (RoomType) {
 	case ERoomType::None:
-		Image_Room->SetBrush(Brush_Discovered);
+		Image_Room->SetBrush(Brush_Explored);
 		break;
 	case ERoomType::SaveRoom:
 		Image_Room->SetBrush(Brush_SaveRoom);
@@ -42,5 +70,53 @@ void URoomTile::RevealRoom() const
 	case ERoomType::ExitRoom:
 		Image_Room->SetBrush(Brush_ExitRoom);
 		break;
+	}
+}
+
+void URoomTile::SetBorders(const FIntPoint& Coordinates, const FIntPoint& Size) const
+{
+	if (Coordinates.X == 1)
+	{
+		Image_BorderLeft->SetBrush(Brush_BorderV);
+		Image_BorderLeft->SetVisibility(ESlateVisibility::Visible);
+	}
+	if (Coordinates.X == Size.X)
+	{
+		Image_BorderRight->SetBrush(Brush_BorderV);
+		Image_BorderRight->SetVisibility(ESlateVisibility::Visible);
+	}
+	if (Coordinates.Y == Size.Y)
+	{
+		Image_BorderBottom->SetBrush(Brush_BorderH);
+		Image_BorderBottom->SetVisibility(ESlateVisibility::Visible);
+	}
+	if (Coordinates.Y == 1)
+	{
+		Image_BorderTop->SetBrush(Brush_BorderH);
+		Image_BorderTop->SetVisibility(ESlateVisibility::Visible);
+	}
+}
+
+void URoomTile::SetBordersUnexplored(const FIntPoint& Coordinates, const FIntPoint& Size) const
+{
+	if (Coordinates.X == 1)
+	{
+		Image_BorderLeft->SetBrush(Brush_Border_Undiscovered_V);
+		Image_BorderLeft->SetVisibility(ESlateVisibility::Visible);
+	}
+	if (Coordinates.X == Size.X)
+	{
+		Image_BorderRight->SetBrush(Brush_Border_Undiscovered_V);
+		Image_BorderRight->SetVisibility(ESlateVisibility::Visible);
+	}
+	if (Coordinates.Y == Size.Y)
+	{
+		Image_BorderBottom->SetBrush(Brush_Border_Undiscovered_H);
+		Image_BorderBottom->SetVisibility(ESlateVisibility::Visible);
+	}
+	if (Coordinates.Y == 1)
+	{
+		Image_BorderTop->SetBrush(Brush_Border_Undiscovered_H);
+		Image_BorderTop->SetVisibility(ESlateVisibility::Visible);
 	}
 }

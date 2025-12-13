@@ -59,13 +59,30 @@ void UMapComponent::ConstructMapRooms()
 	}
 }
 
-void UMapComponent::UpdateRoom(const FName& RoomName, ERoomUpdateType& UpdateType) const
+void UMapComponent::EnteringRoom(const FName& RoomName, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates)
 {
-	if (UpdateType == ERoomUpdateType::PlayerEntering)
-	{
-		UpdateType =  !IsRoomDiscovered(RoomName) ? ERoomUpdateType::PlayerDiscovering : UpdateType;
-	}
-	MapWidget->UpdateRoomTile(RoomName, UpdateType);
+	if (!Rooms.Contains(RoomName)) return;
+	
+	const ERoomUpdateType NewState = !IsRoomUnveiled(RoomName) ? ERoomUpdateType::Unveiling : UpdateType;
+	UnveilRoom(RoomName);
+	MapWidget->EnteringRoom(*Rooms.Find(RoomName), NewState, PlayerCoordinates);
+	ExploreRoomTile(RoomName, PlayerCoordinates);
+}
+
+void UMapComponent::LeavingRoom(const FName& RoomName, const FIntPoint& PlayerCoordinates)
+{
+	if (!Rooms.Contains(RoomName)) return;
+	
+	MapWidget->LeavingRoom(*Rooms.Find(RoomName), PlayerCoordinates);
+}
+
+void UMapComponent::UpdateRoomAt(const FName& RoomName, const ERoomUpdateType& UpdateType, const FIntPoint& Coordinates)
+{
+	if (!Rooms.Contains(RoomName)) return;
+	
+	const ERoomUpdateType NewState = IsRoomTileExplored(RoomName, Coordinates) ? UpdateType : ERoomUpdateType::Exploring;
+	ExploreRoomTile(RoomName, Coordinates);
+	MapWidget->UpdateRoomTileAt(*Rooms.Find(RoomName), NewState, Coordinates);
 }
 
 TArray<FRoomData> UMapComponent::FilterRoomsByRegion(const FGameplayTag& RegionTag)
@@ -86,12 +103,52 @@ FRoomData UMapComponent::FindRoomByName(const FName& RoomName) const
 	return Rooms.Contains(RoomName) ? *Rooms.Find(RoomName) : FRoomData();
 }
 
-bool UMapComponent::IsRoomDiscovered(const FName& RoomName) const
+bool UMapComponent::IsRoomUnveiled(const FName& RoomName) const
 {
-	return Rooms.Contains(RoomName) ? Rooms.Find(RoomName)->bWasDiscovered : false;
+	return Rooms.Find(RoomName)->bWasUnveiled;
 }
 
-void UMapComponent::SetRoomDiscovered(const FName& RoomName, const bool bDiscovered)
+void UMapComponent::SetRoomUnveiled(const FName& RoomName, const bool bUnveiled)
 {
-	if (Rooms.Contains(RoomName)) Rooms.Find(RoomName)->bWasDiscovered = bDiscovered;
+	Rooms.Find(RoomName)->bWasUnveiled = bUnveiled;
+}
+
+bool UMapComponent::IsRoomTileExplored(const FName& RoomName, const FIntPoint& Coordinates) const
+{
+	if (Rooms.Find(RoomName)->Subdivisions.Contains(Coordinates))
+	{
+		return Rooms.Find(RoomName)->Subdivisions.Find(Coordinates)->SubdivisionState == ESubdivisionState::Explored;
+	}
+	return false;
+}
+
+void UMapComponent::SetRoomTileExplored(const FName& RoomName, const FIntPoint& Coordinates)
+{
+	if (Rooms.Find(RoomName)->Subdivisions.Contains(Coordinates))
+	{
+		Rooms.Find(RoomName)->Subdivisions.Find(Coordinates)->SubdivisionState = ESubdivisionState::Explored;
+	}
+}
+
+void UMapComponent::ExploreRoomTile(const FName& RoomName, const FIntPoint& Coordinates)
+{
+	if (!IsRoomTileExplored(RoomName, Coordinates))
+	{
+		SetRoomTileExplored(RoomName, Coordinates);
+	}
+}
+
+void UMapComponent::UnveilRoom(const FName& RoomName)
+{
+	if (Rooms.Contains(RoomName))
+	{
+		Rooms.Find(RoomName)->bWasUnveiled = true;
+		for (TTuple<FIntPoint, FSubdivision>& Subdivision : Rooms.Find(RoomName)->Subdivisions)
+		{
+			if (Subdivision.Value.SubdivisionState == ESubdivisionState::Hidden)
+			{
+				Subdivision.Value.SubdivisionState = ESubdivisionState::Unexplored;
+			}
+		}
+	}
 }

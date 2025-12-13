@@ -251,6 +251,11 @@ void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 		OnPlayerEntering.Broadcast();
 		ToggleLevelActorActivity(true);
 		GiveToAbilitySystem(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor), &LevelArea_GrantedHandles);
+		
+		GetWorld()->GetTimerManager().SetTimer(TrackingPlayerTimer, [this] ()
+		{
+			TrackPlayerRoomCoordinates();
+		}, 1.f, true);
 
 		if (!bEnvironmentEffectsInitialized)
 		{
@@ -279,8 +284,9 @@ void ACameraBoundary::HandleOnBeginOverlap(AActor* OtherActor)
 {
 	if (OtherActor->Implements<UPlayerInterface>())
 	{
+		TargetActor = OtherActor;
 		IPlayerInterface::Execute_SetCameraInterpolation(OtherActor, this, ECameraInterpState::Entering);
-		RequestRoomUpdate(ERoomUpdateType::PlayerEntering);
+		RequestRoomUpdate(ERoomUpdateType::Entering);
 	}
 }
 
@@ -294,7 +300,10 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 	{
 		OnPlayerLeaving.Broadcast();
 		DestroyOutOfBoundsEncounters();
-		RequestRoomUpdate(ERoomUpdateType::PlayerLeaving);
+		RequestRoomUpdate(ERoomUpdateType::Leaving);
+		TrackingPlayerTimer.Invalidate();
+		GetWorld()->GetTimerManager().ClearTimer(TrackingPlayerTimer);
+		TargetActor = nullptr;
 		
 		// FTimerHandle DestroyTimer;
 		// GetWorld()->GetTimerManager().SetTimer(DestroyTimer, FTimerDelegate::CreateLambda([this] ()
@@ -430,15 +439,38 @@ void FLevelArea_GrantedHandles::TakeFromAbilitySystem(UAbilitySystemComponent* A
 /*
  * Map Updates
  */
-void ACameraBoundary::RequestRoomUpdate(ERoomUpdateType UpdateType) const
+void ACameraBoundary::RequestRoomUpdate(const ERoomUpdateType UpdateType) const
 {
 	if (!IsValid(PlayerController) || !IsValid(TileMap)) return;
 
-	if (const UMapComponent* MapComponent = PlayerController->FindComponentByClass<UMapComponent>())
+	if (UMapComponent* MapComponent = PlayerController->FindComponentByClass<UMapComponent>())
 	{
 		// TODO: LevelAreaName should always be valid, then i can get rid of the replace
-		MapComponent->UpdateRoom(!LevelAreaName.IsNone() ? LevelAreaName : GetTileMapName(), UpdateType);
+		if (UpdateType == ERoomUpdateType::Entering)
+		{
+			MapComponent->EnteringRoom(!LevelAreaName.IsNone() ? LevelAreaName : GetTileMapName(), UpdateType, GetPlayerRoomCoordinates());
+		}
+		if (UpdateType == ERoomUpdateType::Leaving)
+		{
+			MapComponent->LeavingRoom(!LevelAreaName.IsNone() ? LevelAreaName : GetTileMapName(), GetPlayerRoomCoordinates());
+		}
 	}
+}
+
+void ACameraBoundary::TrackPlayerRoomCoordinates() const
+{
+	if (!IsValid(PlayerController) || !IsValid(TargetActor) || !IsValid(TileMap)) return;
+
+	if (UMapComponent* MapComponent = PlayerController->FindComponentByClass<UMapComponent>())
+	{
+		MapComponent->UpdateRoomAt(!LevelAreaName.IsNone() ? LevelAreaName : GetTileMapName(), ERoomUpdateType::Entering, GetPlayerRoomCoordinates());
+	}
+}
+
+FIntPoint ACameraBoundary::GetPlayerRoomCoordinates() const
+{
+	const FVector PlayerRelativeLocation = TargetActor->GetActorLocation() - TileMap->GetActorLocation();
+	return FIntPoint{ FMath::FloorToInt32(PlayerRelativeLocation.X / 1280.f), FMath::FloorToInt32(- PlayerRelativeLocation.Z / 768.f) };
 }
 
 FIntPoint ACameraBoundary::GetRoomSize() const

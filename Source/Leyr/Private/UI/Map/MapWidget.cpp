@@ -4,6 +4,7 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
+#include "UI/Map/Room.h"
 #include "UI/Map/RoomTile.h"
 
 void UMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -21,48 +22,86 @@ void UMapWidget::ConstructMapCanvas(const TArray<FRoomData>& MapData)
 		return;
 	}
 
-	for (const FRoomData& Room : MapData)
+	for (const FRoomData& RoomData : MapData)
 	{
-		URoomTile* RoomTile = CreateWidget<URoomTile>(this, RoomTileClass);
-		RoomTile->SetRoomState(ERoomState::Undiscovered);
-		RoomTile->SetRoomType(Room.RoomType);
-		RoomTile->SetVisibility(ESlateVisibility::Collapsed);
-		CanvasPanel->AddChild(RoomTile);
-		RoomTiles.Emplace(Room.RoomName, RoomTile);
+		URoom* Room = CreateWidget<URoom>(this, RoomClass);
+		Room->SetRoomState(ERoomState::Unexplored);
+		Room->SetRoomType(RoomData.RoomType);
+		Room->ConstructRoom(RoomData);
+		// UE_LOG(LogTemp, Warning, TEXT("Room was created with the name: %s size: (w%d, h%d), coords: (x%d, y%d) Type: %s"), *RoomData.RoomName.ToString(), RoomData.RoomSize.X, RoomData.RoomSize.Y, RoomData.RoomCoordinates.X, RoomData.RoomCoordinates.Y, *UEnum::GetValueAsString(RoomData.RoomType));
 
-		UCanvasPanelSlot* MapCPS = UWidgetLayoutLibrary::SlotAsCanvasSlot(RoomTile);
-		MapCPS->SetSize(FVector2D(Room.RoomSize.X * RoomTileSize, Room.RoomSize.Y * RoomTileSize));
-		MapCPS->SetPosition(FVector2D{ Room.RoomCoordinates.X * RoomTileSize + CanvasCenter.X, - Room.RoomCoordinates.Y * RoomTileSize + CanvasCenter.Y });
-		RoomTile->SetOriginalPositionInCanvas(FVector2D{ Room.RoomCoordinates.X * RoomTileSize + CanvasCenter.X, - Room.RoomCoordinates.Y * RoomTileSize + CanvasCenter.Y });
+		CanvasPanel->AddChild(Room);
+		Rooms.Emplace(RoomData.RoomName, Room);
+
+		UCanvasPanelSlot* MapCPS = UWidgetLayoutLibrary::SlotAsCanvasSlot(Room);
+		MapCPS->SetSize(FVector2D(RoomData.RoomSize.X * RoomTileSize, RoomData.RoomSize.Y * RoomTileSize));
+		MapCPS->SetPosition(FVector2D{ RoomData.RoomCoordinates.X * RoomTileSize + CanvasCenter.X, - RoomData.RoomCoordinates.Y * RoomTileSize + CanvasCenter.Y });
+		
+		Room->SetOriginalPositionInCanvas(FVector2D{ RoomData.RoomCoordinates.X * RoomTileSize + CanvasCenter.X, - RoomData.RoomCoordinates.Y * RoomTileSize + CanvasCenter.Y });
 	}
 }
 
-void UMapWidget::UpdateRoomTile(const FName& RoomName, const ERoomUpdateType& UpdateType)
+void UMapWidget::EnteringRoom(const FRoomData& RoomData, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates)
 {
-	if (!RoomTiles.Contains(RoomName))
+	if (!Rooms.Contains(RoomData.RoomName))
 	{
-		UE_LOG(LogTemp, Error, TEXT("Room name %s not found"), *RoomName.ToString());
+		UE_LOG(LogTemp, Error, TEXT("Room name %s not found"), *RoomData.RoomName.ToString());
 		return;
 	}
 	
-	if (URoomTile* RoomTile = *RoomTiles.Find(RoomName))
+	if (URoom* Room = *Rooms.Find(RoomData.RoomName))
 	{
-		RoomTile->UpdateRoomTile(UpdateType);
-		const FVector2D CurrentRoomTilePosition = RoomTile->GetOriginalPositionInCanvas();
-		// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Red, FString::Printf(TEXT("CurrentRoomTilePosition: %s"), *CurrentRoomTilePosition.ToString()));
-		// StartInterpolation(UpdateType, CurrentRoomTilePosition);
+		if (UpdateType == ERoomUpdateType::Unveiling)
+		{
+			Room->UnveilingRoom(PlayerCoordinates, RoomData);
+		}
+		if (UpdateType == ERoomUpdateType::Entering)
+		{
+			Room->EnteringRoom(PlayerCoordinates, RoomData);
+		}
+		
+		const FVector2D CurrentRoomTilePosition = Room->GetOriginalPositionInCanvas();
 		FTimerHandle InterpTimer;
 		GetWorld()->GetTimerManager().SetTimer(InterpTimer, [this, UpdateType, CurrentRoomTilePosition] ()
 		{
 			StartInterpolation(UpdateType, CurrentRoomTilePosition);
-			// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Red, FString::Printf(TEXT("CurrentRoomTilePosition: %s"), *CurrentRoomTilePosition.ToString()));
 		}, .05f, false);
+	}
+}
+
+void UMapWidget::LeavingRoom(const FRoomData& RoomData, const FIntPoint& PlayerCoordinates)
+{
+	if (!Rooms.Contains(RoomData.RoomName)) return;
+	
+	if (URoom* Room = *Rooms.Find(RoomData.RoomName))
+	{
+		Room->LeavingRoom(PlayerCoordinates, RoomData);
+	}
+}
+
+void UMapWidget::UpdateRoomTileAt(const FRoomData& RoomData, const ERoomUpdateType& UpdateType, const FIntPoint& Coordinates)
+{
+	if (!Rooms.Contains(RoomData.RoomName))
+	{
+		UE_LOG(LogTemp, Error, TEXT("Room name %s not found"), *RoomData.RoomName.ToString());
+		return;
+	}
+	
+	if (URoom* Room = *Rooms.Find(RoomData.RoomName))
+	{
+		Room->UpdateRoomTile(UpdateType, Coordinates, RoomData);
+		// const FVector2D CurrentRoomTilePosition = Room->GetOriginalPositionInCanvas();
+		// FTimerHandle InterpTimer;
+		// GetWorld()->GetTimerManager().SetTimer(InterpTimer, [this, UpdateType, CurrentRoomTilePosition] ()
+		// {
+		// 	StartInterpolation(UpdateType, CurrentRoomTilePosition);
+		// }, .05f, false);
 	}
 }
 
 void UMapWidget::StartInterpolation(const ERoomUpdateType& UpdateType, const FVector2D& RoomTilePosition)
 {
-	if (UpdateType != ERoomUpdateType::PlayerLeaving)
+	if (UpdateType != ERoomUpdateType::Leaving)
 	{
 		CanvasCenter = CanvasPanel->GetCachedGeometry().GetLocalSize() / 2.f;
 		TargetRoomOffset = CanvasCenter - RoomTilePosition;
@@ -72,7 +111,7 @@ void UMapWidget::StartInterpolation(const ERoomUpdateType& UpdateType, const FVe
 
 void UMapWidget::RedrawMap(float DeltaSecond)
 {
-	if (RoomTiles.IsEmpty() || !bShouldInterpolate) return;
+	if (Rooms.IsEmpty() || !bShouldInterpolate) return;
 	
 	CurrentRoomOffset = FMath::Vector2DInterpTo(CurrentRoomOffset , TargetRoomOffset, DeltaSecond, 1.f);
 	if (CurrentRoomOffset.Equals(TargetRoomOffset, 1.f))
@@ -80,10 +119,10 @@ void UMapWidget::RedrawMap(float DeltaSecond)
 		CurrentRoomOffset = TargetRoomOffset;
 		bShouldInterpolate = false;
 	}
-	for (const auto RoomTile : RoomTiles)
+	for (const auto Room : Rooms)
 	{
-		UCanvasPanelSlot* MapCPS = UWidgetLayoutLibrary::SlotAsCanvasSlot(RoomTile.Value);
+		UCanvasPanelSlot* MapCPS = UWidgetLayoutLibrary::SlotAsCanvasSlot(Room.Value);
 		// MapCPS->SetSize(FVector2D(RoomTile.Value.RoomSize.X * RoomTileSize, RoomTile.Value.RoomSize.Y * RoomTileSize));
-		MapCPS->SetPosition(FVector2D{ RoomTile.Value->GetOriginalPositionInCanvas().X + CurrentRoomOffset.X, RoomTile.Value->GetOriginalPositionInCanvas().Y + CurrentRoomOffset.Y});
+		MapCPS->SetPosition(FVector2D{ Room.Value->GetOriginalPositionInCanvas().X + CurrentRoomOffset.X, Room.Value->GetOriginalPositionInCanvas().Y + CurrentRoomOffset.Y});
 	}
 }

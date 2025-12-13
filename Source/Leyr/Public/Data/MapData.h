@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "Engine/RendererSettings.h"
 #include "Game/BaseGameplayTags.h"
 #include "MapData.generated.h"
 
@@ -10,17 +9,27 @@ UENUM()
 enum class ERoomUpdateType : uint8
 {
 	None,
-	PlayerEntering,
-	PlayerLeaving,
-	PlayerDiscovering,
+	Entering,
+	Leaving,
+	Unveiling,
+	Exploring,
+};
+
+UENUM()
+enum class ESubdivisionState : uint8
+{
+	Hidden,
+	Unexplored,
+	Explored,
 };
 
 UENUM()
 enum class ERoomState : uint8
 {
 	None,
-	Undiscovered,
-	Discovered,
+	Hidden,
+	Unexplored,
+	Explored,
 	Occupied,
 };
 
@@ -35,22 +44,46 @@ enum class ERoomType : uint8
 };
 
 USTRUCT()
+struct FSubdivision
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY()
+	ESubdivisionState SubdivisionState = ESubdivisionState::Hidden;
+	
+	UPROPERTY()
+	TSet<FIntPoint> Doors; 
+};
+
+USTRUCT()
 struct FRoomData
 {
 	GENERATED_BODY()
 	FRoomData() {}
 	FRoomData(const FName& Name, const FIntPoint& Coordinates,  const FIntPoint& Size, const ERoomType Type) :
-		RoomName(Name), RoomCoordinates(Coordinates), RoomSize(Size), RoomType(Type) {}
+		RoomName(Name), RoomCoordinates(Coordinates), RoomSize(Size), RoomType(Type)
+	{
+		for (int h = 0; h < RoomSize.Y; ++h)
+		{
+			for (int w = 0; w < RoomSize.X; ++w)
+			{
+				Subdivisions.Emplace(FIntPoint(w, h), FSubdivision{} );
+				UE_LOG(LogTemp, Warning, TEXT("Constructing subdivisions for room name: %s, at room coords x:%d, y:%d"), *RoomName.ToString(), w, h);
+			}
+		}
+	}
 
 	UPROPERTY() FGameplayTag RegionTag = FBaseGameplayTags::Get().Map_Region_Dorn;
 	UPROPERTY() FName RoomName = FName();
 	UPROPERTY() FIntPoint RoomCoordinates = FIntPoint();
 	UPROPERTY() FIntPoint RoomSize = FIntPoint();
 	UPROPERTY() ERoomType RoomType = ERoomType::None;
-	UPROPERTY() bool bWasDiscovered = false;
+	UPROPERTY() bool bWasUnveiled = false;
+	UPROPERTY() TMap<FIntPoint, FSubdivision> Subdivisions;
 };
 
-inline bool operator==(const FRoomData& A, FRoomData& B)
+inline bool operator==(const FRoomData& A, const FRoomData& B)
 {
 	return A.RoomName == B.RoomName;
 }

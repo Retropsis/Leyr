@@ -19,7 +19,15 @@ public:
 	// virtual void NativeOnInitialized() override;
 
 	void UpdateRoomTile(const ERoomUpdateType& UpdateType);
-	void RevealRoom() const;
+	
+	void EnterRoomTile();
+	void LeaveRoomTile();
+	void ExploreRoomTile();
+	void UnveilRoomTile();
+	void RevealRoomTile();
+	
+	void SetBorders(const FIntPoint& Coordinates, const FIntPoint& Size) const;
+	void SetBordersUnexplored(const FIntPoint& Coordinates, const FIntPoint& Size) const;
 
 	void SetRoomState(const ERoomState NewState) { RoomState = NewState; }
 	ERoomState GetRoomState() const { return RoomState; }
@@ -27,6 +35,8 @@ public:
 	ERoomType GetRoomType() const { return RoomType; }
 	void SetOriginalPositionInCanvas(const FVector2D Position) { OriginalPositionInCanvas = Position; }
 	FVector2D GetOriginalPositionInCanvas() const { return OriginalPositionInCanvas; }
+	void SetRoomSize(const FIntPoint& Size) { RoomSize = Size; }
+	void SetRoomCoordinates(const FIntPoint& Coordinates) { RoomCoordinates = Coordinates; }
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void HandleOccupiedAnimation(bool bIsOccupied);
@@ -38,11 +48,23 @@ private:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_Room;
 	
-	UPROPERTY(EditAnywhere, Category="Map")
-	FSlateBrush Brush_Undiscovered;
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_BorderTop;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_BorderLeft;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_BorderRight;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_BorderBottom;
 	
 	UPROPERTY(EditAnywhere, Category="Map")
-	FSlateBrush Brush_Discovered;
+	FSlateBrush Brush_Unexplored;
+	
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateBrush Brush_Explored;
 	
 	UPROPERTY(EditAnywhere, Category="Map")
 	FSlateBrush Brush_Occupied;
@@ -58,8 +80,22 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category="Map")
 	FSlateBrush Brush_ExitRoom;
+	
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateBrush Brush_Border_Undiscovered_H;
+	
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateBrush Brush_Border_Undiscovered_V;
+	
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateBrush Brush_BorderH;
+	
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateBrush Brush_BorderV;
 
-	ERoomState RoomState = ERoomState::None;
+	FIntPoint RoomSize;
+	FIntPoint RoomCoordinates;
+	ERoomState RoomState = ERoomState::Hidden;
 	ERoomType RoomType = ERoomType::None;
 	FVector2D OriginalPositionInCanvas = FVector2D::ZeroVector;
 };

@@ -127,6 +127,7 @@ protected:
 	void DestroyOutOfBoundsEncounters() const;
 	void ToggleLevelActorActivity(bool bActivate) const;
 	void GiveToAbilitySystem(UAbilitySystemComponent* ASC, FLevelArea_GrantedHandles* OutGrantedHandles, float Level = 1.f, UObject* SourceObject = nullptr) const;
+	void TrackPlayerRoomCoordinates() const;
 	
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -190,11 +191,13 @@ protected:
 
 private:
 	void RequestRoomUpdate(ERoomUpdateType UpdateType) const;
+	FIntPoint GetPlayerRoomCoordinates() const;
 	APlayerController* GetPlayerController();
 	
 	UPROPERTY(VisibleAnywhere, Category="Camera Boundary") ERoomType RoomType;
 	UPROPERTY(VisibleAnywhere, Category="Camera Boundary") FName LevelAreaName = FName();;
-	
+
+	UPROPERTY() FTimerHandle TrackingPlayerTimer;
 	UPROPERTY() TObjectPtr<APlayerController> PlayerController;
 	UPROPERTY() TObjectPtr<AActor> TargetActor;
 	UPROPERTY() FLevelArea_GrantedHandles LevelArea_GrantedHandles;
