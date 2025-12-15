@@ -96,6 +96,30 @@ void ACameraBoundary::PostEditChangeProperty(struct FPropertyChangedEvent& Prope
 	{
 		InitializeCameraExtent();
 	}
+	if (PropertyChangedEvent.Property->GetName() == TEXT("Entrances"))
+	{
+		int32 Index = PropertyChangedEvent.GetArrayIndex(TEXT("Entrances"));
+		switch (PropertyChangedEvent.ChangeType)
+		{
+		case 2: AddEntrance(Index); break;
+		case 4: RemoveEntrance(Index); break;
+		case 8: RemoveAllEntrances(); break;
+		case 16: RemoveEntrance(Index); break;
+		default: ;
+		}
+		// UE_LOG(LogClass, Warning, TEXT("ChangeType: %u, index %d"), PropertyChangedEvent.ChangeType, Index);
+	}
+}
+
+void ACameraBoundary::PreEditChange(FProperty* PropertyAboutToChange)
+{
+	Super::PreEditChange(PropertyAboutToChange);
+
+	if (PropertyAboutToChange->GetName() == TEXT("Entrances"))
+	{
+		PreEditEntrances.Empty();
+		PreEditEntrances.Append(Entrances);
+	}
 }
 
 void ACameraBoundary::BeginPlay()
@@ -242,6 +266,38 @@ void ACameraBoundary::ClearWaterVolume()
 {
 	WaterVolume->Destroy();
 	WaterVolume = nullptr; 
+}
+
+void ACameraBoundary::AddEntrance(const int32 Index)
+{
+	if (!IsValid(EntranceClass)) return;
+	
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	AEntrance* Entrance = GetWorld()->SpawnActor<AEntrance>(EntranceClass, GetActorLocation() + FVector{ (Index + 1) * 100.f, 0.f, 0.f }, FRotator::ZeroRotator, SpawnParams);
+	Entrances[Index] = Entrance;
+}
+
+void ACameraBoundary::RemoveEntrance(const int32 Index)
+{
+	if (PreEditEntrances.IsValidIndex(Index) && IsValid(PreEditEntrances[Index]))
+	{
+		PreEditEntrances[Index]->Destroy();
+		PreEditEntrances.RemoveAt(Index);
+	}
+}
+
+void ACameraBoundary::RemoveAllEntrances()
+{
+	for (int i = 0; i < PreEditEntrances.Num(); ++i)
+	{
+		RemoveEntrance(i);
+	}
+}
+
+void ACameraBoundary::SwapEntrances(int32 Index)
+{
+	
 }
 
 void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -448,7 +504,7 @@ TMap<FIntPoint, FSubdivision> ACameraBoundary::ConstructSubdivisions()
 	// ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery1);
 	// ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery2);
 	TArray<AActor*> ActorsToIgnore;
-	UKismetSystemLibrary::BoxOverlapActors(this, BoundaryVisualizer->GetComponentLocation(), BoundaryVisualizer->Bounds.BoxExtent, ObjectTypes, ADoor::StaticClass(), ActorsToIgnore, OutActors);
+	UKismetSystemLibrary::BoxOverlapActors(this, BoundaryVisualizer->GetComponentLocation(), BoundaryVisualizer->Bounds.BoxExtent, ObjectTypes, AEntrance::StaticClass(), ActorsToIgnore, OutActors);
 	for (const AActor* OutActor : OutActors)
 	{
 		if (!IsValid(OutActor)) continue;
@@ -464,8 +520,8 @@ TMap<FIntPoint, FSubdivision> ACameraBoundary::ConstructSubdivisions()
 		FVector2D ActorLoc = FVector2D{ OutActor->GetActorLocation().X, OutActor->GetActorLocation().Z };
 		const float Angle = FMath::RadiansToDegrees(FMath::Atan2((SubLoc - ActorLoc).Y, (SubLoc - ActorLoc).X));
 		
-		UKismetSystemLibrary::DrawDebugSphere(this, SubdivisionLocation, 20.0f, 20, FColor::Green, 90.f);
-		UKismetSystemLibrary::DrawDebugSphere(this, OutActor->GetActorLocation(), 20.0f, 20, FColor::Red, 90.f);
+		// UKismetSystemLibrary::DrawDebugSphere(this, SubdivisionLocation, 20.0f, 20, FColor::Green, 90.f);
+		// UKismetSystemLibrary::DrawDebugSphere(this, OutActor->GetActorLocation(), 20.0f, 20, FColor::Red, 90.f);
 
 		EDoorPlacement DoorPlacement = EDoorPlacement::Right;
 		if (Angle <= -45.f && Angle > -135.f)

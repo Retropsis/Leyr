@@ -10,6 +10,7 @@
 #include "Data/MapData.h"
 #include "CameraBoundary.generated.h"
 
+class AEntrance;
 enum class ERoomType : uint8;
 enum class ERoomUpdateType : uint8;
 struct FActiveGameplayEffectHandle;
@@ -80,6 +81,7 @@ public:
 	ACameraBoundary();
 	virtual void OnConstruction(const FTransform& Transform) override;
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+	virtual void PreEditChange(FProperty* PropertyAboutToChange) override;
 	
 	UFUNCTION(CallInEditor, Category=" Camera Boundary")
 	virtual void InitializeCameraExtent();
@@ -154,6 +156,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
 	TObjectPtr<APaperTileMapActor> TileMap;
 	
+	UPROPERTY(EditDefaultsOnly, Category=" Camera Boundary")
+	TSubclassOf<AEntrance> EntranceClass;
+	
+	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
+	TArray<TObjectPtr<AEntrance>> Entrances;
+	
 	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
 	EBoundaryRule BoundaryRule = EBoundaryRule::Extent;
 
@@ -195,12 +203,19 @@ private:
 	FIntPoint GetPlayerRoomCoordinates() const;
 	APlayerController* GetPlayerController();
 	
+	void AddEntrance(int32 Index);
+	void RemoveEntrance(int32 Index);
+	void RemoveAllEntrances();
+	void SwapEntrances(int32 Index);
+	
 	UPROPERTY(VisibleAnywhere, Category="Camera Boundary") ERoomType RoomType;
 	UPROPERTY(VisibleAnywhere, Category="Camera Boundary") FName LevelAreaName = FName();;
 
 	UPROPERTY() TObjectPtr<APlayerController> PlayerController;
 	UPROPERTY() TObjectPtr<AActor> TargetActor;
 	UPROPERTY() TMap<FIntPoint, FSubdivision> Subdivisions;
+	UPROPERTY() int32 EntrancesCount = 0;
+	UPROPERTY(VisibleAnywhere, Category="Camera Boundary") TArray<TObjectPtr<AEntrance>> PreEditEntrances;
 	UPROPERTY() FLevelArea_GrantedHandles LevelArea_GrantedHandles;
 	UPROPERTY() FBoxSphereBounds TileMapBounds;
 	UPROPERTY() bool bEnvironmentEffectsInitialized = false;

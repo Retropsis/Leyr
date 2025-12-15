@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Entrance.h"
 #include "PaperFlipbookActor.h"
 #include "GameFramework/Actor.h"
 #include "Door.generated.h"
@@ -33,7 +34,7 @@ enum class EDoorType : uint8
 };
 
 UCLASS(Blueprintable, BlueprintType)
-class LEYR_API ADoor : public APaperFlipbookActor
+class LEYR_API ADoor : public AEntrance
 {
 	GENERATED_BODY()
 	
