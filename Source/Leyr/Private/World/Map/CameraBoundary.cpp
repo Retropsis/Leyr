@@ -17,7 +17,7 @@
 #include "UI/Component/MapComponent.h"
 #include "World/Item.h"
 #include "World/Data/CameraData.h"
-#include "World/Level/Door/Door.h"
+#include "World/Level/Door/EntranceMarker.h"
 #include "World/Level/Moving/WaterGroup.h"
 #include "World/Level/Spawner/EncounterSpawnPoint.h"
 #include "World/Level/Spawner/EncounterSpawnVolume.h"
@@ -96,9 +96,9 @@ void ACameraBoundary::PostEditChangeProperty(struct FPropertyChangedEvent& Prope
 	{
 		InitializeCameraExtent();
 	}
-	if (PropertyChangedEvent.Property->GetName() == TEXT("Entrances"))
+	if (PropertyChangedEvent.Property->GetName() == TEXT("EntranceMarkers"))
 	{
-		int32 Index = PropertyChangedEvent.GetArrayIndex(TEXT("Entrances"));
+		int32 Index = PropertyChangedEvent.GetArrayIndex(TEXT("EntranceMarkers"));
 		switch (PropertyChangedEvent.ChangeType)
 		{
 		case 2: AddEntrance(Index); break;
@@ -115,10 +115,10 @@ void ACameraBoundary::PreEditChange(FProperty* PropertyAboutToChange)
 {
 	Super::PreEditChange(PropertyAboutToChange);
 
-	if (PropertyAboutToChange->GetName() == TEXT("Entrances"))
+	if (PropertyAboutToChange->GetName() == TEXT("EntranceMarkers"))
 	{
-		PreEditEntrances.Empty();
-		PreEditEntrances.Append(Entrances);
+		PreEditEntranceMarkers.Empty();
+		PreEditEntranceMarkers.Append(EntranceMarkers);
 	}
 }
 
@@ -270,26 +270,31 @@ void ACameraBoundary::ClearWaterVolume()
 
 void ACameraBoundary::AddEntrance(const int32 Index)
 {
-	if (!IsValid(EntranceClass)) return;
-	
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	AEntrance* Entrance = GetWorld()->SpawnActor<AEntrance>(EntranceClass, GetActorLocation() + FVector{ (Index + 1) * 100.f, 0.f, 0.f }, FRotator::ZeroRotator, SpawnParams);
-	Entrances[Index] = Entrance;
+	if (!IsValid(EntranceMarkerClass)) return;
+
+	if (UEntranceMarker* EntranceMarker = NewObject<UEntranceMarker>(this, EntranceMarkerClass))
+	{
+		AddInstanceComponent(EntranceMarker);
+        EntranceMarker->RegisterComponent();
+		const FString Label = FString::Printf(TEXT("EntranceMarker_%d"), Index);
+		EntranceMarker->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName(*Label));
+        EntranceMarker->SetRelativeLocation(FVector{ (Index + 1) * 100.f, 0.f, 0.f} );
+		EntranceMarkers[Index] = EntranceMarker;
+	}
 }
 
 void ACameraBoundary::RemoveEntrance(const int32 Index)
 {
-	if (PreEditEntrances.IsValidIndex(Index) && IsValid(PreEditEntrances[Index]))
+	if (PreEditEntranceMarkers.IsValidIndex(Index) && IsValid(PreEditEntranceMarkers[Index]))
 	{
-		PreEditEntrances[Index]->Destroy();
-		PreEditEntrances.RemoveAt(Index);
+		PreEditEntranceMarkers[Index]->DestroyComponent();
+		PreEditEntranceMarkers.RemoveAt(Index);
 	}
 }
 
 void ACameraBoundary::RemoveAllEntrances()
 {
-	for (int i = 0; i < PreEditEntrances.Num(); ++i)
+	for (int i = 0; i < PreEditEntranceMarkers.Num(); ++i)
 	{
 		RemoveEntrance(i);
 	}
@@ -498,18 +503,10 @@ TMap<FIntPoint, FSubdivision> ACameraBoundary::ConstructSubdivisions()
 			Subdivisions.Emplace(FIntPoint{ w, h }, FSubdivision{});
 		}
 	}
-	
-	TArray<AActor*> OutActors;
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	// ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery1);
-	// ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery2);
-	TArray<AActor*> ActorsToIgnore;
-	UKismetSystemLibrary::BoxOverlapActors(this, BoundaryVisualizer->GetComponentLocation(), BoundaryVisualizer->Bounds.BoxExtent, ObjectTypes, AEntrance::StaticClass(), ActorsToIgnore, OutActors);
-	for (const AActor* OutActor : OutActors)
+
+	for (const UEntranceMarker* EntranceMarker : EntranceMarkers)
 	{
-		if (!IsValid(OutActor)) continue;
-		
-		const FIntPoint OutActorWorldCoordinates = FIntPoint{ FMath::TruncToInt32(OutActor->GetActorLocation().X / 1280.f), FMath::TruncToInt32(OutActor->GetActorLocation().Z / 768.f) };
+		const FIntPoint OutActorWorldCoordinates = FIntPoint{ FMath::TruncToInt32(EntranceMarker->GetComponentLocation().X / 1280.f), FMath::TruncToInt32(EntranceMarker->GetComponentLocation().Z / 768.f) };
 		const FIntPoint OutActorRoomCoordinates = FIntPoint{
 			FMath::Abs(FMath::Clamp(OutActorWorldCoordinates.X - GetRoomCoordinates().X, 0, FMath::Abs(GetRoomCoordinates().X) + GetRoomSize().X)),
 			FMath::Abs(FMath::Clamp(OutActorWorldCoordinates.Y - GetRoomCoordinates().Y, 0 , FMath::Abs(GetRoomCoordinates().Y) + GetRoomSize().Y)) };
@@ -517,11 +514,11 @@ TMap<FIntPoint, FSubdivision> ACameraBoundary::ConstructSubdivisions()
 		const FVector SubdivisionLocation = FVector{  (GetRoomCoordinates().X + OutActorRoomCoordinates.X) * 1280.f + 640.f, 0.f, (GetRoomCoordinates().Y + OutActorRoomCoordinates.Y) *  768.f - 384.f };
 		
 		FVector2D SubLoc = FVector2D{ SubdivisionLocation.X, SubdivisionLocation.Z };
-		FVector2D ActorLoc = FVector2D{ OutActor->GetActorLocation().X, OutActor->GetActorLocation().Z };
+		FVector2D ActorLoc = FVector2D{ EntranceMarker->GetComponentLocation().X, EntranceMarker->GetComponentLocation().Z };
 		const float Angle = FMath::RadiansToDegrees(FMath::Atan2((SubLoc - ActorLoc).Y, (SubLoc - ActorLoc).X));
 		
 		// UKismetSystemLibrary::DrawDebugSphere(this, SubdivisionLocation, 20.0f, 20, FColor::Green, 90.f);
-		// UKismetSystemLibrary::DrawDebugSphere(this, OutActor->GetActorLocation(), 20.0f, 20, FColor::Red, 90.f);
+		// UKismetSystemLibrary::DrawDebugSphere(this, EntranceMarker->GetComponentLocation(), 20.0f, 20, FColor::Red, 90.f);
 
 		EDoorPlacement DoorPlacement = EDoorPlacement::Right;
 		if (Angle <= -45.f && Angle > -135.f)
@@ -540,12 +537,6 @@ TMap<FIntPoint, FSubdivision> ACameraBoundary::ConstructSubdivisions()
 		{
 			Subdivisions.Find(OutActorRoomCoordinates)->Doors.Add(DoorPlacement);
 		}
-		// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Green,
-		// 	FString::Printf(TEXT("%s at (%s) at angle %f placed at %s"), *OutActor->GetActorLabel(), *SubdivisionLocation.ToCompactString(), Angle, *UEnum::GetValueAsString(DoorPlacement)));
-		// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Green,
-		// 	FString::Printf(TEXT("%s at (x:%d, y:%d) of angle: %f and is placed %s"), *OutActor->GetName(), OutActorRoomCoordinates.X, OutActorRoomCoordinates.Y, Angle, *UEnum::GetValueAsString(DoorPlacement)));
-		// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Green, FString::Printf(TEXT("%s has doors:"), !LevelAreaName.IsNone() ? *LevelAreaName.ToString() : *GetTileMapName().ToString()));
-		// UE_LOG(LogTemp, Warning, TEXT("Angle between Door: %s and this tile center: %f and its placement is %s"), *OutActor->GetName(), Angle, *UEnum::GetValueAsString(DoorPlacement));
 	}
 	return Subdivisions;
 }

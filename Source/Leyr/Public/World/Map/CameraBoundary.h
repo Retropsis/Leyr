@@ -10,6 +10,7 @@
 #include "Data/MapData.h"
 #include "CameraBoundary.generated.h"
 
+class UEntranceMarker;
 class AEntrance;
 enum class ERoomType : uint8;
 enum class ERoomUpdateType : uint8;
@@ -157,10 +158,10 @@ protected:
 	TObjectPtr<APaperTileMapActor> TileMap;
 	
 	UPROPERTY(EditDefaultsOnly, Category=" Camera Boundary")
-	TSubclassOf<AEntrance> EntranceClass;
-	
+	TSubclassOf<UEntranceMarker> EntranceMarkerClass;
+
 	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
-	TArray<TObjectPtr<AEntrance>> Entrances;
+	TArray<TObjectPtr<UEntranceMarker>> EntranceMarkers;
 	
 	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
 	EBoundaryRule BoundaryRule = EBoundaryRule::Extent;
@@ -214,8 +215,7 @@ private:
 	UPROPERTY() TObjectPtr<APlayerController> PlayerController;
 	UPROPERTY() TObjectPtr<AActor> TargetActor;
 	UPROPERTY() TMap<FIntPoint, FSubdivision> Subdivisions;
-	UPROPERTY() int32 EntrancesCount = 0;
-	UPROPERTY(VisibleAnywhere, Category="Camera Boundary") TArray<TObjectPtr<AEntrance>> PreEditEntrances;
+	UPROPERTY(VisibleAnywhere, Category="Camera Boundary") TArray<TObjectPtr<UEntranceMarker>> PreEditEntranceMarkers;
 	UPROPERTY() FLevelArea_GrantedHandles LevelArea_GrantedHandles;
 	UPROPERTY() FBoxSphereBounds TileMapBounds;
 	UPROPERTY() bool bEnvironmentEffectsInitialized = false;
