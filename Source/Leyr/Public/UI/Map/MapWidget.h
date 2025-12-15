@@ -27,7 +27,7 @@ public:
 	void StartInterpolation(const ERoomUpdateType& UpdateType, const FVector2D& RoomTilePosition);
 	void EnteringRoom(const FRoomData& RoomData, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates);
 	void LeavingRoom(const FRoomData& RoomData, const FIntPoint& PlayerCoordinates);
-	void UpdateRoomTileAt(const FRoomData& RoomData, const ERoomUpdateType& UpdateType, const FIntPoint& Coordinates);
+	void UpdateRoomTileAt(const FRoomData& RoomData, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates);
 
 	UFUNCTION(BlueprintCallable)
 	void RedrawMap(float DeltaSecond);

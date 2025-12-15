@@ -21,7 +21,7 @@ public:
 	void ConstructMapRooms();
 	void EnteringRoom(const FName& RoomName, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates);
 	void LeavingRoom(const FName& RoomName, const FIntPoint& PlayerCoordinates);
-	void UpdateRoomAt(const FName& RoomName, const ERoomUpdateType& UpdateType, const FIntPoint& Coordinates);
+	void UpdateRoomAt(const FName& RoomName, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates);
 	
 	UFUNCTION(BlueprintCallable, Category="Map")
 	UMapWidget* GetMapWidget() const { return MapWidget; }
@@ -38,6 +38,8 @@ private:
 	void SetRoomTileExplored(const FName& RoomName, const FIntPoint& Coordinates);
 	void ExploreRoomTile(const FName& RoomName, const FIntPoint& Coordinates);
 	void UnveilRoom(const FName& RoomName);
+	void TrackPlayerRoomCoordinates(const FName& RoomName, const FIntPoint& RoomCoordinates);
+	FIntPoint GetPlayerRoomCoordinates(const FIntPoint& RoomCoordinates) const;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Map")
 	TSubclassOf<UMapWidget> MapWidgetClass;
@@ -49,4 +51,6 @@ private:
 	TMap<FName, FRoomData> Rooms;
 	
 	TWeakObjectPtr<APlayerController> OwningController;
+	TWeakObjectPtr<ACharacter> PlayerCharacter;
+	FTimerHandle TrackingPlayerTimer;
 };

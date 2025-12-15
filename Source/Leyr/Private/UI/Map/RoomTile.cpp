@@ -73,26 +73,54 @@ void URoomTile::RevealRoomTile()
 	}
 }
 
+void URoomTile::DrawDoors(const FSubdivision& Subdivision) const
+{
+	for (const EDoorPlacement Door : Subdivision.Doors)
+	{
+		switch (Door)
+		{
+		case EDoorPlacement::None:
+			break;
+		case EDoorPlacement::Top:
+			Image_BorderTop->SetBrush(Brush_DoorBorder_H);
+			Image_BorderTop->SetVisibility(ESlateVisibility::Visible);
+			break;
+		case EDoorPlacement::Bottom:
+			Image_BorderBottom->SetBrush(Brush_DoorBorder_H);
+			Image_BorderBottom->SetVisibility(ESlateVisibility::Visible);
+			break;
+		case EDoorPlacement::Left:
+			Image_BorderLeft->SetBrush(Brush_DoorBorder_V);
+			Image_BorderLeft->SetVisibility(ESlateVisibility::Visible);
+			break;
+		case EDoorPlacement::Right:
+			Image_BorderRight->SetBrush(Brush_DoorBorder_V);
+			Image_BorderRight->SetVisibility(ESlateVisibility::Visible);
+			break;
+		}
+	}
+}
+
 void URoomTile::SetBorders(const FIntPoint& Coordinates, const FIntPoint& Size) const
 {
 	if (Coordinates.X == 1)
 	{
-		Image_BorderLeft->SetBrush(Brush_BorderV);
+		Image_BorderLeft->SetBrush(Brush_Border_V);
 		Image_BorderLeft->SetVisibility(ESlateVisibility::Visible);
 	}
 	if (Coordinates.X == Size.X)
 	{
-		Image_BorderRight->SetBrush(Brush_BorderV);
+		Image_BorderRight->SetBrush(Brush_Border_V);
 		Image_BorderRight->SetVisibility(ESlateVisibility::Visible);
 	}
 	if (Coordinates.Y == Size.Y)
 	{
-		Image_BorderBottom->SetBrush(Brush_BorderH);
+		Image_BorderBottom->SetBrush(Brush_Border_H);
 		Image_BorderBottom->SetVisibility(ESlateVisibility::Visible);
 	}
 	if (Coordinates.Y == 1)
 	{
-		Image_BorderTop->SetBrush(Brush_BorderH);
+		Image_BorderTop->SetBrush(Brush_Border_H);
 		Image_BorderTop->SetVisibility(ESlateVisibility::Visible);
 	}
 }

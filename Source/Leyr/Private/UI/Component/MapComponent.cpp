@@ -4,6 +4,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Data/MapData.h"
 #include "Game/BaseGameplayTags.h"
+#include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/Map/MapWidget.h"
 #include "World/Map/CameraBoundary.h"
@@ -25,6 +26,8 @@ void UMapComponent::ConstructMapWidget()
 	checkf(OwningController.IsValid(), TEXT("Map Component should have PlayerController as Owner."));
 	if (!OwningController->IsLocalController()) return;
 
+	PlayerCharacter = OwningController->GetCharacter();
+
 	MapWidget = CreateWidget<UMapWidget>(OwningController.Get(), MapWidgetClass);
 	MapWidget->ConstructMapCanvas(FilterRoomsByRegion(FBaseGameplayTags::Get().Map_Region_Dorn));
 	// CloseInventoryMenu();
@@ -41,13 +44,14 @@ void UMapComponent::ConstructMapRooms()
 	Rooms.Empty();
 	for (AActor* TempRoom : TempRooms)
 	{
-		if (const ACameraBoundary* Boundary = Cast<ACameraBoundary>(TempRoom))
+		if (ACameraBoundary* Boundary = Cast<ACameraBoundary>(TempRoom))
 		{
 			FRoomData Data {
 				!Boundary->GetLevelAreaName().IsNone() ? Boundary->GetLevelAreaName() : Boundary->GetTileMapName(),
 				FIntPoint{ Boundary->GetRoomCoordinates().X, Boundary->GetRoomCoordinates().Y },
 				FIntPoint(Boundary->GetRoomSize().X, Boundary->GetRoomSize().Y),
-				Boundary->GetRoomType()
+				Boundary->GetRoomType(),
+				Boundary->ConstructSubdivisions()
 			};
 
 			if (Data.RoomName.IsNone()) continue;
@@ -65,8 +69,18 @@ void UMapComponent::EnteringRoom(const FName& RoomName, const ERoomUpdateType& U
 	
 	const ERoomUpdateType NewState = !IsRoomUnveiled(RoomName) ? ERoomUpdateType::Unveiling : UpdateType;
 	UnveilRoom(RoomName);
-	MapWidget->EnteringRoom(*Rooms.Find(RoomName), NewState, PlayerCoordinates);
+	const FRoomData RoomData = *Rooms.Find(RoomName);
+	const FIntPoint RoomCoordinates = RoomData.RoomCoordinates;
+	MapWidget->EnteringRoom(RoomData, NewState, PlayerCoordinates);
+	
 	ExploreRoomTile(RoomName, PlayerCoordinates);
+
+	GetWorld()->GetTimerManager().ClearTimer(TrackingPlayerTimer);
+	TrackingPlayerTimer.Invalidate();
+	GetWorld()->GetTimerManager().SetTimer(TrackingPlayerTimer, [this, RoomName, RoomCoordinates] ()
+	{
+		TrackPlayerRoomCoordinates(RoomName, RoomCoordinates);
+	}, 1.f, true);
 }
 
 void UMapComponent::LeavingRoom(const FName& RoomName, const FIntPoint& PlayerCoordinates)
@@ -76,13 +90,29 @@ void UMapComponent::LeavingRoom(const FName& RoomName, const FIntPoint& PlayerCo
 	MapWidget->LeavingRoom(*Rooms.Find(RoomName), PlayerCoordinates);
 }
 
-void UMapComponent::UpdateRoomAt(const FName& RoomName, const ERoomUpdateType& UpdateType, const FIntPoint& Coordinates)
+void UMapComponent::TrackPlayerRoomCoordinates(const FName& RoomName, const FIntPoint& RoomCoordinates)
+{
+	if (!PlayerCharacter.IsValid()) return;
+	const FIntPoint PlayerCoordinates = GetPlayerRoomCoordinates(RoomCoordinates);
+	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green,
+	// 	FString::Printf(TEXT("Room name: %s, Player coords(x:%d, y:%d), Room coords(x:%d, y:%d)"),
+	// 		*RoomName.ToString(), PlayerCoordinates.X, PlayerCoordinates.Y, RoomCoordinates.X, RoomCoordinates.Y ));
+	UpdateRoomAt(RoomName, ERoomUpdateType::Entering, PlayerCoordinates);
+}
+
+FIntPoint UMapComponent::GetPlayerRoomCoordinates(const FIntPoint& RoomCoordinates) const
+{
+	const FIntPoint PlayerWorldCoordinates{ FMath::TruncToInt32(PlayerCharacter->GetActorLocation().X / 1280.f), FMath::TruncToInt32( PlayerCharacter->GetActorLocation().Z / 768.f) };
+	return FIntPoint{ FMath::Abs(PlayerWorldCoordinates.X - RoomCoordinates.X), FMath::Abs(PlayerWorldCoordinates.Y - RoomCoordinates.Y)  };
+}
+
+void UMapComponent::UpdateRoomAt(const FName& RoomName, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates)
 {
 	if (!Rooms.Contains(RoomName)) return;
 	
-	const ERoomUpdateType NewState = IsRoomTileExplored(RoomName, Coordinates) ? UpdateType : ERoomUpdateType::Exploring;
-	ExploreRoomTile(RoomName, Coordinates);
-	MapWidget->UpdateRoomTileAt(*Rooms.Find(RoomName), NewState, Coordinates);
+	const ERoomUpdateType NewState = IsRoomTileExplored(RoomName, PlayerCoordinates) ? UpdateType : ERoomUpdateType::Exploring;
+	ExploreRoomTile(RoomName, PlayerCoordinates);
+	MapWidget->UpdateRoomTileAt(*Rooms.Find(RoomName), NewState, PlayerCoordinates);
 }
 
 TArray<FRoomData> UMapComponent::FilterRoomsByRegion(const FGameplayTag& RegionTag)

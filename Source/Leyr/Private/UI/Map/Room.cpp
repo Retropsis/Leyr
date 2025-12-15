@@ -33,6 +33,7 @@ void URoom::EnteringRoom(const FIntPoint& PlayerCoordinates, const FRoomData& Ro
 		{
 			if (PlayerCoordinates == RoomTile.Key)
 			{
+				LeaveRoomTile(RoomTile.Value);
 				RoomTile.Value->EnterRoomTile();
 			}
 		}
@@ -48,7 +49,13 @@ void URoom::UnveilingRoom(const FIntPoint& PlayerCoordinates, const FRoomData& R
 			RoomTile.Value->UnveilRoomTile();
 			if (PlayerCoordinates == RoomTile.Key)
 			{
+				LeaveRoomTile(RoomTile.Value);
 				RoomTile.Value->ExploreRoomTile();
+				for (const TTuple<FIntPoint, FSubdivision>& Subdivision : RoomData.Subdivisions)
+				{
+					if (Subdivision.Key == PlayerCoordinates) RoomTile.Value->DrawDoors(Subdivision.Value);
+					// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Orange, FString::Printf(TEXT("Checking door in tile (x:%d, y:%d)"), Subdivision.Key.X, Subdivision.Key.Y));
+				}
 			}
 		}
 	}
@@ -83,6 +90,11 @@ void URoom::UpdateRoomTile(const ERoomUpdateType& UpdateType, const FIntPoint& C
 		case ERoomUpdateType::Exploring:
 			LeaveRoomTile(RoomTile);
 			RoomTile->ExploreRoomTile();
+			for (const TTuple<FIntPoint, FSubdivision>& Subdivision : RoomData.Subdivisions)
+			{
+				if (Subdivision.Key == Coordinates) RoomTile->DrawDoors(Subdivision.Value);
+				// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Purple, FString::Printf(TEXT("Checking door in tile (x:%d, y:%d)"), Subdivision.Key.X, Subdivision.Key.Y));
+			}
 			break;
 		case ERoomUpdateType::Unveiling:
 			RoomTile->UnveilRoomTile();

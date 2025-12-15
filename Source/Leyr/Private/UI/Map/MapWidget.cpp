@@ -79,7 +79,7 @@ void UMapWidget::LeavingRoom(const FRoomData& RoomData, const FIntPoint& PlayerC
 	}
 }
 
-void UMapWidget::UpdateRoomTileAt(const FRoomData& RoomData, const ERoomUpdateType& UpdateType, const FIntPoint& Coordinates)
+void UMapWidget::UpdateRoomTileAt(const FRoomData& RoomData, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates)
 {
 	if (!Rooms.Contains(RoomData.RoomName))
 	{
@@ -89,7 +89,7 @@ void UMapWidget::UpdateRoomTileAt(const FRoomData& RoomData, const ERoomUpdateTy
 	
 	if (URoom* Room = *Rooms.Find(RoomData.RoomName))
 	{
-		Room->UpdateRoomTile(UpdateType, Coordinates, RoomData);
+		Room->UpdateRoomTile(UpdateType, PlayerCoordinates, RoomData);
 		// const FVector2D CurrentRoomTilePosition = Room->GetOriginalPositionInCanvas();
 		// FTimerHandle InterpTimer;
 		// GetWorld()->GetTimerManager().SetTimer(InterpTimer, [this, UpdateType, CurrentRoomTilePosition] ()

@@ -7,14 +7,15 @@
 #include "PaperTileMapActor.h"
 #include "Components/BoxComponent.h"
 #include "Data/EncounterSpawnData.h"
+#include "Data/MapData.h"
 #include "CameraBoundary.generated.h"
 
 enum class ERoomType : uint8;
 enum class ERoomUpdateType : uint8;
+struct FActiveGameplayEffectHandle;
 class AWaterGroup;
 class UNiagaraComponent;
 class UNiagaraSystem;
-struct FActiveGameplayEffectHandle;
 class UGameplayEffect;
 class UAbilitySystemComponent;
 class ULevelAreaData;
@@ -112,6 +113,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	FBoxSphereBounds GetNavigationBounds() const { return NavigationBoundary->Bounds; }
 
+	TMap<FIntPoint, FSubdivision> ConstructSubdivisions();
 	FIntPoint GetRoomSize() const;
 	FIntPoint GetRoomCoordinates() const;
 	FName GetTileMapName() const;
@@ -127,7 +129,6 @@ protected:
 	void DestroyOutOfBoundsEncounters() const;
 	void ToggleLevelActorActivity(bool bActivate) const;
 	void GiveToAbilitySystem(UAbilitySystemComponent* ASC, FLevelArea_GrantedHandles* OutGrantedHandles, float Level = 1.f, UObject* SourceObject = nullptr) const;
-	void TrackPlayerRoomCoordinates() const;
 	
 	UFUNCTION()
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -197,9 +198,9 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="Camera Boundary") ERoomType RoomType;
 	UPROPERTY(VisibleAnywhere, Category="Camera Boundary") FName LevelAreaName = FName();;
 
-	UPROPERTY() FTimerHandle TrackingPlayerTimer;
 	UPROPERTY() TObjectPtr<APlayerController> PlayerController;
 	UPROPERTY() TObjectPtr<AActor> TargetActor;
+	UPROPERTY() TMap<FIntPoint, FSubdivision> Subdivisions;
 	UPROPERTY() FLevelArea_GrantedHandles LevelArea_GrantedHandles;
 	UPROPERTY() FBoxSphereBounds TileMapBounds;
 	UPROPERTY() bool bEnvironmentEffectsInitialized = false;

@@ -25,6 +25,7 @@ public:
 	void ExploreRoomTile();
 	void UnveilRoomTile();
 	void RevealRoomTile();
+	void DrawDoors(const FSubdivision& Subdivision) const;
 	
 	void SetBorders(const FIntPoint& Coordinates, const FIntPoint& Size) const;
 	void SetBordersUnexplored(const FIntPoint& Coordinates, const FIntPoint& Size) const;
@@ -88,10 +89,16 @@ private:
 	FSlateBrush Brush_Border_Undiscovered_V;
 	
 	UPROPERTY(EditAnywhere, Category="Map")
-	FSlateBrush Brush_BorderH;
+	FSlateBrush Brush_Border_H;
 	
 	UPROPERTY(EditAnywhere, Category="Map")
-	FSlateBrush Brush_BorderV;
+	FSlateBrush Brush_Border_V;
+	
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateBrush Brush_DoorBorder_H;
+	
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateBrush Brush_DoorBorder_V;
 
 	FIntPoint RoomSize;
 	FIntPoint RoomCoordinates;

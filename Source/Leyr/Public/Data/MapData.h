@@ -43,6 +43,16 @@ enum class ERoomType : uint8
 	ExitRoom,
 };
 
+UENUM()
+enum class EDoorPlacement : uint8
+{
+	None,
+	Top,
+	Bottom,
+	Left,
+	Right,
+};
+
 USTRUCT()
 struct FSubdivision
 {
@@ -53,7 +63,7 @@ public:
 	ESubdivisionState SubdivisionState = ESubdivisionState::Hidden;
 	
 	UPROPERTY()
-	TSet<FIntPoint> Doors; 
+	TSet<EDoorPlacement> Doors; 
 };
 
 USTRUCT()
@@ -61,17 +71,17 @@ struct FRoomData
 {
 	GENERATED_BODY()
 	FRoomData() {}
-	FRoomData(const FName& Name, const FIntPoint& Coordinates,  const FIntPoint& Size, const ERoomType Type) :
-		RoomName(Name), RoomCoordinates(Coordinates), RoomSize(Size), RoomType(Type)
+	FRoomData(const FName& Name, const FIntPoint& Coordinates,  const FIntPoint& Size, const ERoomType Type, const TMap<FIntPoint, FSubdivision>& Divisions) :
+		RoomName(Name), RoomCoordinates(Coordinates), RoomSize(Size), RoomType(Type), Subdivisions(Divisions)
 	{
-		for (int h = 0; h < RoomSize.Y; ++h)
-		{
-			for (int w = 0; w < RoomSize.X; ++w)
-			{
-				Subdivisions.Emplace(FIntPoint(w, h), FSubdivision{} );
-				UE_LOG(LogTemp, Warning, TEXT("Constructing subdivisions for room name: %s, at room coords x:%d, y:%d"), *RoomName.ToString(), w, h);
-			}
-		}
+		// for (int h = 0; h < RoomSize.Y; ++h)
+		// {
+		// 	for (int w = 0; w < RoomSize.X; ++w)
+		// 	{
+		// 		Subdivisions.Emplace(FIntPoint(w, h), FSubdivision{} );
+		// 		// UE_LOG(LogTemp, Warning, TEXT("Constructing subdivisions for room name: %s, at room coords x:%d, y:%d"), *RoomName.ToString(), w, h);
+		// 	}
+		// }
 	}
 
 	UPROPERTY() FGameplayTag RegionTag = FBaseGameplayTags::Get().Map_Region_Dorn;

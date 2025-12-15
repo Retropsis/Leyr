@@ -9,7 +9,6 @@
 #include "PaperTileMapComponent.h"
 #include "AI/AICharacter.h"
 #include "Data/LevelAreaData.h"
-#include "Data/MapData.h"
 #include "Engine/OverlapResult.h"
 #include "Interaction/InteractionInterface.h"
 #include "Interaction/LevelActorInterface.h"
@@ -18,6 +17,7 @@
 #include "UI/Component/MapComponent.h"
 #include "World/Item.h"
 #include "World/Data/CameraData.h"
+#include "World/Level/Door/Door.h"
 #include "World/Level/Moving/WaterGroup.h"
 #include "World/Level/Spawner/EncounterSpawnPoint.h"
 #include "World/Level/Spawner/EncounterSpawnVolume.h"
@@ -85,6 +85,7 @@ void ACameraBoundary::OnConstruction(const FTransform& Transform)
 			}
 		});
 	}
+	// ConstructSubdivisions();
 }
 
 void ACameraBoundary::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
@@ -252,11 +253,6 @@ void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 		ToggleLevelActorActivity(true);
 		GiveToAbilitySystem(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OtherActor), &LevelArea_GrantedHandles);
 		
-		GetWorld()->GetTimerManager().SetTimer(TrackingPlayerTimer, [this] ()
-		{
-			TrackPlayerRoomCoordinates();
-		}, 1.f, true);
-
 		if (!bEnvironmentEffectsInitialized)
 		{
 			for (TObjectPtr<UNiagaraSystem> EnvironmentEffect : EnvironmentEffects)
@@ -301,9 +297,6 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 		OnPlayerLeaving.Broadcast();
 		DestroyOutOfBoundsEncounters();
 		RequestRoomUpdate(ERoomUpdateType::Leaving);
-		TrackingPlayerTimer.Invalidate();
-		GetWorld()->GetTimerManager().ClearTimer(TrackingPlayerTimer);
-		TargetActor = nullptr;
 		
 		// FTimerHandle DestroyTimer;
 		// GetWorld()->GetTimerManager().SetTimer(DestroyTimer, FTimerDelegate::CreateLambda([this] ()
@@ -439,6 +432,68 @@ void FLevelArea_GrantedHandles::TakeFromAbilitySystem(UAbilitySystemComponent* A
 /*
  * Map Updates
  */
+TMap<FIntPoint, FSubdivision> ACameraBoundary::ConstructSubdivisions()
+{
+	Subdivisions.Empty();
+	for (int h = 0; h < GetRoomSize().Y; ++h)
+	{
+		for (int w = 0; w < GetRoomSize().X; ++w)
+		{
+			Subdivisions.Emplace(FIntPoint{ w, h }, FSubdivision{});
+		}
+	}
+	
+	TArray<AActor*> OutActors;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	// ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery1);
+	// ObjectTypes.Add(EObjectTypeQuery::ObjectTypeQuery2);
+	TArray<AActor*> ActorsToIgnore;
+	UKismetSystemLibrary::BoxOverlapActors(this, BoundaryVisualizer->GetComponentLocation(), BoundaryVisualizer->Bounds.BoxExtent, ObjectTypes, ADoor::StaticClass(), ActorsToIgnore, OutActors);
+	for (const AActor* OutActor : OutActors)
+	{
+		if (!IsValid(OutActor)) continue;
+		
+		const FIntPoint OutActorWorldCoordinates = FIntPoint{ FMath::TruncToInt32(OutActor->GetActorLocation().X / 1280.f), FMath::TruncToInt32(OutActor->GetActorLocation().Z / 768.f) };
+		const FIntPoint OutActorRoomCoordinates = FIntPoint{
+			FMath::Abs(FMath::Clamp(OutActorWorldCoordinates.X - GetRoomCoordinates().X, 0, FMath::Abs(GetRoomCoordinates().X) + GetRoomSize().X)),
+			FMath::Abs(FMath::Clamp(OutActorWorldCoordinates.Y - GetRoomCoordinates().Y, 0 , FMath::Abs(GetRoomCoordinates().Y) + GetRoomSize().Y)) };
+		
+		const FVector SubdivisionLocation = FVector{  (GetRoomCoordinates().X + OutActorRoomCoordinates.X) * 1280.f + 640.f, 0.f, (GetRoomCoordinates().Y + OutActorRoomCoordinates.Y) *  768.f - 384.f };
+		
+		FVector2D SubLoc = FVector2D{ SubdivisionLocation.X, SubdivisionLocation.Z };
+		FVector2D ActorLoc = FVector2D{ OutActor->GetActorLocation().X, OutActor->GetActorLocation().Z };
+		const float Angle = FMath::RadiansToDegrees(FMath::Atan2((SubLoc - ActorLoc).Y, (SubLoc - ActorLoc).X));
+		
+		UKismetSystemLibrary::DrawDebugSphere(this, SubdivisionLocation, 20.0f, 20, FColor::Green, 90.f);
+		UKismetSystemLibrary::DrawDebugSphere(this, OutActor->GetActorLocation(), 20.0f, 20, FColor::Red, 90.f);
+
+		EDoorPlacement DoorPlacement = EDoorPlacement::Right;
+		if (Angle <= -45.f && Angle > -135.f)
+		{
+			DoorPlacement = EDoorPlacement::Top;
+		}
+		if (Angle <= 45.f && Angle > -45.f)
+		{
+			DoorPlacement = EDoorPlacement::Left;
+		}
+		if (Angle > 45.f && Angle < 135.f)
+		{
+			DoorPlacement = EDoorPlacement::Bottom;
+		}
+		if (Subdivisions.Contains(OutActorRoomCoordinates))
+		{
+			Subdivisions.Find(OutActorRoomCoordinates)->Doors.Add(DoorPlacement);
+		}
+		// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Green,
+		// 	FString::Printf(TEXT("%s at (%s) at angle %f placed at %s"), *OutActor->GetActorLabel(), *SubdivisionLocation.ToCompactString(), Angle, *UEnum::GetValueAsString(DoorPlacement)));
+		// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Green,
+		// 	FString::Printf(TEXT("%s at (x:%d, y:%d) of angle: %f and is placed %s"), *OutActor->GetName(), OutActorRoomCoordinates.X, OutActorRoomCoordinates.Y, Angle, *UEnum::GetValueAsString(DoorPlacement)));
+		// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Green, FString::Printf(TEXT("%s has doors:"), !LevelAreaName.IsNone() ? *LevelAreaName.ToString() : *GetTileMapName().ToString()));
+		// UE_LOG(LogTemp, Warning, TEXT("Angle between Door: %s and this tile center: %f and its placement is %s"), *OutActor->GetName(), Angle, *UEnum::GetValueAsString(DoorPlacement));
+	}
+	return Subdivisions;
+}
+
 void ACameraBoundary::RequestRoomUpdate(const ERoomUpdateType UpdateType) const
 {
 	if (!IsValid(PlayerController) || !IsValid(TileMap)) return;
@@ -457,20 +512,10 @@ void ACameraBoundary::RequestRoomUpdate(const ERoomUpdateType UpdateType) const
 	}
 }
 
-void ACameraBoundary::TrackPlayerRoomCoordinates() const
-{
-	if (!IsValid(PlayerController) || !IsValid(TargetActor) || !IsValid(TileMap)) return;
-
-	if (UMapComponent* MapComponent = PlayerController->FindComponentByClass<UMapComponent>())
-	{
-		MapComponent->UpdateRoomAt(!LevelAreaName.IsNone() ? LevelAreaName : GetTileMapName(), ERoomUpdateType::Entering, GetPlayerRoomCoordinates());
-	}
-}
-
 FIntPoint ACameraBoundary::GetPlayerRoomCoordinates() const
 {
 	const FVector PlayerRelativeLocation = TargetActor->GetActorLocation() - TileMap->GetActorLocation();
-	return FIntPoint{ FMath::FloorToInt32(PlayerRelativeLocation.X / 1280.f), FMath::FloorToInt32(- PlayerRelativeLocation.Z / 768.f) };
+	return FIntPoint{ FMath::TruncToInt32(PlayerRelativeLocation.X / 1280.f), FMath::TruncToInt32(- PlayerRelativeLocation.Z / 768.f) };
 }
 
 FIntPoint ACameraBoundary::GetRoomSize() const
@@ -482,7 +527,7 @@ FIntPoint ACameraBoundary::GetRoomCoordinates() const
 {
 	if (!IsValid(TileMap)) return FIntPoint{ 0 };
 	
-	return FIntPoint{ FMath::FloorToInt32(TileMap->GetActorLocation().X / 1280.f), FMath::FloorToInt32(TileMap->GetActorLocation().Z / 768.f) };
+	return FIntPoint{ FMath::TruncToInt32(TileMap->GetActorLocation().X / 1280.f), FMath::TruncToInt32(TileMap->GetActorLocation().Z / 768.f) };
 }
 
 FName ACameraBoundary::GetTileMapName() const
