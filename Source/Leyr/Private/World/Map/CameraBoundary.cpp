@@ -506,19 +506,20 @@ TMap<FIntPoint, FSubdivision> ACameraBoundary::ConstructSubdivisions()
 
 	for (const UEntranceMarker* EntranceMarker : EntranceMarkers)
 	{
-		const FIntPoint OutActorWorldCoordinates = FIntPoint{ FMath::TruncToInt32(EntranceMarker->GetComponentLocation().X / 1280.f), FMath::TruncToInt32(EntranceMarker->GetComponentLocation().Z / 768.f) };
-		const FIntPoint OutActorRoomCoordinates = FIntPoint{
-			FMath::Abs(FMath::Clamp(OutActorWorldCoordinates.X - GetRoomCoordinates().X, 0, FMath::Abs(GetRoomCoordinates().X) + GetRoomSize().X)),
-			FMath::Abs(FMath::Clamp(OutActorWorldCoordinates.Y - GetRoomCoordinates().Y, 0 , FMath::Abs(GetRoomCoordinates().Y) + GetRoomSize().Y)) };
+		const FIntPoint EntranceMarkerRoomCoordinates = FIntPoint{
+			FMath::Abs(FMath::TruncToInt32((EntranceMarker->GetRelativeLocation().X + GetTileMapBounds().BoxExtent.X) / 1280.f)),
+			FMath::Abs(FMath::TruncToInt32((EntranceMarker->GetRelativeLocation().Z - GetTileMapBounds().BoxExtent.Z) / 768.f)) };
+
+		GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Magenta, FString::Printf(TEXT("EntranceMarkerRoomCoordinates (x:%d, y:%d)"), EntranceMarkerRoomCoordinates.X, EntranceMarkerRoomCoordinates.Y));
 		
-		const FVector SubdivisionLocation = FVector{  (GetRoomCoordinates().X + OutActorRoomCoordinates.X) * 1280.f + 640.f, 0.f, (GetRoomCoordinates().Y + OutActorRoomCoordinates.Y) *  768.f - 384.f };
+		const FVector SubdivisionLocation = FVector{  (GetRoomCoordinates().X + EntranceMarkerRoomCoordinates.X) * 1280.f + 640.f, 0.f, (GetRoomCoordinates().Y - EntranceMarkerRoomCoordinates.Y) *  768.f - 384.f };
 		
 		FVector2D SubLoc = FVector2D{ SubdivisionLocation.X, SubdivisionLocation.Z };
 		FVector2D ActorLoc = FVector2D{ EntranceMarker->GetComponentLocation().X, EntranceMarker->GetComponentLocation().Z };
 		const float Angle = FMath::RadiansToDegrees(FMath::Atan2((SubLoc - ActorLoc).Y, (SubLoc - ActorLoc).X));
 		
-		// UKismetSystemLibrary::DrawDebugSphere(this, SubdivisionLocation, 20.0f, 20, FColor::Green, 90.f);
-		// UKismetSystemLibrary::DrawDebugSphere(this, EntranceMarker->GetComponentLocation(), 20.0f, 20, FColor::Red, 90.f);
+		UKismetSystemLibrary::DrawDebugSphere(this, SubdivisionLocation, 20.0f, 20, FColor::Green, 90.f);
+		UKismetSystemLibrary::DrawDebugSphere(this, EntranceMarker->GetComponentLocation(), 20.0f, 20, FColor::Red, 90.f);
 
 		EDoorPlacement DoorPlacement = EDoorPlacement::Right;
 		if (Angle <= -45.f && Angle > -135.f)
@@ -533,9 +534,9 @@ TMap<FIntPoint, FSubdivision> ACameraBoundary::ConstructSubdivisions()
 		{
 			DoorPlacement = EDoorPlacement::Bottom;
 		}
-		if (Subdivisions.Contains(OutActorRoomCoordinates))
+		if (Subdivisions.Contains(EntranceMarkerRoomCoordinates))
 		{
-			Subdivisions.Find(OutActorRoomCoordinates)->Doors.Add(DoorPlacement);
+			Subdivisions.Find(EntranceMarkerRoomCoordinates)->Doors.Add(DoorPlacement);
 		}
 	}
 	return Subdivisions;
