@@ -6,6 +6,7 @@
 #include "CommonUserWidget.h"
 #include "MapWidget.generated.h"
 
+class UTextBlock;
 enum class ERoomUpdateType : uint8;
 struct FRoomData;
 class URoom;
@@ -28,16 +29,26 @@ public:
 	void EnteringRoom(const FRoomData& RoomData, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates);
 	void LeavingRoom(const FRoomData& RoomData, const FIntPoint& PlayerCoordinates);
 	void UpdateRoomTileAt(const FRoomData& RoomData, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates);
+	void UpdateCompletionText(float CompletionRate) const;
 
 	UFUNCTION(BlueprintCallable)
 	void RedrawMap(float DeltaSecond);
 	
 private:
 	UPROPERTY(EditDefaultsOnly)
-	float RoomTileSize = 32.f;
+	float RoomTileSize_X = 32.f;
+	
+	UPROPERTY(EditDefaultsOnly)
+	float RoomTileSize_Y = 32.f;
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UCanvasPanel> CanvasPanel;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> Text_RoomName;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> Text_MapCompletion;
 
 	UPROPERTY(VisibleAnywhere)
 	TMap<FName, URoom*> Rooms;

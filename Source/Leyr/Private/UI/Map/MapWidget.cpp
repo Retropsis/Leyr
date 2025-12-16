@@ -4,6 +4,7 @@
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/CanvasPanel.h"
 #include "Components/CanvasPanelSlot.h"
+#include "Components/TextBlock.h"
 #include "UI/Map/Room.h"
 #include "UI/Map/RoomTile.h"
 
@@ -34,10 +35,10 @@ void UMapWidget::ConstructMapCanvas(const TArray<FRoomData>& MapData)
 		Rooms.Emplace(RoomData.RoomName, Room);
 
 		UCanvasPanelSlot* MapCPS = UWidgetLayoutLibrary::SlotAsCanvasSlot(Room);
-		MapCPS->SetSize(FVector2D(RoomData.RoomSize.X * RoomTileSize, RoomData.RoomSize.Y * RoomTileSize));
-		MapCPS->SetPosition(FVector2D{ RoomData.RoomCoordinates.X * RoomTileSize + CanvasCenter.X, - RoomData.RoomCoordinates.Y * RoomTileSize + CanvasCenter.Y });
+		MapCPS->SetSize(FVector2D(RoomData.RoomSize.X * RoomTileSize_X, RoomData.RoomSize.Y * RoomTileSize_X));
+		MapCPS->SetPosition(FVector2D{ RoomData.RoomCoordinates.X * RoomTileSize_X + CanvasCenter.X, - RoomData.RoomCoordinates.Y * RoomTileSize_X + CanvasCenter.Y });
 		
-		Room->SetOriginalPositionInCanvas(FVector2D{ RoomData.RoomCoordinates.X * RoomTileSize + CanvasCenter.X, - RoomData.RoomCoordinates.Y * RoomTileSize + CanvasCenter.Y });
+		Room->SetOriginalPositionInCanvas(FVector2D{ RoomData.RoomCoordinates.X * RoomTileSize_X + CanvasCenter.X, - RoomData.RoomCoordinates.Y * RoomTileSize_X + CanvasCenter.Y });
 	}
 }
 
@@ -48,6 +49,8 @@ void UMapWidget::EnteringRoom(const FRoomData& RoomData, const ERoomUpdateType& 
 		UE_LOG(LogTemp, Error, TEXT("Room name %s not found"), *RoomData.RoomName.ToString());
 		return;
 	}
+
+	Text_RoomName->SetText(FText::FromName(RoomData.RoomName));
 	
 	if (URoom* Room = *Rooms.Find(RoomData.RoomName))
 	{
@@ -97,6 +100,11 @@ void UMapWidget::UpdateRoomTileAt(const FRoomData& RoomData, const ERoomUpdateTy
 		// 	StartInterpolation(UpdateType, CurrentRoomTilePosition);
 		// }, .05f, false);
 	}
+}
+
+void UMapWidget::UpdateCompletionText(const float CompletionRate) const
+{
+	Text_MapCompletion->SetText(FText::FromString(FString::Printf(TEXT("%.1f"), CompletionRate)));
 }
 
 void UMapWidget::StartInterpolation(const ERoomUpdateType& UpdateType, const FVector2D& RoomTilePosition)

@@ -53,6 +53,7 @@ void UMapComponent::ConstructMapRooms()
 				Boundary->GetRoomType(),
 				Boundary->ConstructSubdivisions()
 			};
+			SubdivisionTotalCount += Data.Subdivisions.Num();
 
 			if (Data.RoomName.IsNone()) continue;
 			
@@ -164,6 +165,8 @@ void UMapComponent::ExploreRoomTile(const FName& RoomName, const FIntPoint& Coor
 {
 	if (!IsRoomTileExplored(RoomName, Coordinates))
 	{
+		SubdivisionExploredCount++;
+		MapWidget->UpdateCompletionText(static_cast<float>(SubdivisionExploredCount) / static_cast<float>(SubdivisionTotalCount) * 100.f);
 		SetRoomTileExplored(RoomName, Coordinates);
 	}
 }

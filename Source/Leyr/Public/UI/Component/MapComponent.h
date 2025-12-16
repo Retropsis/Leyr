@@ -49,6 +49,9 @@ private:
 
 	UPROPERTY()
 	TMap<FName, FRoomData> Rooms;
+
+	UPROPERTY() uint32 SubdivisionExploredCount = 0;
+	UPROPERTY() uint32 SubdivisionTotalCount = 0;
 	
 	TWeakObjectPtr<APlayerController> OwningController;
 	TWeakObjectPtr<ACharacter> PlayerCharacter;
