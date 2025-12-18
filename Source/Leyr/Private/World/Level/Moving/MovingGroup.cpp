@@ -82,6 +82,7 @@ void AMovingGroup::ToggleActivate_Implementation(bool bActivate)
 	}
 	else
 	{
+		ActiveActors.Empty();
 		OverlapBox->OnComponentBeginOverlap.RemoveAll(this);
 		OverlapBox->OnComponentEndOverlap.RemoveAll(this);
 	}
@@ -91,9 +92,9 @@ void AMovingGroup::HandleActiveActors(float DeltaSeconds)
 {
 	if(ActiveActors.Num() == 0) return;
 
-	for (AActor* Actor : ActiveActors)
+	for (TObjectPtr<AActor> Actor : ActiveActors)
 	{
-		if(Actor)
+		if(IsValid(Actor))
 		{
 			FVector CurrentBottom = FVector(Actor->GetActorLocation().X, 0.f, InterpTarget.Z);
 			UKismetSystemLibrary::DrawDebugPoint(this, InterpTarget, 15.f, FLinearColor::Green);

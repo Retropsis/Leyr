@@ -89,7 +89,7 @@ protected:
 	float SurfaceZ = 0.f;
 	
 	UPROPERTY()
-	TArray<AActor*> ActiveActors = TArray<AActor*>();
+	TArray<TObjectPtr<AActor>> ActiveActors = TArray<TObjectPtr<AActor>>();
 
 private:
 	bool bIsActive = false;

@@ -167,7 +167,7 @@ public:
 	void HandleEntangled(float MinZ, float EntangledWalkSpeed, float EntangledGravityScale, bool bEndOverlap);
 
 	UFUNCTION(BlueprintNativeEvent)
-	void HandleSwimming(float MinZ, float SwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap);
+	bool HandleSwimming(float MinZ, float SwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap);
 	
 	UFUNCTION(BlueprintNativeEvent)
 	void HandleElevator(APawn* InElevator, bool bEndOverlap);

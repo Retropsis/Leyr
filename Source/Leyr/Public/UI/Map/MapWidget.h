@@ -25,7 +25,7 @@ class LEYR_API UMapWidget : public UCommonUserWidget
 public:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	void ConstructMapCanvas(const TArray<FRoomData>& MapData);
-	void StartInterpolation(const ERoomUpdateType& UpdateType, const FVector2D& RoomTilePosition);
+	void StartInterpolation(const FVector2D& RoomTilePosition);
 	void EnteringRoom(const FRoomData& RoomData, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates);
 	void LeavingRoom(const FRoomData& RoomData, const FIntPoint& PlayerCoordinates);
 	void UpdateRoomTileAt(const FRoomData& RoomData, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates);

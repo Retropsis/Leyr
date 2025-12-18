@@ -170,7 +170,8 @@ public:
 	virtual void HandleHangingOnHook_Implementation(FVector HangingTarget, bool bEndOverlap) override;
 	virtual void HandleClimbing_Implementation(FVector HangingTarget, bool bEndOverlap) override;
 	virtual void HandleEntangled_Implementation(float MinZ, float EntangledWalkSpeed, float EntangledGravityScale, bool bEndOverlap) override;
-	virtual void HandleSwimming_Implementation(float MinZ, float EnvironmentSwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap) override;
+	virtual bool HandleSwimming_Implementation(float MinZ, float EnvironmentSwimmingSpeed, float SwimmingGravityScale,
+	                                           bool bEndOverlap) override;
 	virtual void HandleElevator_Implementation(APawn* InElevator, bool bEndOverlap) override;
 	virtual void HandleOverlapZone_Implementation(ECombatState NewState, bool bEndOverlap) override;
 	virtual void ReduceWalkSpeed_Implementation(float AmountToReduce) override;

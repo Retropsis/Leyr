@@ -41,6 +41,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "UI/Controller/InventoryWidgetController.h"
 #include "UI/PlayerHUD.h"
+#include "World/Level/Moving/WaterGroup.h"
 #include "World/Map/CameraBoundary.h"
 #include "World/Map/ParallaxController.h"
 
@@ -1000,21 +1001,34 @@ void APlayerCharacter::HandleEntangled_Implementation(float MinZ, float Entangle
 /*
  * Swimming
  */
-void APlayerCharacter::HandleSwimming_Implementation(float MinZ, float EnvironmentSwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap)
+bool APlayerCharacter::HandleSwimming_Implementation(float MinZ, float EnvironmentSwimmingSpeed, float SwimmingGravityScale, bool bEndOverlap)
 {
 	if(bEndOverlap)
 	{
+		FHitResult Hit;
+		const FVector Start = RopeHangingCollision->GetComponentLocation();
+		const FVector End = Start + GetActorForwardVector() * 100.f;
+		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+		ObjectTypes.Add(ObjectTypeQuery2);
+		UKismetSystemLibrary::LineTraceSingleForObjects(this, Start, End, ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::None, Hit, true);
+		if (Hit.bBlockingHit && IsValid(Hit.GetActor()) && Cast<AWaterGroup>(Hit.GetActor()))
+		{
+			return true;
+		}
 		GetCharacterMovement()->GetPhysicsVolume()->bWaterVolume = false;
 		HandleCombatState(ECombatState::Unoccupied);
 		Jump();
+		return false;
 	}
-	else
+	if (CombatState != ECombatState::Swimming)
 	{
 		CurrentMinZ = MinZ;
 		GetCharacterMovement()->MaxSwimSpeed = SwimmingSpeed;
 		GetCharacterMovement()->GravityScale = SwimmingGravityScale;
 		HandleCombatState(ECombatState::Swimming);
+		return false;
 	}
+	return true;
 }
 
 /*

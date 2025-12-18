@@ -97,8 +97,11 @@ public:
 	UFUNCTION(CallInEditor, Category=" Camera Boundary")
 	virtual void ClearSpawnVolumes();
 	
-	UFUNCTION(CallInEditor, Category=" Camera Boundary")
+	UFUNCTION(CallInEditor, Category=" Camera Boundary|Water")
 	void SpawnWaterVolume();
+	
+	UFUNCTION(CallInEditor, Category=" Camera Boundary|Water")
+	void UpdateWaterVolume() const;
 	
 	UFUNCTION(CallInEditor, Category=" Camera Boundary")
 	void ClearWaterVolume();
@@ -154,14 +157,20 @@ protected:
 	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
 	TObjectPtr<ULevelAreaData> LevelAreaData;
 	
+	UPROPERTY(VisibleAnywhere, Category="Camera Boundary")
+	FName LevelAreaName = FName();
+	
+	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
+	TArray<TObjectPtr<UEntranceMarker>> EntranceMarkers;
+	
+	UPROPERTY(VisibleAnywhere, Category="Camera Boundary")
+	TArray<TObjectPtr<UEntranceMarker>> PreEditEntranceMarkers;
+	
 	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
 	TObjectPtr<APaperTileMapActor> TileMap;
 	
 	UPROPERTY(EditDefaultsOnly, Category=" Camera Boundary")
 	TSubclassOf<UEntranceMarker> EntranceMarkerClass;
-
-	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
-	TArray<TObjectPtr<UEntranceMarker>> EntranceMarkers;
 	
 	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
 	EBoundaryRule BoundaryRule = EBoundaryRule::Extent;
@@ -171,6 +180,9 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
 	bool bConstrainX = true;
+	
+	UPROPERTY(VisibleAnywhere, Category="Camera Boundary")
+	ERoomType RoomType;
 
 	/*
 	 * Other Game Mechanics
@@ -181,7 +193,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category=" Camera Boundary")
 	TArray<TObjectPtr<AEncounterSpawnVolume>> SpawningVolumes;
 
-	UPROPERTY(EditDefaultsOnly, Category=" Camera Boundary")
+	UPROPERTY(EditDefaultsOnly, Category=" Camera Boundary|Water")
 	TSubclassOf<AWaterGroup> WaterVolumeClass;
 	
 	UPROPERTY(VisibleAnywhere, Category="Camera Boundary")
@@ -203,19 +215,17 @@ private:
 	void RequestRoomUpdate(ERoomUpdateType UpdateType) const;
 	FIntPoint GetPlayerRoomCoordinates() const;
 	APlayerController* GetPlayerController();
+	FName GetValidRoomName() const;
+	FName GetValidRoomNameTrimmed() const;
 	
 	void AddEntrance(int32 Index);
 	void RemoveEntrance(int32 Index);
 	void RemoveAllEntrances();
 	void SwapEntrances(int32 Index);
-	
-	UPROPERTY(VisibleAnywhere, Category="Camera Boundary") ERoomType RoomType;
-	UPROPERTY(VisibleAnywhere, Category="Camera Boundary") FName LevelAreaName = FName();;
 
 	UPROPERTY() TObjectPtr<APlayerController> PlayerController;
 	UPROPERTY() TObjectPtr<AActor> TargetActor;
 	UPROPERTY() TMap<FIntPoint, FSubdivision> Subdivisions;
-	UPROPERTY(VisibleAnywhere, Category="Camera Boundary") TArray<TObjectPtr<UEntranceMarker>> PreEditEntranceMarkers;
 	UPROPERTY() FLevelArea_GrantedHandles LevelArea_GrantedHandles;
 	UPROPERTY() FBoxSphereBounds TileMapBounds;
 	UPROPERTY() bool bEnvironmentEffectsInitialized = false;

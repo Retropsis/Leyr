@@ -107,7 +107,6 @@ void ACameraBoundary::PostEditChangeProperty(struct FPropertyChangedEvent& Prope
 		case 16: RemoveEntrance(Index); break;
 		default: ;
 		}
-		// UE_LOG(LogClass, Warning, TEXT("ChangeType: %u, index %d"), PropertyChangedEvent.ChangeType, Index);
 	}
 }
 
@@ -256,9 +255,18 @@ void ACameraBoundary::SpawnWaterVolume()
 		if (WaterVolume = GetWorld()->SpawnActor<AWaterGroup>(WaterVolumeClass, GetActorLocation(), FRotator::ZeroRotator, SpawnParams); IsValid(WaterVolume))
 		{
 			WaterVolume->SetupWaterVolumeFromBounds(GetTileMapBounds());
-			WaterVolume->SetActorLabel(IsValid(LevelAreaData) ? LevelAreaData->GetName().Replace(TEXT("LevelAreaData"), TEXT("WaterVolume")) : TEXT("WaterVolume"));
+			WaterVolume->SetActorLabel(FString("WaterVolume_").Append(GetValidRoomNameTrimmed().ToString()));
 			WaterVolume->SetFolderPath(GetFolderPath());
 		}
+	}
+}
+
+void ACameraBoundary::UpdateWaterVolume() const
+{
+	if (IsValid(WaterVolume))
+	{
+		WaterVolume->SetActorLabel(FString("WaterVolume_").Append(GetValidRoomNameTrimmed().ToString()));
+		WaterVolume->SetFolderPath(GetFolderPath());
 	}
 }
 
@@ -278,7 +286,7 @@ void ACameraBoundary::AddEntrance(const int32 Index)
         EntranceMarker->RegisterComponent();
 		const FString Label = FString::Printf(TEXT("EntranceMarker_%d"), Index);
 		EntranceMarker->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName(*Label));
-        EntranceMarker->SetRelativeLocation(FVector{ (Index + 1) * 100.f, 0.f, 0.f} );
+        EntranceMarker->SetRelativeLocation(FVector{ (Index + 1) * 100.f, 0.f, 100.f} );
 		EntranceMarkers[Index] = EntranceMarker;
 	}
 }
@@ -551,13 +559,23 @@ void ACameraBoundary::RequestRoomUpdate(const ERoomUpdateType UpdateType) const
 		// TODO: LevelAreaName should always be valid, then i can get rid of the replace
 		if (UpdateType == ERoomUpdateType::Entering)
 		{
-			MapComponent->EnteringRoom(!LevelAreaName.IsNone() ? LevelAreaName : GetTileMapName(), UpdateType, GetPlayerRoomCoordinates());
+			MapComponent->EnteringRoom(GetValidRoomName(), UpdateType, GetPlayerRoomCoordinates());
 		}
 		if (UpdateType == ERoomUpdateType::Leaving)
 		{
-			MapComponent->LeavingRoom(!LevelAreaName.IsNone() ? LevelAreaName : GetTileMapName(), GetPlayerRoomCoordinates());
+			MapComponent->LeavingRoom(GetValidRoomName(), GetPlayerRoomCoordinates());
 		}
 	}
+}
+
+FName ACameraBoundary::GetValidRoomName() const
+{
+	return !LevelAreaName.IsNone() ? LevelAreaName : GetTileMapName();
+}
+
+FName ACameraBoundary::GetValidRoomNameTrimmed() const
+{
+	return FName(GetValidRoomName().ToString().Replace(TEXT(" "), TEXT("")).Replace(TEXT("TM_"), TEXT("")));
 }
 
 FIntPoint ACameraBoundary::GetPlayerRoomCoordinates() const

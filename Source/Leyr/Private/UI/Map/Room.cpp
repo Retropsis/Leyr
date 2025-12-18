@@ -1,6 +1,9 @@
 // @ Retropsis 2024-2025.
 
 #include "UI/Map/Room.h"
+
+#include "Blueprint/WidgetLayoutLibrary.h"
+#include "Components/CanvasPanelSlot.h"
 #include "Components/GridPanel.h"
 #include "UI/Map/RoomTile.h"
 
