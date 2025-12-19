@@ -9,6 +9,7 @@
 #include "Interaction/CombatInterface.h"
 #include "AbilityActor.generated.h"
 
+class UBaseAttributeSet;
 class UAbilitySet;
 class UPaperSprite;
 class UWidgetComponent;
@@ -44,14 +45,14 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UAttributeSet> AttributeSet;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
 	EActorClass ActorClass = EActorClass::Default;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
-	TObjectPtr<UAbilitySet> AbilitySet = nullptr;
+	TObjectPtr<UBaseAttributeSet> AbilitySet = nullptr;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Combat")
 	float LifeSpan = 1.f;

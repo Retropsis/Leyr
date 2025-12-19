@@ -13,6 +13,7 @@ enum class ERoomUpdateType : uint8
 	Leaving,
 	Unveiling,
 	Exploring,
+	RevealDoor,
 };
 
 UENUM()
@@ -44,13 +45,22 @@ enum class ERoomType : uint8
 };
 
 UENUM()
-enum class EDoorPlacement : uint8
+enum class ESubdivisionSide : uint8
 {
 	None,
 	Top,
 	Bottom,
 	Left,
 	Right,
+};
+
+UENUM()
+enum class EEntranceType : uint8
+{
+	None,
+	Hidden,
+	Locked,
+	Boss,
 };
 
 USTRUCT()
@@ -63,7 +73,7 @@ public:
 	ESubdivisionState SubdivisionState = ESubdivisionState::Hidden;
 	
 	UPROPERTY()
-	TSet<EDoorPlacement> Doors; 
+	TMap<ESubdivisionSide, EEntranceType> Doors; 
 };
 
 USTRUCT()
@@ -72,17 +82,7 @@ struct FRoomData
 	GENERATED_BODY()
 	FRoomData() {}
 	FRoomData(const FName& Name, const FIntPoint& Coordinates,  const FIntPoint& Size, const ERoomType Type, const TMap<FIntPoint, FSubdivision>& Divisions) :
-		RoomName(Name), RoomCoordinates(Coordinates), RoomSize(Size), RoomType(Type), Subdivisions(Divisions)
-	{
-		// for (int h = 0; h < RoomSize.Y; ++h)
-		// {
-		// 	for (int w = 0; w < RoomSize.X; ++w)
-		// 	{
-		// 		Subdivisions.Emplace(FIntPoint(w, h), FSubdivision{} );
-		// 		// UE_LOG(LogTemp, Warning, TEXT("Constructing subdivisions for room name: %s, at room coords x:%d, y:%d"), *RoomName.ToString(), w, h);
-		// 	}
-		// }
-	}
+		RoomName(Name), RoomCoordinates(Coordinates), RoomSize(Size), RoomType(Type), Subdivisions(Divisions) {}
 
 	UPROPERTY() FGameplayTag RegionTag = FBaseGameplayTags::Get().Map_Region_Dorn;
 	UPROPERTY() FName RoomName = FName();

@@ -22,6 +22,7 @@ public:
 	void EnteringRoom(const FName& RoomName, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates);
 	void LeavingRoom(const FName& RoomName, const FIntPoint& PlayerCoordinates);
 	void UpdateRoomAt(const FName& RoomName, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates);
+	void RevealHiddenWall(const FName& RoomName, const FIntPoint& RoomCoordinates, ESubdivisionSide Side);
 	
 	UFUNCTION(BlueprintCallable, Category="Map")
 	UMapWidget* GetMapWidget() const { return MapWidget; }

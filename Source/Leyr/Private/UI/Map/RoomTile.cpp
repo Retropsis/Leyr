@@ -20,6 +20,8 @@ void URoomTile::UpdateRoomTile(const ERoomUpdateType& UpdateType)
 	case ERoomUpdateType::Leaving:
 		LeaveRoomTile();
 		break;
+	case ERoomUpdateType::RevealDoor:
+		break;
 	}
 }
 
@@ -75,26 +77,26 @@ void URoomTile::RevealRoomTile()
 
 void URoomTile::DrawDoors(const FSubdivision& Subdivision) const
 {
-	for (const EDoorPlacement Door : Subdivision.Doors)
+	for (const TTuple<ESubdivisionSide, EEntranceType> Door : Subdivision.Doors)
 	{
-		switch (Door)
+		switch (Door.Key)
 		{
-		case EDoorPlacement::None:
+		case ESubdivisionSide::None:
 			break;
-		case EDoorPlacement::Top:
-			Image_BorderTop->SetBrush(Brush_DoorBorder_H);
+		case ESubdivisionSide::Top:
+			Image_BorderTop->SetBrush(Door.Value == EEntranceType::Hidden ? Brush_Border_H : Brush_DoorBorder_H);
 			Image_BorderTop->SetVisibility(ESlateVisibility::Visible);
 			break;
-		case EDoorPlacement::Bottom:
-			Image_BorderBottom->SetBrush(Brush_DoorBorder_H);
+		case ESubdivisionSide::Bottom:
+			Image_BorderBottom->SetBrush(Door.Value == EEntranceType::Hidden ? Brush_Border_H : Brush_DoorBorder_H);
 			Image_BorderBottom->SetVisibility(ESlateVisibility::Visible);
 			break;
-		case EDoorPlacement::Left:
-			Image_BorderLeft->SetBrush(Brush_DoorBorder_V);
+		case ESubdivisionSide::Left:
+			Image_BorderLeft->SetBrush(Door.Value == EEntranceType::Hidden ? Brush_Border_V : Brush_DoorBorder_V);
 			Image_BorderLeft->SetVisibility(ESlateVisibility::Visible);
 			break;
-		case EDoorPlacement::Right:
-			Image_BorderRight->SetBrush(Brush_DoorBorder_V);
+		case ESubdivisionSide::Right:
+			Image_BorderRight->SetBrush(Door.Value == EEntranceType::Hidden ? Brush_Border_V : Brush_DoorBorder_V);
 			Image_BorderRight->SetVisibility(ESlateVisibility::Visible);
 			break;
 		}

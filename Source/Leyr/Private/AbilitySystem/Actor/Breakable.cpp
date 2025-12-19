@@ -4,8 +4,11 @@
 #include "PaperFlipbookComponent.h"
 #include "AbilitySystem/BaseAttributeSet.h"
 #include "Components/BoxComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Leyr/Leyr.h"
+#include "World/Map/CameraBoundary.h"
+#include "World/Utility/WorldUtility.h"
 
 ABreakable::ABreakable()
 {	
@@ -66,6 +69,26 @@ void ABreakable::BeginPlay()
 		// AbilitySystemComponent->RegisterGameplayTagEvent(FBaseGameplayTags::Get().Effects_HitReact, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAICharacter::HitReactTagChanged);
 		// OnHealthChanged.Broadcast(BaseAS->GetHealth());
 	}
+
+	if (!bIsHiddenWall) return;
+	
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(ObjectTypeQuery2);
+	FHitResult Hit;
+	UKismetSystemLibrary::LineTraceSingleForObjects(this, GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 10.f, ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::None, Hit, true);
+	if (const ACameraBoundary* CameraBoundary = Cast<ACameraBoundary>(Hit.GetActor()); Hit.bBlockingHit && CameraBoundary)
+	{
+		SubdivisionCoordinates = CameraBoundary->GetRoomCoordinates() - UWorldUtility::GetWorldCoordinates(GetActorLocation());
+		// GEngine->AddOnScreenDebugMessage(3249, 90.f, FColor::Cyan, FString::Printf(TEXT("CameraBoundary RoomCoordinates: (x:%d, y:%d) This Actor WorldCoordinates: (x:%d, y:%d)"),
+		// 	CameraBoundary->GetRoomCoordinates().X, CameraBoundary->GetRoomCoordinates().Y, UWorldUtility::GetWorldCoordinates(GetActorLocation()).X, UWorldUtility::GetWorldCoordinates(GetActorLocation()).Y));
+		const FVector SubdivisionLocation = FVector{  (CameraBoundary->GetRoomCoordinates().X + SubdivisionCoordinates.X) * 1280.f + 640.f, 0.f, (CameraBoundary->GetRoomCoordinates().Y - SubdivisionCoordinates.Y) *  768.f - 384.f };
+		const float Angle = UWorldUtility::GetAngleBetweenPoints(SubdivisionLocation, GetActorLocation());
+		SubdivisionSide = UWorldUtility::GetSubdivisionSideFromAngle(Angle);
+		// GEngine->AddOnScreenDebugMessage(3248, 90.f, FColor::Cyan, FString::Printf(TEXT("SubdivisionCoordinates: (x:%d, y:%d) Angle: %f"), SubdivisionCoordinates.X, SubdivisionCoordinates.Y, Angle));
+		// UKismetSystemLibrary::DrawDebugSphere(this, SubdivisionLocation, 25.f, 12, FLinearColor::White, 90.f);
+		// UKismetSystemLibrary::DrawDebugSphere(this, GetActorLocation(), 25.f, 12, FLinearColor::Green, 90.f);
+		OnHiddenRevealed.AddDynamic(CameraBoundary, &ACameraBoundary::OnHiddenRevealed);
+	}
 }
 
 void ABreakable::OnConstruction(const FTransform& Transform)
@@ -88,6 +111,7 @@ void ABreakable::DestroyActor_Implementation()
 {
 	Super::DestroyActor_Implementation();
 	MulticastHandleDestruction();
+	OnHiddenRevealed.Broadcast(SubdivisionCoordinates, SubdivisionSide);
 }
 
 void ABreakable::MulticastHandleDestruction_Implementation()

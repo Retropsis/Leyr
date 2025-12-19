@@ -94,10 +94,8 @@ void UMapComponent::LeavingRoom(const FName& RoomName, const FIntPoint& PlayerCo
 void UMapComponent::TrackPlayerRoomCoordinates(const FName& RoomName, const FIntPoint& RoomCoordinates)
 {
 	if (!PlayerCharacter.IsValid()) return;
+	
 	const FIntPoint PlayerCoordinates = GetPlayerRoomCoordinates(RoomCoordinates);
-	// GEngine->AddOnScreenDebugMessage(-1, 3.f, FColor::Green,
-	// 	FString::Printf(TEXT("Room name: %s, Player coords(x:%d, y:%d), Room coords(x:%d, y:%d)"),
-	// 		*RoomName.ToString(), PlayerCoordinates.X, PlayerCoordinates.Y, RoomCoordinates.X, RoomCoordinates.Y ));
 	UpdateRoomAt(RoomName, ERoomUpdateType::Entering, PlayerCoordinates);
 }
 
@@ -114,6 +112,18 @@ void UMapComponent::UpdateRoomAt(const FName& RoomName, const ERoomUpdateType& U
 	const ERoomUpdateType NewState = IsRoomTileExplored(RoomName, PlayerCoordinates) ? UpdateType : ERoomUpdateType::Exploring;
 	ExploreRoomTile(RoomName, PlayerCoordinates);
 	MapWidget->UpdateRoomTileAt(*Rooms.Find(RoomName), NewState, PlayerCoordinates);
+}
+
+/*
+ * TODO: Marked for refacto
+ */
+void UMapComponent::RevealHiddenWall(const FName& RoomName, const FIntPoint& RoomCoordinates, const ESubdivisionSide Side)
+{
+	if (Rooms.Find(RoomName)->Subdivisions.Contains(RoomCoordinates) && Rooms.Find(RoomName)->Subdivisions.Find(RoomCoordinates)->Doors.Contains(Side))
+	{
+		*Rooms.Find(RoomName)->Subdivisions.Find(RoomCoordinates)->Doors.Find(Side) = EEntranceType::None;
+		MapWidget->UpdateRoomTileAt(*Rooms.Find(RoomName), ERoomUpdateType::RevealDoor, RoomCoordinates);
+	}
 }
 
 TArray<FRoomData> UMapComponent::FilterRoomsByRegion(const FGameplayTag& RegionTag)

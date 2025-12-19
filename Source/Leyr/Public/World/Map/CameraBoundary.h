@@ -10,11 +10,8 @@
 #include "Data/MapData.h"
 #include "CameraBoundary.generated.h"
 
-class UEntranceMarker;
-class AEntrance;
-enum class ERoomType : uint8;
-enum class ERoomUpdateType : uint8;
 struct FActiveGameplayEffectHandle;
+class UEntranceMarker;
 class AWaterGroup;
 class UNiagaraComponent;
 class UNiagaraSystem;
@@ -124,7 +121,10 @@ public:
 	FIntPoint GetRoomCoordinates() const;
 	FName GetTileMapName() const;
 	FName GetLevelAreaName() const { return LevelAreaName; }
-	ERoomType GetRoomType() const { return RoomType; } 
+	ERoomType GetRoomType() const { return RoomType; }
+
+	UFUNCTION()
+	void OnHiddenRevealed(const FIntPoint& SubdivisionCoordinates, ESubdivisionSide Side);
 	
 	FOnPlayerLeaving OnPlayerLeaving;
 	FOnPlayerEntering OnPlayerEntering;

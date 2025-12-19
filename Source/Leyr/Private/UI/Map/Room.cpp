@@ -1,9 +1,6 @@
 // @ Retropsis 2024-2025.
 
 #include "UI/Map/Room.h"
-
-#include "Blueprint/WidgetLayoutLibrary.h"
-#include "Components/CanvasPanelSlot.h"
 #include "Components/GridPanel.h"
 #include "UI/Map/RoomTile.h"
 
@@ -101,6 +98,9 @@ void URoom::UpdateRoomTile(const ERoomUpdateType& UpdateType, const FIntPoint& C
 			break;
 		case ERoomUpdateType::Unveiling:
 			RoomTile->UnveilRoomTile();
+			break;
+		case ERoomUpdateType::RevealDoor:
+			RoomTile->DrawDoors(*RoomData.Subdivisions.Find(Coordinates));
 			break;
 		}
 	}

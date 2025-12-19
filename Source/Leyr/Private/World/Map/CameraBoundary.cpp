@@ -21,6 +21,7 @@
 #include "World/Level/Moving/WaterGroup.h"
 #include "World/Level/Spawner/EncounterSpawnPoint.h"
 #include "World/Level/Spawner/EncounterSpawnVolume.h"
+#include "World/Utility/WorldUtility.h"
 
 ACameraBoundary::ACameraBoundary()
 {
@@ -517,34 +518,27 @@ TMap<FIntPoint, FSubdivision> ACameraBoundary::ConstructSubdivisions()
 		const FIntPoint EntranceMarkerRoomCoordinates = FIntPoint{
 			FMath::Abs(FMath::TruncToInt32((EntranceMarker->GetRelativeLocation().X + GetTileMapBounds().BoxExtent.X) / 1280.f)),
 			FMath::Abs(FMath::TruncToInt32((EntranceMarker->GetRelativeLocation().Z - GetTileMapBounds().BoxExtent.Z) / 768.f)) };
-
 		
 		const FVector SubdivisionLocation = FVector{  (GetRoomCoordinates().X + EntranceMarkerRoomCoordinates.X) * 1280.f + 640.f, 0.f, (GetRoomCoordinates().Y - EntranceMarkerRoomCoordinates.Y) *  768.f - 384.f };
+		const float Angle = UWorldUtility::GetAngleBetweenPoints(SubdivisionLocation, EntranceMarker->GetComponentLocation());
 		
-		FVector2D SubLoc = FVector2D{ SubdivisionLocation.X, SubdivisionLocation.Z };
-		FVector2D ActorLoc = FVector2D{ EntranceMarker->GetComponentLocation().X, EntranceMarker->GetComponentLocation().Z };
-		const float Angle = FMath::RadiansToDegrees(FMath::Atan2((SubLoc - ActorLoc).Y, (SubLoc - ActorLoc).X));
+		// FVector2D SubLoc = FVector2D{ SubdivisionLocation.X, SubdivisionLocation.Z };
+		// FVector2D ActorLoc = FVector2D{ EntranceMarker->GetComponentLocation().X, EntranceMarker->GetComponentLocation().Z };
+		// const float Angle = FMath::RadiansToDegrees(FMath::Atan2((SubLoc - ActorLoc).Y, (SubLoc - ActorLoc).X));
 		
 		// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Magenta, FString::Printf(TEXT("EntranceMarkerRoomCoordinates (x:%d, y:%d)"), EntranceMarkerRoomCoordinates.X, EntranceMarkerRoomCoordinates.Y));
 		// UKismetSystemLibrary::DrawDebugSphere(this, SubdivisionLocation, 20.0f, 20, FColor::Green, 90.f);
 		// UKismetSystemLibrary::DrawDebugSphere(this, EntranceMarker->GetComponentLocation(), 20.0f, 20, FColor::Red, 90.f);
 
-		EDoorPlacement DoorPlacement = EDoorPlacement::Right;
-		if (Angle <= -45.f && Angle > -135.f)
-		{
-			DoorPlacement = EDoorPlacement::Top;
-		}
-		if (Angle <= 45.f && Angle > -45.f)
-		{
-			DoorPlacement = EDoorPlacement::Left;
-		}
-		if (Angle > 45.f && Angle < 135.f)
-		{
-			DoorPlacement = EDoorPlacement::Bottom;
-		}
+		ESubdivisionSide DoorPlacement = UWorldUtility::GetSubdivisionSideFromAngle(Angle);
 		if (Subdivisions.Contains(EntranceMarkerRoomCoordinates))
 		{
-			Subdivisions.Find(EntranceMarkerRoomCoordinates)->Doors.Add(DoorPlacement);
+			Subdivisions.Find(EntranceMarkerRoomCoordinates)->Doors.Add(DoorPlacement, EntranceMarker->GetEntranceType());
+		}
+		
+		if (EntranceMarker->GetEntranceType() == EEntranceType::Hidden)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Magenta, FString::Printf(TEXT("%s"), *GetValidRoomName().ToString()));
 		}
 	}
 	return Subdivisions;
@@ -605,6 +599,16 @@ FName ACameraBoundary::GetTileMapName() const
 	}
 	
 	return *TileMap->GetActorLabel().Replace(TEXT("TM_"), TEXT(""));
+}
+
+void ACameraBoundary::OnHiddenRevealed(const FIntPoint& SubdivisionCoordinates, const ESubdivisionSide Side)
+{
+	if (!IsValid(PlayerController) || !IsValid(TileMap)) return;
+
+	if (UMapComponent* MapComponent = PlayerController->FindComponentByClass<UMapComponent>())
+	{
+		MapComponent->RevealHiddenWall(GetValidRoomName(), SubdivisionCoordinates, Side);
+	}
 }
 
 FBoxSphereBounds ACameraBoundary::GetTileMapBounds() const
