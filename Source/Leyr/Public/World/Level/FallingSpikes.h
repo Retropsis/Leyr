@@ -16,6 +16,7 @@ class LEYR_API AFallingSpikes : public AActor, public ILevelActorInterface
 
 public:
 	AFallingSpikes();
+	virtual void OnConstruction(const FTransform& Transform) override;
 	virtual void Tick(float DeltaSeconds) override;
 	
 	//~ LevelActorInterface
@@ -61,9 +62,8 @@ protected:
 	EInterpMethod InterpMethod = EInterpMethod::Default;
 
 	UFUNCTION(BlueprintCallable)
-	FORCEINLINE EMovementDirection GetMovementDirection() const { return MovementDirection; } 
+	FORCEINLINE EMovementDirection GetMovementDirection() const { return MovementDirection; }
 
-private:
 	FTimerHandle UpPositionTimer;
 	FTimerHandle DownPositionTimer;
 	FVector CurrentTarget = FVector::Zero();

@@ -19,6 +19,16 @@ AFallingSpikes::AFallingSpikes()
 	RouteSpline->SetupAttachment(Root);
 }
 
+void AFallingSpikes::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	
+	for (int i = 0; i < RouteSpline->GetNumberOfSplinePoints(); ++i)
+	{
+		RouteSpline->SetSplinePointType(i, ESplinePointType::Linear);
+	}
+}
+
 void AFallingSpikes::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -39,12 +49,12 @@ void AFallingSpikes::Tick(float DeltaSeconds)
 		if(MovementDirection == EMovementDirection::Upward)
 		{
 			MovementDirection = EMovementDirection::Still;
-			if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(UpPositionTimer, this, &AFallingSpikes::HandleUpPositionTimeEnd, UpPositionTime);
+			GetWorld()->GetTimerManager().SetTimer(UpPositionTimer, this, &AFallingSpikes::HandleUpPositionTimeEnd, UpPositionTime);
 		}
 		if(MovementDirection == EMovementDirection::Downward)
 		{
 			MovementDirection = EMovementDirection::Still;
-			if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(DownPositionTimer, this, &AFallingSpikes::HandleDownPositionTimeEnd, DownPositionTime);
+			GetWorld()->GetTimerManager().SetTimer(DownPositionTimer, this, &AFallingSpikes::HandleDownPositionTimeEnd, DownPositionTime);
 		}
 	}
 	UKismetSystemLibrary::DrawDebugPoint(this, CurrentTarget, 15.f, FLinearColor::White);
@@ -57,13 +67,14 @@ void AFallingSpikes::BeginPlay()
 	{		
 		UpPosition = RouteSpline->GetLocationAtSplinePoint(0, ESplineCoordinateSpace::World);
 		DownPosition = RouteSpline->GetLocationAtSplinePoint(1, ESplineCoordinateSpace::World);
-		if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(UpPositionTimer, this, &AFallingSpikes::HandleUpPositionTimeEnd, UpPositionTime);
+		GetWorld()->GetTimerManager().SetTimer(UpPositionTimer, this, &AFallingSpikes::HandleUpPositionTimeEnd, UpPositionTime);
 	}
 	SetActorTickEnabled(false);
 }
 
 void AFallingSpikes::ToggleActivate_Implementation(bool bActivate)
 {
+	GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Green, bActivate ? "true" : "false");
 	SetActorTickEnabled(bActivate);
 }
 

@@ -428,7 +428,10 @@ void ACameraBoundary::ToggleLevelActorActivity(bool bActivate) const
 	{
 		if (Overlap.GetActor() && Overlap.GetActor()->Implements<ULevelActorInterface>())
 		{
-			ILevelActorInterface::Execute_ToggleActivate(Overlap.GetActor(), bActivate);
+			if (bActivate)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Green, FString::Printf(TEXT("%s, %hs"), *Overlap.GetActor()->GetName(), bActivate ? "true" : "false"));
+			}
 			if (bActivate) ILevelActorInterface::Execute_ResetState(Overlap.GetActor());
 		}
 		if (AItem* Item = Cast<AItem>(Overlap.GetActor()))
@@ -521,14 +524,6 @@ TMap<FIntPoint, FSubdivision> ACameraBoundary::ConstructSubdivisions()
 		
 		const FVector SubdivisionLocation = FVector{  (GetRoomCoordinates().X + EntranceMarkerRoomCoordinates.X) * 1280.f + 640.f, 0.f, (GetRoomCoordinates().Y - EntranceMarkerRoomCoordinates.Y) *  768.f - 384.f };
 		const float Angle = UWorldUtility::GetAngleBetweenPoints(SubdivisionLocation, EntranceMarker->GetComponentLocation());
-		
-		// FVector2D SubLoc = FVector2D{ SubdivisionLocation.X, SubdivisionLocation.Z };
-		// FVector2D ActorLoc = FVector2D{ EntranceMarker->GetComponentLocation().X, EntranceMarker->GetComponentLocation().Z };
-		// const float Angle = FMath::RadiansToDegrees(FMath::Atan2((SubLoc - ActorLoc).Y, (SubLoc - ActorLoc).X));
-		
-		// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Magenta, FString::Printf(TEXT("EntranceMarkerRoomCoordinates (x:%d, y:%d)"), EntranceMarkerRoomCoordinates.X, EntranceMarkerRoomCoordinates.Y));
-		// UKismetSystemLibrary::DrawDebugSphere(this, SubdivisionLocation, 20.0f, 20, FColor::Green, 90.f);
-		// UKismetSystemLibrary::DrawDebugSphere(this, EntranceMarker->GetComponentLocation(), 20.0f, 20, FColor::Red, 90.f);
 
 		ESubdivisionSide DoorPlacement = UWorldUtility::GetSubdivisionSideFromAngle(Angle);
 		if (Subdivisions.Contains(EntranceMarkerRoomCoordinates))
@@ -536,10 +531,10 @@ TMap<FIntPoint, FSubdivision> ACameraBoundary::ConstructSubdivisions()
 			Subdivisions.Find(EntranceMarkerRoomCoordinates)->Doors.Add(DoorPlacement, EntranceMarker->GetEntranceType());
 		}
 		
-		if (EntranceMarker->GetEntranceType() == EEntranceType::Hidden)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Magenta, FString::Printf(TEXT("%s"), *GetValidRoomName().ToString()));
-		}
+		// if (EntranceMarker->GetEntranceType() == EEntranceType::Hidden)
+		// {
+		// 	GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Magenta, FString::Printf(TEXT("%s"), *GetValidRoomName().ToString()));
+		// }
 	}
 	return Subdivisions;
 }

@@ -45,10 +45,10 @@ protected:
 	virtual void BeginPlay() override;
 	void HandleOnTimerEnd();
 	
-	UPROPERTY(EditAnywhere, Category="Platform")
+	UPROPERTY(EditAnywhere, Category="Event")
 	TObjectPtr<UBoxComponent> OverlapBox;
 	
-	UPROPERTY(EditAnywhere, Category="Platform")
+	UPROPERTY(EditAnywhere, Category="Event")
 	ELeverType LeverType = ELeverType::Switch;
 
 	UPROPERTY(SaveGame)
@@ -56,19 +56,19 @@ protected:
 	
 	bool bShouldBlockProjectile = true;
 	
-	UPROPERTY(EditAnywhere, Category="Platform")
-	float OnTime = 3.f;
+	UPROPERTY(EditAnywhere, Category="Event")
+	float OnTime = -1.f;
 
-	UPROPERTY(EditAnywhere, Category="Platform|Audio")
+	UPROPERTY(EditAnywhere, Category="Event|Audio")
 	TObjectPtr<USoundBase> SwitchOnSound = nullptr;
 	
-	UPROPERTY(EditAnywhere, Category="Platform|Audio")
+	UPROPERTY(EditAnywhere, Category="Event|Audio")
 	TObjectPtr<USoundBase> SwitchOffSound = nullptr;
 	
-	UPROPERTY(EditAnywhere, Category="Platform|Audio")
+	UPROPERTY(EditAnywhere, Category="Event|Audio")
 	TObjectPtr<USoundBase> TimerTickSound = nullptr;
 	
-	UPROPERTY(EditAnywhere, Category="Platform|Audio")
+	UPROPERTY(EditAnywhere, Category="Event|Audio")
 	TObjectPtr<USoundBase> TimerEndSound = nullptr;
 
 private:

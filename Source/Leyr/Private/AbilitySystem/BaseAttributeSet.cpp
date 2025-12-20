@@ -212,8 +212,6 @@ void UBaseAttributeSet::HandleIncomingDamage(const FEffectProperties& Props)
 	{		
 		const float NewHealth = GetHealth() - LocalIncomingDamage;
 		SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
-		
-		GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Magenta, FString::Printf(TEXT("%f/%f"), GetHealth(), GetMaxHealth()));
 
 		if (NewHealth <= 0.f)
 		{

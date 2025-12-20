@@ -39,7 +39,17 @@ void ALever::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 	EventState = EEventState::On;
 	HandleLeverVisualState(EventState);
 	OnEventStateChanged.Broadcast(EventState);
-	if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(OnTimer, this, &ALever::HandleOnTimerEnd, OnTime);
+	if(OnTime > 0.f)
+	{
+		GetWorld()->GetTimerManager().SetTimer(OnTimer, this, &ALever::HandleOnTimerEnd, OnTime);
+	}
+	else
+	{
+		OverlapBox->OnComponentBeginOverlap.RemoveAll(this);
+		OverlapBox->OnComponentEndOverlap.RemoveAll(this);
+		OverlapBox->SetCollisionResponseToAllChannels(ECR_Ignore);
+		OverlapBox->SetNotifyRigidBodyCollision(false);
+	}
 }
 
 void ALever::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -57,7 +67,7 @@ void ALever::Interact_Implementation(AActor* InteractingActor)
 		break;
 	case ELeverType::Timer:
 		EventState = EEventState::On;
-		if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(OnTimer, this, &ALever::HandleOnTimerEnd, OnTime);
+		if(OnTime > 0.f)  GetWorld()->GetTimerManager().SetTimer(OnTimer, this, &ALever::HandleOnTimerEnd, OnTime);
 		break;
 	case ELeverType::SingleUse:
 		EventState = EEventState::On;
