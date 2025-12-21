@@ -55,7 +55,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category="Event")
 	bool bIsProximityDoor = false;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Event")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Event")
 	TObjectPtr<UBoxComponent> OverlapBox;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Event")
