@@ -428,10 +428,6 @@ void ACameraBoundary::ToggleLevelActorActivity(bool bActivate) const
 	{
 		if (Overlap.GetActor() && Overlap.GetActor()->Implements<ULevelActorInterface>())
 		{
-			if (bActivate)
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Green, FString::Printf(TEXT("%s, %hs"), *Overlap.GetActor()->GetName(), bActivate ? "true" : "false"));
-			}
 			if (bActivate) ILevelActorInterface::Execute_ResetState(Overlap.GetActor());
 		}
 		if (AItem* Item = Cast<AItem>(Overlap.GetActor()))
