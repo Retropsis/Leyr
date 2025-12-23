@@ -23,6 +23,9 @@ class LEYR_API AEncounterSpawnVolume : public AActor, public ISaveInterface
 public:	
 	AEncounterSpawnVolume();
 	virtual void OnConstruction(const FTransform& Transform) override;
+
+	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
+	
 	void DisableVolume() const;
 	void EnableVolume() const;
 	void ToggleOnDespawnOverlap(bool bEnable) const;
@@ -37,7 +40,7 @@ public:
 	//~ Save Interface
 
 	UFUNCTION(CallInEditor, Category="Spawner")
-	void InitializeSpawnPoints();
+	void CreateSpawnPoints();
 	
 	UFUNCTION(CallInEditor, Category="Spawner")
 	void UpdateSpawnPoints();
@@ -58,19 +61,12 @@ public:
 	void HandlePlayerEntering();
 	
 	void ClearSpawnPoints();
+
+	/* GETTER SETTER */
 	TArray<AEncounterSpawnPoint*> GetSpawnPoints() { return SpawnPoints; }
 	void SetEncounterSpawnData(const FEncounterSpawn& Data) { EncounterSpawnData = Data; }
 	void SetEncounterSpawnTag(const FGameplayTag& Tag) { EncounterSpawnTag = Tag; }
 	FGameplayTag GetEncounterSpawnTag() const { return EncounterSpawnTag; }
-
-	// UFUNCTION(BlueprintImplementableEvent)
-	// void UpdateEncounterIcon(UTexture2D* 
-
-	UPROPERTY(VisibleAnywhere, Category="Spawner")
-	TObjectPtr<ASplineComponentActor> SplineComponentActor;
-
-	UPROPERTY(VisibleAnywhere, Category="Spawner")
-	FBoxSphereBounds TileMapBounds;
 
 protected:
 	virtual void BeginPlay() override;
@@ -81,25 +77,32 @@ protected:
 	UFUNCTION()
 	virtual void OnDespawnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	
+private:
+	FBoundLocations CalculateBounds() const;
+	
+	UPROPERTY(VisibleAnywhere, Category="Spawner")
+	FGameplayTag EncounterSpawnTag = FGameplayTag::EmptyTag;
+	
 	UPROPERTY(EditAnywhere, Category="Spawner")
 	FEncounterSpawn EncounterSpawnData;
 	
 	UPROPERTY(VisibleAnywhere, Category="Spawner")
 	TArray<AEncounterSpawnPoint*> SpawnPoints;
 	
-private:
-	FBoundLocations CalculateBounds() const;
+	UPROPERTY(VisibleAnywhere, Category="Spawner")
+	TObjectPtr<ASplineComponentActor> SplineComponentActor;
 
-	UPROPERTY(VisibleAnywhere)
-	FGameplayTag EncounterSpawnTag = FGameplayTag::EmptyTag;
+	UPROPERTY(VisibleAnywhere, Category="Spawner")
+	FBoxSphereBounds TileMapBounds;
 	
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category="Spawner")
 	TObjectPtr<UBoxComponent> TriggerVolume;
 	
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category="Spawner")
 	TObjectPtr<UBoxComponent> SpawningBounds;
 	
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category="Spawner")
 	TObjectPtr<UBoxComponent> DespawningBounds;
 	
 	UPROPERTY(SaveGame)

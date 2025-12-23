@@ -83,25 +83,19 @@ void AEncounterSpawnVolume::OnConstruction(const FTransform& Transform)
 	}
 }
 
+void AEncounterSpawnVolume::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	
+}
+
 void AEncounterSpawnVolume::LoadActor_Implementation()
 {
 	if (bActivated) DisableVolume();
 }
 
-void AEncounterSpawnVolume::CreateSplineComponentActor()
-{
-	SplineComponentActor = NewObject<ASplineComponentActor>(this);
-	FString NewLabel = EncounterSpawnData.EncounterData->GetName().Replace(TEXT("Encounter"), TEXT("Spline"));
-	SplineComponentActor->SetActorLabel(NewLabel);
-	SplineComponentActor->SetActorLocation(GetActorLocation() + FVector(0.f, 0.f, 50.f));
-	for (int i = 0; i < SplineComponentActor->GetSplineComponent()->GetNumberOfSplinePoints(); ++i)
-	{
-		SplineComponentActor->GetSplineComponent()->SetSplinePointType(i, ESplinePointType::Linear);
-	}
-	SplineComponentActor->RegisterAllComponents();
-}
-
-void AEncounterSpawnVolume::InitializeSpawnPoints()
+void AEncounterSpawnVolume::CreateSpawnPoints()
 {
 	ClearSpawnPoints();
 	
@@ -125,6 +119,17 @@ void AEncounterSpawnVolume::InitializeSpawnPoints()
 			}
 		}
 	}
+}
+
+void AEncounterSpawnVolume::ClearSpawnPoints()
+{
+	if (SpawnPoints.Num() == 0) return;
+	
+	for (AEncounterSpawnPoint* SpawnPoint : SpawnPoints)
+	{
+		if (IsValid(SpawnPoint)) SpawnPoint->Destroy();
+	}
+	SpawnPoints.Empty();
 }
 
 void AEncounterSpawnVolume::CreateSpawnPoint(const FActorSpawnParameters& SpawnParams, const bool bUniqueSpawnLocationType, const FVector& Offset, const bool bFirstIndex)
@@ -171,7 +176,7 @@ void AEncounterSpawnVolume::UpdateSpawnPoints()
 	// if (!IsValid(EncounterSpawnData.EncounterClass)) return;
 	if (SpawnPoints.IsEmpty())
 	{
-		InitializeSpawnPoints();
+		CreateSpawnPoints();
 		return;
 	}
 
@@ -306,17 +311,6 @@ void AEncounterSpawnVolume::HandlePlayerEntering()
 	// GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Green, FString::Printf(TEXT("HandlePlayerEntering")));
 }
 
-void AEncounterSpawnVolume::ClearSpawnPoints()
-{
-	if (SpawnPoints.Num() == 0) return;
-	
-	for (AEncounterSpawnPoint* SpawnPoint : SpawnPoints)
-	{
-		if (IsValid(SpawnPoint)) SpawnPoint->Destroy();
-	}
-	SpawnPoints.Empty();
-}
-
 FBoundLocations AEncounterSpawnVolume::CalculateBounds() const
 {
 	FBoundLocations Bounds;
@@ -350,4 +344,17 @@ void AEncounterSpawnVolume::ToggleOnDespawnOverlap(const bool bEnable) const
 	{
 		DespawningBounds->OnComponentEndOverlap.RemoveAll(this);
 	}
+}
+
+void AEncounterSpawnVolume::CreateSplineComponentActor()
+{
+	SplineComponentActor = NewObject<ASplineComponentActor>(this);
+	FString NewLabel = EncounterSpawnData.EncounterData->GetName().Replace(TEXT("Encounter"), TEXT("Spline"));
+	SplineComponentActor->SetActorLabel(NewLabel);
+	SplineComponentActor->SetActorLocation(GetActorLocation() + FVector(0.f, 0.f, 50.f));
+	for (int i = 0; i < SplineComponentActor->GetSplineComponent()->GetNumberOfSplinePoints(); ++i)
+	{
+		SplineComponentActor->GetSplineComponent()->SetSplinePointType(i, ESplinePointType::Linear);
+	}
+	SplineComponentActor->RegisterAllComponents();
 }

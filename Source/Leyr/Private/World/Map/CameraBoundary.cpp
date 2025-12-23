@@ -190,7 +190,7 @@ void ACameraBoundary::CreateSpawningVolume(const FActorSpawnParameters& SpawnPar
 	AEncounterSpawnVolume* SpawningVolume = GetWorld()->SpawnActor<AEncounterSpawnVolume>(SpawningVolumeClass, Location, FRotator::ZeroRotator, SpawnParams);
 	SpawningVolume->SetEncounterSpawnData(Data);
 	SpawningVolume->SetEncounterSpawnTag(Data.EncounterSpawnTag);
-	SpawningVolume->InitializeSpawnPoints();
+	SpawningVolume->CreateSpawnPoints();
 	SpawningVolume->TileMapBounds = GetTileMapBounds();
 	SpawningVolume->SetActorLabel(Label);
 	SpawningVolumes.Add(SpawningVolume);
@@ -428,7 +428,11 @@ void ACameraBoundary::ToggleLevelActorActivity(bool bActivate) const
 	{
 		if (Overlap.GetActor() && Overlap.GetActor()->Implements<ULevelActorInterface>())
 		{
-			if (bActivate) ILevelActorInterface::Execute_ResetState(Overlap.GetActor());
+			ILevelActorInterface::Execute_ToggleActivate(Overlap.GetActor(), bActivate);
+			if (bActivate)
+			{
+				ILevelActorInterface::Execute_ResetState(Overlap.GetActor());
+			}
 		}
 		if (AItem* Item = Cast<AItem>(Overlap.GetActor()))
 		{

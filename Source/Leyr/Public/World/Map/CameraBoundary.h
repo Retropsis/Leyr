@@ -81,17 +81,17 @@ public:
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 	virtual void PreEditChange(FProperty* PropertyAboutToChange) override;
 	
-	UFUNCTION(CallInEditor, Category=" Camera Boundary")
+	UFUNCTION(CallInEditor, Category=" Camera Boundary|Encounters")
 	virtual void InitializeCameraExtent();
 	void CreateSpawningVolume(const FActorSpawnParameters& SpawnParams, const FEncounterSpawn& Data, const FVector& Offset, const FString& Label);
 
-	UFUNCTION(CallInEditor, Category=" Camera Boundary")
+	UFUNCTION(CallInEditor, Category=" Camera Boundary|Encounters")
 	virtual void InitializeSpawnVolumes();
 	
-	UFUNCTION(CallInEditor, Category=" Camera Boundary")
+	UFUNCTION(CallInEditor, Category=" Camera Boundary|Encounters")
 	virtual void UpdateSpawnVolumes();
 	
-	UFUNCTION(CallInEditor, Category=" Camera Boundary")
+	UFUNCTION(CallInEditor, Category=" Camera Boundary|Encounters")
 	virtual void ClearSpawnVolumes();
 	
 	UFUNCTION(CallInEditor, Category=" Camera Boundary|Water")
@@ -100,7 +100,7 @@ public:
 	UFUNCTION(CallInEditor, Category=" Camera Boundary|Water")
 	void UpdateWaterVolume() const;
 	
-	UFUNCTION(CallInEditor, Category=" Camera Boundary")
+	UFUNCTION(CallInEditor, Category=" Camera Boundary|Water")
 	void ClearWaterVolume();
 	
 	AActor* GetTargetActor() { return TargetActor; }
@@ -187,16 +187,16 @@ protected:
 	/*
 	 * Other Game Mechanics
 	 */
-	UPROPERTY(EditDefaultsOnly, Category=" Camera Boundary")
+	UPROPERTY(EditDefaultsOnly, Category=" Camera Boundary|Encounters")
 	TSubclassOf<AEncounterSpawnVolume> SpawningVolumeClass;
 	
-	UPROPERTY(VisibleAnywhere, Category=" Camera Boundary")
+	UPROPERTY(VisibleAnywhere, Category=" Camera Boundary|Encounters")
 	TArray<TObjectPtr<AEncounterSpawnVolume>> SpawningVolumes;
 
 	UPROPERTY(EditDefaultsOnly, Category=" Camera Boundary|Water")
 	TSubclassOf<AWaterGroup> WaterVolumeClass;
 	
-	UPROPERTY(VisibleAnywhere, Category="Camera Boundary")
+	UPROPERTY(VisibleAnywhere, Category="Camera Boundary|Water")
 	TObjectPtr<AWaterGroup> WaterVolume;
 
 	UPROPERTY()

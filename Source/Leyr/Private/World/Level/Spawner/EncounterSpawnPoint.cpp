@@ -113,6 +113,7 @@ void AEncounterSpawnPoint::GetSpawnLocations()
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 		APointCollection* PointCollection = GetWorld()->SpawnActor<APointCollection>(PointCollectionClass, GetActorTransform(), SpawnParams);
+		SpawnLocations.Empty();
 		// if (SpawnLocationType == ESpawnLocationType::PointCollection)
 		// {
 		// 	SpawnLocations = PointCollection->GetGroundLocations(Count);
