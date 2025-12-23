@@ -10,10 +10,13 @@
 #include "Leyr/Leyr.h"
 #include "EncounterSpawnVolume.generated.h"
 
+class APaperTileMapActor;
 class ASplineComponentActor;
 class UEncounterSpawnData;
 class AEncounterSpawnPoint;
 class UBoxComponent;
+
+DECLARE_MULTICAST_DELEGATE(FSplineComponentActorUpdated);
 
 UCLASS()
 class LEYR_API AEncounterSpawnVolume : public AActor, public ISaveInterface
@@ -26,14 +29,14 @@ public:
 
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 	
-	void DisableVolume() const;
-	void EnableVolume() const;
+	void DisableTriggerVolume() const;
+	void EnableTriggerVolume() const;
 	void ToggleOnDespawnOverlap(bool bEnable) const;
-	void CreateSpawnPoint(const FActorSpawnParameters& SpawnParams, bool bUniqueSpawnLocationType, const FVector& Offset, bool bFirstIndex);
-	void UpdateSpawnPointData(bool bUniqueSpawnLocationType, AEncounterSpawnPoint* SpawnPoint) const;
-	void UpdateSpawnPointLabel(AEncounterSpawnPoint* SpawnPoint);
-	void UpdateSpawnPointEncounterIcon(const AEncounterSpawnPoint* SpawnPoint) const;
+	void CreateSpawnPoint(const FActorSpawnParameters& SpawnParams, const FVector& Offset, bool bFirstIndex);
 	void CreateSplineComponentActor();
+	void SpawnEncountersDelayed();
+	void ClearSpawnPoints();
+	void DespawnEncounter();
 
 	//~ Save Interface
 	virtual void LoadActor_Implementation() override;
@@ -59,14 +62,12 @@ public:
 	
 	UFUNCTION()
 	void HandlePlayerEntering();
-	
-	void ClearSpawnPoints();
 
 	/* GETTER SETTER */
 	TArray<AEncounterSpawnPoint*> GetSpawnPoints() { return SpawnPoints; }
-	void SetEncounterSpawnData(const FEncounterSpawn& Data) { EncounterSpawnData = Data; }
 	void SetEncounterSpawnTag(const FGameplayTag& Tag) { EncounterSpawnTag = Tag; }
 	FGameplayTag GetEncounterSpawnTag() const { return EncounterSpawnTag; }
+	void SetTileMapBounds(const FBoxSphereBounds& Bounds) { TileMapBounds = Bounds; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -77,21 +78,20 @@ protected:
 	UFUNCTION()
 	virtual void OnDespawnOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	
 private:
-	FBoundLocations CalculateBounds() const;
+	FBoundLocations CalculateSpawningBounds() const;
 	
 	UPROPERTY(VisibleAnywhere, Category="Spawner")
 	FGameplayTag EncounterSpawnTag = FGameplayTag::EmptyTag;
-	
-	UPROPERTY(EditAnywhere, Category="Spawner")
-	FEncounterSpawn EncounterSpawnData;
 	
 	UPROPERTY(VisibleAnywhere, Category="Spawner")
 	TArray<AEncounterSpawnPoint*> SpawnPoints;
 	
 	UPROPERTY(VisibleAnywhere, Category="Spawner")
 	TObjectPtr<ASplineComponentActor> SplineComponentActor;
+
+	UPROPERTY(EditAnywhere, Category="Spawner")
+	TObjectPtr<APaperTileMapActor> TileMap;
 
 	UPROPERTY(VisibleAnywhere, Category="Spawner")
 	FBoxSphereBounds TileMapBounds;
@@ -107,8 +107,45 @@ private:
 	
 	UPROPERTY(SaveGame)
 	bool bActivated = false;
+
+	/*
+	 * Spawn point
+	 */
+	UFUNCTION(BlueprintCallable)
+	void SpawnEncounterGroup();
+
+	void SpawnEncounter(UClass* EncounterToSpawn, const FTransform& InSpawnTransform);
+
+	void GetSpawnLocationsFromPointCollection();
+	FTransform DetermineSpawnTransform(int32 SpawnLocationIndex = 0);
+
+	UFUNCTION()
+	void Respawn(AActor* DefeatedEncounter);
+	void ClearSpawnTimers();
+
+	bool RequestRespawnEncounter(AAICharacter* Encounter);
+
+	FVector FindRandomPointWithinBounds(const FVector& Origin) const;
 	
-	UPROPERTY() ESpawnLocationType SpawnLocationType = ESpawnLocationType::Point;;
-	UPROPERTY() ESpawnerType SpawnerType = ESpawnerType::Once;
-	float PreferredSpawningRange = 0.f;
+	FSplineComponentActorUpdated SplineComponentActorUpdated;
+	
+	UPROPERTY(EditAnywhere, Category="Spawner") TObjectPtr<UEncounterSpawnData> EncounterSpawnData = nullptr;
+	UPROPERTY(EditAnywhere, Category="Spawner") int32 EncounterLevel = 1;
+	UPROPERTY(EditAnywhere, Category="Spawner") int32 Count = 1;
+	UPROPERTY(EditAnywhere, Category="Spawner") float RespawnTime = 120.f;
+	UPROPERTY(EditAnywhere, Category="Spawner") float SpawnDelay = 1.f;
+	UPROPERTY(EditAnywhere, Category="Spawner") float PreferredSpawningRange = 750.f;
+	
+	UPROPERTY() TSubclassOf<AAICharacter> EncounterClass;
+	UPROPERTY() TObjectPtr<UBehaviourData> OverrideBehaviourData = nullptr;
+	UPROPERTY() TSubclassOf<APointCollection> PointCollectionClass;
+	UPROPERTY() ESpawnLocationType SpawnLocationType = ESpawnLocationType::SelectedPoint;
+	UPROPERTY() ESpawnerType SpawnerType = ESpawnerType::OnlyOnce;
+	
+	FVector PreferredLocation = FVector::ZeroVector;
+	
+	TWeakObjectPtr<AActor> Target = nullptr;
+	TArray<FVector> SpawnLocations;
+	TArray<TWeakObjectPtr<AActor>> CurrentSpawns;
+	TArray<FTimerHandle> SpawnTimers;
 };

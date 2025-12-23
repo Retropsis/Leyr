@@ -1,12 +1,18 @@
 // @ Retropsis 2024-2025.
 
 #include "World/Level/Spawner/EncounterSpawnVolume.h"
+
+#include "PaperTileMapComponent.h"
+#include "AbilitySystem/Actor/PointCollection.h"
 #include "AI/AICharacter.h"
 #include "AI/SplineComponentActor.h"
+#include "Algo/RandomShuffle.h"
 #include "Components/BoxComponent.h"
 #include "Components/SplineComponent.h"
 #include "Data/BehaviourData.h"
 #include "Data/EncounterData.h"
+#include "Engine/AssetManager.h"
+#include "Engine/StreamableManager.h"
 #include "Interaction/PlayerInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "World/Level/Spawner/EncounterSpawnPoint.h"
@@ -49,10 +55,10 @@ void AEncounterSpawnVolume::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
-	if (IsValid(EncounterSpawnData.EncounterData) && IsValid(EncounterSpawnData.EncounterData->BehaviourData))
+	if (IsValid(EncounterSpawnData) && IsValid(EncounterSpawnData->EncounterData) && IsValid(EncounterSpawnData->EncounterData->BehaviourData))
 	{
-		EncounterSpawnData.EncounterData->BehaviourData->OnMovementTypePropertyChanged.RemoveAll(EncounterSpawnData.EncounterData->BehaviourData);
-		EncounterSpawnData.EncounterData->BehaviourData->OnMovementTypePropertyChanged.AddLambda([&] (const EMovementType MovementType)
+		EncounterSpawnData->EncounterData->BehaviourData->OnMovementTypePropertyChanged.RemoveAll(EncounterSpawnData->EncounterData->BehaviourData);
+		EncounterSpawnData->EncounterData->BehaviourData->OnMovementTypePropertyChanged.AddLambda([&] (const EMovementType MovementType)
 		{
 			if (MovementType == EMovementType::Spline)
 			{
@@ -63,22 +69,6 @@ void AEncounterSpawnVolume::OnConstruction(const FTransform& Transform)
 				SplineComponentActor->Destroy();
 				SplineComponentActor = nullptr;
 			}
-			for (AEncounterSpawnPoint* SpawnPoint : SpawnPoints)
-			{
-				if (IsValid(SpawnPoint) && IsValid(SplineComponentActor))
-				{
-					SpawnPoint->SplineComponentActor = SplineComponentActor;
-				} 
-				if (!IsValid(SpawnPoint))
-				{
-					UE_LOG(LogTemp, Error, TEXT("SpawnPoint is not valid"));
-				}
-				if (! IsValid(SplineComponentActor))
-				{
-					UE_LOG(LogTemp, Error, TEXT("SplineComponentActor is not valid"));
-				}
-					
-			}
 		});
 	}
 }
@@ -87,36 +77,44 @@ void AEncounterSpawnVolume::PostEditChangeProperty(struct FPropertyChangedEvent&
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
-	
+	// EncounterSpawnData
+	if (PropertyChangedEvent.Property->GetName() == TEXT("EncounterSpawnData") && IsValid(EncounterSpawnData))
+	{
+		EncounterLevel = EncounterSpawnData->Level;
+		Count = EncounterSpawnData->Count;
+		RespawnTime = EncounterSpawnData->RespawnTime;
+		PreferredSpawningRange = EncounterSpawnData->PreferredSpawningRange;
+		SpawnerType = EncounterSpawnData->SpawnerType;
+		SpawnLocationType = EncounterSpawnData->SpawnLocationType;
+		CreateSpawnPoints();
+	}
+	// TileMap
+	if (PropertyChangedEvent.Property->GetName() == TEXT("TileMap") && IsValid(TileMap))
+	{
+		TileMapBounds = TileMap->GetRenderComponent()->Bounds;
+		SetTriggerBoundaryToRoomSize();
+		SetSpawnBoundaryToRoomSize();
+		SetDespawnBoundaryToRoomSize();
+	}
 }
 
 void AEncounterSpawnVolume::LoadActor_Implementation()
 {
-	if (bActivated) DisableVolume();
+	if (bActivated) DisableTriggerVolume();
 }
 
 void AEncounterSpawnVolume::CreateSpawnPoints()
 {
 	ClearSpawnPoints();
 	
-	if (EncounterSpawnData.EncounterClass)
+	if (IsValid(EncounterSpawnData->EncounterData))
 	{
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-		bool bUniqueSpawnLocationType = EncounterSpawnData.SpawnLocationType == ESpawnLocationType::Point || EncounterSpawnData.SpawnLocationType == ESpawnLocationType::AroundPoint;
 		
-		FVector Offset = FVector{ 100.f, 0.f, 0.f};
-		
-		for (int i = 0; i < EncounterSpawnData.Count; ++i)
+		for (int i = 0; i < Count; ++i)
 		{
-			CreateSpawnPoint(SpawnParams, bUniqueSpawnLocationType, Offset, i == 0);
-			Offset.X += 50.f;
-
-			if (!bUniqueSpawnLocationType)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *UEnum::GetValueAsString(EncounterSpawnData.SpawnLocationType));
-				return;
-			}
+			CreateSpawnPoint(SpawnParams, FVector{ 100.f + i * 50.f, 0.f, 0.f}, i == 0);
 		}
 	}
 }
@@ -132,59 +130,35 @@ void AEncounterSpawnVolume::ClearSpawnPoints()
 	SpawnPoints.Empty();
 }
 
-void AEncounterSpawnVolume::CreateSpawnPoint(const FActorSpawnParameters& SpawnParams, const bool bUniqueSpawnLocationType, const FVector& Offset, const bool bFirstIndex)
+void AEncounterSpawnVolume::CreateSpawnPoint(const FActorSpawnParameters& SpawnParams, const FVector& Offset, const bool bFirstIndex)
 {
 	AEncounterSpawnPoint* SpawnPoint = GetWorld()->SpawnActor<AEncounterSpawnPoint>(AEncounterSpawnPoint::StaticClass(), GetActorLocation() + Offset, FRotator::ZeroRotator, SpawnParams);
-			
-	UpdateSpawnPointData(bUniqueSpawnLocationType, SpawnPoint);
-	SpawnPoint->SplineComponentActor = SplineComponentActor;
-	UpdateSpawnPointEncounterIcon(SpawnPoint);
-	UpdateSpawnPointLabel(SpawnPoint);
-	SpawnPoints.Add(SpawnPoint);
-}
-
-void AEncounterSpawnVolume::UpdateSpawnPointData(bool bUniqueSpawnLocationType, AEncounterSpawnPoint* SpawnPoint) const
-{
-	if(EncounterSpawnData.OverrideBehaviourData) EncounterSpawnData.EncounterData->BehaviourData = EncounterSpawnData.OverrideBehaviourData;
-	SpawnPoint->EncounterClass = EncounterSpawnData.EncounterClass;
-	SpawnPoint->EncounterLevel = EncounterSpawnData.Level;
-	SpawnPoint->EncounterData = EncounterSpawnData.EncounterData;
-	SpawnPoint->RespawnTime = EncounterSpawnData.RespawnTime;
-	SpawnPoint->SpawnerType = EncounterSpawnData.SpawnerType;
-	SpawnPoint->SpawnLocationType = EncounterSpawnData.SpawnLocationType;
-	SpawnPoint->PreferredSpawningRange = EncounterSpawnData.PreferredSpawningRange;
-	SpawnPoint->PointCollectionClass = EncounterSpawnData.PointCollectionClass;
-	SpawnPoint->Count = bUniqueSpawnLocationType ? 1 : EncounterSpawnData.Count;
-}
-
-void AEncounterSpawnVolume::UpdateSpawnPointLabel(AEncounterSpawnPoint* SpawnPoint)
-{
-	FString NewLabel = SpawnPoint->EncounterData->GetName().Replace(TEXT("Encounter"), TEXT("SpawnPoint"));
-	SpawnPoint->SetActorLabel(NewLabel);
-}
-
-void AEncounterSpawnVolume::UpdateSpawnPointEncounterIcon(const AEncounterSpawnPoint* SpawnPoint) const
-{
-	if (EncounterSpawnData.EncounterData->EncounterIcon)
+	
+	if (!IsValid(EncounterSpawnData->EncounterData))
 	{
-		SpawnPoint->SetEncounterIcon(EncounterSpawnData.EncounterData->EncounterIcon);
+		UE_LOG(LogTemp, Error, TEXT("EncounterSpawnData EncounterData is NULL"));
+		return;
 	}
+	
+	const FString NewLabel = EncounterSpawnData->EncounterData->GetName().Replace(TEXT("Encounter"), TEXT("SpawnPoint"));
+	SpawnPoint->SetLabel(NewLabel);
+	SpawnPoint->SetEncounterIcon(EncounterSpawnData->EncounterData->EncounterIcon);
+	SpawnPoints.Add(SpawnPoint);
 }
 
 void AEncounterSpawnVolume::UpdateSpawnPoints()
 {
-	// if (!IsValid(EncounterSpawnData.EncounterClass)) return;
 	if (SpawnPoints.IsEmpty())
 	{
 		CreateSpawnPoints();
 		return;
 	}
 
-	if (SpawnPoints.Num() != EncounterSpawnData.Count)
+	if (SpawnPoints.Num() != Count)
 	{
-		if (SpawnPoints.Num() > EncounterSpawnData.Count)
+		if (SpawnPoints.Num() > Count)
 		{
-			for (int i = EncounterSpawnData.Count - 1; i < SpawnPoints.Num(); ++i)
+			for (int i = Count - 1; i < SpawnPoints.Num(); ++i)
 			{
 				if (SpawnPoints.IsValidIndex(i))
 				{
@@ -193,34 +167,29 @@ void AEncounterSpawnVolume::UpdateSpawnPoints()
 				}
 			}
 		}
-		if (SpawnPoints.Num() < EncounterSpawnData.Count)
+		if (SpawnPoints.Num() < Count)
 		{
-			for (int i = SpawnPoints.Num(); i < EncounterSpawnData.Count; ++i)
+			for (int i = SpawnPoints.Num(); i < Count; ++i)
 			{
 				// Create a new spawn point
 				FActorSpawnParameters SpawnParams;
 				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-				bool bUniqueSpawnLocationType = EncounterSpawnData.SpawnLocationType == ESpawnLocationType::Point || EncounterSpawnData.SpawnLocationType == ESpawnLocationType::AroundPoint;
 				FVector Offset = FVector{ 100.f + 50.f * i, 0.f, 0.f};
-				CreateSpawnPoint(SpawnParams, bUniqueSpawnLocationType, Offset, i == 0);
+				CreateSpawnPoint(SpawnParams, Offset, i == 0);
 			}
 		}
 		return;
 	}
 	
-	bool bUniqueSpawnLocationType = EncounterSpawnData.SpawnLocationType == ESpawnLocationType::Point || EncounterSpawnData.SpawnLocationType == ESpawnLocationType::AroundPoint;
-	
-	for (int i = 0; i < EncounterSpawnData.Count; ++i)
+	if (!IsValid(EncounterSpawnData->EncounterData))
 	{
-		AEncounterSpawnPoint* SpawnPoint = SpawnPoints[i];
-
-		if (SpawnPoint == nullptr || !IsValid(EncounterSpawnData.EncounterData)) continue;
-		
-		UpdateSpawnPointData(bUniqueSpawnLocationType, SpawnPoint);
-		SpawnPoint->SplineComponentActor = SplineComponentActor;
-		UpdateSpawnPointEncounterIcon(SpawnPoint);
-		
-		if (!bUniqueSpawnLocationType) return;
+		UE_LOG(LogTemp, Error, TEXT("EncounterSpawnData.EncounterData is NULL"));
+		return;
+	}
+	
+	for (const AEncounterSpawnPoint* SpawnPoint : SpawnPoints)
+	{
+		SpawnPoint->SetEncounterIcon(EncounterSpawnData->EncounterData->EncounterIcon);
 	}
 }
 
@@ -256,20 +225,13 @@ void AEncounterSpawnVolume::OnBeginOverlap(UPrimitiveComponent* OverlappedCompon
 {
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>())
 	{
-		for (AEncounterSpawnPoint* SpawnPoint : SpawnPoints)
-		{
-			if (IsValid(SpawnPoint))
-			{
-				SpawnPoint->PreferredLocation = FVector{ OtherActor->GetActorLocation().X, 0.f, GetActorLocation().Z };
-				SpawnPoint->SpawningBounds = CalculateBounds();
-				UKismetSystemLibrary::DrawDebugPoint(this, SpawnPoint->SpawningBounds.Left, 25.f, FLinearColor::Green, 90.f);
-				UKismetSystemLibrary::DrawDebugPoint(this, SpawnPoint->SpawningBounds.Right, 25.f, FLinearColor::Green, 90.f);
-				SpawnPoint->Target = OtherActor;
-				SpawnPoint->SpawnEncounterGroup();
-			}
-		}
-		if (SpawnerType == ESpawnerType::Once) bActivated = true;
-		DisableVolume();
+		PreferredLocation = FVector{ OtherActor->GetActorLocation().X, 0.f, GetActorLocation().Z };
+		UKismetSystemLibrary::DrawDebugPoint(this, SpawningBounds->Bounds.Origin - FVector{ SpawningBounds->Bounds.BoxExtent.X, 0.f, 0.f }, 25.f, FLinearColor::Green, 90.f);
+		UKismetSystemLibrary::DrawDebugPoint(this, SpawningBounds->Bounds.Origin + FVector{ SpawningBounds->Bounds.BoxExtent.X, 0.f, 0.f }, 25.f, FLinearColor::Green, 90.f);
+		Target = OtherActor;
+		SpawnEncounterGroup();
+		if (SpawnerType == ESpawnerType::OnlyOnce) bActivated = true;
+		DisableTriggerVolume();
 	}
 }
 
@@ -281,7 +243,7 @@ void AEncounterSpawnVolume::OnDespawnOverlap(UPrimitiveComponent* OverlappedComp
 		{
 			if (!ICombatInterface::Execute_IsDefeated(Encounter))
 			{
-				bool bHasSpawned = SpawnPoint->RequestRespawnEncounter(Encounter);
+				bool bHasSpawned = RequestRespawnEncounter(Encounter);
 				if (Encounter->IsActorBeingDestroyed())
 				{
 					// GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Red, FString::Printf(TEXT("%s is being destroyed"), *Encounter->GetName()));
@@ -295,23 +257,25 @@ void AEncounterSpawnVolume::OnDespawnOverlap(UPrimitiveComponent* OverlappedComp
 	}
 }
 
-void AEncounterSpawnVolume::HandlePlayerLeaving()
-{
-	EnableVolume();
-	ToggleOnDespawnOverlap(false);
-	for (AEncounterSpawnPoint* SpawnPoint : SpawnPoints)
-	{
-		if (SpawnPoint) SpawnPoint->DespawnEncounter();
-	}
-}
-
+/*
+ * Called by CameraBoundary when player enters CameraBounds
+ */
 void AEncounterSpawnVolume::HandlePlayerEntering()
 {
 	ToggleOnDespawnOverlap(true);
-	// GEngine->AddOnScreenDebugMessage(-1, 8.f, FColor::Green, FString::Printf(TEXT("HandlePlayerEntering")));
 }
 
-FBoundLocations AEncounterSpawnVolume::CalculateBounds() const
+/*
+ * Called by CameraBoundary when player leaves CameraBounds
+ */
+void AEncounterSpawnVolume::HandlePlayerLeaving()
+{
+	EnableTriggerVolume();
+	ToggleOnDespawnOverlap(false);
+	DespawnEncounter();
+}
+
+FBoundLocations AEncounterSpawnVolume::CalculateSpawningBounds() const
 {
 	FBoundLocations Bounds;
 	const FVector Extent = SpawningBounds->GetScaledBoxExtent();
@@ -321,13 +285,13 @@ FBoundLocations AEncounterSpawnVolume::CalculateBounds() const
 	return Bounds;
 }
 
-void AEncounterSpawnVolume::DisableVolume() const
+void AEncounterSpawnVolume::DisableTriggerVolume() const
 {
 	TriggerVolume->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	TriggerVolume->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
 
-void AEncounterSpawnVolume::EnableVolume() const
+void AEncounterSpawnVolume::EnableTriggerVolume() const
 {
 	TriggerVolume->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	TriggerVolume->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
@@ -348,8 +312,14 @@ void AEncounterSpawnVolume::ToggleOnDespawnOverlap(const bool bEnable) const
 
 void AEncounterSpawnVolume::CreateSplineComponentActor()
 {
+	if (!IsValid(EncounterSpawnData->EncounterData))
+	{
+		UE_LOG(LogTemp, Error, TEXT("EncounterSpawnData.EncounterData is NULL"));
+		return;
+	}
+	
 	SplineComponentActor = NewObject<ASplineComponentActor>(this);
-	FString NewLabel = EncounterSpawnData.EncounterData->GetName().Replace(TEXT("Encounter"), TEXT("Spline"));
+	const FString NewLabel = EncounterSpawnData->EncounterData->GetName().Replace(TEXT("Encounter"), TEXT("Spline"));
 	SplineComponentActor->SetActorLabel(NewLabel);
 	SplineComponentActor->SetActorLocation(GetActorLocation() + FVector(0.f, 0.f, 50.f));
 	for (int i = 0; i < SplineComponentActor->GetSplineComponent()->GetNumberOfSplinePoints(); ++i)
@@ -357,4 +327,226 @@ void AEncounterSpawnVolume::CreateSplineComponentActor()
 		SplineComponentActor->GetSplineComponent()->SetSplinePointType(i, ESplinePointType::Linear);
 	}
 	SplineComponentActor->RegisterAllComponents();
+}
+
+/*
+ * Spawning Encounters 
+ */
+void AEncounterSpawnVolume::SpawnEncounterGroup()
+{
+	if (EncounterSpawnData->EncounterData->EncounterClass.Get() == nullptr)
+	{
+		UAssetManager::GetStreamableManager().RequestAsyncLoad(EncounterSpawnData->EncounterData->EncounterClass.ToSoftObjectPath(), [this] ()
+		{
+			if (IsValid(EncounterSpawnData->EncounterData->EncounterClass.Get()))
+			{
+				SpawnEncountersDelayed();
+			}
+		}, FStreamableManager::AsyncLoadHighPriority);
+	}
+	else SpawnEncountersDelayed();
+}
+
+void AEncounterSpawnVolume::SpawnEncountersDelayed()
+{
+	for (int i = 0; i < Count; ++i)
+	{
+		GetSpawnLocationsFromPointCollection();
+		FTimerHandle SpawnTimer;
+		GetWorld()->GetTimerManager().SetTimer(SpawnTimer, FTimerDelegate::CreateLambda([this, i, SpawnTimer] ()
+		{
+			SpawnEncounter(EncounterSpawnData->EncounterData->EncounterClass.Get(), DetermineSpawnTransform(i));
+			SpawnTimers.Remove(SpawnTimer);
+		}), SpawnDelay * (i + 1), false);
+		SpawnTimers.Add(SpawnTimer);
+	}
+}
+
+void AEncounterSpawnVolume::SpawnEncounter(UClass* EncounterToSpawn, const FTransform& InSpawnTransform)
+{
+	AAICharacter* Encounter = GetWorld()->SpawnActorDeferred<AAICharacter>(EncounterToSpawn, InSpawnTransform, this, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	Encounter->SetEncounterLevel(EncounterLevel);
+	Encounter->SetEncounterData(EncounterSpawnData->EncounterData);
+	if (OverrideBehaviourData) Encounter->SetBehaviourData(OverrideBehaviourData);
+
+	FBoundLocations BoundLocations;
+	BoundLocations.Left = SpawningBounds->Bounds.Origin - FVector{ SpawningBounds->Bounds.BoxExtent.X, 0.f, 0.f };
+	BoundLocations.Right = SpawningBounds->Bounds.Origin + FVector{ SpawningBounds->Bounds.BoxExtent.X, 0.f, 0.f };
+	IAIInterface::Execute_SetSpawningBounds(Encounter, BoundLocations);
+	
+	if (IsValid(SplineComponentActor))
+	{
+		Encounter->SplineComponentActor = SplineComponentActor;
+		Encounter->SplineComponent = SplineComponentActor->GetSplineComponent();
+		Encounter->SplineComponentActor->SetActorLocation(SplineComponentActor->GetActorLocation());
+	}
+	Encounter->SpawnDefaultController();
+	Encounter->FinishSpawning(InSpawnTransform);
+	CurrentSpawns.Add(Encounter);
+
+	if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Encounter); CombatInterface && SpawnerType == ESpawnerType::Infinite)
+	{
+		CombatInterface->GetOnDeath().AddDynamic(this, &AEncounterSpawnVolume::Respawn);
+	}
+}
+
+void AEncounterSpawnVolume::Respawn(AActor* DefeatedEncounter)
+{
+	CurrentSpawns.Remove(DefeatedEncounter);
+	if(SpawnerType == ESpawnerType::Infinite)
+	{
+	}
+	
+	FTimerHandle RespawnTimer;
+	GetWorldTimerManager().SetTimer(RespawnTimer, [this] ()
+	{
+		SpawnEncounter(EncounterSpawnData->EncounterData->EncounterClass.Get(), DetermineSpawnTransform(FMath::RandRange(0, SpawnPoints.Num() - 1)));
+	}, RespawnTime, false);
+	SpawnTimers.Add(RespawnTimer);
+}
+
+void AEncounterSpawnVolume::ClearSpawnTimers()
+{
+	for (FTimerHandle RespawnTimer : SpawnTimers)
+	{
+		GetWorldTimerManager().ClearTimer(RespawnTimer);
+		RespawnTimer.Invalidate();
+	}
+	SpawnTimers.Empty();
+}
+
+/*
+ * Despawn encounter when player leaves
+ * (not killed, it doesn't respawn and timer is invalidated)
+ */
+void AEncounterSpawnVolume::DespawnEncounter()
+{
+	for (int i = 0; i < CurrentSpawns.Num(); ++i)
+	{
+		if (CurrentSpawns[i] != nullptr)
+		{
+			CurrentSpawns[i]->Destroy();
+			CurrentSpawns.Shrink();
+		}
+	}
+	ClearSpawnTimers();
+}
+
+bool AEncounterSpawnVolume::RequestRespawnEncounter(AAICharacter* Encounter)
+{
+	if (IsValid(Encounter) && CurrentSpawns.Contains(Encounter))
+	{
+		Respawn(Encounter);
+		return true;
+	}
+	return false;
+}
+
+void AEncounterSpawnVolume::GetSpawnLocationsFromPointCollection()
+{
+	if (IsValid(PointCollectionClass))
+	{
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+		APointCollection* PointCollection = GetWorld()->SpawnActor<APointCollection>(PointCollectionClass, GetActorTransform(), SpawnParams);
+		SpawnLocations.Empty();
+		const FVector SpawnBoundsOrigin = SpawningBounds->GetComponentLocation();
+		if (Target.IsValid())
+		{
+			FName Tag;	
+			if (Target->GetActorLocation().X < SpawnBoundsOrigin.X)
+			{
+				PointCollection->SetActorLocation(FVector{ Target->GetActorLocation().X, 0.f, SpawnBoundsOrigin.Z });
+				Tag = FName("Right");
+			}
+			else
+			{
+				PointCollection->SetActorLocation(FVector{ Target->GetActorLocation().X, 0.f, SpawnBoundsOrigin.Z });
+				Tag = FName("Left");
+			}
+			
+			SpawnLocations = PointCollection->GetLocationsWithTag(Tag);
+			Algo::RandomShuffle(SpawnLocations);
+			PointCollection->Destroy();
+		}
+	}
+}
+
+FTransform AEncounterSpawnVolume::DetermineSpawnTransform(const int32 SpawnLocationIndex)
+{
+	FTransform SpawnTransform = GetActorTransform();
+	const FBoundLocations BoundLocations = CalculateSpawningBounds();
+	
+	switch (SpawnLocationType) {
+	case ESpawnLocationType::SelectedPoint:
+		if (SpawnPoints.IsValidIndex(SpawnLocationIndex) && IsValid(SpawnPoints[SpawnLocationIndex]))
+		{
+			SpawnTransform.SetLocation(SpawnPoints[SpawnLocationIndex]->GetActorLocation());
+			SpawnTransform.SetRotation(SpawnPoints[SpawnLocationIndex]->GetActorRotation().Quaternion());
+		}
+		break;
+	case ESpawnLocationType::AroundPoint:
+		SpawnTransform.SetLocation(FindRandomPointWithinBounds(GetActorLocation()));
+		break;
+	case ESpawnLocationType::PointCollection:
+		SpawnTransform.SetLocation(SpawnLocations[SpawnLocationIndex] + FVector{ 0.f, 0.f, 75.f });
+		break;
+	case ESpawnLocationType::PointCollectionRandom:
+		SpawnTransform.SetLocation(SpawnLocations[FMath::RandRange(0, SpawnLocations.Num() - 1)] + FVector{ 0.f, 0.f, 75.f });
+		break;
+	case ESpawnLocationType::Random:
+		SpawnTransform.SetLocation(FVector{ FMath::FRandRange(BoundLocations.Left.X, BoundLocations.Right.X), 0.f, BoundLocations.Left.Z });
+		break;
+	case ESpawnLocationType::RandomCloseToPlayer:
+		SpawnTransform.SetLocation(FindRandomPointWithinBounds(PreferredLocation));
+		break;
+	case ESpawnLocationType::OutOfBounds:
+		if (Target.IsValid())
+		{
+			const FVector SpawnBoundsOrigin = (BoundLocations.Left + BoundLocations.Right) / 2.f;
+			if (SpawnBoundsOrigin.X < Target->GetActorLocation().X)
+			{
+				const FVector LeftBound{ BoundLocations.Left.X - 50.f, 0.f, Target->GetActorLocation().Z };
+				UKismetSystemLibrary::DrawDebugSphere(this, LeftBound, 25.f, 20, FColor::Red, 90.f);
+				UKismetSystemLibrary::DrawDebugSphere(this, GetActorLocation(), 25.f, 20, FColor::White, 90.f);
+				SpawnTransform.SetLocation(LeftBound);
+			}
+			else
+			{
+				const FVector RightBound{ BoundLocations.Right.X + 50.f, 0.f, Target->GetActorLocation().Z };
+				UKismetSystemLibrary::DrawDebugSphere(this, RightBound, 25.f, 20, FColor::Red, 90.f);
+				UKismetSystemLibrary::DrawDebugSphere(this, GetActorLocation(), 25.f, 20, FColor::White, 90.f);
+				SpawnTransform.SetLocation(RightBound);
+			}
+		}
+		break;
+	case ESpawnLocationType::OutOfBoundsFixed:
+		break;
+	}
+	return SpawnTransform;
+}
+
+FVector AEncounterSpawnVolume::FindRandomPointWithinBounds(const FVector& Origin) const
+{	
+	FBoundLocations BoundLocations = CalculateSpawningBounds();
+	const float PreferredLeftX = FMath::Clamp(Origin.X - PreferredSpawningRange, BoundLocations.Left.X, BoundLocations.Right.X);
+	const float PreferredRightX = FMath::Clamp(Origin.X + PreferredSpawningRange, BoundLocations.Left.X, BoundLocations.Right.X);
+	const bool bSweepLeftToRight = Origin.X > (BoundLocations.Left.X +  BoundLocations.Right.X) / 2.f;
+
+	const float Delta = PreferredRightX - PreferredLeftX;
+	const int32 MaxTries = static_cast<int32>(Delta / 80.f);
+	FVector ChosenLocation = FVector::ZeroVector;
+	int32 Tries = 0;
+	while (Tries < MaxTries)
+	{
+		ChosenLocation = bSweepLeftToRight ? FVector{ PreferredLeftX + Tries * 80.f, 0.f, BoundLocations.Left.Z } : FVector{ PreferredRightX - Tries * 80.f, 0.f, BoundLocations.Left.Z };
+		// ChosenLocation = FVector{ FMath::FRandRange(PreferredLeftX, PreferredRightX), 0.f, SpawningBounds.Left.Z };
+		FHitResult Hit;
+		UKismetSystemLibrary::BoxTraceSingle(this, ChosenLocation - FVector{ 0.f, 0.f, 50.f }, ChosenLocation + FVector{ 0.f, 0.f, 50.f }, 
+			{ 80.f, 50.f, 20.f }, FRotator::ZeroRotator,
+			TraceTypeQuery3, false, TArray<AActor*>(), EDrawDebugTrace::None, Hit, true);
+		if (!Hit.bBlockingHit) return ChosenLocation;
+		Tries++;
+	}
+	return  ChosenLocation;
 }

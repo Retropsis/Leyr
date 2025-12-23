@@ -19,7 +19,6 @@
 #include "World/Data/CameraData.h"
 #include "World/Level/Door/EntranceMarker.h"
 #include "World/Level/Moving/WaterGroup.h"
-#include "World/Level/Spawner/EncounterSpawnPoint.h"
 #include "World/Level/Spawner/EncounterSpawnVolume.h"
 #include "World/Utility/WorldUtility.h"
 
@@ -68,23 +67,6 @@ void ACameraBoundary::OnConstruction(const FTransform& Transform)
 	{
 		LevelAreaName = LevelAreaData->LevelAreaName;
 		RoomType = LevelAreaData->RoomType;
-		LevelAreaData->OnLevelAreaDataPropertyChanged.AddLambda([this] (FName PropertyName) {
-			UE_LOG(LogTemp, Warning, TEXT("Level Area Data Property Changed : %s"), *PropertyName.ToString());
-			UpdateSpawnVolumes();
-		});
-		LevelAreaData->OnEncounterSpawnsPropertyDeleted.AddLambda([this] (const FGameplayTag Tag) {
-			for (TObjectPtr<AEncounterSpawnVolume> SpawnVolume : SpawningVolumes)
-			{
-				if (IsValid(SpawnVolume) && SpawnVolume->GetEncounterSpawnTag().MatchesTagExact(Tag))
-				{
-					UE_LOG(LogTemp, Warning, TEXT("SpawnVolume with tag : %s, deleting with tag: %s"), *SpawnVolume->GetEncounterSpawnTag().ToString(), *Tag.ToString());
-					SpawningVolumes.Remove(SpawnVolume);
-					SpawnVolume->ClearSpawnPoints();
-					SpawnVolume->Destroy();
-					break;
-				}
-			}
-		});
 	}
 	// ConstructSubdivisions();
 }
@@ -96,6 +78,18 @@ void ACameraBoundary::PostEditChangeProperty(struct FPropertyChangedEvent& Prope
 	if (PropertyChangedEvent.Property->GetName() == TEXT("TileMap"))
 	{
 		InitializeCameraExtent();
+	}
+	if (PropertyChangedEvent.Property->GetName() == TEXT("SpawningVolumes"))
+	{
+		int32 Index = PropertyChangedEvent.GetArrayIndex(TEXT("SpawningVolumes"));
+		switch (PropertyChangedEvent.ChangeType)
+		{
+		case 2: AddSpawnVolume(Index); break;
+		case 4: RemoveSpawnVolume(Index); break;
+		case 8: RemoveAllSpawnVolumes(); break;
+		case 16: RemoveSpawnVolume(Index); break;
+		default: ;
+		}
 	}
 	if (PropertyChangedEvent.Property->GetName() == TEXT("EntranceMarkers"))
 	{
@@ -115,6 +109,11 @@ void ACameraBoundary::PreEditChange(FProperty* PropertyAboutToChange)
 {
 	Super::PreEditChange(PropertyAboutToChange);
 
+	if (PropertyAboutToChange->GetName() == TEXT("SpawningVolumes"))
+	{
+		PreEditSpawningVolumes.Empty();
+		PreEditSpawningVolumes.Append(SpawningVolumes);
+	}
 	if (PropertyAboutToChange->GetName() == TEXT("EntranceMarkers"))
 	{
 		PreEditEntranceMarkers.Empty();
@@ -156,85 +155,41 @@ void ACameraBoundary::InitializeCameraExtent()
 	}
 }
 
-void ACameraBoundary::InitializeSpawnVolumes()
+void ACameraBoundary::AddSpawnVolume(const int32 Index)
 {	
 	if (SpawningVolumeClass == nullptr)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Please fill up SpawningVolumeClass in [%s]"), *GetName());
 		return;
 	}
-	if (LevelAreaData == nullptr)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Please fill up LevelAreaData in [%s]"), *GetName());
-		return;
-	}
-	
-	ClearSpawnVolumes();
 	
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-		
-	FVector Offset = FVector{ 100.f, 0.f, 0.f };
-	
-	for (int i = 0; i < LevelAreaData->EncounterSpawns.Num(); i++)
-	{
-		const FString NewLabel = LevelAreaData->EncounterSpawns[i].EncounterClass->GetName().Replace(TEXT("BP"), TEXT("SpawningVolume"));
-		CreateSpawningVolume(SpawnParams, LevelAreaData->EncounterSpawns[i], Offset, NewLabel);
-		Offset.X += 50.f;
-	}
-}
-
-void ACameraBoundary::CreateSpawningVolume(const FActorSpawnParameters& SpawnParams, const FEncounterSpawn& Data, const FVector& Offset, const FString& Label)
-{
-	FVector Location = FVector{ GetActorLocation().X, 0.f, GetActorLocation().Z } + Offset;
+	const FString NewLabel = FString::Printf(TEXT("SpawningVolume_%s"), *LevelAreaName.ToString());
+	const FVector Location = FVector{ GetActorLocation().X, 0.f, GetActorLocation().Z } + FVector{ 100.f + Index * 50.f, 0.f, 0.f };
 	AEncounterSpawnVolume* SpawningVolume = GetWorld()->SpawnActor<AEncounterSpawnVolume>(SpawningVolumeClass, Location, FRotator::ZeroRotator, SpawnParams);
-	SpawningVolume->SetEncounterSpawnData(Data);
-	SpawningVolume->SetEncounterSpawnTag(Data.EncounterSpawnTag);
-	SpawningVolume->CreateSpawnPoints();
-	SpawningVolume->TileMapBounds = GetTileMapBounds();
-	SpawningVolume->SetActorLabel(Label);
-	SpawningVolumes.Add(SpawningVolume);
+	// SpawningVolume->SetEncounterSpawnTag(Data.EncounterSpawnTag);
+	SpawningVolume->SetTileMapBounds(GetTileMapBounds());
+	SpawningVolume->SetTriggerBoundaryToRoomSize();
+	SpawningVolume->SetSpawnBoundaryToRoomSize();
+	SpawningVolume->SetDespawnBoundaryToRoomSize();
+	SpawningVolume->SetActorLabel(NewLabel);
+	SpawningVolumes[Index] = SpawningVolume;
 }
 
-void ACameraBoundary::UpdateSpawnVolumes()
+void ACameraBoundary::RemoveSpawnVolume(int32 Index)
 {
-	if (SpawningVolumes.Num() == 0) return;
-
-	if (SpawningVolumes.Num() < LevelAreaData->EncounterSpawns.Num())
+	if (PreEditSpawningVolumes.IsValidIndex(Index) && IsValid(PreEditSpawningVolumes[Index]))
 	{
-		for (int i = SpawningVolumes.Num(); i < LevelAreaData->EncounterSpawns.Num(); ++i)
-		{
-			// Create a new spawn volume
-			FActorSpawnParameters SpawnParams;
-			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-			FVector Offset = FVector{ 100.f + 50.f * i, 0.f, 0.f };
-			const FString NewLabel = LevelAreaData->EncounterSpawns[i].EncounterClass->GetName().Replace(TEXT("BP"), TEXT("SpawningVolume"));
-			CreateSpawningVolume(SpawnParams, LevelAreaData->EncounterSpawns[i], Offset, NewLabel);
-		}
-		return;
-	}
-
-	for (int i = 0; i < SpawningVolumes.Num(); ++i)
-	{
-		if (IsValid(SpawningVolumes[i]))
-		{
-			SpawningVolumes[i]->SetEncounterSpawnData(LevelAreaData->EncounterSpawns[i]);
-			SpawningVolumes[i]->UpdateSpawnPoints();
-			SpawningVolumes[i]->TileMapBounds = GetTileMapBounds();
-			if (!SpawningVolumes[i]->GetEncounterSpawnTag().IsValid())
-			{
-				SpawningVolumes[i]->SetEncounterSpawnTag(LevelAreaData->EncounterSpawns[i].EncounterSpawnTag);
-			}
-			FString NewLabel = LevelAreaData->EncounterSpawns[i].EncounterClass->GetName().Replace(TEXT("BP"), TEXT("SpawningVolume"));
-			SpawningVolumes[i]->SetActorLabel(NewLabel);
-		}
+		PreEditSpawningVolumes[Index]->Destroy();
+		PreEditSpawningVolumes.RemoveAt(Index);
 	}
 }
 
-void ACameraBoundary::ClearSpawnVolumes()
+void ACameraBoundary::RemoveAllSpawnVolumes()
 {
 	if (SpawningVolumes.Num() == 0) return;
-
+	
 	for (AEncounterSpawnVolume* SpawningVolume : SpawningVolumes)
 	{
 		if (IsValid(SpawningVolume))
@@ -245,6 +200,7 @@ void ACameraBoundary::ClearSpawnVolumes()
 	}
 	OnPlayerLeaving.RemoveAll(this);
 	SpawningVolumes.Empty();
+	PreEditSpawningVolumes.Empty();
 }
 
 void ACameraBoundary::SpawnWaterVolume()
@@ -309,11 +265,6 @@ void ACameraBoundary::RemoveAllEntrances()
 	}
 }
 
-void ACameraBoundary::SwapEntrances(int32 Index)
-{
-	
-}
-
 void ACameraBoundary::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if(OtherActor && OtherActor->Implements<UPlayerInterface>())
@@ -375,10 +326,7 @@ void ACameraBoundary::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AAc
 		
 		for (const TObjectPtr<AEncounterSpawnVolume> SpawningVolume : SpawningVolumes)
 		{
-			for (AEncounterSpawnPoint* SpawnPoint : SpawningVolume->GetSpawnPoints())
-			{
-				SpawnPoint->DespawnEncounter();
-			}
+			SpawningVolume->DespawnEncounter();
 		}
 
 		ToggleLevelActorActivity(false);

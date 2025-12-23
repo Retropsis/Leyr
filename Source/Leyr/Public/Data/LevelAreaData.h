@@ -8,14 +8,13 @@
 #include "LevelAreaData.generated.h"
 
 struct FGameplayTag;
-struct FEncounterSpawn;
 class UNiagaraSystem;
 class UGameplayEffect;
 class UEncounterSpawnData;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelAreaDataPropertyChanged, FName /* PropertyName */);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnEncounterSpawnsPropertyChanged, FName /* PropertyName */);
-DECLARE_MULTICAST_DELEGATE_OneParam(FOnEncounterSpawnsPropertyDeleted, FGameplayTag /* EncounterSpawnTag */);
+// DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelAreaDataPropertyChanged, FName /* PropertyName */);
+// DECLARE_MULTICAST_DELEGATE_OneParam(FOnEncounterSpawnsPropertyChanged, FName /* PropertyName */);
+// DECLARE_MULTICAST_DELEGATE_OneParam(FOnEncounterSpawnsPropertyDeleted, FGameplayTag /* EncounterSpawnTag */);
 
 UCLASS(BlueprintType)
 class LEYR_API ULevelAreaData : public UPrimaryDataAsset
@@ -24,23 +23,20 @@ class LEYR_API ULevelAreaData : public UPrimaryDataAsset
 
 public:	
 #if WITH_EDITOR
-	virtual void PreEditChange(FProperty* PropertyAboutToChange) override;
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-	virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;
+	// virtual void PreEditChange(FProperty* PropertyAboutToChange) override;
+	// virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+	// virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;
 #endif
 
-	FOnLevelAreaDataPropertyChanged OnLevelAreaDataPropertyChanged;
-	FOnEncounterSpawnsPropertyChanged OnEncounterSpawnsPropertyChanged;
-	FOnEncounterSpawnsPropertyDeleted OnEncounterSpawnsPropertyDeleted;
+	// FOnLevelAreaDataPropertyChanged OnLevelAreaDataPropertyChanged;
+	// FOnEncounterSpawnsPropertyChanged OnEncounterSpawnsPropertyChanged;
+	// FOnEncounterSpawnsPropertyDeleted OnEncounterSpawnsPropertyDeleted;
 	
 	UPROPERTY(EditDefaultsOnly)
 	FName LevelAreaName = FName("");
 	
 	UPROPERTY(EditDefaultsOnly)
 	ERoomType RoomType = ERoomType::None;
-	
-	UPROPERTY(EditDefaultsOnly)
-	TArray<FEncounterSpawn> EncounterSpawns;
 
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSubclassOf<UGameplayEffect>> GrantedGameplayEffects;
@@ -48,5 +44,5 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TObjectPtr<UNiagaraSystem>> EnvironmentEffects;
 	
-	TArray<FEncounterSpawn> TempEncounterSpawns;
+	// TArray<FEncounterSpawn> TempEncounterSpawns;
 };

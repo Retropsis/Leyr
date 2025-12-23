@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "PaperTileMapActor.h"
 #include "Components/BoxComponent.h"
-#include "Data/EncounterSpawnData.h"
 #include "Data/MapData.h"
 #include "CameraBoundary.generated.h"
 
@@ -81,26 +80,16 @@ public:
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 	virtual void PreEditChange(FProperty* PropertyAboutToChange) override;
 	
-	UFUNCTION(CallInEditor, Category=" Camera Boundary|Encounters")
+	UFUNCTION(CallInEditor, Category="Camera Boundary|Encounters")
 	virtual void InitializeCameraExtent();
-	void CreateSpawningVolume(const FActorSpawnParameters& SpawnParams, const FEncounterSpawn& Data, const FVector& Offset, const FString& Label);
-
-	UFUNCTION(CallInEditor, Category=" Camera Boundary|Encounters")
-	virtual void InitializeSpawnVolumes();
 	
-	UFUNCTION(CallInEditor, Category=" Camera Boundary|Encounters")
-	virtual void UpdateSpawnVolumes();
-	
-	UFUNCTION(CallInEditor, Category=" Camera Boundary|Encounters")
-	virtual void ClearSpawnVolumes();
-	
-	UFUNCTION(CallInEditor, Category=" Camera Boundary|Water")
+	UFUNCTION(CallInEditor, Category="Camera Boundary|Water")
 	void SpawnWaterVolume();
 	
-	UFUNCTION(CallInEditor, Category=" Camera Boundary|Water")
+	UFUNCTION(CallInEditor, Category="Camera Boundary|Water")
 	void UpdateWaterVolume() const;
 	
-	UFUNCTION(CallInEditor, Category=" Camera Boundary|Water")
+	UFUNCTION(CallInEditor, Category="Camera Boundary|Water")
 	void ClearWaterVolume();
 	
 	AActor* GetTargetActor() { return TargetActor; }
@@ -154,31 +143,31 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> BoundaryVisualizer;
 	
-	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
+	UPROPERTY(EditAnywhere, Category="Camera Boundary")
 	TObjectPtr<ULevelAreaData> LevelAreaData;
 	
 	UPROPERTY(VisibleAnywhere, Category="Camera Boundary")
 	FName LevelAreaName = FName();
 	
-	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
+	UPROPERTY(EditAnywhere, Category="Camera Boundary")
 	TArray<TObjectPtr<UEntranceMarker>> EntranceMarkers;
 	
 	UPROPERTY(VisibleAnywhere, Category="Camera Boundary")
 	TArray<TObjectPtr<UEntranceMarker>> PreEditEntranceMarkers;
 	
-	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
+	UPROPERTY(EditAnywhere, Category="Camera Boundary")
 	TObjectPtr<APaperTileMapActor> TileMap;
 	
-	UPROPERTY(EditDefaultsOnly, Category=" Camera Boundary")
+	UPROPERTY(EditDefaultsOnly, Category="Camera Boundary")
 	TSubclassOf<UEntranceMarker> EntranceMarkerClass;
 	
-	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
+	UPROPERTY(EditAnywhere, Category="Camera Boundary")
 	EBoundaryRule BoundaryRule = EBoundaryRule::Extent;
 
-	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
+	UPROPERTY(EditAnywhere, Category="Camera Boundary")
 	bool bConstrainZ = true;
 	
-	UPROPERTY(EditAnywhere, Category=" Camera Boundary")
+	UPROPERTY(EditAnywhere, Category="Camera Boundary")
 	bool bConstrainX = true;
 	
 	UPROPERTY(VisibleAnywhere, Category="Camera Boundary")
@@ -187,13 +176,16 @@ protected:
 	/*
 	 * Other Game Mechanics
 	 */
-	UPROPERTY(EditDefaultsOnly, Category=" Camera Boundary|Encounters")
+	UPROPERTY(EditDefaultsOnly, Category="Camera Boundary|Encounters")
 	TSubclassOf<AEncounterSpawnVolume> SpawningVolumeClass;
 	
-	UPROPERTY(VisibleAnywhere, Category=" Camera Boundary|Encounters")
+	UPROPERTY(EditAnywhere, Category="Camera Boundary|Encounters")
 	TArray<TObjectPtr<AEncounterSpawnVolume>> SpawningVolumes;
+	
+	UPROPERTY(VisibleAnywhere, Category="Camera Boundary|Encounters")
+	TArray<TObjectPtr<AEncounterSpawnVolume>> PreEditSpawningVolumes;
 
-	UPROPERTY(EditDefaultsOnly, Category=" Camera Boundary|Water")
+	UPROPERTY(EditDefaultsOnly, Category="Camera Boundary|Water")
 	TSubclassOf<AWaterGroup> WaterVolumeClass;
 	
 	UPROPERTY(VisibleAnywhere, Category="Camera Boundary|Water")
@@ -202,7 +194,7 @@ protected:
 	UPROPERTY()
 	TArray<TScriptInterface<ILevelActorInterface>> LevelActors;
 		
-	UPROPERTY(EditAnywhere, Category=" Camera Boundary|Gameplay Effects", meta=(TitleProperty=GameplayEffect))
+	UPROPERTY(EditAnywhere, Category="Camera Boundary|Gameplay Effects", meta=(TitleProperty=GameplayEffect))
 	TArray<FLevelArea_GameplayEffect> GrantedGameplayEffects;
 	
 	UPROPERTY()
@@ -221,7 +213,10 @@ private:
 	void AddEntrance(int32 Index);
 	void RemoveEntrance(int32 Index);
 	void RemoveAllEntrances();
-	void SwapEntrances(int32 Index);
+
+	void AddSpawnVolume(int32 Index);
+	void RemoveSpawnVolume(int32 Index);
+	void RemoveAllSpawnVolumes();
 
 	UPROPERTY() TObjectPtr<APlayerController> PlayerController;
 	UPROPERTY() TObjectPtr<AActor> TargetActor;
