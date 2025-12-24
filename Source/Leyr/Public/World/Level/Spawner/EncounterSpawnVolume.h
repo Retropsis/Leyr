@@ -145,6 +145,7 @@ private:
 	bool RequestRespawnEncounter(AAICharacter* Encounter);
 
 	FVector FindRandomPointWithinBounds(const FVector& Origin) const;
+	TArray<UEncounterSpawnPointComponent*> FindSelectedPointAroundPlayer(const FVector& PlayerLocation) const;
 	
 	FSplineComponentActorUpdated SplineComponentActorUpdated;
 	

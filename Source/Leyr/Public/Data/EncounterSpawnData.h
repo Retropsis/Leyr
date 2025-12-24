@@ -25,7 +25,7 @@ UENUM(BlueprintType)
 enum class ESpawnLocationType : uint8
 {
 	SelectedPoint,					/* Chosen by placing a valid SpawnPoint */
-	AroundPoint,						/* Chosen randomly around a valid SpawnPoint */
+	SelectedPointAroundPlayer,						/* Chosen randomly around a valid SpawnPoint */
 	PointCollection,				/* Chosen by using a collection of points, by index order */
 	PointCollectionRandom, /* Chosen by using a collection of points, randomly */
 	Random,							/* Randomly chosen within the spawning bounds */

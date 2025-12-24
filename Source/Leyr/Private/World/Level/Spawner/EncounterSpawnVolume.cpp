@@ -528,8 +528,21 @@ FTransform AEncounterSpawnVolume::DetermineSpawnTransform(const int32 SpawnLocat
 			SpawnTransform.SetRotation(SpawnPoints[SpawnLocationIndex]->GetComponentRotation().Quaternion());
 		}
 		break;
-	case ESpawnLocationType::AroundPoint:
-		SpawnTransform.SetLocation(FindRandomPointWithinBounds(GetActorLocation()));
+	case ESpawnLocationType::SelectedPointAroundPlayer:
+		if (Target.IsValid())
+		{
+			if (const TArray<UEncounterSpawnPointComponent*> SelectedSpawnPoints = FindSelectedPointAroundPlayer(Target->GetActorLocation()); SelectedSpawnPoints.Num() > 0)
+			{
+				const int32 SelectedIndex = SelectedSpawnPoints.Num() >= 2 ? FMath::RandRange(0, 1) : 0;
+				const UEncounterSpawnPointComponent* SelectedSpawnPoint = SelectedSpawnPoints[SelectedIndex];
+				
+				SpawnTransform.SetLocation(SelectedSpawnPoint->GetComponentLocation());
+				SpawnTransform.SetRotation(SelectedSpawnPoint->GetComponentRotation().Quaternion());
+				break;
+			}
+		}
+		SpawnTransform.SetLocation(SpawnPoints[SpawnLocationIndex]->GetComponentLocation());
+		SpawnTransform.SetRotation(SpawnPoints[SpawnLocationIndex]->GetComponentRotation().Quaternion());
 		break;
 	case ESpawnLocationType::PointCollection:
 		SpawnTransform.SetLocation(SpawnLocations[SpawnLocationIndex] + FVector{ 0.f, 0.f, 75.f });
@@ -592,4 +605,25 @@ FVector AEncounterSpawnVolume::FindRandomPointWithinBounds(const FVector& Origin
 		Tries++;
 	}
 	return  ChosenLocation;
+}
+
+TArray<UEncounterSpawnPointComponent*> AEncounterSpawnVolume::FindSelectedPointAroundPlayer(const FVector& PlayerLocation) const
+{
+	// float ClosestDistance = FLT_MAX;
+	TMap<float, UEncounterSpawnPointComponent*> ChosenSpawnPoints;
+	for (const TObjectPtr<UEncounterSpawnPointComponent>& SpawnPoint : SpawnPoints)
+	{
+		const float DistanceToPlayer = FVector::Distance(PlayerLocation, SpawnPoint->GetComponentLocation());
+		if (DistanceToPlayer < 150.f) continue;
+		
+		ChosenSpawnPoints.Add(DistanceToPlayer, SpawnPoint);
+	}
+	ChosenSpawnPoints.KeySort([] (const float A, const float B)
+	{
+		return A < B;
+	});
+	
+	TArray<UEncounterSpawnPointComponent*> OutSpawnPoints;
+	ChosenSpawnPoints.GenerateValueArray(OutSpawnPoints);
+	return OutSpawnPoints;
 }
