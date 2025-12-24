@@ -79,9 +79,9 @@ void AAICharacter::PossessedBy(AController* NewController)
 	BaseAIController->GetBlackboardComponent()->SetValueAsBool(FName("RangedAttacker"), CharacterClass != ECharacterClass::Warrior);
 	BaseAIController->GetBlackboardComponent()->SetValueAsVector(FName("StartLocation"), StartLocation);
 	BaseAIController->GetBlackboardComponent()->SetValueAsObject(FName("OwningSummoner"), OwningSummoner);
-	if (IsValid(SplineComponentActor))
+	if (IsValid(SplineComponent))
 	{
-		SplineComponent = SplineComponentActor->SplineComponent;
+		// SplineComponent = SplineComponentActor->SplineComponent;
 		BaseAIController->GetBlackboardComponent()->SetValueAsObject(FName("SplineComponent"), SplineComponent);
 	}
 	BaseAIController->SetPawn(this);
@@ -437,7 +437,7 @@ void AAICharacter::SpawnFromEgg()
 	AAICharacter* Encounter = GetWorld()->SpawnActorDeferred<AAICharacter>(ActorClassToSpawn, SpawnTransform, this, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 	// Encounter->SetEncounterLevel(Level);
 	// Encounter->SetEncounterData(EncounterData);
-	Encounter->SplineComponentActor = SplineComponentActor;
+	Encounter->SplineComponent = SplineComponent;
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	// IAIInterface::Execute_SetSpawningBounds(Encounter, SpawningBounds);					
 	Encounter->SpawnDefaultController();
@@ -742,8 +742,8 @@ void AAICharacter::FaceTarget_Implementation()
 
 bool AAICharacter::FollowSpline_Implementation(const int32 SplineIndex)
 {
-	if(SplineComponentActor == nullptr) return false;
-	if(SplineComponent == nullptr) SplineComponent = SplineComponentActor->GetSplineComponent();
+	if (!IsValid(SplineComponent)) return false;
+	
 	const FVector Destination = SplineComponent->GetLocationAtSplinePoint(SplineIndex, ESplineCoordinateSpace::World);
 	const FVector Direction = (Destination - GetActorLocation()).GetSafeNormal();
 	AddMovementInput(Direction, 1.f);
@@ -763,16 +763,12 @@ bool AAICharacter::FollowSplinePoints_Implementation(int32 SplineIndex)
 
 FVector AAICharacter::GetNextLocation_Implementation(const int32 SplineIndex)
 {
-	if(SplineComponentActor == nullptr) return GetActorLocation();
-	if(SplineComponent == nullptr) SplineComponent = SplineComponentActor->GetSplineComponent();
-	// UKismetSystemLibrary::DrawDebugSphere(this, SplineComponent->GetLocationAtSplinePoint(SplineIndex, ESplineCoordinateSpace::World), 6.f, 12, FLinearColor::Red, 8.f);
+	if (!IsValid(SplineComponent)) return GetActorLocation();
 	return  SplineComponent->GetLocationAtSplinePoint(SplineIndex, ESplineCoordinateSpace::World);
 }
 
 void AAICharacter::StartSplineMovement_Implementation()
 {
-	// FActorSpawnParameters SpawnParameters;
-	// ASplineComponentActor* SplineComponentActor = GetWorld()->SpawnActor<ASplineComponentActor>(GetActorLocation(), FRotator::ZeroRotator, SpawnParameters);
 	if(CombatTarget == nullptr) return;
 	
 	SplinePoints.Empty();
@@ -780,7 +776,6 @@ void AAICharacter::StartSplineMovement_Implementation()
 	SplinePoints.Add(CombatTarget->GetActorLocation());
 	SplinePoints.Add(CombatTarget->GetActorLocation() + GetActorForwardVector() * 300.f);
 	SplinePoints.Add(FVector(CombatTarget->GetActorLocation().X + GetActorForwardVector().X * 900.f, 0.f, GetActorLocation().Z));
-	// SplineComponentActor->GetSplineComponent()->SetSplinePoints(SplinePoints, ESplineCoordinateSpace::World);
 }
 
 void AAICharacter::SetNewMovementSpeed_Implementation(EMovementMode InMovementMode, float NewSpeed)
@@ -1026,7 +1021,7 @@ void AAICharacter::FindAndApplyPatternParamsForPattern_Implementation(const FNam
 		}
 		if (Params.SplineComponentActors.Num() > 0)
 		{
-			SplineComponentActor = Params.SplineComponentActors[FMath::RandRange(0, Params.SplineComponentActors.Num() - 1)];
+			SplineComponent = Params.SplineComponentActors[FMath::RandRange(0, Params.SplineComponentActors.Num() - 1)]->GetSplineComponent();
 		}
 		if (AnimationComponent && Params.PaperAnimInstance)
 		{

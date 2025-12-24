@@ -13,8 +13,3 @@ void AEncounterSpawnPoint::SetEncounterIcon(UTexture2D* Icon) const
 {
 	GetSpriteComponent()->SetSprite(Icon);
 }
-
-void AEncounterSpawnPoint::SetLabel(const FString& Label)
-{
-	SetActorLabel(Label);
-}

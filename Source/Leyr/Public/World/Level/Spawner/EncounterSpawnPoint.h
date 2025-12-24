@@ -17,5 +17,4 @@ class LEYR_API AEncounterSpawnPoint : public ATargetPoint
 public:
 	AEncounterSpawnPoint();
 	void SetEncounterIcon(UTexture2D* Icon) const;
-	void SetLabel(const FString& Label);
 };

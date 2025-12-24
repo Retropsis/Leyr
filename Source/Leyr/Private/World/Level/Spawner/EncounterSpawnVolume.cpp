@@ -1,22 +1,19 @@
 // @ Retropsis 2024-2025.
 
 #include "World/Level/Spawner/EncounterSpawnVolume.h"
-
 #include "PaperTileMapComponent.h"
 #include "AbilitySystem/Actor/PointCollection.h"
 #include "AI/AICharacter.h"
-#include "AI/SplineComponentActor.h"
 #include "Algo/RandomShuffle.h"
 #include "Components/BoxComponent.h"
 #include "Components/SplineComponent.h"
-#include "Data/BehaviourData.h"
 #include "Data/EncounterData.h"
 #include "Engine/AssetManager.h"
 #include "Engine/StreamableManager.h"
 #include "Interaction/PlayerInterface.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "World/Level/Spawner/EncounterSpawnPoint.h"
 #include "Leyr/Leyr.h"
+#include "World/Level/Spawner/EncounterSpawnPointComponent.h"
 
 AEncounterSpawnVolume::AEncounterSpawnVolume()
 {
@@ -55,22 +52,22 @@ void AEncounterSpawnVolume::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
-	if (IsValid(EncounterSpawnData) && IsValid(EncounterSpawnData->EncounterData) && IsValid(EncounterSpawnData->EncounterData->BehaviourData))
-	{
-		EncounterSpawnData->EncounterData->BehaviourData->OnMovementTypePropertyChanged.RemoveAll(EncounterSpawnData->EncounterData->BehaviourData);
-		EncounterSpawnData->EncounterData->BehaviourData->OnMovementTypePropertyChanged.AddLambda([&] (const EMovementType MovementType)
-		{
-			if (MovementType == EMovementType::Spline)
-			{
-				CreateSplineComponentActor();
-			}
-			else if (IsValid(SplineComponentActor))
-			{
-				SplineComponentActor->Destroy();
-				SplineComponentActor = nullptr;
-			}
-		});
-	}
+	// if (IsValid(EncounterSpawnData) && IsValid(EncounterSpawnData->EncounterData) && IsValid(EncounterSpawnData->EncounterData->BehaviourData))
+	// {
+	// 	EncounterSpawnData->EncounterData->BehaviourData->OnMovementTypePropertyChanged.RemoveAll(EncounterSpawnData->EncounterData->BehaviourData);
+	// 	EncounterSpawnData->EncounterData->BehaviourData->OnMovementTypePropertyChanged.AddLambda([&] (const EMovementType MovementType)
+	// 	{
+	// 		if (MovementType == EMovementType::Spline)
+	// 		{
+	// 			CreateSplineComponentActor();
+	// 		}
+	// 		else if (IsValid(SplineComponentActor))
+	// 		{
+	// 			SplineComponentActor->Destroy();
+	// 			SplineComponentActor = nullptr;
+	// 		}
+	// 	});
+	// }
 }
 
 void AEncounterSpawnVolume::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
@@ -92,9 +89,6 @@ void AEncounterSpawnVolume::PostEditChangeProperty(struct FPropertyChangedEvent&
 	if (PropertyChangedEvent.Property->GetName() == TEXT("TileMap") && IsValid(TileMap))
 	{
 		TileMapBounds = TileMap->GetRenderComponent()->Bounds;
-		SetTriggerBoundaryToRoomSize();
-		SetSpawnBoundaryToRoomSize();
-		SetDespawnBoundaryToRoomSize();
 	}
 }
 
@@ -114,7 +108,7 @@ void AEncounterSpawnVolume::CreateSpawnPoints()
 		
 		for (int i = 0; i < Count; ++i)
 		{
-			CreateSpawnPoint(SpawnParams, FVector{ 100.f + i * 50.f, 0.f, 0.f}, i == 0);
+			CreateSpawnPoint(FVector{ 100.f + i * 50.f, 0.f, 0.f});
 		}
 	}
 }
@@ -123,26 +117,30 @@ void AEncounterSpawnVolume::ClearSpawnPoints()
 {
 	if (SpawnPoints.Num() == 0) return;
 	
-	for (AEncounterSpawnPoint* SpawnPoint : SpawnPoints)
+	for (UEncounterSpawnPointComponent* SpawnPoint : SpawnPoints)
 	{
-		if (IsValid(SpawnPoint)) SpawnPoint->Destroy();
+		if (IsValid(SpawnPoint)) SpawnPoint->DestroyComponent();
 	}
 	SpawnPoints.Empty();
 }
 
-void AEncounterSpawnVolume::CreateSpawnPoint(const FActorSpawnParameters& SpawnParams, const FVector& Offset, const bool bFirstIndex)
+void AEncounterSpawnVolume::CreateSpawnPoint(const FVector& Offset)
 {
-	AEncounterSpawnPoint* SpawnPoint = GetWorld()->SpawnActor<AEncounterSpawnPoint>(AEncounterSpawnPoint::StaticClass(), GetActorLocation() + Offset, FRotator::ZeroRotator, SpawnParams);
-	
 	if (!IsValid(EncounterSpawnData->EncounterData))
 	{
 		UE_LOG(LogTemp, Error, TEXT("EncounterSpawnData EncounterData is NULL"));
 		return;
 	}
 	
+	if (!IsValid(EncounterSpawnPointComponentClass)) return;
+	
+	UEncounterSpawnPointComponent* SpawnPoint = NewObject<UEncounterSpawnPointComponent>(this, EncounterSpawnPointComponentClass);
+	AddInstanceComponent(SpawnPoint);
+	SpawnPoint->RegisterComponent();
 	const FString NewLabel = EncounterSpawnData->EncounterData->GetName().Replace(TEXT("Encounter"), TEXT("SpawnPoint"));
-	SpawnPoint->SetLabel(NewLabel);
-	SpawnPoint->SetEncounterIcon(EncounterSpawnData->EncounterData->EncounterIcon);
+	SpawnPoint->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName(*NewLabel));
+	SpawnPoint->SetRelativeLocation(Offset);
+	SpawnPoint->SetSprite(EncounterSpawnData->EncounterData->EncounterIcon);
 	SpawnPoints.Add(SpawnPoint);
 }
 
@@ -162,7 +160,7 @@ void AEncounterSpawnVolume::UpdateSpawnPoints()
 			{
 				if (SpawnPoints.IsValidIndex(i))
 				{
-					SpawnPoints[i]->Destroy();
+					SpawnPoints[i]->DestroyComponent();
 					SpawnPoints.RemoveAt(i);
 				}
 			}
@@ -175,7 +173,7 @@ void AEncounterSpawnVolume::UpdateSpawnPoints()
 				FActorSpawnParameters SpawnParams;
 				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 				FVector Offset = FVector{ 100.f + 50.f * i, 0.f, 0.f};
-				CreateSpawnPoint(SpawnParams, Offset, i == 0);
+				CreateSpawnPoint(Offset);
 			}
 		}
 		return;
@@ -187,28 +185,52 @@ void AEncounterSpawnVolume::UpdateSpawnPoints()
 		return;
 	}
 	
-	for (const AEncounterSpawnPoint* SpawnPoint : SpawnPoints)
+	for (UEncounterSpawnPointComponent* SpawnPoint : SpawnPoints)
 	{
-		SpawnPoint->SetEncounterIcon(EncounterSpawnData->EncounterData->EncounterIcon);
+		SpawnPoint->SetSprite(EncounterSpawnData->EncounterData->EncounterIcon);
 	}
+}
+
+void AEncounterSpawnVolume::AddSpawnPoint()
+{
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	CreateSpawnPoint(FVector{ 100.f + SpawnPoints.Num() * 50.f, 0.f, 0.f});
+}
+
+void AEncounterSpawnVolume::RemoveSpawnPointAboveCount()
+{
+	if (SpawnPoints.Num() > Count && Count > 0)
+	{
+		UEncounterSpawnPointComponent* SpawnPoint = SpawnPoints.Last();
+		SpawnPoints.RemoveAt(SpawnPoints.Num() - 1);
+		if (IsValid(SpawnPoint)) SpawnPoint->DestroyComponent();
+	}
+}
+
+void AEncounterSpawnVolume::SetAllBoundariesToRoomSize() const
+{
+	SetTriggerBoundaryToRoomSize();
+	SetSpawnBoundaryToRoomSize();
+	SetDespawnBoundaryToRoomSize();
 }
 
 void AEncounterSpawnVolume::SetTriggerBoundaryToRoomSize() const
 {
 	TriggerVolume->SetWorldLocation(TileMapBounds.Origin);
-	TriggerVolume->SetWorldScale3D(FVector{ TileMapBounds.BoxExtent.X / 100.f - 0.2f, 1.f, TileMapBounds.BoxExtent.Z / 100.f - 0.2f });
+	TriggerVolume->SetBoxExtent(FVector{ TileMapBounds.BoxExtent.X - 16.f, 100.f, TileMapBounds.BoxExtent.Z - 16.f });
 }
 
 void AEncounterSpawnVolume::SetSpawnBoundaryToRoomSize() const
 {
 	SpawningBounds->SetWorldLocation(TileMapBounds.Origin);
-	SpawningBounds->SetWorldScale3D(FVector{ TileMapBounds.BoxExtent.X / 100.f + 0.2f, 1.f, TileMapBounds.BoxExtent.Z / 100.f + 0.2f });
+	SpawningBounds->SetBoxExtent(FVector{ TileMapBounds.BoxExtent.X + 16.f, 100.f, TileMapBounds.BoxExtent.Z + 16.f });
 }
 
 void AEncounterSpawnVolume::SetDespawnBoundaryToRoomSize() const
 {
 	DespawningBounds->SetWorldLocation(TileMapBounds.Origin);
-	DespawningBounds->SetWorldScale3D(FVector{ TileMapBounds.BoxExtent.X / 100.f + 0.2f, 1.f, TileMapBounds.BoxExtent.Z / 100.f + 0.2f });
+	DespawningBounds->SetBoxExtent(FVector{ TileMapBounds.BoxExtent.X + 16.f, 100.f, TileMapBounds.BoxExtent.Z + 16.f });
 }
 
 void AEncounterSpawnVolume::BeginPlay()
@@ -239,7 +261,7 @@ void AEncounterSpawnVolume::OnDespawnOverlap(UPrimitiveComponent* OverlappedComp
 {
 	if(AAICharacter* Encounter = Cast<AAICharacter>(OtherActor))
 	{
-		for (AEncounterSpawnPoint* SpawnPoint : SpawnPoints)
+		for (UEncounterSpawnPointComponent* SpawnPoint : SpawnPoints)
 		{
 			if (!ICombatInterface::Execute_IsDefeated(Encounter))
 			{
@@ -310,23 +332,42 @@ void AEncounterSpawnVolume::ToggleOnDespawnOverlap(const bool bEnable) const
 	}
 }
 
-void AEncounterSpawnVolume::CreateSplineComponentActor()
+void AEncounterSpawnVolume::CreateSplineComponent()
 {
+	if (!IsValid(EncounterSpawnData))
+	{
+		UE_LOG(LogTemp, Error, TEXT("EncounterSpawnData is NULL"));
+		return;
+	}
 	if (!IsValid(EncounterSpawnData->EncounterData))
 	{
-		UE_LOG(LogTemp, Error, TEXT("EncounterSpawnData.EncounterData is NULL"));
+		UE_LOG(LogTemp, Error, TEXT("EncounterSpawnData EncounterData is NULL"));
+		return;
+	}
+	if (IsValid(SplineComponent))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Spline already exists"));
 		return;
 	}
 	
-	SplineComponentActor = NewObject<ASplineComponentActor>(this);
+	SplineComponent = NewObject<USplineComponent>(this);
 	const FString NewLabel = EncounterSpawnData->EncounterData->GetName().Replace(TEXT("Encounter"), TEXT("Spline"));
-	SplineComponentActor->SetActorLabel(NewLabel);
-	SplineComponentActor->SetActorLocation(GetActorLocation() + FVector(0.f, 0.f, 50.f));
-	for (int i = 0; i < SplineComponentActor->GetSplineComponent()->GetNumberOfSplinePoints(); ++i)
+	SplineComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform, FName(*NewLabel));
+	SplineComponent->SetRelativeLocation(FVector(0.f, 0.f, 100.f));
+	for (int i = 0; i < SplineComponent->GetNumberOfSplinePoints(); ++i)
 	{
-		SplineComponentActor->GetSplineComponent()->SetSplinePointType(i, ESplinePointType::Linear);
+		SplineComponent->SetSplinePointType(i, ESplinePointType::Linear);
 	}
-	SplineComponentActor->RegisterAllComponents();
+	SplineComponent->RegisterComponent();
+	
+}
+
+void AEncounterSpawnVolume::RemoveSplineComponent() const
+{
+	if (IsValid(SplineComponent))
+	{
+		SplineComponent->DestroyComponent();
+	}
 }
 
 /*
@@ -349,13 +390,21 @@ void AEncounterSpawnVolume::SpawnEncounterGroup()
 
 void AEncounterSpawnVolume::SpawnEncountersDelayed()
 {
+	TArray<int32> Indexes;
+	for (int i = 0; i < SpawnPoints.Num(); ++i)
+	{
+		Indexes.Add(i);
+	}
+	Algo::RandomShuffle(Indexes);
 	for (int i = 0; i < Count; ++i)
 	{
 		GetSpawnLocationsFromPointCollection();
 		FTimerHandle SpawnTimer;
-		GetWorld()->GetTimerManager().SetTimer(SpawnTimer, FTimerDelegate::CreateLambda([this, i, SpawnTimer] ()
+		int32 RandomIndex = Indexes.Last();
+		Indexes.RemoveAt(Indexes.Num() - 1);
+		GetWorld()->GetTimerManager().SetTimer(SpawnTimer, FTimerDelegate::CreateLambda([this, RandomIndex, SpawnTimer] ()
 		{
-			SpawnEncounter(EncounterSpawnData->EncounterData->EncounterClass.Get(), DetermineSpawnTransform(i));
+			SpawnEncounter(EncounterSpawnData->EncounterData->EncounterClass.Get(), DetermineSpawnTransform(RandomIndex));
 			SpawnTimers.Remove(SpawnTimer);
 		}), SpawnDelay * (i + 1), false);
 		SpawnTimers.Add(SpawnTimer);
@@ -374,12 +423,7 @@ void AEncounterSpawnVolume::SpawnEncounter(UClass* EncounterToSpawn, const FTran
 	BoundLocations.Right = SpawningBounds->Bounds.Origin + FVector{ SpawningBounds->Bounds.BoxExtent.X, 0.f, 0.f };
 	IAIInterface::Execute_SetSpawningBounds(Encounter, BoundLocations);
 	
-	if (IsValid(SplineComponentActor))
-	{
-		Encounter->SplineComponentActor = SplineComponentActor;
-		Encounter->SplineComponent = SplineComponentActor->GetSplineComponent();
-		Encounter->SplineComponentActor->SetActorLocation(SplineComponentActor->GetActorLocation());
-	}
+	if (IsValid(SplineComponent)) Encounter->SplineComponent = SplineComponent;
 	Encounter->SpawnDefaultController();
 	Encounter->FinishSpawning(InSpawnTransform);
 	CurrentSpawns.Add(Encounter);
@@ -393,14 +437,13 @@ void AEncounterSpawnVolume::SpawnEncounter(UClass* EncounterToSpawn, const FTran
 void AEncounterSpawnVolume::Respawn(AActor* DefeatedEncounter)
 {
 	CurrentSpawns.Remove(DefeatedEncounter);
-	if(SpawnerType == ESpawnerType::Infinite)
-	{
-	}
+	if(SpawnerType == ESpawnerType::Infinite) {}
 	
 	FTimerHandle RespawnTimer;
 	GetWorldTimerManager().SetTimer(RespawnTimer, [this] ()
 	{
-		SpawnEncounter(EncounterSpawnData->EncounterData->EncounterClass.Get(), DetermineSpawnTransform(FMath::RandRange(0, SpawnPoints.Num() - 1)));
+		const int32 RandomIndex = FMath::RandRange(0, SpawnPoints.Num() - 1);
+		SpawnEncounter(EncounterSpawnData->EncounterData->EncounterClass.Get(), DetermineSpawnTransform(RandomIndex));
 	}, RespawnTime, false);
 	SpawnTimers.Add(RespawnTimer);
 }
@@ -481,8 +524,8 @@ FTransform AEncounterSpawnVolume::DetermineSpawnTransform(const int32 SpawnLocat
 	case ESpawnLocationType::SelectedPoint:
 		if (SpawnPoints.IsValidIndex(SpawnLocationIndex) && IsValid(SpawnPoints[SpawnLocationIndex]))
 		{
-			SpawnTransform.SetLocation(SpawnPoints[SpawnLocationIndex]->GetActorLocation());
-			SpawnTransform.SetRotation(SpawnPoints[SpawnLocationIndex]->GetActorRotation().Quaternion());
+			SpawnTransform.SetLocation(SpawnPoints[SpawnLocationIndex]->GetComponentLocation());
+			SpawnTransform.SetRotation(SpawnPoints[SpawnLocationIndex]->GetComponentRotation().Quaternion());
 		}
 		break;
 	case ESpawnLocationType::AroundPoint:

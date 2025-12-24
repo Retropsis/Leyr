@@ -10,6 +10,8 @@
 #include "Leyr/Leyr.h"
 #include "EncounterSpawnVolume.generated.h"
 
+class USplineComponent;
+class UEncounterSpawnPointComponent;
 class APaperTileMapActor;
 class ASplineComponentActor;
 class UEncounterSpawnData;
@@ -32,8 +34,7 @@ public:
 	void DisableTriggerVolume() const;
 	void EnableTriggerVolume() const;
 	void ToggleOnDespawnOverlap(bool bEnable) const;
-	void CreateSpawnPoint(const FActorSpawnParameters& SpawnParams, const FVector& Offset, bool bFirstIndex);
-	void CreateSplineComponentActor();
+	void CreateSpawnPoint(const FVector& Offset);
 	void SpawnEncountersDelayed();
 	void ClearSpawnPoints();
 	void DespawnEncounter();
@@ -49,6 +50,15 @@ public:
 	void UpdateSpawnPoints();
 	
 	UFUNCTION(CallInEditor, Category="Spawner")
+	void AddSpawnPoint();
+	
+	UFUNCTION(CallInEditor, Category="Spawner")
+	void RemoveSpawnPointAboveCount();
+	
+	UFUNCTION(CallInEditor, Category="Spawner")
+	void SetAllBoundariesToRoomSize() const;
+	
+	UFUNCTION(CallInEditor, Category="Spawner")
 	void SetTriggerBoundaryToRoomSize() const;
 	
 	UFUNCTION(CallInEditor, Category="Spawner")
@@ -57,6 +67,12 @@ public:
 	UFUNCTION(CallInEditor, Category="Spawner")
 	void SetDespawnBoundaryToRoomSize() const;
 	
+	UFUNCTION(CallInEditor, Category="Spawner")
+	void CreateSplineComponent();
+	
+	UFUNCTION(CallInEditor, Category="Spawner")
+	void RemoveSplineComponent() const;
+	
 	UFUNCTION()
 	void HandlePlayerLeaving();
 	
@@ -64,7 +80,7 @@ public:
 	void HandlePlayerEntering();
 
 	/* GETTER SETTER */
-	TArray<AEncounterSpawnPoint*> GetSpawnPoints() { return SpawnPoints; }
+	TArray<UEncounterSpawnPointComponent*> GetSpawnPoints() { return SpawnPoints; }
 	void SetEncounterSpawnTag(const FGameplayTag& Tag) { EncounterSpawnTag = Tag; }
 	FGameplayTag GetEncounterSpawnTag() const { return EncounterSpawnTag; }
 	void SetTileMapBounds(const FBoxSphereBounds& Bounds) { TileMapBounds = Bounds; }
@@ -84,11 +100,14 @@ private:
 	UPROPERTY(VisibleAnywhere, Category="Spawner")
 	FGameplayTag EncounterSpawnTag = FGameplayTag::EmptyTag;
 	
-	UPROPERTY(VisibleAnywhere, Category="Spawner")
-	TArray<AEncounterSpawnPoint*> SpawnPoints;
+	UPROPERTY(EditDefaultsOnly, Category="Spawner")
+	TSubclassOf<UEncounterSpawnPointComponent> EncounterSpawnPointComponentClass;
 	
 	UPROPERTY(VisibleAnywhere, Category="Spawner")
-	TObjectPtr<ASplineComponentActor> SplineComponentActor;
+	TArray<TObjectPtr<UEncounterSpawnPointComponent>> SpawnPoints;
+	
+	UPROPERTY(VisibleAnywhere, Category="Spawner")
+	TObjectPtr<USplineComponent> SplineComponent;
 
 	UPROPERTY(EditAnywhere, Category="Spawner")
 	TObjectPtr<APaperTileMapActor> TileMap;
