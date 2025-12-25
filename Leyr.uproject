@@ -22,6 +22,11 @@
 				"CommonUI",
 				"GameplayTasks"
 			]
+		},
+		{
+			"Name": "LeyrEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
 		}
 	],
 	"Plugins": [

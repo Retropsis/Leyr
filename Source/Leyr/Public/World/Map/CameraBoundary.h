@@ -80,16 +80,19 @@ public:
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 	virtual void PreEditChange(FProperty* PropertyAboutToChange) override;
 	
-	UFUNCTION(CallInEditor, Category="Camera Boundary|Encounters")
+	UFUNCTION(CallInEditor, Category="Leyr|Camera Boundary")
+	virtual void RenameVolumes();
+	
+	UFUNCTION(CallInEditor, Category="Leyr|Camera Boundary|Encounters")
 	virtual void InitializeCameraExtent();
 	
-	UFUNCTION(CallInEditor, Category="Camera Boundary|Water")
+	UFUNCTION(CallInEditor, Category="Leyr|Camera Boundary|Water")
 	void SpawnWaterVolume();
 	
-	UFUNCTION(CallInEditor, Category="Camera Boundary|Water")
+	UFUNCTION(CallInEditor, Category="Leyr|Camera Boundary|Water")
 	void UpdateWaterVolume() const;
 	
-	UFUNCTION(CallInEditor, Category="Camera Boundary|Water")
+	UFUNCTION(CallInEditor, Category="Leyr|Camera Boundary|Water")
 	void ClearWaterVolume();
 	
 	AActor* GetTargetActor() { return TargetActor; }
@@ -143,58 +146,58 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> BoundaryVisualizer;
 	
-	UPROPERTY(EditAnywhere, Category="Camera Boundary")
+	UPROPERTY(EditAnywhere, Category="Leyr|Camera Boundary")
 	TObjectPtr<ULevelAreaData> LevelAreaData;
 	
-	UPROPERTY(VisibleAnywhere, Category="Camera Boundary")
+	UPROPERTY(VisibleAnywhere, Category="Leyr|Camera Boundary")
 	FName LevelAreaName = FName();
 	
-	UPROPERTY(EditAnywhere, Category="Camera Boundary")
+	UPROPERTY(EditAnywhere, Category="Leyr|Camera Boundary")
 	TArray<TObjectPtr<UEntranceMarker>> EntranceMarkers;
 	
-	UPROPERTY(VisibleAnywhere, Category="Camera Boundary")
+	UPROPERTY(VisibleAnywhere, Category="Leyr|Camera Boundary")
 	TArray<TObjectPtr<UEntranceMarker>> PreEditEntranceMarkers;
 	
-	UPROPERTY(EditAnywhere, Category="Camera Boundary")
+	UPROPERTY(EditAnywhere, Category="Leyr|Camera Boundary")
 	TObjectPtr<APaperTileMapActor> TileMap;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Camera Boundary")
+	UPROPERTY(EditDefaultsOnly, Category="Leyr|Camera Boundary")
 	TSubclassOf<UEntranceMarker> EntranceMarkerClass;
 	
-	UPROPERTY(EditAnywhere, Category="Camera Boundary")
+	UPROPERTY(EditAnywhere, Category="Leyr|Camera Boundary")
 	EBoundaryRule BoundaryRule = EBoundaryRule::Extent;
 
-	UPROPERTY(EditAnywhere, Category="Camera Boundary")
+	UPROPERTY(EditAnywhere, Category="Leyr|Camera Boundary")
 	bool bConstrainZ = true;
 	
-	UPROPERTY(EditAnywhere, Category="Camera Boundary")
+	UPROPERTY(EditAnywhere, Category="Leyr|Camera Boundary")
 	bool bConstrainX = true;
 	
-	UPROPERTY(VisibleAnywhere, Category="Camera Boundary")
+	UPROPERTY(VisibleAnywhere, Category="Leyr|Camera Boundary")
 	ERoomType RoomType;
 
 	/*
 	 * Other Game Mechanics
 	 */
-	UPROPERTY(EditDefaultsOnly, Category="Camera Boundary|Encounters")
+	UPROPERTY(EditDefaultsOnly, Category="Leyr|Camera Boundary|Encounters")
 	TSubclassOf<AEncounterSpawnVolume> SpawningVolumeClass;
 	
-	UPROPERTY(EditAnywhere, Category="Camera Boundary|Encounters")
+	UPROPERTY(EditAnywhere, Category="Leyr|Camera Boundary|Encounters")
 	TArray<TObjectPtr<AEncounterSpawnVolume>> SpawningVolumes;
 	
-	UPROPERTY(VisibleAnywhere, Category="Camera Boundary|Encounters")
+	UPROPERTY(VisibleAnywhere, Category="Leyr|Camera Boundary|Encounters")
 	TArray<TObjectPtr<AEncounterSpawnVolume>> PreEditSpawningVolumes;
 
-	UPROPERTY(EditDefaultsOnly, Category="Camera Boundary|Water")
+	UPROPERTY(EditDefaultsOnly, Category="Leyr|Camera Boundary|Water")
 	TSubclassOf<AWaterGroup> WaterVolumeClass;
 	
-	UPROPERTY(VisibleAnywhere, Category="Camera Boundary|Water")
+	UPROPERTY(VisibleAnywhere, Category="Leyr|Camera Boundary|Water")
 	TObjectPtr<AWaterGroup> WaterVolume;
 
 	UPROPERTY()
 	TArray<TScriptInterface<ILevelActorInterface>> LevelActors;
 		
-	UPROPERTY(EditAnywhere, Category="Camera Boundary|Gameplay Effects", meta=(TitleProperty=GameplayEffect))
+	UPROPERTY(EditAnywhere, Category="Leyr|Camera Boundary|Gameplay Effects", meta=(TitleProperty=GameplayEffect))
 	TArray<FLevelArea_GameplayEffect> GrantedGameplayEffects;
 	
 	UPROPERTY()

@@ -108,7 +108,7 @@ void AEncounterSpawnVolume::CreateSpawnPoints()
 		
 		for (int i = 0; i < Count; ++i)
 		{
-			CreateSpawnPoint(FVector{ 100.f + i * 50.f, 0.f, 0.f});
+			CreateSpawnPoint(FVector{  100.f + i * SpawnPointOffset.X, 0.f, -50.f + i * SpawnPointOffset.Y });
 		}
 	}
 }
@@ -141,7 +141,17 @@ void AEncounterSpawnVolume::CreateSpawnPoint(const FVector& Offset)
 	SpawnPoint->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::SnapToTargetIncludingScale, FName(*NewLabel));
 	SpawnPoint->SetRelativeLocation(Offset);
 	SpawnPoint->SetSprite(EncounterSpawnData->EncounterData->EncounterIcon);
+	if (bDropSpawnPointToGround) DropSpawnPointToGround(SpawnPoint);
 	SpawnPoints.Add(SpawnPoint);
+}
+
+void AEncounterSpawnVolume::DropSpawnPointToGround(UEncounterSpawnPointComponent* SpawnPoint)
+{
+	const FVector Start =SpawnPoint->GetComponentLocation() + FVector{ 0.f, 0.f, 25.f };
+	const FVector End = Start + FVector{ 0.f, 0.f, -250.f };
+	FHitResult HIt;
+	UKismetSystemLibrary::LineTraceSingle(this, Start, End, TraceTypeQuery1, false, TArray<AActor*>(), EDrawDebugTrace::None, HIt, true);
+	if (HIt.bBlockingHit) SpawnPoint->SetWorldLocation(HIt.Location + FVector{ 0.f, 0.f, 25.f });
 }
 
 void AEncounterSpawnVolume::UpdateSpawnPoints()
@@ -169,11 +179,7 @@ void AEncounterSpawnVolume::UpdateSpawnPoints()
 		{
 			for (int i = SpawnPoints.Num(); i < Count; ++i)
 			{
-				// Create a new spawn point
-				FActorSpawnParameters SpawnParams;
-				SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-				FVector Offset = FVector{ 100.f + 50.f * i, 0.f, 0.f};
-				CreateSpawnPoint(Offset);
+				CreateSpawnPoint(FVector{  100.f + i * SpawnPointOffset.X, 0.f, -50.f + i * SpawnPointOffset.Y });
 			}
 		}
 		return;
@@ -193,9 +199,29 @@ void AEncounterSpawnVolume::UpdateSpawnPoints()
 
 void AEncounterSpawnVolume::AddSpawnPoint()
 {
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-	CreateSpawnPoint(FVector{ 100.f + SpawnPoints.Num() * 50.f, 0.f, 0.f});
+	CreateSpawnPoint(FVector{  100.f + SpawnPoints.Num() * SpawnPointOffset.X, 0.f, -50.f + SpawnPoints.Num() * SpawnPointOffset.Y });
+}
+
+void AEncounterSpawnVolume::RepositionSpawnPoints()
+{
+	for (int i = 0; i < SpawnPoints.Num(); ++i)
+	{
+		if (SpawnPoints.IsValidIndex(i) && IsValid(SpawnPoints[i]))
+		{
+			SpawnPoints[i]->SetRelativeLocation(FVector{  100.f + i * SpawnPointOffset.X, 0.f, -50.f + i * SpawnPointOffset.Y });
+		}
+	}
+}
+
+void AEncounterSpawnVolume::DropSpawnPointsToGround()
+{
+	for (int i = 0; i < SpawnPoints.Num(); ++i)
+	{
+		if (SpawnPoints.IsValidIndex(i) && IsValid(SpawnPoints[i]))
+		{
+			DropSpawnPointToGround(SpawnPoints[i]);
+		}
+	}
 }
 
 void AEncounterSpawnVolume::RemoveSpawnPointAboveCount()
@@ -210,27 +236,49 @@ void AEncounterSpawnVolume::RemoveSpawnPointAboveCount()
 
 void AEncounterSpawnVolume::SetAllBoundariesToRoomSize() const
 {
-	SetTriggerBoundaryToRoomSize();
-	SetSpawnBoundaryToRoomSize();
-	SetDespawnBoundaryToRoomSize();
+	SetTriggerBoundaryToSize(FVector2D{ TileMapBounds.BoxExtent.X, TileMapBounds.BoxExtent.Z });
+	SetSpawnBoundaryToSize(FVector2D{ TileMapBounds.BoxExtent.X, TileMapBounds.BoxExtent.Z });
+	SetDespawnBoundaryToSize(FVector2D{ TileMapBounds.BoxExtent.X, TileMapBounds.BoxExtent.Z });
 }
 
 void AEncounterSpawnVolume::SetTriggerBoundaryToRoomSize() const
 {
-	TriggerVolume->SetWorldLocation(TileMapBounds.Origin);
-	TriggerVolume->SetBoxExtent(FVector{ TileMapBounds.BoxExtent.X - 16.f, 100.f, TileMapBounds.BoxExtent.Z - 16.f });
+	SetTriggerBoundaryToSize(FVector2D{ TileMapBounds.BoxExtent.X, TileMapBounds.BoxExtent.Z });
 }
 
 void AEncounterSpawnVolume::SetSpawnBoundaryToRoomSize() const
 {
-	SpawningBounds->SetWorldLocation(TileMapBounds.Origin);
-	SpawningBounds->SetBoxExtent(FVector{ TileMapBounds.BoxExtent.X + 16.f, 100.f, TileMapBounds.BoxExtent.Z + 16.f });
+	SetSpawnBoundaryToSize(FVector2D{ TileMapBounds.BoxExtent.X, TileMapBounds.BoxExtent.Z });
 }
 
 void AEncounterSpawnVolume::SetDespawnBoundaryToRoomSize() const
 {
+	SetDespawnBoundaryToSize(FVector2D{ TileMapBounds.BoxExtent.X, TileMapBounds.BoxExtent.Z });
+}
+
+void AEncounterSpawnVolume::SetAllBoundariesToSize() const
+{
+	SetTriggerBoundaryToSize(DefaultBoundaryBoxExtent);
+	SetSpawnBoundaryToSize(DefaultBoundaryBoxExtent);
+	SetDespawnBoundaryToSize(DefaultBoundaryBoxExtent);
+}
+
+void AEncounterSpawnVolume::SetTriggerBoundaryToSize(const FVector2D& BoxExtent) const
+{
+	TriggerVolume->SetBoxExtent(FVector{ BoxExtent.X - 16.f, 100.f, BoxExtent.Y - 16.f });
+	TriggerVolume->SetWorldLocation(TileMapBounds.Origin);
+}
+
+void AEncounterSpawnVolume::SetSpawnBoundaryToSize(const FVector2D& BoxExtent) const
+{
+	SpawningBounds->SetBoxExtent(FVector{ BoxExtent.X - 16.f, 100.f, BoxExtent.Y - 16.f });
+	SpawningBounds->SetWorldLocation(TileMapBounds.Origin);
+}
+
+void AEncounterSpawnVolume::SetDespawnBoundaryToSize(const FVector2D& BoxExtent) const
+{
+	DespawningBounds->SetBoxExtent(FVector{ BoxExtent.X - 16.f, 100.f, BoxExtent.Y - 16.f });
 	DespawningBounds->SetWorldLocation(TileMapBounds.Origin);
-	DespawningBounds->SetBoxExtent(FVector{ TileMapBounds.BoxExtent.X + 16.f, 100.f, TileMapBounds.BoxExtent.Z + 16.f });
 }
 
 void AEncounterSpawnVolume::BeginPlay()

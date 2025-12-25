@@ -37,40 +37,59 @@ public:
 	void CreateSpawnPoint(const FVector& Offset);
 	void SpawnEncountersDelayed();
 	void ClearSpawnPoints();
+	void DropSpawnPointToGround(UEncounterSpawnPointComponent* SpawnPoint);
 	void DespawnEncounter();
 
 	//~ Save Interface
 	virtual void LoadActor_Implementation() override;
 	//~ Save Interface
 
-	UFUNCTION(CallInEditor, Category="Spawner")
+	UFUNCTION(CallInEditor, Category="Leyr|Spawner")
 	void CreateSpawnPoints();
 	
-	UFUNCTION(CallInEditor, Category="Spawner")
+	UFUNCTION(CallInEditor, Category="Leyr|Spawner")
 	void UpdateSpawnPoints();
 	
-	UFUNCTION(CallInEditor, Category="Spawner")
+	UFUNCTION(CallInEditor, Category="Leyr|Spawner")
 	void AddSpawnPoint();
 	
-	UFUNCTION(CallInEditor, Category="Spawner")
+	UFUNCTION(CallInEditor, Category="Leyr|Spawner")
+	void RepositionSpawnPoints();
+	
+	UFUNCTION(CallInEditor, Category="Leyr|Spawner")
+	void DropSpawnPointsToGround();
+	
+	UFUNCTION(CallInEditor, Category="Leyr|Spawner")
 	void RemoveSpawnPointAboveCount();
 	
-	UFUNCTION(CallInEditor, Category="Spawner")
+	UFUNCTION(CallInEditor, Category="Leyr|Spawner")
 	void SetAllBoundariesToRoomSize() const;
 	
-	UFUNCTION(CallInEditor, Category="Spawner")
+	UFUNCTION(CallInEditor, Category="Leyr|Spawner")
 	void SetTriggerBoundaryToRoomSize() const;
 	
-	UFUNCTION(CallInEditor, Category="Spawner")
+	UFUNCTION(CallInEditor, Category="Leyr|Spawner")
 	void SetSpawnBoundaryToRoomSize() const;
 	
-	UFUNCTION(CallInEditor, Category="Spawner")
+	UFUNCTION(CallInEditor, Category="Leyr|Spawner")
 	void SetDespawnBoundaryToRoomSize() const;
 	
-	UFUNCTION(CallInEditor, Category="Spawner")
+	UFUNCTION(CallInEditor, Category="Leyr|Spawner")
+	void SetAllBoundariesToSize() const;
+	
+	UFUNCTION(CallInEditor, Category="Leyr|Spawner")
+	void SetTriggerBoundaryToSize(const FVector2D& BoxExtent) const;
+	
+	UFUNCTION(CallInEditor, Category="Leyr|Spawner")
+	void SetSpawnBoundaryToSize(const FVector2D& BoxExtent) const;
+	
+	UFUNCTION(CallInEditor, Category="Leyr|Spawner")
+	void SetDespawnBoundaryToSize(const FVector2D& BoxExtent) const;
+	
+	UFUNCTION(CallInEditor, Category="Leyr|Spawner")
 	void CreateSplineComponent();
 	
-	UFUNCTION(CallInEditor, Category="Spawner")
+	UFUNCTION(CallInEditor, Category="Leyr|Spawner")
 	void RemoveSplineComponent() const;
 	
 	UFUNCTION()
@@ -84,6 +103,7 @@ public:
 	void SetEncounterSpawnTag(const FGameplayTag& Tag) { EncounterSpawnTag = Tag; }
 	FGameplayTag GetEncounterSpawnTag() const { return EncounterSpawnTag; }
 	void SetTileMapBounds(const FBoxSphereBounds& Bounds) { TileMapBounds = Bounds; }
+	void SetTileMap(APaperTileMapActor* InTileMap) { TileMap = InTileMap; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -97,32 +117,25 @@ protected:
 private:
 	FBoundLocations CalculateSpawningBounds() const;
 	
-	UPROPERTY(VisibleAnywhere, Category="Spawner")
+	UPROPERTY(VisibleAnywhere, Category="Leyr|Spawner")
 	FGameplayTag EncounterSpawnTag = FGameplayTag::EmptyTag;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Spawner")
+	UPROPERTY(EditDefaultsOnly, Category="Leyr|Spawner")
 	TSubclassOf<UEncounterSpawnPointComponent> EncounterSpawnPointComponentClass;
 	
-	UPROPERTY(VisibleAnywhere, Category="Spawner")
+	UPROPERTY()
 	TArray<TObjectPtr<UEncounterSpawnPointComponent>> SpawnPoints;
 	
-	UPROPERTY(VisibleAnywhere, Category="Spawner")
+	UPROPERTY(VisibleAnywhere, Category="Leyr|Spawner")
 	TObjectPtr<USplineComponent> SplineComponent;
 
-	UPROPERTY(EditAnywhere, Category="Spawner")
+	UPROPERTY(EditAnywhere, Category="Leyr|Spawner")
 	TObjectPtr<APaperTileMapActor> TileMap;
 
-	UPROPERTY(VisibleAnywhere, Category="Spawner")
-	FBoxSphereBounds TileMapBounds;
-	
-	UPROPERTY(VisibleAnywhere, Category="Spawner")
-	TObjectPtr<UBoxComponent> TriggerVolume;
-	
-	UPROPERTY(VisibleAnywhere, Category="Spawner")
-	TObjectPtr<UBoxComponent> SpawningBounds;
-	
-	UPROPERTY(VisibleAnywhere, Category="Spawner")
-	TObjectPtr<UBoxComponent> DespawningBounds;
+	UPROPERTY() FBoxSphereBounds TileMapBounds;
+	UPROPERTY() TObjectPtr<UBoxComponent> TriggerVolume;
+	UPROPERTY() TObjectPtr<UBoxComponent> SpawningBounds;
+	UPROPERTY() TObjectPtr<UBoxComponent> DespawningBounds;
 	
 	UPROPERTY(SaveGame)
 	bool bActivated = false;
@@ -149,12 +162,15 @@ private:
 	
 	FSplineComponentActorUpdated SplineComponentActorUpdated;
 	
-	UPROPERTY(EditAnywhere, Category="Spawner") TObjectPtr<UEncounterSpawnData> EncounterSpawnData = nullptr;
-	UPROPERTY(EditAnywhere, Category="Spawner") int32 EncounterLevel = 1;
-	UPROPERTY(EditAnywhere, Category="Spawner") int32 Count = 1;
-	UPROPERTY(EditAnywhere, Category="Spawner") float RespawnTime = 120.f;
-	UPROPERTY(EditAnywhere, Category="Spawner") float SpawnDelay = 1.f;
-	UPROPERTY(EditAnywhere, Category="Spawner") float PreferredSpawningRange = 750.f;
+	UPROPERTY(EditAnywhere, Category="Leyr|Spawner") TObjectPtr<UEncounterSpawnData> EncounterSpawnData = nullptr;
+	UPROPERTY(EditAnywhere, Category="Leyr|Spawner") int32 EncounterLevel = 1;
+	UPROPERTY(EditAnywhere, Category="Leyr|Spawner") int32 Count = 1;
+	UPROPERTY(EditAnywhere, Category="Leyr|Spawner") float RespawnTime = 120.f;
+	UPROPERTY(EditAnywhere, Category="Leyr|Spawner") float SpawnDelay = 1.f;
+	UPROPERTY(EditAnywhere, Category="Leyr|Spawner") float PreferredSpawningRange = 750.f;
+	UPROPERTY(EditAnywhere, Category="Leyr|Spawner") FVector2D SpawnPointOffset{ 50.f, 0.f };
+	UPROPERTY(EditAnywhere, Category="Leyr|Spawner") FVector2D DefaultBoundaryBoxExtent{ 512.f, 384.f };
+	UPROPERTY(EditAnywhere, Category="Leyr|Spawner") bool  bDropSpawnPointToGround = false;
 	
 	UPROPERTY() TSubclassOf<AAICharacter> EncounterClass;
 	UPROPERTY() TObjectPtr<UBehaviourData> OverrideBehaviourData = nullptr;

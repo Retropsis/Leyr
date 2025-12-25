@@ -75,6 +75,11 @@ void ACameraBoundary::PostEditChangeProperty(struct FPropertyChangedEvent& Prope
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 	
+	
+	if (PropertyChangedEvent.Property->GetName() == TEXT("LevelAreaData") && IsValid(LevelAreaData))
+	{
+		LevelAreaName = LevelAreaData->LevelAreaName;
+	}
 	if (PropertyChangedEvent.Property->GetName() == TEXT("TileMap"))
 	{
 		InitializeCameraExtent();
@@ -142,6 +147,18 @@ void ACameraBoundary::BeginPlay()
 	}
 }
 
+void ACameraBoundary::RenameVolumes()
+{
+	for (TObjectPtr<AEncounterSpawnVolume> SpawningVolume : SpawningVolumes)
+	{
+		if (IsValid(SpawningVolume))
+		{
+			FString NewLabel = FString::Printf(TEXT("SpawningVolume_%s"), *LevelAreaName.ToString());
+			SpawningVolume->SetActorLabel(NewLabel);
+		}
+	}
+}
+
 void ACameraBoundary::InitializeCameraExtent()
 {
 	if (TileMap)
@@ -169,10 +186,8 @@ void ACameraBoundary::AddSpawnVolume(const int32 Index)
 	const FVector Location = FVector{ GetActorLocation().X, 0.f, GetActorLocation().Z } + FVector{ 100.f + Index * 50.f, 0.f, 0.f };
 	AEncounterSpawnVolume* SpawningVolume = GetWorld()->SpawnActor<AEncounterSpawnVolume>(SpawningVolumeClass, Location, FRotator::ZeroRotator, SpawnParams);
 	// SpawningVolume->SetEncounterSpawnTag(Data.EncounterSpawnTag);
+	SpawningVolume->SetTileMap(TileMap);
 	SpawningVolume->SetTileMapBounds(GetTileMapBounds());
-	SpawningVolume->SetTriggerBoundaryToRoomSize();
-	SpawningVolume->SetSpawnBoundaryToRoomSize();
-	SpawningVolume->SetDespawnBoundaryToRoomSize();
 	SpawningVolume->SetActorLabel(NewLabel);
 	SpawningVolumes[Index] = SpawningVolume;
 }
@@ -188,9 +203,9 @@ void ACameraBoundary::RemoveSpawnVolume(int32 Index)
 
 void ACameraBoundary::RemoveAllSpawnVolumes()
 {
-	if (SpawningVolumes.Num() == 0) return;
+	if (PreEditSpawningVolumes.Num() == 0) return;
 	
-	for (AEncounterSpawnVolume* SpawningVolume : SpawningVolumes)
+	for (AEncounterSpawnVolume* SpawningVolume : PreEditSpawningVolumes)
 	{
 		if (IsValid(SpawningVolume))
 		{
