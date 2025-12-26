@@ -582,7 +582,13 @@ FTransform AEncounterSpawnVolume::DetermineSpawnTransform(const int32 SpawnLocat
 			if (const TArray<UEncounterSpawnPointComponent*> SelectedSpawnPoints = FindSelectedPointAroundPlayer(Target->GetActorLocation()); SelectedSpawnPoints.Num() > 0)
 			{
 				const int32 SelectedIndex = SelectedSpawnPoints.Num() >= 2 ? FMath::RandRange(0, 1) : 0;
-				const UEncounterSpawnPointComponent* SelectedSpawnPoint = SelectedSpawnPoints[SelectedIndex];
+				TWeakObjectPtr<UEncounterSpawnPointComponent> SelectedSpawnPoint = SelectedSpawnPoints[SelectedIndex];
+				SpawnPointsInUse.Add(SelectedSpawnPoint);
+				FTimerHandle SpawnPointInUseTimer;
+				GetWorld()->GetTimerManager().SetTimer(SpawnPointInUseTimer, [this, SelectedSpawnPoint] ()
+				{
+					if (SelectedSpawnPoint.IsValid()) SpawnPointsInUse.Remove(SelectedSpawnPoint);
+				}, 3.f, false);
 				
 				SpawnTransform.SetLocation(SelectedSpawnPoint->GetComponentLocation());
 				SpawnTransform.SetRotation(SelectedSpawnPoint->GetComponentRotation().Quaternion());
@@ -661,6 +667,7 @@ TArray<UEncounterSpawnPointComponent*> AEncounterSpawnVolume::FindSelectedPointA
 	TMap<float, UEncounterSpawnPointComponent*> ChosenSpawnPoints;
 	for (const TObjectPtr<UEncounterSpawnPointComponent>& SpawnPoint : SpawnPoints)
 	{
+		if (SpawnPointsInUse.Contains(SpawnPoint)) continue;
 		const float DistanceToPlayer = FVector::Distance(PlayerLocation, SpawnPoint->GetComponentLocation());
 		if (DistanceToPlayer < 150.f) continue;
 		

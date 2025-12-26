@@ -9,6 +9,8 @@ void FLeyrEditorModule::StartupModule()
 		{
 			TSharedRef<FPropertySection> Section = PropertyModule.FindOrCreateSection("Actor", "Leyr", LOCTEXT("Leyr", "Leyr"));
 			Section->AddCategory("Leyr");
+			Section->AddCategory("Spawner");
+			Section->AddCategory("Boundary");
 		}
 	}
 

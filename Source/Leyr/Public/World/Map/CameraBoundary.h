@@ -80,19 +80,19 @@ public:
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 	virtual void PreEditChange(FProperty* PropertyAboutToChange) override;
 	
-	UFUNCTION(CallInEditor, Category="Leyr|Camera Boundary")
+	UFUNCTION(CallInEditor, Category="Leyr")
 	virtual void RenameVolumes();
 	
-	UFUNCTION(CallInEditor, Category="Leyr|Camera Boundary|Encounters")
+	UFUNCTION(CallInEditor, Category="Leyr")
 	virtual void InitializeCameraExtent();
 	
-	UFUNCTION(CallInEditor, Category="Leyr|Camera Boundary|Water")
+	UFUNCTION(CallInEditor, Category="Leyr")
 	void SpawnWaterVolume();
 	
-	UFUNCTION(CallInEditor, Category="Leyr|Camera Boundary|Water")
+	UFUNCTION(CallInEditor, Category="Leyr")
 	void UpdateWaterVolume() const;
 	
-	UFUNCTION(CallInEditor, Category="Leyr|Camera Boundary|Water")
+	UFUNCTION(CallInEditor, Category="Leyr")
 	void ClearWaterVolume();
 	
 	AActor* GetTargetActor() { return TargetActor; }
@@ -146,58 +146,58 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UStaticMeshComponent> BoundaryVisualizer;
 	
-	UPROPERTY(EditAnywhere, Category="Leyr|Camera Boundary")
+	UPROPERTY(EditAnywhere, Category="Leyr")
 	TObjectPtr<ULevelAreaData> LevelAreaData;
 	
-	UPROPERTY(VisibleAnywhere, Category="Leyr|Camera Boundary")
+	UPROPERTY(VisibleAnywhere, Category="Leyr")
 	FName LevelAreaName = FName();
 	
-	UPROPERTY(EditAnywhere, Category="Leyr|Camera Boundary")
+	UPROPERTY(EditAnywhere, Category="Leyr")
 	TArray<TObjectPtr<UEntranceMarker>> EntranceMarkers;
 	
-	UPROPERTY(VisibleAnywhere, Category="Leyr|Camera Boundary")
+	UPROPERTY(VisibleAnywhere, Category="Leyr")
 	TArray<TObjectPtr<UEntranceMarker>> PreEditEntranceMarkers;
 	
-	UPROPERTY(EditAnywhere, Category="Leyr|Camera Boundary")
+	UPROPERTY(EditAnywhere, Category="Leyr")
 	TObjectPtr<APaperTileMapActor> TileMap;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Leyr|Camera Boundary")
+	UPROPERTY(EditDefaultsOnly, Category="Leyr")
 	TSubclassOf<UEntranceMarker> EntranceMarkerClass;
 	
-	UPROPERTY(EditAnywhere, Category="Leyr|Camera Boundary")
+	UPROPERTY(EditAnywhere, Category="Leyr")
 	EBoundaryRule BoundaryRule = EBoundaryRule::Extent;
 
-	UPROPERTY(EditAnywhere, Category="Leyr|Camera Boundary")
+	UPROPERTY(EditAnywhere, Category="Leyr")
 	bool bConstrainZ = true;
 	
-	UPROPERTY(EditAnywhere, Category="Leyr|Camera Boundary")
+	UPROPERTY(EditAnywhere, Category="Leyr")
 	bool bConstrainX = true;
 	
-	UPROPERTY(VisibleAnywhere, Category="Leyr|Camera Boundary")
+	UPROPERTY(VisibleAnywhere, Category="Leyr")
 	ERoomType RoomType;
 
 	/*
 	 * Other Game Mechanics
 	 */
-	UPROPERTY(EditDefaultsOnly, Category="Leyr|Camera Boundary|Encounters")
+	UPROPERTY(EditDefaultsOnly, Category="Leyr")
 	TSubclassOf<AEncounterSpawnVolume> SpawningVolumeClass;
 	
-	UPROPERTY(EditAnywhere, Category="Leyr|Camera Boundary|Encounters")
+	UPROPERTY(EditAnywhere, Category="Leyr")
 	TArray<TObjectPtr<AEncounterSpawnVolume>> SpawningVolumes;
 	
-	UPROPERTY(VisibleAnywhere, Category="Leyr|Camera Boundary|Encounters")
+	UPROPERTY(VisibleAnywhere, Category="Leyr")
 	TArray<TObjectPtr<AEncounterSpawnVolume>> PreEditSpawningVolumes;
 
-	UPROPERTY(EditDefaultsOnly, Category="Leyr|Camera Boundary|Water")
+	UPROPERTY(EditDefaultsOnly, Category="Leyr|Water")
 	TSubclassOf<AWaterGroup> WaterVolumeClass;
 	
-	UPROPERTY(VisibleAnywhere, Category="Leyr|Camera Boundary|Water")
+	UPROPERTY(VisibleAnywhere, Category="Leyr|Water")
 	TObjectPtr<AWaterGroup> WaterVolume;
 
 	UPROPERTY()
 	TArray<TScriptInterface<ILevelActorInterface>> LevelActors;
 		
-	UPROPERTY(EditAnywhere, Category="Leyr|Camera Boundary|Gameplay Effects", meta=(TitleProperty=GameplayEffect))
+	UPROPERTY(EditAnywhere, Category="Leyr", meta=(TitleProperty=GameplayEffect))
 	TArray<FLevelArea_GameplayEffect> GrantedGameplayEffects;
 	
 	UPROPERTY()
