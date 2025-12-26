@@ -41,6 +41,9 @@ public:
 	//~ Save Interface
 
 	UFUNCTION(CallInEditor, Category="Leyr")
+	void UpdateValuesFromData();
+	
+	UFUNCTION(CallInEditor, Category="Leyr")
 	void CreateSpawnPoints();
 	
 	UFUNCTION(CallInEditor, Category="Leyr")
@@ -163,7 +166,7 @@ private:
 	UPROPERTY(EditAnywhere, Category="Spawner") int32 Count = 1;
 	UPROPERTY(EditAnywhere, Category="Spawner") int32 SpawnPointsCount = 1;
 	UPROPERTY(EditAnywhere, Category="Spawner") float RespawnTime = 120.f;
-	UPROPERTY(EditAnywhere, Category="Spawner") float SpawnDelay = 1.f;
+	UPROPERTY(EditAnywhere, Category="Spawner") float SpawnDelay = 0.2f;
 	UPROPERTY(EditAnywhere, Category="Spawner") float PreferredSpawningRange = 750.f;
 	UPROPERTY(EditAnywhere, Category="Spawner") FVector2D SpawnPointOffset{ 50.f, 0.f };
 	UPROPERTY(EditAnywhere, Category="Spawner") FVector2D DefaultBoundaryBoxExtent{ 512.f, 384.f };

@@ -77,13 +77,7 @@ void AEncounterSpawnVolume::PostEditChangeProperty(struct FPropertyChangedEvent&
 	// EncounterSpawnData
 	if (PropertyChangedEvent.Property->GetName() == TEXT("EncounterSpawnData") && IsValid(EncounterSpawnData))
 	{
-		EncounterLevel = EncounterSpawnData->Level;
-		Count = EncounterSpawnData->Count;
-		SpawnPointsCount = Count;
-		RespawnTime = EncounterSpawnData->RespawnTime;
-		PreferredSpawningRange = EncounterSpawnData->PreferredSpawningRange;
-		SpawnerType = EncounterSpawnData->SpawnerType;
-		SpawnLocationType = EncounterSpawnData->SpawnLocationType;
+		UpdateValuesFromData();
 		CreateSpawnPoints();
 	}
 	// TileMap
@@ -100,11 +94,29 @@ void AEncounterSpawnVolume::PostEditChangeProperty(struct FPropertyChangedEvent&
 		} 
 		AddOrRemoveSpawnPointsByCount();
 	}
+	// Count
+	if (PropertyChangedEvent.Property->GetName() == TEXT("Count"))
+	{
+		SpawnPointsCount = Count;
+		AddOrRemoveSpawnPointsByCount();
+	}
 }
 
 void AEncounterSpawnVolume::LoadActor_Implementation()
 {
 	if (bActivated) DisableTriggerVolume();
+}
+
+void AEncounterSpawnVolume::UpdateValuesFromData()
+{
+	EncounterLevel = EncounterSpawnData->Level;
+	Count = EncounterSpawnData->Count;
+	SpawnPointsCount = Count;
+	RespawnTime = EncounterSpawnData->RespawnTime;
+	PreferredSpawningRange = EncounterSpawnData->PreferredSpawningRange;
+	SpawnerType = EncounterSpawnData->SpawnerType;
+	SpawnLocationType = EncounterSpawnData->SpawnLocationType;
+	OverrideBehaviourData = EncounterSpawnData->OverrideBehaviourData;
 }
 
 void AEncounterSpawnVolume::CreateSpawnPoints()
@@ -519,7 +531,7 @@ void AEncounterSpawnVolume::SpawnEncounter(UClass* EncounterToSpawn, const FTran
 void AEncounterSpawnVolume::Respawn(AActor* DefeatedEncounter)
 {
 	CurrentSpawns.Remove(DefeatedEncounter);
-	if(SpawnerType == ESpawnerType::Infinite) {}
+	if(SpawnerType != ESpawnerType::Infinite) return;
 	
 	FTimerHandle RespawnTimer;
 	GetWorldTimerManager().SetTimer(RespawnTimer, [this] ()

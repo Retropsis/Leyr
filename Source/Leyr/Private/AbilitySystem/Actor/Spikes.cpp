@@ -3,10 +3,16 @@
 #include "AbilitySystem/Actor/Spikes.h"
 #include "Components/BoxComponent.h"
 #include "Interaction/PlayerInterface.h"
+#include "Leyr/Leyr.h"
 
 ASpikes::ASpikes()
 {
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>("BoxCollision");
+	BoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	BoxCollision->SetCollisionResponseToAllChannels(ECR_Ignore);
+	BoxCollision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	BoxCollision->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
+	BoxCollision->SetCollisionResponseToChannel(ECC_Enemy, ECR_Overlap);
 	SetRootComponent(BoxCollision);
 }
 

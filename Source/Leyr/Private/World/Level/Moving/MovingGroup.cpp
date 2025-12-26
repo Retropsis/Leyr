@@ -17,6 +17,7 @@ AMovingGroup::AMovingGroup()
 
 	Sprite = CreateDefaultSubobject<UPaperSpriteComponent>("WaterSprite");
 	Sprite->SetupAttachment(OverlapBox);
+	Sprite->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AMovingGroup::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -26,8 +27,6 @@ void AMovingGroup::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 	if (PropertyChangedEvent.Property->GetName() == TEXT("Width") || PropertyChangedEvent.Property->GetName() == TEXT("Depth"))
 	{
 		SetupWaterVolume(Width, Depth);
-		GEngine->AddOnScreenDebugMessage(-1, 95.f, FColor::Red, "PostEditChangeProperty");
-		UE_LOG(LogTemp, Warning, TEXT("Changing Width: %d - Depth: %d"), Width, Depth);
 	}
 }
 
