@@ -79,6 +79,7 @@ void AEncounterSpawnVolume::PostEditChangeProperty(struct FPropertyChangedEvent&
 	{
 		EncounterLevel = EncounterSpawnData->Level;
 		Count = EncounterSpawnData->Count;
+		SpawnPointsCount = Count;
 		RespawnTime = EncounterSpawnData->RespawnTime;
 		PreferredSpawningRange = EncounterSpawnData->PreferredSpawningRange;
 		SpawnerType = EncounterSpawnData->SpawnerType;
@@ -89,6 +90,15 @@ void AEncounterSpawnVolume::PostEditChangeProperty(struct FPropertyChangedEvent&
 	if (PropertyChangedEvent.Property->GetName() == TEXT("TileMap") && IsValid(TileMap))
 	{
 		TileMapBounds = TileMap->GetRenderComponent()->Bounds;
+	}
+	// SpawnPoint Count
+	if (PropertyChangedEvent.Property->GetName() == TEXT("SpawnPointsCount"))
+	{
+		if (SpawnPointsCount < Count)
+		{
+			SpawnPointsCount = Count;
+		} 
+		AddOrRemoveSpawnPointsByCount();
 	}
 }
 
@@ -197,9 +207,43 @@ void AEncounterSpawnVolume::UpdateSpawnPoints()
 	}
 }
 
+void AEncounterSpawnVolume::AddOrRemoveSpawnPointsByCount()
+{
+	const int32 SpawnPointsNum = SpawnPoints.Num();
+	if (SpawnPointsCount > SpawnPoints.Num())
+	{
+		for (int i = SpawnPointsNum; i < SpawnPointsCount; ++i)
+		{
+			CreateSpawnPoint(FVector{ 100.f + i * SpawnPointOffset.X, 0.f, -50.f + i * SpawnPointOffset.Y });
+		}
+		return;
+	}
+	if (SpawnPointsCount < SpawnPoints.Num())
+	{
+		for (int i = SpawnPointsCount; i <  SpawnPointsNum; ++i)
+		{
+			RemoveSpawnPoint();
+		}
+	}
+}
+
 void AEncounterSpawnVolume::AddSpawnPoint()
 {
+	SpawnPointsCount++;
 	CreateSpawnPoint(FVector{  100.f + SpawnPoints.Num() * SpawnPointOffset.X, 0.f, -50.f + SpawnPoints.Num() * SpawnPointOffset.Y });
+}
+
+void AEncounterSpawnVolume::RemoveSpawnPointAboveCount()
+{
+	SpawnPointsCount = FMath::Max(--SpawnPointsCount, Count);
+	if (SpawnPoints.Num() > SpawnPointsCount) RemoveSpawnPoint();
+}
+
+void AEncounterSpawnVolume::RemoveSpawnPoint()
+{
+	UEncounterSpawnPointComponent* SpawnPoint = SpawnPoints.Last();
+	SpawnPoints.RemoveAt(SpawnPoints.Num() - 1);
+	if (IsValid(SpawnPoint)) SpawnPoint->DestroyComponent();
 }
 
 void AEncounterSpawnVolume::RepositionSpawnPoints()
@@ -221,16 +265,6 @@ void AEncounterSpawnVolume::DropSpawnPointsToGround()
 		{
 			DropSpawnPointToGround(SpawnPoints[i]);
 		}
-	}
-}
-
-void AEncounterSpawnVolume::RemoveSpawnPointAboveCount()
-{
-	if (SpawnPoints.Num() > Count && Count > 0)
-	{
-		UEncounterSpawnPointComponent* SpawnPoint = SpawnPoints.Last();
-		SpawnPoints.RemoveAt(SpawnPoints.Num() - 1);
-		if (IsValid(SpawnPoint)) SpawnPoint->DestroyComponent();
 	}
 }
 

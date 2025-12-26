@@ -10,15 +10,11 @@
 #include "Leyr/Leyr.h"
 #include "EncounterSpawnVolume.generated.h"
 
-class USplineComponent;
 class UEncounterSpawnPointComponent;
-class APaperTileMapActor;
-class ASplineComponentActor;
 class UEncounterSpawnData;
-class AEncounterSpawnPoint;
+class USplineComponent;
 class UBoxComponent;
-
-DECLARE_MULTICAST_DELEGATE(FSplineComponentActorUpdated);
+class APaperTileMapActor;
 
 UCLASS()
 class LEYR_API AEncounterSpawnVolume : public AActor, public ISaveInterface
@@ -52,7 +48,8 @@ public:
 	
 	UFUNCTION(CallInEditor, Category="Leyr")
 	void AddSpawnPoint();
-	
+	void RemoveSpawnPoint();
+
 	UFUNCTION(CallInEditor, Category="Leyr")
 	void RepositionSpawnPoints();
 	
@@ -116,6 +113,7 @@ protected:
 
 private:
 	FBoundLocations CalculateSpawningBounds() const;
+	void AddOrRemoveSpawnPointsByCount();
 	
 	UPROPERTY(VisibleAnywhere, Category="Spawner")
 	FGameplayTag EncounterSpawnTag = FGameplayTag::EmptyTag;
@@ -160,11 +158,10 @@ private:
 	FVector FindRandomPointWithinBounds(const FVector& Origin) const;
 	TArray<UEncounterSpawnPointComponent*> FindSelectedPointAroundPlayer(const FVector& PlayerLocation) const;
 	
-	FSplineComponentActorUpdated SplineComponentActorUpdated;
-	
 	UPROPERTY(EditAnywhere, Category="Spawner") TObjectPtr<UEncounterSpawnData> EncounterSpawnData = nullptr;
 	UPROPERTY(EditAnywhere, Category="Spawner") int32 EncounterLevel = 1;
 	UPROPERTY(EditAnywhere, Category="Spawner") int32 Count = 1;
+	UPROPERTY(EditAnywhere, Category="Spawner") int32 SpawnPointsCount = 1;
 	UPROPERTY(EditAnywhere, Category="Spawner") float RespawnTime = 120.f;
 	UPROPERTY(EditAnywhere, Category="Spawner") float SpawnDelay = 1.f;
 	UPROPERTY(EditAnywhere, Category="Spawner") float PreferredSpawningRange = 750.f;
