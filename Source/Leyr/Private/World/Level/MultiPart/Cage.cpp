@@ -1,6 +1,7 @@
 // @ Retropsis 2024-2025.
 
 #include "World/Level/MultiPart/Cage.h"
+
 #include "PaperFlipbookComponent.h"
 #include "PaperSpriteComponent.h"
 #include "Components/BoxComponent.h"
@@ -8,7 +9,7 @@
 ACage::ACage()
 {
 	PrimaryActorTick.bCanEverTick = false;
-
+	
 	CageFlipbook = CreateDefaultSubobject<UPaperFlipbookComponent>("CageFlipbook");
 	CageFlipbook->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	// CageFlipbook->SetGenerateOverlapEvents(false);
@@ -34,7 +35,6 @@ ACage::ACage()
 void ACage::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
-	
 	if (PropertyChangedEvent.Property->GetName() == TEXT("CageChainLength") && IsValid(MultiPartFlipbook))
 	{
 		ConstructChain();
@@ -45,7 +45,7 @@ void ACage::ConstructChain()
 {
 	CageChainLength = FMath::Clamp(CageChainLength, 1, MultiPartFlipbook->GetNumBones());
 	CageFlipbook->AttachToComponent(MultiPartFlipbook, FAttachmentTransformRules::SnapToTargetIncludingScale, MultiPartFlipbook->GetBoneName(CageChainLength));
-	Box_Door->AttachToComponent(MultiPartFlipbook, FAttachmentTransformRules::SnapToTargetIncludingScale, MultiPartFlipbook->GetBoneName(CageChainLength));
+	Box_Door->AttachToComponent(MultiPartFlipbook, FAttachmentTransformRules::KeepRelativeTransform, MultiPartFlipbook->GetBoneName(CageChainLength));
 	RootSpriteComponent->AttachToComponent(MultiPartFlipbook, FAttachmentTransformRules::SnapToTargetIncludingScale, MultiPartFlipbook->GetBoneName(0));
 	TArray<UActorComponent*> Components;
 	GetComponents(UPaperSpriteComponent::StaticClass(), Components);

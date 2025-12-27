@@ -6,9 +6,9 @@
 #include "MultiPartActor.h"
 #include "Cage.generated.h"
 
-class UBoxComponent;
-class UPaperSpriteComponent;
 class UPaperSprite;
+class UPaperSpriteComponent;
+class UBoxComponent;
 
 UCLASS()
 class LEYR_API ACage : public AMultiPartActor
@@ -29,7 +29,7 @@ public:
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void PlayShakeEffect(float Strength, float PlayRate);
-
+	
 	UPROPERTY(BlueprintReadWrite)
 	TObjectPtr< UMaterialInstanceDynamic> DynamicSpriteInstance = nullptr;
 	

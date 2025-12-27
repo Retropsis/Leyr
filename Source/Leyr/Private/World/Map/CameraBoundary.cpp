@@ -75,6 +75,7 @@ void ACameraBoundary::PostEditChangeProperty(struct FPropertyChangedEvent& Prope
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 	
+	
 	if (PropertyChangedEvent.Property->GetName() == TEXT("LevelAreaData") && IsValid(LevelAreaData))
 	{
 		LevelAreaName = LevelAreaData->LevelAreaName;
