@@ -6,6 +6,10 @@
 #include "MultiPartActor.h"
 #include "Cage.generated.h"
 
+class UPaperSprite;
+class UPaperSpriteComponent;
+class UBoxComponent;
+
 UCLASS()
 class LEYR_API ACage : public AMultiPartActor
 {
@@ -13,6 +17,8 @@ class LEYR_API ACage : public AMultiPartActor
 
 public:
 	ACage();
+	void ConstructChain();
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	virtual void InteractHit_Implementation(AActor* InteractingActor, FName BoneName) override;
 	
 	UFUNCTION(BlueprintImplementableEvent)
@@ -29,23 +35,41 @@ public:
 	
 	UPROPERTY(BlueprintReadWrite)
 	FVector SpriteLocation = FVector::ZeroVector;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TObjectPtr<UBoxComponent> Box_Door;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TObjectPtr<UPaperFlipbookComponent> DoorFlipbook;
 
 private:
-	UPROPERTY(EditDefaultsOnly, Category="Cage")
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UPaperFlipbookComponent> CageFlipbook;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UPaperSpriteComponent> RootSpriteComponent;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UPaperSprite> ChainSprite;
+	
+	UPROPERTY(EditAnywhere, Category="Leyr", meta=(ClampMin=1))
+	int32 CageChainLength = 1;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Leyr")
 	float Health = 100.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Cage")
+	UPROPERTY(EditDefaultsOnly, Category="Leyr")
 	float FlashStrength = 1.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Cage")
+	UPROPERTY(EditDefaultsOnly, Category="Leyr")
 	float FlashDuration = 1.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Cage")
+	UPROPERTY(EditDefaultsOnly, Category="Leyr")
 	FLinearColor FlashColor = FLinearColor::Red;
 
-	UPROPERTY(EditDefaultsOnly, Category="Cage")
+	UPROPERTY(EditDefaultsOnly, Category="Leyr")
 	float ShakingStrength = 10.f;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Cage")
+	UPROPERTY(EditDefaultsOnly, Category="Leyr")
 	float ShakingDuration = 5.f;
 };
