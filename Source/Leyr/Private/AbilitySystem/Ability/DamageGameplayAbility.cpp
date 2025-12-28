@@ -221,7 +221,7 @@ void UDamageGameplayAbility::ExecuteDamageGameplayCue(FGameplayTag GameplayCueTa
 	FGameplayCueParameters GameplayCueParameters;
 	GameplayCueParameters.Location = HitLocation;
 	GameplayCueParameters.EffectCauser = GetAvatarActorFromActorInfo();
-	GameplayCueParameters.SourceObject = GameplayCueDefinition;
+	GameplayCueParameters.SourceObject = GameplayCueDefinition.Get();
 	GameplayCueParameters.AggregatedSourceTags = MontageTag.GetSingleTagContainer();
 
 	if (UAbilitySystemComponent* const AbilitySystemComponent = GetAbilitySystemComponentFromActorInfo())

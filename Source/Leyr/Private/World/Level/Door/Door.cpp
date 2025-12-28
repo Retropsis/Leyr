@@ -44,7 +44,7 @@ void ADoor::BeginPlay()
 	
 	if(IsValid(EventOwner))
 	{
-		bIsProximityDoor = false;
+		// bIsProximityDoor = false;
 		if(EventOwner->GetEventState() == EEventState::On)
 		{
 			HandleDoorState(true);
@@ -55,6 +55,8 @@ void ADoor::BeginPlay()
 		EventOwner->OnEventStateChanged.AddLambda([this] (const EEventState NewState)
 		{
 			HandleDoorState(NewState == EEventState::On);
+			OverlapBox->OnComponentBeginOverlap.RemoveAll(this);
+			OverlapBox->OnComponentEndOverlap.RemoveAll(this);
 		});
 	}
 	

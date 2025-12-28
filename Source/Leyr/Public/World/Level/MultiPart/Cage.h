@@ -17,6 +17,7 @@ class LEYR_API ACage : public AMultiPartActor
 
 public:
 	ACage();
+	virtual void BeginPlay() override;
 	void ConstructChain();
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	virtual void InteractHit_Implementation(AActor* InteractingActor, FName BoneName) override;
@@ -55,6 +56,12 @@ private:
 	UPROPERTY(EditAnywhere, Category="Leyr", meta=(ClampMin=1))
 	int32 CageChainLength = 1;
 	
+	UPROPERTY(EditAnywhere, Category="Leyr")
+	bool bFlipCageDoor = false;
+	
+	UPROPERTY(EditAnywhere, Category="Leyr")
+	bool bShouldAnimate = true;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Leyr")
 	float Health = 100.f;
 	
@@ -72,4 +79,7 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Leyr")
 	float ShakingDuration = 5.f;
+	
+	UPROPERTY(EditAnywhere, Category="Leyr")
+	TWeakObjectPtr<AActor> ItemPickup = nullptr;
 };

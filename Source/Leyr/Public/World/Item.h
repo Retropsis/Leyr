@@ -46,10 +46,13 @@ public:
 	virtual void LoadActor_Implementation() override;
 	//~ Save Interface
 	
-	UPROPERTY(EditDefaultsOnly, Category="Container|Initialization")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TObjectPtr<USphereComponent> Sphere;
+	
+	UPROPERTY(EditDefaultsOnly, Category="Leyr")
 	TObjectPtr<UDataTable> ItemDataTable;
 	
-	UPROPERTY(EditInstanceOnly, Category="Container|Initialization")
+	UPROPERTY(EditInstanceOnly, Category="Leyr")
 	FDataTableRowHandle ItemRowHandle;
 
 	UPROPERTY(BlueprintReadWrite)
@@ -85,29 +88,26 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FRotator CalculatedRotation;
  
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup Movement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Leyr")
 	bool bRotates = false;
  
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup Movement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Leyr")
 	float RotationRate = 45.f;
  
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup Movement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Leyr")
 	bool bSinusoidalMovement = false;
  	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup Movement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Leyr")
 	float SineAmplitude = 1.f;
  
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup Movement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Leyr")
 	float SinePeriodConstant = 1.f; 
  
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pickup Movement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Leyr")
 	FVector InitialLocation;
 	
 protected:
 	virtual void BeginPlay() override;
-	
-	UPROPERTY(EditDefaultsOnly)
-	TObjectPtr<USphereComponent> Sphere;
 
 private:
 	UPROPERTY() TObjectPtr<AActor> OverlappingActor;

@@ -1,7 +1,6 @@
 // @ Retropsis 2024-2025.
 
 #include "World/Level/MultiPart/Cage.h"
-
 #include "PaperFlipbookComponent.h"
 #include "PaperSpriteComponent.h"
 #include "Components/BoxComponent.h"
@@ -32,12 +31,35 @@ ACage::ACage()
 	RootSpriteComponent->SetupAttachment(MultiPartFlipbook, MultiPartFlipbook->GetBoneName(0));
 }
 
+void ACage::BeginPlay()
+{
+	Super::BeginPlay();
+	MultiPartFlipbook->SetPlayRate(bShouldAnimate ? FMath::FRandRange(0.9f, 1.1f) : 0.f);
+	MultiPartFlipbook->SetPosition(bShouldAnimate ? FMath::FRandRange(0.f, 20.f) : 0.f);
+	if (ItemPickup.IsValid())
+	{
+		ItemPickup->AttachToComponent(MultiPartFlipbook, FAttachmentTransformRules{ EAttachmentRule::KeepRelative, true }, MultiPartFlipbook->GetBoneName(CageChainLength));
+	}
+}
+
 void ACage::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 	if (PropertyChangedEvent.Property->GetName() == TEXT("CageChainLength") && IsValid(MultiPartFlipbook))
 	{
 		ConstructChain();
+	}
+	if (PropertyChangedEvent.Property->GetName() == TEXT("ItemPickup") && ItemPickup.IsValid())
+	{
+		ItemPickup->AttachToComponent(MultiPartFlipbook, FAttachmentTransformRules{ EAttachmentRule::KeepRelative, true }, MultiPartFlipbook->GetBoneName(CageChainLength));
+	}
+	if (PropertyChangedEvent.Property->GetName() == TEXT("bFlipCageDoor"))
+	{
+		Box_Door->SetRelativeLocation(FVector(56.f , 0.f, -9.f));
+		Box_Door->SetRelativeRotation(FRotator(0.f, bFlipCageDoor ? -180.f : 0.f, 0.f));
+		DoorFlipbook->SetRelativeLocation(FVector(bFlipCageDoor ? 56.f : -56.f, 50.f, 9.f));
+		DoorFlipbook->SetRelativeRotation(FRotator(0.f, bFlipCageDoor ? -180.f : 0.f, 0.f));
+		SetActorRotation(FRotator(0.f, bFlipCageDoor ? -180.f : 0.f, 0.f));
 	}
 }
 
@@ -47,6 +69,11 @@ void ACage::ConstructChain()
 	CageFlipbook->AttachToComponent(MultiPartFlipbook, FAttachmentTransformRules::SnapToTargetIncludingScale, MultiPartFlipbook->GetBoneName(CageChainLength));
 	Box_Door->AttachToComponent(MultiPartFlipbook, FAttachmentTransformRules::KeepRelativeTransform, MultiPartFlipbook->GetBoneName(CageChainLength));
 	RootSpriteComponent->AttachToComponent(MultiPartFlipbook, FAttachmentTransformRules::SnapToTargetIncludingScale, MultiPartFlipbook->GetBoneName(0));
+	Box_Door->SetRelativeLocation(FVector(56.f , 0.f, -9.f));
+	Box_Door->SetRelativeRotation(FRotator(0.f, bFlipCageDoor ? -180.f : 0.f, 0.f));
+	DoorFlipbook->SetRelativeLocation(FVector(bFlipCageDoor ? 56.f : -56.f, 50.f, 9.f));
+	DoorFlipbook->SetRelativeRotation(FRotator(0.f, bFlipCageDoor ? -180.f : 0.f, 0.f));
+	SetActorRotation(FRotator(0.f, bFlipCageDoor ? -180.f : 0.f, 0.f));
 	TArray<UActorComponent*> Components;
 	GetComponents(UPaperSpriteComponent::StaticClass(), Components);
 	// MoveTemp(Components);
