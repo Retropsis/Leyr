@@ -40,6 +40,17 @@ void AMultiPartActor::HandleOnHit(const FHitResult& HitResult)
 void AMultiPartActor::ResetState_Implementation()
 {
 	SetActorLocation(StartLocation);
+
+	if (!IsValid(MPAToRespawnClass)) return;
+	
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	if (AMultiPartActor* NewSpawn = GetWorld()->SpawnActor<AMultiPartActor>(MPAToRespawnClass, SpawnParameters))
+	{
+		NewSpawn->SetActorLocation(StartLocation);
+		NewSpawn->StartLocation = StartLocation;
+	}
+	Destroy();
 }
 
 void AMultiPartActor::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

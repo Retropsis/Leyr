@@ -110,6 +110,9 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+	UPROPERTY(EditDefaultsOnly, Category = "Leyr")
+	TArray<FName> RoomsToUnveil;
+	
 	UPROPERTY() TObjectPtr<AActor> OverlappingActor;
 	UPROPERTY(SaveGame) bool bPickedUp = false;
 	

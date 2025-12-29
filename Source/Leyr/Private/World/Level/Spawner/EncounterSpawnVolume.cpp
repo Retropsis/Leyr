@@ -48,28 +48,6 @@ AEncounterSpawnVolume::AEncounterSpawnVolume()
 	DespawningBounds->ShapeColor = FColor::Red;
 }
 
-void AEncounterSpawnVolume::OnConstruction(const FTransform& Transform)
-{
-	Super::OnConstruction(Transform);
-
-	// if (IsValid(EncounterSpawnData) && IsValid(EncounterSpawnData->EncounterData) && IsValid(EncounterSpawnData->EncounterData->BehaviourData))
-	// {
-	// 	EncounterSpawnData->EncounterData->BehaviourData->OnMovementTypePropertyChanged.RemoveAll(EncounterSpawnData->EncounterData->BehaviourData);
-	// 	EncounterSpawnData->EncounterData->BehaviourData->OnMovementTypePropertyChanged.AddLambda([&] (const EMovementType MovementType)
-	// 	{
-	// 		if (MovementType == EMovementType::Spline)
-	// 		{
-	// 			CreateSplineComponentActor();
-	// 		}
-	// 		else if (IsValid(SplineComponentActor))
-	// 		{
-	// 			SplineComponentActor->Destroy();
-	// 			SplineComponentActor = nullptr;
-	// 		}
-	// 	});
-	// }
-}
-
 void AEncounterSpawnVolume::PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -469,6 +447,17 @@ void AEncounterSpawnVolume::RemoveSplineComponent() const
  */
 void AEncounterSpawnVolume::SpawnEncounterGroup()
 {
+	if (!IsValid(EncounterSpawnData))
+	{
+		UE_LOG(LogTemp, Error, TEXT("EncounterSpawnData is NULL"));
+		return;
+	}
+	if (!IsValid(EncounterSpawnData->EncounterData))
+	{
+		UE_LOG(LogTemp, Error, TEXT("EncounterSpawnData EncounterData is NULL"));
+		return;
+	}
+	
 	if (EncounterSpawnData->EncounterData->EncounterClass.Get() == nullptr)
 	{
 		UAssetManager::GetStreamableManager().RequestAsyncLoad(EncounterSpawnData->EncounterData->EncounterClass.ToSoftObjectPath(), [this] ()

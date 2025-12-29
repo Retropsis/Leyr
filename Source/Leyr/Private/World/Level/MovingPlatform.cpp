@@ -24,7 +24,7 @@ AMovingPlatform::AMovingPlatform()
 void AMovingPlatform::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
-	if(RouteSpline == nullptr) return;
+	if(!IsValid(RouteSpline)) return;
 	for (int i = 0; i < RouteSpline->GetNumberOfSplinePoints(); ++i)
 	{
 		RouteSpline->SetSplinePointType(i, ESplinePointType::Linear);

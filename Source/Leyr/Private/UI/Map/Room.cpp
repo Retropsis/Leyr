@@ -44,6 +44,8 @@ void URoom::UnveilingRoom(const FIntPoint& PlayerCoordinates, const FRoomData& R
 {
 	for (const TTuple<FIntPoint, URoomTile*>& RoomTile : RoomTiles)
 	{		
+		// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Orange, FString::Printf(TEXT("Unveiling tile (x:%d, y:%d) for room: %s"), RoomTile.Key.X, RoomTile.Key.Y, *RoomData.RoomName.ToString()));
+		
 		if (RoomData.Subdivisions.Contains(RoomTile.Key) && RoomData.Subdivisions.Find(RoomTile.Key)->SubdivisionState == ESubdivisionState::Unexplored)
 		{
 			RoomTile.Value->UnveilRoomTile();
@@ -59,6 +61,7 @@ void URoom::UnveilingRoom(const FIntPoint& PlayerCoordinates, const FRoomData& R
 			}
 		}
 	}
+	HandleUnveilAnimation();
 }
 
 void URoom::LeavingRoom(const FIntPoint& PlayerCoordinates, const FRoomData& RoomData)

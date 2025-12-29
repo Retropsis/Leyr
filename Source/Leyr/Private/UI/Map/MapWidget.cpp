@@ -62,15 +62,19 @@ void UMapWidget::EnteringRoom(const FRoomData& RoomData, const ERoomUpdateType& 
 			Room->EnteringRoom(PlayerCoordinates, RoomData);
 		}
 
-		UCanvasPanelSlot* RoomCPS = UWidgetLayoutLibrary::SlotAsCanvasSlot(Room);
-		const FVector2D CurrentRoomTilePosition = Room->GetOriginalPositionInCanvas() + RoomCPS->GetSize() / 2.f;
-		// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Magenta, FString::Printf(TEXT("%s"), *RoomCPS->GetSize().ToString()));
-		FTimerHandle InterpTimer;
-		GetWorld()->GetTimerManager().SetTimer(InterpTimer, [this, UpdateType, CurrentRoomTilePosition] ()
-		{
-			StartInterpolation(CurrentRoomTilePosition);
-		}, .05f, false);
+		InterpolateMinimapToCenter(UpdateType, Room);
 	}
+}
+
+void UMapWidget::InterpolateMinimapToCenter(const ERoomUpdateType& UpdateType, URoom* Room)
+{
+	const UCanvasPanelSlot* RoomCPS = UWidgetLayoutLibrary::SlotAsCanvasSlot(Room);
+	const FVector2D CurrentRoomTilePosition = Room->GetOriginalPositionInCanvas() + RoomCPS->GetSize() / 2.f;
+	FTimerHandle InterpTimer;
+	GetWorld()->GetTimerManager().SetTimer(InterpTimer, [this, UpdateType, CurrentRoomTilePosition] ()
+	{
+		StartInterpolation(CurrentRoomTilePosition);
+	}, .05f, false);
 }
 
 void UMapWidget::LeavingRoom(const FRoomData& RoomData, const FIntPoint& PlayerCoordinates)
@@ -83,11 +87,25 @@ void UMapWidget::LeavingRoom(const FRoomData& RoomData, const FIntPoint& PlayerC
 	}
 }
 
+void UMapWidget::UnveilRoom(const FRoomData& RoomData)
+{
+	if (!Rooms.Contains(RoomData.RoomName))
+	{
+		UE_LOG(LogTemp, Error, TEXT("Room Tile name %s not found"), *RoomData.RoomName.ToString());
+		return;
+	}
+	
+	if (URoom* Room = *Rooms.Find(RoomData.RoomName))
+	{
+		Room->UnveilingRoom(FIntPoint(-1, -1), RoomData);
+	}
+}
+
 void UMapWidget::UpdateRoomTileAt(const FRoomData& RoomData, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates)
 {
 	if (!Rooms.Contains(RoomData.RoomName))
 	{
-		UE_LOG(LogTemp, Error, TEXT("Room name %s not found"), *RoomData.RoomName.ToString());
+		UE_LOG(LogTemp, Error, TEXT("Room Tile name %s not found"), *RoomData.RoomName.ToString());
 		return;
 	}
 	

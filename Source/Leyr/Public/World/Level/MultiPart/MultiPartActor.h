@@ -64,6 +64,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<USoundBase> ImpactSound;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AMultiPartActor> MPAToRespawnClass;
 	
 private:
 	FVector StartLocation;

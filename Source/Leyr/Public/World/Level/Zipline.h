@@ -21,6 +21,10 @@ public:
 	AZipline();
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void ChooseNextStep() override;
+	
+	//~ LevelActorInterface
+	virtual void ResetState_Implementation() override;
+	//~ LevelActorInterface
 
 	UPROPERTY(BlueprintAssignable) FOnZiplineFalling OnTrolleyFalling;
 	UPROPERTY(BlueprintAssignable) FOnZiplineRespawn OnTrolleyRespawn;
@@ -30,12 +34,11 @@ protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
 	virtual void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	virtual void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
-	// virtual void HandleIgnoreCollisionEnd() override;
 
 	void HandleOverlapWaitTimeEnd();
 	void HandleRespawnTimeEnd();
 	void HandleFallingTimeEnd();
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Platform|Trolley")
 	bool bIsSingleUse = false;
 	
@@ -55,4 +58,6 @@ private:
 	FTimerHandle OverlapWaitTimer;
 	FTimerHandle RespawnTimer;
 	FTimerHandle FallingTimer;
+	bool bHasReachedTarget = false;
+	bool bHasEndedOverlap = false;
 };

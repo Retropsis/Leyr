@@ -57,6 +57,7 @@ void UMapComponent::ConstructMapRooms()
 
 			if (Data.RoomName.IsNone()) continue;
 			
+			UE_LOG(LogTemp, Warning, TEXT("Room created-> Name: %s"), *Data.RoomName.ToString());
 			// UE_LOG(LogTemp, Warning, TEXT("Room created-> Name: %s size: (w%d, h%d), coords: (x%d, y%d) Type: %s"), *Data.RoomName.ToString(), Data.RoomSize.X, Data.RoomSize.Y, Data.RoomCoordinates.X, Data.RoomCoordinates.Y, *UEnum::GetValueAsString(Data.RoomType));
 			
 			Rooms.Add(Data.RoomName, Data);
@@ -70,15 +71,21 @@ void UMapComponent::EnteringRoom(const FName& RoomName, const ERoomUpdateType& U
 	
 	const ERoomUpdateType NewState = !IsRoomUnveiled(RoomName) ? ERoomUpdateType::Unveiling : UpdateType;
 	UnveilRoom(RoomName);
+	
 	const FRoomData RoomData = *Rooms.Find(RoomName);
 	const FIntPoint RoomCoordinates = RoomData.RoomCoordinates;
+	// ExploreRoomTile(RoomName, PlayerCoordinates);
+	UpdateRoomAt(RoomName, NewState, PlayerCoordinates);
 	MapWidget->EnteringRoom(RoomData, NewState, PlayerCoordinates);
 	
-	ExploreRoomTile(RoomName, PlayerCoordinates);
+	StartTrackingPlayerRoomCoordinates(RoomName, RoomCoordinates);
+}
 
+void UMapComponent::StartTrackingPlayerRoomCoordinates(const FName& RoomName, const FIntPoint RoomCoordinates)
+{
 	GetWorld()->GetTimerManager().ClearTimer(TrackingPlayerTimer);
 	TrackingPlayerTimer.Invalidate();
-	GetWorld()->GetTimerManager().SetTimer(TrackingPlayerTimer, [this, RoomName, RoomCoordinates] ()
+	GetWorld()->GetTimerManager().SetTimer(TrackingPlayerTimer, [this,  RoomName, RoomCoordinates] ()
 	{
 		TrackPlayerRoomCoordinates(RoomName, RoomCoordinates);
 	}, 1.f, true);
@@ -93,14 +100,14 @@ void UMapComponent::LeavingRoom(const FName& RoomName, const FIntPoint& PlayerCo
 
 void UMapComponent::TrackPlayerRoomCoordinates(const FName& RoomName, const FIntPoint& RoomCoordinates)
 {
-	if (!PlayerCharacter.IsValid()) return;
-	
 	const FIntPoint PlayerCoordinates = GetPlayerRoomCoordinates(RoomCoordinates);
 	UpdateRoomAt(RoomName, ERoomUpdateType::Entering, PlayerCoordinates);
 }
 
 FIntPoint UMapComponent::GetPlayerRoomCoordinates(const FIntPoint& RoomCoordinates) const
 {
+	if (!PlayerCharacter.IsValid()) return FIntPoint();
+	
 	const FIntPoint PlayerWorldCoordinates{ FMath::TruncToInt32(PlayerCharacter->GetActorLocation().X / 1280.f), FMath::TruncToInt32( PlayerCharacter->GetActorLocation().Z / 768.f) };
 	return FIntPoint{ FMath::Abs(PlayerWorldCoordinates.X - RoomCoordinates.X), FMath::Abs(PlayerWorldCoordinates.Y - RoomCoordinates.Y)  };
 }
@@ -192,6 +199,23 @@ void UMapComponent::UnveilRoom(const FName& RoomName)
 			{
 				Subdivision.Value.SubdivisionState = ESubdivisionState::Unexplored;
 			}
+		}
+	}
+}
+
+void UMapComponent::UnveilRooms(const TArray<FName>& RoomNames)
+{
+	for (int i = 0; i < RoomNames.Num(); ++i)
+	{
+		FName RoomName = RoomNames[i];
+		UnveilRoom(RoomName);
+		if (Rooms.Contains(RoomName))
+		{
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, RoomName] ()
+			{
+				MapWidget->UnveilRoom(*Rooms.Find(RoomName));
+			}, (i * UnveilRoomAnimationDelay) + UnveilRoomAnimationFirstDelay, false);
 		}
 	}
 }

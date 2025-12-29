@@ -16,7 +16,6 @@ class LEYR_API URoomTile : public UCommonUserWidget
 	GENERATED_BODY()
 	
 public:
-	// virtual void NativeOnInitialized() override;
 
 	void UpdateRoomTile(const ERoomUpdateType& UpdateType);
 	
@@ -45,7 +44,13 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void HandleRevealAnimation();
 
+protected:
+	virtual void NativeConstruct() override;
+
 private:
+	UPROPERTY(EditDefaultsOnly, Category ="Map")
+	float BorderSize = 4.f;
+	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_Room;
 	
@@ -92,7 +97,25 @@ private:
 	FSlateBrush Brush_Border_H;
 	
 	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateBrush Brush_Border_H_L;
+	
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateBrush Brush_Border_H_R;
+	
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateBrush Brush_Border_H_LR;
+	
+	UPROPERTY(EditAnywhere, Category="Map")
 	FSlateBrush Brush_Border_V;
+	
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateBrush Brush_Border_V_T;
+	
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateBrush Brush_Border_V_B;
+	
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateBrush Brush_Border_V_TB;
 	
 	UPROPERTY(EditAnywhere, Category="Map")
 	FSlateBrush Brush_DoorBorder_H;

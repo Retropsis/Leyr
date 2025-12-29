@@ -23,7 +23,6 @@ class LEYR_API AEncounterSpawnVolume : public AActor, public ISaveInterface
 	
 public:	
 	AEncounterSpawnVolume();
-	virtual void OnConstruction(const FTransform& Transform) override;
 
 	virtual void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent) override;
 	

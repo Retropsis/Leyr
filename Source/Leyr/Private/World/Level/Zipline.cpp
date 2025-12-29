@@ -40,32 +40,41 @@ void AZipline::BeginPlay()
 
 void AZipline::ChooseNextStep()
 {
+	bHasReachedTarget = true;
 	if(bIsSingleUse) SetLifeSpan(3.f);
-	if (const UWorld* World = GetWorld())
+	
+	if(bShouldCollapse)
 	{
-		if(bShouldCollapse)
-		{
-			World->GetTimerManager().SetTimer(FallingTimer, this, &AZipline::HandleFallingTimeEnd, FallingTime);
-			BoxCollision->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-			BoxCollision->SetSimulatePhysics(true);
-			BoxCollision->SetEnableGravity(true);
-		}
-		else
-		{
-			World->GetTimerManager().SetTimer(RespawnTimer, this, &AZipline::HandleRespawnTimeEnd, RespawnTime);
-		}
+		GetWorld()->GetTimerManager().SetTimer(FallingTimer, this, &AZipline::HandleFallingTimeEnd, FallingTime);
+		BoxCollision->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+		BoxCollision->SetSimulatePhysics(true);
+		BoxCollision->SetEnableGravity(true);
+	}
+	else if (bHasEndedOverlap)
+	{
+		GetWorld()->GetTimerManager().SetTimer(RespawnTimer, this, &AZipline::HandleRespawnTimeEnd, RespawnTime);
 	}
 	
 	if(OverlapWaitTimer.IsValid()) OverlapWaitTimer.Invalidate();
+}
+
+void AZipline::ResetState_Implementation()
+{
+	Super::ResetState_Implementation();
+	BoxCollision->SetRelativeLocation(FVector::ZeroVector);
+	bIsActivated = false;
+	bHasReachedTarget = false;
+	bHasEndedOverlap = false;
+	CurrentIndex = 1;
 }
 
 void AZipline::OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if(OtherComp && OtherComp->ComponentHasTag("RopeCollision"))
 	{
-		if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(OverlapWaitTimer, this, &AZipline::HandleOverlapWaitTimeEnd, OverlapWaitTime);
+		GetWorld()->GetTimerManager().SetTimer(OverlapWaitTimer, this, &AZipline::HandleOverlapWaitTimeEnd, OverlapWaitTime);
 		BoxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		const FVector Location{BoxCollision->GetComponentLocation().X, 0.f, BoxCollision->GetComponentLocation().Z};
+		const FVector Location{ BoxCollision->GetComponentLocation().X, 0.f, BoxCollision->GetComponentLocation().Z };
 		if(OtherActor && !OtherActor->IsAttachedTo(this)) OtherActor->AttachToComponent(BoxCollision, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		IPlayerInterface::Execute_HandleHangingOnHook(OtherActor, Location, false);
 	}
@@ -75,13 +84,18 @@ void AZipline::OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* Ot
 {
 	if(OtherComp && OtherComp->ComponentHasTag("RopeCollision"))
 	{
- 		IPlayerInterface::Execute_HandleHangingOnHook(OtherActor, FVector::ZeroVector, true);
+		IPlayerInterface::Execute_HandleHangingOnHook(OtherActor, FVector::ZeroVector, true);
+		bHasEndedOverlap = true;
+		if (bHasReachedTarget)
+		{
+			GetWorld()->GetTimerManager().SetTimer(RespawnTimer, this, &AZipline::HandleRespawnTimeEnd, RespawnTime);
+		}
 	}
 }
 
 void AZipline::HandleFallingTimeEnd()
 {
-	if(const UWorld* World = GetWorld()) World->GetTimerManager().SetTimer(RespawnTimer, this, &AZipline::HandleRespawnTimeEnd, RespawnTime);
+	GetWorld()->GetTimerManager().SetTimer(RespawnTimer, this, &AZipline::HandleRespawnTimeEnd, RespawnTime);
 	if(FallingTimer.IsValid()) FallingTimer.Invalidate();
 	OnTrolleyFalling.Broadcast();
 }

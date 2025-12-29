@@ -19,10 +19,12 @@ public:
 	UMapComponent();
 	void ConstructMapWidget();
 	void ConstructMapRooms();
+	void StartTrackingPlayerRoomCoordinates(const FName& RoomName, FIntPoint RoomCoordinates);
 	void EnteringRoom(const FName& RoomName, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates);
 	void LeavingRoom(const FName& RoomName, const FIntPoint& PlayerCoordinates);
 	void UpdateRoomAt(const FName& RoomName, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates);
 	void RevealHiddenWall(const FName& RoomName, const FIntPoint& RoomCoordinates, ESubdivisionSide Side);
+	void UnveilRooms(const TArray<FName>& RoomNames);
 	
 	UFUNCTION(BlueprintCallable, Category="Map")
 	UMapWidget* GetMapWidget() const { return MapWidget; }
@@ -44,6 +46,12 @@ private:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Map")
 	TSubclassOf<UMapWidget> MapWidgetClass;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Map")
+	float UnveilRoomAnimationFirstDelay = .05f;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Map")
+	float UnveilRoomAnimationDelay = .1f;
 
 	UPROPERTY()
 	TObjectPtr<UMapWidget> MapWidget;

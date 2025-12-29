@@ -3,6 +3,12 @@
 #include "UI/Map/RoomTile.h"
 #include "Components/Image.h"
 
+void URoomTile::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+}
+
 void URoomTile::UpdateRoomTile(const ERoomUpdateType& UpdateType)
 {	
 	switch (UpdateType) {
@@ -107,22 +113,34 @@ void URoomTile::SetBorders(const FIntPoint& Coordinates, const FIntPoint& Size) 
 {
 	if (Coordinates.X == 1)
 	{
-		Image_BorderLeft->SetBrush(Brush_Border_V);
+		if (Coordinates.Y == 1 && Coordinates.Y == Size.Y) Image_BorderLeft->SetBrush(Brush_Border_V_TB);
+		else if (Coordinates.Y == 1) Image_BorderLeft->SetBrush(Brush_Border_V_T);
+		else if (Coordinates.Y == Size.Y) Image_BorderLeft->SetBrush(Brush_Border_V_B);
+		else Image_BorderLeft->SetBrush(Brush_Border_V);
 		Image_BorderLeft->SetVisibility(ESlateVisibility::Visible);
 	}
 	if (Coordinates.X == Size.X)
 	{
-		Image_BorderRight->SetBrush(Brush_Border_V);
+		if (Coordinates.Y == 1 && Coordinates.Y == Size.Y) Image_BorderRight->SetBrush(Brush_Border_V_TB);
+		else if (Coordinates.Y == 1) Image_BorderRight->SetBrush(Brush_Border_V_T);
+		else if (Coordinates.Y == Size.Y) Image_BorderRight->SetBrush(Brush_Border_V_B);
+		else Image_BorderRight->SetBrush(Brush_Border_V);
 		Image_BorderRight->SetVisibility(ESlateVisibility::Visible);
 	}
 	if (Coordinates.Y == Size.Y)
 	{
-		Image_BorderBottom->SetBrush(Brush_Border_H);
+		if (Coordinates.X == 1 && Coordinates.X == Size.X) Image_BorderBottom->SetBrush(Brush_Border_H_LR);
+		else if (Coordinates.X == 1) Image_BorderBottom->SetBrush(Brush_Border_H_L);
+		else if (Coordinates.X == Size.X) Image_BorderBottom->SetBrush(Brush_Border_H_R);
+		else Image_BorderBottom->SetBrush(Brush_Border_H);
 		Image_BorderBottom->SetVisibility(ESlateVisibility::Visible);
 	}
 	if (Coordinates.Y == 1)
 	{
-		Image_BorderTop->SetBrush(Brush_Border_H);
+		if (Coordinates.X == 1 && Coordinates.X == Size.X) Image_BorderTop->SetBrush(Brush_Border_H_LR);
+		else if (Coordinates.X == 1) Image_BorderTop->SetBrush(Brush_Border_H_L);
+		else if (Coordinates.X == Size.X) Image_BorderTop->SetBrush(Brush_Border_H_R);
+		else Image_BorderTop->SetBrush(Brush_Border_H);
 		Image_BorderTop->SetVisibility(ESlateVisibility::Visible);
 	}
 }

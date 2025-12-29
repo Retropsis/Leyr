@@ -449,7 +449,6 @@ void UInventoryWidgetController::UseItem(const FInventoryItemData& Item, int32& 
 	if (AbilitySystemComponent && Item.Asset.Get()->AbilitySet)
 	{
 		FGameplayAbilitySpecHandle AbilitySpecHandle = Item.Asset.Get()->AbilitySet->ActivateMenuAbility(AbilitySystemComponent, Item.Asset.Get());
-		
 	}
 }
 

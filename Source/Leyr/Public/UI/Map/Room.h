@@ -29,6 +29,9 @@ public:
 	ERoomType GetRoomType() const { return RoomType; }
 	void SetOriginalPositionInCanvas(const FVector2D Position) { OriginalPositionInCanvas = Position; }
 	FVector2D GetOriginalPositionInCanvas() const { return OriginalPositionInCanvas; }
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void HandleUnveilAnimation();
 	
 private:
 	UPROPERTY(meta=(BindWidget))
