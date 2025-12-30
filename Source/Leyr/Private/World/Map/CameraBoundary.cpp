@@ -15,7 +15,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "UI/Component/MapComponent.h"
-#include "World/Item.h"
+#include "World/Item/Item.h"
 #include "World/Data/CameraData.h"
 #include "World/Level/Door/EntranceMarker.h"
 #include "World/Level/Moving/WaterGroup.h"

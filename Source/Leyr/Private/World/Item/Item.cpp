@@ -1,6 +1,6 @@
 // @ Retropsis 2024-2025.
 
-#include "World/Item.h"
+#include "World/Item/Item.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "PaperFlipbookComponent.h"
@@ -10,7 +10,7 @@
 #include "Interaction/InventoryInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "UI/Component/MapComponent.h"
+#include "Leyr/Leyr.h"
 
 AItem::AItem()
 {
@@ -21,6 +21,8 @@ AItem::AItem()
 	SetRootComponent(Sphere);
 	// Sphere->SetupAttachment(GetRootComponent());
 	Sphere->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	Sphere->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	Sphere->SetCollisionObjectType(ECC_Interaction);
 	
 	GetRenderComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetRenderComponent()->SetupAttachment(GetRootComponent());
@@ -151,13 +153,6 @@ void AItem::Interact_Implementation(AActor* InteractingActor)
 		Sphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 		GetRenderComponent()->SetVisibility(false);
 		bPickedUp = true;
-	}
-	if (const APlayerController* PlayerController = Cast<APlayerController>(InteractingActor->GetInstigatorController()))
-	{
-		if (UMapComponent* MapComponent = PlayerController->FindComponentByClass<UMapComponent>())
-		{
-			MapComponent->UnveilRooms(RoomsToUnveil);
-		}
 	}
 }
 

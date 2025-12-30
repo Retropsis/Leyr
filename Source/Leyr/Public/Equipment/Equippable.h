@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "EquipmentData.h"
 #include "Interaction/EquipmentInterface.h"
-#include "World/Item.h"
+#include "World/Item/Item.h"
 #include "Equippable.generated.h"
 
 /**

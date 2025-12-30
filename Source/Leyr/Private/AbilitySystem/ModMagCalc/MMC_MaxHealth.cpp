@@ -34,7 +34,7 @@ float UMMC_MaxHealth::CalculateBaseMagnitude_Implementation(const FGameplayEffec
 	}
 	// return /*80.f + */2.5f * Vitality + 10.f * CharacterLevel;
 	// GEngine->AddOnScreenDebugMessage(-1, 999.f, FColor::Magenta, FString::Printf(TEXT("[%s] Vitality[%f] CharacterLevel[%d] = [%f]"), *Spec.GetContext().GetSourceObject()->GetName(), Vitality, CharacterLevel, Vitality * CharacterLevel * 10.f));
-	return Vitality * CharacterLevel * 10.f;
+	return Vitality * 10.f +  CharacterLevel * 10.f;
 	/*
 	 * Less than 10HP = (1 * 1 + 5 * 1 = 6) 10HP
 	 * 100HP, 10 Vit, Level 1 (Level 1 * 10 Vit * 10)

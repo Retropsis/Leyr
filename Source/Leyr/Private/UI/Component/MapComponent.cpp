@@ -88,6 +88,7 @@ void UMapComponent::StartTrackingPlayerRoomCoordinates(const FName& RoomName, co
 	GetWorld()->GetTimerManager().SetTimer(TrackingPlayerTimer, [this,  RoomName, RoomCoordinates] ()
 	{
 		TrackPlayerRoomCoordinates(RoomName, RoomCoordinates);
+		GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Green, FString::Printf(TEXT("Tracking Tile: (x: %d, y: %d)"), RoomCoordinates.X, RoomCoordinates.Y));
 	}, 1.f, true);
 }
 
@@ -109,6 +110,7 @@ FIntPoint UMapComponent::GetPlayerRoomCoordinates(const FIntPoint& RoomCoordinat
 	if (!PlayerCharacter.IsValid()) return FIntPoint();
 	
 	const FIntPoint PlayerWorldCoordinates{ FMath::TruncToInt32(PlayerCharacter->GetActorLocation().X / 1280.f), FMath::TruncToInt32( PlayerCharacter->GetActorLocation().Z / 768.f) };
+	GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Cyan, FString::Printf(TEXT("Tracking Player at: (x: %d, y: %d)"), PlayerWorldCoordinates.X, PlayerWorldCoordinates.Y));
 	return FIntPoint{ FMath::Abs(PlayerWorldCoordinates.X - RoomCoordinates.X), FMath::Abs(PlayerWorldCoordinates.Y - RoomCoordinates.Y)  };
 }
 

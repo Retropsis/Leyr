@@ -348,6 +348,15 @@ void UBaseAbilitySystemComponent::ServerEquipAbility_Implementation(const FGamep
 	}
 }
 
+void UBaseAbilitySystemComponent::ServerUpgradeAttributeFromItem_Implementation(const FGameplayTag& AttributeTag)
+{
+	FGameplayEventData Payload;
+	Payload.EventTag = AttributeTag;
+	Payload.EventMagnitude = 1.f;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetAvatarActor(), AttributeTag, Payload);
+}
+
 void UBaseAbilitySystemComponent::ServerUpgradeAttribute_Implementation(const FGameplayTag& AttributeTag)
 {
 	FGameplayEventData Payload;
@@ -358,7 +367,7 @@ void UBaseAbilitySystemComponent::ServerUpgradeAttribute_Implementation(const FG
 
 	if (GetAvatarActor()->Implements<UPlayerInterface>())
 	{
-		IPlayerInterface::Execute_AddToAttributePoints(GetAvatarActor(), -1);
+		IPlayerInterface::Execute_AddToAttributePoints(GetAvatarActor(), - 1);
 	}
 }
 

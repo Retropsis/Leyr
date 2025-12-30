@@ -39,8 +39,10 @@ public:
 	UFUNCTION()
 	void HandleOnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	
+	//~ Interaction Interface
 	virtual void Interact_Implementation(AActor* InteractingActor) override;
 	virtual bool ShouldDespawn_Implementation() override { return bShouldDespawn; }
+	//~ Interaction Interface
 	
 	//~ Save Interface
 	virtual void LoadActor_Implementation() override;
@@ -109,10 +111,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-private:
-	UPROPERTY(EditDefaultsOnly, Category = "Leyr")
-	TArray<FName> RoomsToUnveil;
-	
+private:	
 	UPROPERTY() TObjectPtr<AActor> OverlappingActor;
 	UPROPERTY(SaveGame) bool bPickedUp = false;
 	

@@ -46,9 +46,12 @@ public:
 	
 	void UpdateAbilityStatuses(int32 Level);
 	void UpgradeAttribute(const FGameplayTag& AttributeTag);
-
+	
 	UFUNCTION(Server, Reliable)
 	void ServerUpgradeAttribute(const FGameplayTag& AttributeTag);
+
+	UFUNCTION(Server, Reliable)
+	void ServerUpgradeAttributeFromItem(const FGameplayTag& AttributeTag);
 	
 	UFUNCTION(Server, Reliable)
 	void ServerSpendSkillPoint(const FGameplayTag& AbilityTag);

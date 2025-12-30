@@ -23,7 +23,7 @@
 #include "Player/PlayerCharacterState.h"
 #include "UI/PlayerHUD.h"
 #include "UI/Controller/WidgetController.h"
-#include "World/Item.h"
+#include "World/Item/Item.h"
 
 /*
  * Widget Controllers
