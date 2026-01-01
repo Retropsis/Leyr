@@ -60,7 +60,7 @@ void UMapComponent::ConstructMapRooms()
 			if (Data.RoomName.IsNone()) continue;
 			
 			// UE_LOG(LogTemp, Warning, TEXT("Room created-> Name: %s"), *Data.RoomName.ToString());
-			UE_LOG(LogTemp, Warning, TEXT("Room created-> Name: %s size: (w%d, h%d), coords: (x%d, y%d) Type: %s"), *Data.RoomName.ToString(), Data.RoomSize.X, Data.RoomSize.Y, Data.RoomCoordinates.X, Data.RoomCoordinates.Y, *UEnum::GetValueAsString(Data.RoomType));
+			// UE_LOG(LogTemp, Warning, TEXT("Room created-> Name: %s size: (w%d, h%d), coords: (x%d, y%d) Type: %s"), *Data.RoomName.ToString(), Data.RoomSize.X, Data.RoomSize.Y, Data.RoomCoordinates.X, Data.RoomCoordinates.Y, *UEnum::GetValueAsString(Data.RoomType));
 			
 			Rooms.Add(Data.RoomName, Data);
 		}
@@ -78,8 +78,8 @@ void UMapComponent::EnteringRoom(const FName& RoomName, const ERoomUpdateType& U
 	const FRoomData RoomData = *Rooms.Find(RoomName);
 	// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Green, FString::Printf(TEXT("RoomCoordinates: (x: %d, y: %d)"), RoomCoordinates.X, RoomCoordinates.Y));
 	// ExploreRoomTile(RoomName, PlayerCoordinates);
-	UpdateRoomAt(RoomName, NewState, PlayerCoordinates);
 	MapWidget->EnteringRoom(RoomData, NewState, PlayerCoordinates);
+	UpdateRoomAt(RoomName, NewState, UWorldUtility::GetPlayerRoomCoordinates(PlayerCharacter->GetActorLocation(), RoomData.RoomLocation));
 	StartTrackingPlayerRoomCoordinates(RoomName, RoomData.RoomLocation);
 }
 
@@ -103,7 +103,7 @@ void UMapComponent::LeavingRoom(const FName& RoomName, const FIntPoint& PlayerCo
 
 void UMapComponent::TrackPlayerRoomCoordinates(const FName& RoomName, const FVector& RoomLocation)
 {
-	const FIntPoint PlayerCoordinates =UWorldUtility::GetPlayerRoomCoordinates(PlayerCharacter->GetActorLocation(), RoomLocation);
+	const FIntPoint PlayerCoordinates = UWorldUtility::GetPlayerRoomCoordinates(PlayerCharacter->GetActorLocation(), RoomLocation);
 	// const FIntPoint PlayerCoordinates = GetPlayerRoomCoordinates(RoomCoordinates);
 	UpdateRoomAt(RoomName, ERoomUpdateType::Entering, PlayerCoordinates);
 }
