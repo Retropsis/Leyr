@@ -81,11 +81,12 @@ struct FRoomData
 {
 	GENERATED_BODY()
 	FRoomData() {}
-	FRoomData(const FName& Name, const FIntPoint& Coordinates,  const FIntPoint& Size, const ERoomType Type, const TMap<FIntPoint, FSubdivision>& Divisions) :
-		RoomName(Name), RoomCoordinates(Coordinates), RoomSize(Size), RoomType(Type), Subdivisions(Divisions) {}
+	FRoomData(const FName& Name, const FVector& Location, const FIntPoint& Coordinates,  const FIntPoint& Size, const ERoomType Type, const TMap<FIntPoint, FSubdivision>& Divisions) :
+		RoomName(Name), RoomLocation(Location), RoomCoordinates(Coordinates), RoomSize(Size), RoomType(Type), Subdivisions(Divisions) {}
 
 	UPROPERTY() FGameplayTag RegionTag = FBaseGameplayTags::Get().Map_Region_Dorn;
 	UPROPERTY() FName RoomName = FName();
+	UPROPERTY() FVector RoomLocation = FVector::ZeroVector;
 	UPROPERTY() FIntPoint RoomCoordinates = FIntPoint();
 	UPROPERTY() FIntPoint RoomSize = FIntPoint();
 	UPROPERTY() ERoomType RoomType = ERoomType::None;

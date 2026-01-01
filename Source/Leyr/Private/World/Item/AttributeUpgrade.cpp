@@ -1,8 +1,8 @@
 // @ Retropsis 2024-2025.
 
+#include "World/Item/AttributeUpgrade.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystem/BaseAbilitySystemComponent.h"
-#include "World/Item/AttributeUpgrade.h"
 
 AAttributeUpgrade::AAttributeUpgrade()
 {

@@ -19,7 +19,7 @@ public:
 	UMapComponent();
 	void ConstructMapWidget();
 	void ConstructMapRooms();
-	void StartTrackingPlayerRoomCoordinates(const FName& RoomName, FIntPoint RoomCoordinates);
+	void StartTrackingPlayerRoomCoordinates(const FName& RoomName, const FVector& RoomLocation);
 	void EnteringRoom(const FName& RoomName, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates);
 	void LeavingRoom(const FName& RoomName, const FIntPoint& PlayerCoordinates);
 	void UpdateRoomAt(const FName& RoomName, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates);
@@ -41,7 +41,7 @@ private:
 	void SetRoomTileExplored(const FName& RoomName, const FIntPoint& Coordinates);
 	void ExploreRoomTile(const FName& RoomName, const FIntPoint& Coordinates);
 	void UnveilRoom(const FName& RoomName);
-	void TrackPlayerRoomCoordinates(const FName& RoomName, const FIntPoint& RoomCoordinates);
+	void TrackPlayerRoomCoordinates(const FName& RoomName, const FVector& RoomLocation);
 	FIntPoint GetPlayerRoomCoordinates(const FIntPoint& RoomCoordinates) const;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Map")

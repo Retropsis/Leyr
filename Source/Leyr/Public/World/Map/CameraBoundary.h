@@ -110,8 +110,8 @@ public:
 
 	TMap<FIntPoint, FSubdivision> ConstructSubdivisions();
 	FIntPoint GetRoomSize() const;
-	FIntPoint GetRoomCoordinates() const;
 	FName GetTileMapName() const;
+	FVector GetTileMapLocation() const;
 	FName GetLevelAreaName() const { return LevelAreaName; }
 	ERoomType GetRoomType() const { return RoomType; }
 
@@ -208,7 +208,6 @@ protected:
 
 private:
 	void RequestRoomUpdate(ERoomUpdateType UpdateType) const;
-	FIntPoint GetPlayerRoomCoordinates() const;
 	APlayerController* GetPlayerController();
 	FName GetValidRoomName() const;
 	FName GetValidRoomNameTrimmed() const;

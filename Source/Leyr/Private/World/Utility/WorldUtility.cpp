@@ -30,5 +30,22 @@ ESubdivisionSide UWorldUtility::GetSubdivisionSideFromAngle(const float Angle)
 
 FIntPoint UWorldUtility::GetWorldCoordinates(const FVector& WorldLocation)
 {
-	return FIntPoint{ FMath::TruncToInt32(WorldLocation.X / 1280.f), FMath::TruncToInt32(WorldLocation.Z / 768.f) };
+	const FIntPoint WorldCoordinates = FIntPoint{ FMath::FloorToInt32(WorldLocation.X / 1280.f), FMath::FloorToInt32(WorldLocation.Z / 768.f) };
+	// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Cyan, FString::Printf(TEXT("WorldCoordinates: (x: %d, y: %d)"), WorldCoordinates.X, WorldCoordinates.Y));
+	return WorldCoordinates;
+}
+
+FIntPoint UWorldUtility::GetPlayerRoomCoordinates(const FVector& PlayerLocation, const FVector& RoomLocation)
+{
+	const FVector PlayerRelativeLocation = PlayerLocation - RoomLocation;
+	const FIntPoint PlayerRoomCoordinates = FIntPoint{ FMath::Abs(FMath::TruncToInt32(PlayerRelativeLocation.X / 1280.f)), FMath::Abs(FMath::TruncToInt32(PlayerRelativeLocation.Z / 768.f)) };
+	// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Cyan, FString::Printf(TEXT("PlayerRoomCoordinates: (x: %d, y: %d)"), PlayerRoomCoordinates.X, PlayerRoomCoordinates.Y));
+	return PlayerRoomCoordinates;
+}
+
+FIntPoint UWorldUtility::GetRoomCoordinates(const FVector& WorldLocation)
+{
+	const FIntPoint RoomCoordinates = FIntPoint{ FMath::FloorToInt32(WorldLocation.X / 1280.f), FMath::FloorToInt32(WorldLocation.Z / 768.f) };
+	// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Cyan, FString::Printf(TEXT("RoomCoordinates: (x: %d, y: %d)"), RoomCoordinates.X, RoomCoordinates.Y));
+	return RoomCoordinates;
 }

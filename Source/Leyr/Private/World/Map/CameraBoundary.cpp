@@ -484,8 +484,9 @@ TMap<FIntPoint, FSubdivision> ACameraBoundary::ConstructSubdivisions()
 		const FIntPoint EntranceMarkerRoomCoordinates = FIntPoint{
 			FMath::Abs(FMath::TruncToInt32((EntranceMarker->GetRelativeLocation().X + GetTileMapBounds().BoxExtent.X) / 1280.f)),
 			FMath::Abs(FMath::TruncToInt32((EntranceMarker->GetRelativeLocation().Z - GetTileMapBounds().BoxExtent.Z) / 768.f)) };
-		
-		const FVector SubdivisionLocation = FVector{  (GetRoomCoordinates().X + EntranceMarkerRoomCoordinates.X) * 1280.f + 640.f, 0.f, (GetRoomCoordinates().Y - EntranceMarkerRoomCoordinates.Y) *  768.f - 384.f };
+
+		const FIntPoint RoomCoordinates = UWorldUtility::GetRoomCoordinates(TileMap->GetActorLocation());
+		const FVector SubdivisionLocation = FVector{  (RoomCoordinates.X + EntranceMarkerRoomCoordinates.X) * 1280.f + 640.f, 0.f, (RoomCoordinates.Y - EntranceMarkerRoomCoordinates.Y) *  768.f - 384.f };
 		const float Angle = UWorldUtility::GetAngleBetweenPoints(SubdivisionLocation, EntranceMarker->GetComponentLocation());
 
 		ESubdivisionSide DoorPlacement = UWorldUtility::GetSubdivisionSideFromAngle(Angle);
@@ -504,18 +505,18 @@ TMap<FIntPoint, FSubdivision> ACameraBoundary::ConstructSubdivisions()
 
 void ACameraBoundary::RequestRoomUpdate(const ERoomUpdateType UpdateType) const
 {
-	if (!IsValid(PlayerController) || !IsValid(TileMap)) return;
+	if (!IsValid(PlayerController) || !IsValid(TargetActor)) return;
 
 	if (UMapComponent* MapComponent = PlayerController->FindComponentByClass<UMapComponent>())
 	{
 		// TODO: LevelAreaName should always be valid, then i can get rid of the replace
 		if (UpdateType == ERoomUpdateType::Entering)
 		{
-			MapComponent->EnteringRoom(GetValidRoomName(), UpdateType, GetPlayerRoomCoordinates());
+			MapComponent->EnteringRoom(GetValidRoomName(), UpdateType, UWorldUtility::GetRoomCoordinates(TargetActor->GetActorLocation()));
 		}
 		if (UpdateType == ERoomUpdateType::Leaving)
 		{
-			MapComponent->LeavingRoom(GetValidRoomName(), GetPlayerRoomCoordinates());
+			MapComponent->LeavingRoom(GetValidRoomName(), UWorldUtility::GetRoomCoordinates(TargetActor->GetActorLocation()));
 		}
 	}
 }
@@ -530,22 +531,9 @@ FName ACameraBoundary::GetValidRoomNameTrimmed() const
 	return FName(GetValidRoomName().ToString().Replace(TEXT(" "), TEXT("")).Replace(TEXT("TM_"), TEXT("")));
 }
 
-FIntPoint ACameraBoundary::GetPlayerRoomCoordinates() const
-{
-	const FVector PlayerRelativeLocation = TargetActor->GetActorLocation() - TileMap->GetActorLocation();
-	return FIntPoint{ FMath::TruncToInt32(PlayerRelativeLocation.X / 1280.f), FMath::TruncToInt32(- PlayerRelativeLocation.Z / 768.f) };
-}
-
 FIntPoint ACameraBoundary::GetRoomSize() const
 {
 	return FIntPoint{ FMath::FloorToInt32(GetTileMapBounds().BoxExtent.X * 2.f / 1280.f), FMath::FloorToInt32(GetTileMapBounds().BoxExtent.Z * 2.f / 768.f) };
-}
-
-FIntPoint ACameraBoundary::GetRoomCoordinates() const
-{
-	if (!IsValid(TileMap)) return FIntPoint{ 0 };
-	
-	return FIntPoint{ FMath::TruncToInt32(TileMap->GetActorLocation().X / 1280.f), FMath::TruncToInt32(TileMap->GetActorLocation().Z / 768.f) };
 }
 
 FName ACameraBoundary::GetTileMapName() const
@@ -557,6 +545,15 @@ FName ACameraBoundary::GetTileMapName() const
 	}
 	
 	return *TileMap->GetActorLabel().Replace(TEXT("TM_"), TEXT(""));
+}
+
+FVector ACameraBoundary::GetTileMapLocation() const
+{
+	if (IsValid(TileMap)) return IsValid(TileMap) ? TileMap->GetActorLocation() : FVector::ZeroVector;
+
+	UE_LOG(LogTemp, Error, TEXT("TileMap is invalid in ACameraBoundary::GetTileMapLocation"));
+	
+	 return FVector{ GetActorLocation().X - CameraBoundary->GetScaledBoxExtent().X, 0.f, GetActorLocation().Z - CameraBoundary->GetScaledBoxExtent().Z };
 }
 
 void ACameraBoundary::OnHiddenRevealed(const FIntPoint& SubdivisionCoordinates, const ESubdivisionSide Side)

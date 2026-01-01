@@ -17,4 +17,6 @@ public:
 	static float GetAngleBetweenPoints(const FVector& Point_A, const FVector& Point_B);
 	static ESubdivisionSide GetSubdivisionSideFromAngle(const float Angle);
 	static FIntPoint GetWorldCoordinates(const FVector& WorldLocation);
+	static FIntPoint GetPlayerRoomCoordinates(const FVector& PlayerLocation, const FVector& RoomLocation);
+	static FIntPoint GetRoomCoordinates(const FVector& WorldLocation);
 };

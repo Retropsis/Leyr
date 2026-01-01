@@ -78,10 +78,10 @@ void ABreakable::BeginPlay()
 	UKismetSystemLibrary::LineTraceSingleForObjects(this, GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 10.f, ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::None, Hit, true);
 	if (const ACameraBoundary* CameraBoundary = Cast<ACameraBoundary>(Hit.GetActor()); Hit.bBlockingHit && CameraBoundary)
 	{
-		SubdivisionCoordinates = CameraBoundary->GetRoomCoordinates() - UWorldUtility::GetWorldCoordinates(GetActorLocation());
+		SubdivisionCoordinates = UWorldUtility::GetPlayerRoomCoordinates(GetActorLocation(), CameraBoundary->GetTileMapLocation());
 		// GEngine->AddOnScreenDebugMessage(3249, 90.f, FColor::Cyan, FString::Printf(TEXT("CameraBoundary RoomCoordinates: (x:%d, y:%d) This Actor WorldCoordinates: (x:%d, y:%d)"),
-		// 	CameraBoundary->GetRoomCoordinates().X, CameraBoundary->GetRoomCoordinates().Y, UWorldUtility::GetWorldCoordinates(GetActorLocation()).X, UWorldUtility::GetWorldCoordinates(GetActorLocation()).Y));
-		const FVector SubdivisionLocation = FVector{  (CameraBoundary->GetRoomCoordinates().X + SubdivisionCoordinates.X) * 1280.f + 640.f, 0.f, (CameraBoundary->GetRoomCoordinates().Y - SubdivisionCoordinates.Y) *  768.f - 384.f };
+		const FIntPoint CameraBoundaryCoordinates = UWorldUtility::GetRoomCoordinates(CameraBoundary->GetActorLocation());
+		const FVector SubdivisionLocation = FVector{  (CameraBoundaryCoordinates.X + SubdivisionCoordinates.X) * 1280.f + 640.f, 0.f, (CameraBoundaryCoordinates.Y - SubdivisionCoordinates.Y) *  768.f - 384.f };
 		const float Angle = UWorldUtility::GetAngleBetweenPoints(SubdivisionLocation, GetActorLocation());
 		SubdivisionSide = UWorldUtility::GetSubdivisionSideFromAngle(Angle);
 		// GEngine->AddOnScreenDebugMessage(3248, 90.f, FColor::Cyan, FString::Printf(TEXT("SubdivisionCoordinates: (x:%d, y:%d) Angle: %f"), SubdivisionCoordinates.X, SubdivisionCoordinates.Y, Angle));

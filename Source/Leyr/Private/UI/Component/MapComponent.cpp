@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "UI/Map/MapWidget.h"
 #include "World/Map/CameraBoundary.h"
+#include "World/Utility/WorldUtility.h"
 
 UMapComponent::UMapComponent()
 {
@@ -48,8 +49,9 @@ void UMapComponent::ConstructMapRooms()
 		{
 			FRoomData Data {
 				!Boundary->GetLevelAreaName().IsNone() ? Boundary->GetLevelAreaName() : Boundary->GetTileMapName(),
-				FIntPoint{ Boundary->GetRoomCoordinates().X, Boundary->GetRoomCoordinates().Y },
-				FIntPoint(Boundary->GetRoomSize().X, Boundary->GetRoomSize().Y),
+				Boundary->GetTileMapLocation(),
+				UWorldUtility::GetWorldCoordinates(Boundary->GetTileMapLocation()),
+				Boundary->GetRoomSize(),
 				Boundary->GetRoomType(),
 				Boundary->ConstructSubdivisions()
 			};
@@ -57,8 +59,8 @@ void UMapComponent::ConstructMapRooms()
 
 			if (Data.RoomName.IsNone()) continue;
 			
-			UE_LOG(LogTemp, Warning, TEXT("Room created-> Name: %s"), *Data.RoomName.ToString());
-			// UE_LOG(LogTemp, Warning, TEXT("Room created-> Name: %s size: (w%d, h%d), coords: (x%d, y%d) Type: %s"), *Data.RoomName.ToString(), Data.RoomSize.X, Data.RoomSize.Y, Data.RoomCoordinates.X, Data.RoomCoordinates.Y, *UEnum::GetValueAsString(Data.RoomType));
+			// UE_LOG(LogTemp, Warning, TEXT("Room created-> Name: %s"), *Data.RoomName.ToString());
+			UE_LOG(LogTemp, Warning, TEXT("Room created-> Name: %s size: (w%d, h%d), coords: (x%d, y%d) Type: %s"), *Data.RoomName.ToString(), Data.RoomSize.X, Data.RoomSize.Y, Data.RoomCoordinates.X, Data.RoomCoordinates.Y, *UEnum::GetValueAsString(Data.RoomType));
 			
 			Rooms.Add(Data.RoomName, Data);
 		}
@@ -68,27 +70,27 @@ void UMapComponent::ConstructMapRooms()
 void UMapComponent::EnteringRoom(const FName& RoomName, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates)
 {
 	if (!Rooms.Contains(RoomName)) return;
+	// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Green, FString::Printf(TEXT("PlayerCoordinates: (x: %d, y: %d)"), PlayerCoordinates.X, PlayerCoordinates.Y));
 	
 	const ERoomUpdateType NewState = !IsRoomUnveiled(RoomName) ? ERoomUpdateType::Unveiling : UpdateType;
 	UnveilRoom(RoomName);
 	
 	const FRoomData RoomData = *Rooms.Find(RoomName);
-	const FIntPoint RoomCoordinates = RoomData.RoomCoordinates;
+	// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Green, FString::Printf(TEXT("RoomCoordinates: (x: %d, y: %d)"), RoomCoordinates.X, RoomCoordinates.Y));
 	// ExploreRoomTile(RoomName, PlayerCoordinates);
 	UpdateRoomAt(RoomName, NewState, PlayerCoordinates);
 	MapWidget->EnteringRoom(RoomData, NewState, PlayerCoordinates);
-	
-	StartTrackingPlayerRoomCoordinates(RoomName, RoomCoordinates);
+	StartTrackingPlayerRoomCoordinates(RoomName, RoomData.RoomLocation);
 }
 
-void UMapComponent::StartTrackingPlayerRoomCoordinates(const FName& RoomName, const FIntPoint RoomCoordinates)
+void UMapComponent::StartTrackingPlayerRoomCoordinates(const FName& RoomName, const FVector& RoomLocation)
 {
 	GetWorld()->GetTimerManager().ClearTimer(TrackingPlayerTimer);
 	TrackingPlayerTimer.Invalidate();
-	GetWorld()->GetTimerManager().SetTimer(TrackingPlayerTimer, [this,  RoomName, RoomCoordinates] ()
+	GetWorld()->GetTimerManager().SetTimer(TrackingPlayerTimer, [this,  RoomName, RoomLocation] ()
 	{
-		TrackPlayerRoomCoordinates(RoomName, RoomCoordinates);
-		GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Green, FString::Printf(TEXT("Tracking Tile: (x: %d, y: %d)"), RoomCoordinates.X, RoomCoordinates.Y));
+		TrackPlayerRoomCoordinates(RoomName, RoomLocation);
+		// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Green, FString::Printf(TEXT("Tracking Tile: (x: %d, y: %d)"), RoomCoordinates.X, RoomCoordinates.Y));
 	}, 1.f, true);
 }
 
@@ -99,9 +101,10 @@ void UMapComponent::LeavingRoom(const FName& RoomName, const FIntPoint& PlayerCo
 	MapWidget->LeavingRoom(*Rooms.Find(RoomName), PlayerCoordinates);
 }
 
-void UMapComponent::TrackPlayerRoomCoordinates(const FName& RoomName, const FIntPoint& RoomCoordinates)
+void UMapComponent::TrackPlayerRoomCoordinates(const FName& RoomName, const FVector& RoomLocation)
 {
-	const FIntPoint PlayerCoordinates = GetPlayerRoomCoordinates(RoomCoordinates);
+	const FIntPoint PlayerCoordinates =UWorldUtility::GetPlayerRoomCoordinates(PlayerCharacter->GetActorLocation(), RoomLocation);
+	// const FIntPoint PlayerCoordinates = GetPlayerRoomCoordinates(RoomCoordinates);
 	UpdateRoomAt(RoomName, ERoomUpdateType::Entering, PlayerCoordinates);
 }
 
@@ -109,9 +112,11 @@ FIntPoint UMapComponent::GetPlayerRoomCoordinates(const FIntPoint& RoomCoordinat
 {
 	if (!PlayerCharacter.IsValid()) return FIntPoint();
 	
-	const FIntPoint PlayerWorldCoordinates{ FMath::TruncToInt32(PlayerCharacter->GetActorLocation().X / 1280.f), FMath::TruncToInt32( PlayerCharacter->GetActorLocation().Z / 768.f) };
-	GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Cyan, FString::Printf(TEXT("Tracking Player at: (x: %d, y: %d)"), PlayerWorldCoordinates.X, PlayerWorldCoordinates.Y));
-	return FIntPoint{ FMath::Abs(PlayerWorldCoordinates.X - RoomCoordinates.X), FMath::Abs(PlayerWorldCoordinates.Y - RoomCoordinates.Y)  };
+	const FIntPoint PlayerWorldCoordinates{ FMath::FloorToInt32(PlayerCharacter->GetActorLocation().X / 1280.f), FMath::FloorToInt32( PlayerCharacter->GetActorLocation().Z / 768.f) };
+	// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Cyan, FString::Printf(TEXT("Tracking PlayerWorldCoordinates at: (x: %d, y: %d)"), PlayerWorldCoordinates.X, PlayerWorldCoordinates.Y));
+	const FIntPoint PlayerRoomCoordinates = FIntPoint{ FMath::Abs(PlayerWorldCoordinates.X - RoomCoordinates.X), FMath::Abs(PlayerWorldCoordinates.Y - RoomCoordinates.Y)  };
+	// GEngine->AddOnScreenDebugMessage(-1, 90.f, FColor::Cyan, FString::Printf(TEXT("Tracking PlayerRoomCoordinates at: (x: %d, y: %d)"), PlayerRoomCoordinates.X, PlayerRoomCoordinates.Y));
+	return PlayerRoomCoordinates;
 }
 
 void UMapComponent::UpdateRoomAt(const FName& RoomName, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates)
