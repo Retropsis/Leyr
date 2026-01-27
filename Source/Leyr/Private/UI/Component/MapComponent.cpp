@@ -3,7 +3,9 @@
 #include "UI/Component/MapComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Data/MapData.h"
-#include "Game/BaseGameplayTags.h"
+#include "Game/LeyrGameInstance.h"
+#include "Game/LeyrGameMode.h"
+#include "Game/LoadMenuSaveGame.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/Map/MapWidget.h"
@@ -15,9 +17,26 @@ UMapComponent::UMapComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
+void UMapComponent::OnComponentCreated()
+{
+	Super::OnComponentCreated();
+	UE_LOG(LogTemp, Warning, TEXT("OnComponentCreated"));
+}
+
 void UMapComponent::InitializeMap()
 {
-	ConstructMapRooms();
+	const ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this));
+	const ULeyrGameInstance* LeyrGameInstance = Cast<ULeyrGameInstance>(LeyrGameMode->GetGameInstance());
+	if (const ULoadMenuSaveGame* SaveGame = LeyrGameMode->GetSaveSlotData(LeyrGameInstance->LoadSlotName, LeyrGameInstance->LoadSlotIndex))
+	{
+		Rooms = SaveGame->SavedRooms;
+	}
+	
+	if (Rooms.IsEmpty())
+	{
+		ConstructMapRooms();
+	}
+	
 	ConstructMapWidget();
 }
 
@@ -30,7 +49,7 @@ void UMapComponent::ConstructMapWidget()
 	PlayerCharacter = OwningController->GetCharacter();
 
 	MapWidget = CreateWidget<UMapWidget>(OwningController.Get(), MapWidgetClass);
-	MapWidget->ConstructMapCanvas(FilterRoomsByRegion(FBaseGameplayTags::Get().Map_Region_Dorn));
+	MapWidget->ConstructMapCanvas(FilterRoomsByRegion(GetCurrentRegionTag()));
 	// CloseInventoryMenu();
 }
 
@@ -43,6 +62,10 @@ void UMapComponent::ConstructMapRooms()
 	TArray<AActor*> TempRooms;
 	UGameplayStatics::GetAllActorsOfClass(this, ACameraBoundary::StaticClass(), TempRooms);
 	Rooms.Empty();
+	
+	const FGameplayTag RegionTag = GetCurrentRegionTag();
+	ExplorationData.Add(RegionTag, FExplorationData{});
+	
 	for (AActor* TempRoom : TempRooms)
 	{
 		if (ACameraBoundary* Boundary = Cast<ACameraBoundary>(TempRoom))
@@ -53,10 +76,14 @@ void UMapComponent::ConstructMapRooms()
 				UWorldUtility::GetWorldCoordinates(Boundary->GetTileMapLocation()),
 				Boundary->GetRoomSize(),
 				Boundary->GetRoomType(),
-				Boundary->ConstructSubdivisions()
+				Boundary->ConstructSubdivisions(),
+				RegionTag
 			};
-			SubdivisionTotalCount += Data.Subdivisions.Num();
-
+			if (FExplorationData* RegionData = ExplorationData.Find(RegionTag))
+			{
+				RegionData->SubdivisionTotalCount += Data.Subdivisions.Num();
+			}
+			
 			if (Data.RoomName.IsNone()) continue;
 			
 			// UE_LOG(LogTemp, Warning, TEXT("Room created-> Name: %s"), *Data.RoomName.ToString());
@@ -103,6 +130,8 @@ void UMapComponent::LeavingRoom(const FName& RoomName, const FIntPoint& PlayerCo
 
 void UMapComponent::TrackPlayerRoomCoordinates(const FName& RoomName, const FVector& RoomLocation)
 {
+	if (!PlayerCharacter.IsValid()) return; //TODO: 
+	
 	const FIntPoint PlayerCoordinates = UWorldUtility::GetPlayerRoomCoordinates(PlayerCharacter->GetActorLocation(), RoomLocation);
 	// const FIntPoint PlayerCoordinates = GetPlayerRoomCoordinates(RoomCoordinates);
 	UpdateRoomAt(RoomName, ERoomUpdateType::Entering, PlayerCoordinates);
@@ -189,8 +218,12 @@ void UMapComponent::ExploreRoomTile(const FName& RoomName, const FIntPoint& Coor
 {
 	if (!IsRoomTileExplored(RoomName, Coordinates))
 	{
-		SubdivisionExploredCount++;
-		MapWidget->UpdateCompletionText(static_cast<float>(SubdivisionExploredCount) / static_cast<float>(SubdivisionTotalCount) * 100.f);
+		const FGameplayTag RegionTag = GetCurrentRegionTag();
+		if (FExplorationData* RegionData = ExplorationData.Find(RegionTag))
+		{
+			RegionData->SubdivisionExploredCount++;
+			MapWidget->UpdateCompletionText(static_cast<float>(RegionData->SubdivisionExploredCount) / static_cast<float>(RegionData->SubdivisionTotalCount) * 100.f);
+		}
 		SetRoomTileExplored(RoomName, Coordinates);
 	}
 }
@@ -225,4 +258,10 @@ void UMapComponent::UnveilRooms(const TArray<FName>& RoomNames)
 			}, (i * UnveilRoomAnimationDelay) + UnveilRoomAnimationFirstDelay, false);
 		}
 	}
+}
+
+FGameplayTag UMapComponent::GetCurrentRegionTag() const
+{
+	const FName MapName(GetWorld()->GetName());
+	return FGameplayTag::RequestGameplayTag(MapName);
 }

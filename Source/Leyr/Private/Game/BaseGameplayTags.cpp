@@ -728,7 +728,10 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	/*
 	 * Map Tags
 	 */
-	GameplayTags.Map_Region_Dorn = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Map.Region.Dorn"), FString("Map Region Dorn"));
-	GameplayTags.Map_Region_Myre = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Map.Region.Myre"), FString("Map Region Myre"));
-	GameplayTags.Map_Region_Drei = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("Map.Region.Drei"), FString("Map Region Drei"));
+	GameplayTags.DORN = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("DORN"), FString("Map Region Dorn"));
+	GameplayTags.MYRE = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("MYRE"), FString("Map Region Myre"));
+	GameplayTags.DREI = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("DREI"), FString("Map Region Drei"));
+	GameplayTags.RYLA = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("RYLA"), FString("Map Region Ryla"));
+	GameplayTags.YREN = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("YREN"), FString("Map Region Yren"));
+	GameplayTags.MESA = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("MESA"), FString("Map Region Mesa"));
 }

@@ -41,6 +41,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "UI/Controller/InventoryWidgetController.h"
 #include "UI/PlayerHUD.h"
+#include "UI/Component/MapComponent.h"
 #include "World/Level/Moving/WaterGroup.h"
 #include "World/Map/CameraBoundary.h"
 #include "World/Map/ParallaxController.h"
@@ -1139,6 +1140,10 @@ void APlayerCharacter::SaveProgress_Implementation(const FName& SavePointTag)
 			if(UInventoryWidgetController* IC =PlayerCharacterController->GetInventoryWidgetController())
 			{
 				SaveData->SavedEquippedItems = IC->GetEquippedItems();
+			}
+			if (const UMapComponent* MapComponent = PlayerCharacterController->FindComponentByClass<UMapComponent>())
+			{
+				SaveData->SavedRooms = MapComponent->GetRooms();
 			}
 		}
 

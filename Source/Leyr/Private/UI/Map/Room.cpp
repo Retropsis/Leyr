@@ -7,19 +7,15 @@
 void URoom::ConstructRoom(const FRoomData& RoomData)
 {
 	// UE_LOG(LogTemp, Warning, TEXT("Constructing room %s with size of (w: %d,h: %d)"), *RoomData.RoomName.ToString(), RoomData.RoomSize.X, RoomData.RoomSize.Y);
-	for (int h = 1; h <= RoomData.RoomSize.Y; ++h)
+	for (int h = 0; h < RoomData.RoomSize.Y; ++h)
 	{
-		for (int w = 1; w <= RoomData.RoomSize.X; ++w)
+		for (int w = 0; w < RoomData.RoomSize.X; ++w)
 		{
 			URoomTile* RoomTile = CreateWidget<URoomTile>(this, RoomTileClass);
-			RoomTile->SetRoomState(ERoomState::Hidden);
-			RoomTile->SetRoomType(RoomData.RoomType);
-			RoomTile->SetVisibility(ESlateVisibility::Collapsed);
-			RoomTile->SetRoomSize(RoomData.RoomSize);
-			RoomTile->SetRoomCoordinates(FIntPoint(w, h));
+			RoomTile->InitializeRoomTile(RoomData, FIntPoint(w, h));
 			RoomSize = RoomData.RoomSize;
 			RoomGrid->AddChildToGrid(RoomTile, h, w);
-			RoomTiles.Emplace(FIntPoint(w - 1, h - 1), RoomTile);
+			RoomTiles.Emplace(FIntPoint(w, h), RoomTile);
 			// UE_LOG(LogTemp, Warning, TEXT("Constructing a room tile at (x: %d, y: %d)"), w, h);
 		}
 	}

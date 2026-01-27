@@ -81,10 +81,9 @@ struct FRoomData
 {
 	GENERATED_BODY()
 	FRoomData() {}
-	FRoomData(const FName& Name, const FVector& Location, const FIntPoint& Coordinates,  const FIntPoint& Size, const ERoomType Type, const TMap<FIntPoint, FSubdivision>& Divisions) :
-		RoomName(Name), RoomLocation(Location), RoomCoordinates(Coordinates), RoomSize(Size), RoomType(Type), Subdivisions(Divisions) {}
+	FRoomData(const FName& Name, const FVector& Location, const FIntPoint& Coordinates,  const FIntPoint& Size, const ERoomType Type, const TMap<FIntPoint, FSubdivision>& Divisions, const FGameplayTag& Region) :
+		RoomName(Name), RoomLocation(Location), RoomCoordinates(Coordinates), RoomSize(Size), RoomType(Type), Subdivisions(Divisions), RegionTag(Region) {}
 
-	UPROPERTY() FGameplayTag RegionTag = FBaseGameplayTags::Get().Map_Region_Dorn;
 	UPROPERTY() FName RoomName = FName();
 	UPROPERTY() FVector RoomLocation = FVector::ZeroVector;
 	UPROPERTY() FIntPoint RoomCoordinates = FIntPoint();
@@ -92,6 +91,7 @@ struct FRoomData
 	UPROPERTY() ERoomType RoomType = ERoomType::None;
 	UPROPERTY() bool bWasUnveiled = false;
 	UPROPERTY() TMap<FIntPoint, FSubdivision> Subdivisions;
+	UPROPERTY() FGameplayTag RegionTag = FBaseGameplayTags::Get().DORN;
 };
 
 inline bool operator==(const FRoomData& A, const FRoomData& B)

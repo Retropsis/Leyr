@@ -10,7 +10,6 @@
 #include "CommonUserWidget.h"
 #include "PlayerCharacterController.generated.h"
 
-class UMapComponent;
 struct FWidgetControllerParams;
 struct FGameplayTag;
 class UBaseUserWidget;

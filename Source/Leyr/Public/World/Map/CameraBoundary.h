@@ -81,6 +81,9 @@ public:
 	virtual void PreEditChange(FProperty* PropertyAboutToChange) override;
 	
 	UFUNCTION(CallInEditor, Category="Leyr")
+	virtual void GroupIntoRoomFolder();
+	
+	UFUNCTION(CallInEditor, Category="Leyr")
 	virtual void RenameVolumes();
 	
 	UFUNCTION(CallInEditor, Category="Leyr")
@@ -211,6 +214,7 @@ private:
 	APlayerController* GetPlayerController();
 	FName GetValidRoomName() const;
 	FName GetValidRoomNameTrimmed() const;
+	FName MakeFolderPathFromRoomName() const;
 	
 	void AddEntrance(int32 Index);
 	void RemoveEntrance(int32 Index);
@@ -219,6 +223,8 @@ private:
 	void AddSpawnVolume(int32 Index);
 	void RemoveSpawnVolume(int32 Index);
 	void RemoveAllSpawnVolumes();
+
+	void GetAllOverlappingActors(TArray<FOverlapResult>& Overlaps) const;
 
 	UPROPERTY() TObjectPtr<APlayerController> PlayerController;
 	UPROPERTY() TObjectPtr<AActor> TargetActor;

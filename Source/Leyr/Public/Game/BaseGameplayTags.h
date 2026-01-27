@@ -636,9 +636,12 @@ FGameplayTag EncounterSpawn_9;
 /*
  * Map Tags
  */
-FGameplayTag Map_Region_Dorn;
-FGameplayTag Map_Region_Myre;
-FGameplayTag Map_Region_Drei;
+FGameplayTag DORN;
+FGameplayTag MYRE;
+FGameplayTag DREI;
+FGameplayTag RYLA;
+FGameplayTag YREN;
+FGameplayTag MESA;
  
 private:
 	static FBaseGameplayTags GameplayTags;

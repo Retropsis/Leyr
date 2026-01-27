@@ -18,10 +18,11 @@ class LEYR_API URoomTile : public UCommonUserWidget
 public:
 
 	void UpdateRoomTile(const ERoomUpdateType& UpdateType);
-	
+	void InitializeRoomTile(const FRoomData& RoomData, const FIntPoint& SubdivisionCoordinates);
 	void EnterRoomTile();
 	void LeaveRoomTile();
 	void ExploreRoomTile();
+	void SetRoomTileBrushByType(ERoomType Type) const;
 	void UnveilRoomTile();
 	void RevealRoomTile();
 	void DrawDoors(const FSubdivision& Subdivision) const;
@@ -36,7 +37,7 @@ public:
 	void SetOriginalPositionInCanvas(const FVector2D Position) { OriginalPositionInCanvas = Position; }
 	FVector2D GetOriginalPositionInCanvas() const { return OriginalPositionInCanvas; }
 	void SetRoomSize(const FIntPoint& Size) { RoomSize = Size; }
-	void SetRoomCoordinates(const FIntPoint& Coordinates) { RoomCoordinates = Coordinates; }
+	void SetTileCoordinates(const FIntPoint& Coordinates) { TileCoordinates = Coordinates; }
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void HandleOccupiedAnimation(bool bIsOccupied);
@@ -124,7 +125,7 @@ private:
 	FSlateBrush Brush_DoorBorder_V;
 
 	FIntPoint RoomSize;
-	FIntPoint RoomCoordinates;
+	FIntPoint TileCoordinates;
 	ERoomState RoomState = ERoomState::Hidden;
 	ERoomType RoomType = ERoomType::None;
 	FVector2D OriginalPositionInCanvas = FVector2D::ZeroVector;

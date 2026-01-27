@@ -147,6 +147,29 @@ void ACameraBoundary::BeginPlay()
 	}
 }
 
+void ACameraBoundary::GroupIntoRoomFolder()
+{
+	const FName RoomPath = MakeFolderPathFromRoomName();
+	const FString NewLabel = FString::Printf(TEXT("CameraBoundary_%s"), *GetValidRoomName().ToString());
+	SetActorLabel(NewLabel);
+	SetFolderPath(RoomPath);
+	if (IsValid(TileMap)) TileMap->SetFolderPath(RoomPath);
+	if (IsValid(WaterVolume)) WaterVolume->SetFolderPath(RoomPath);
+	for (TObjectPtr<AEncounterSpawnVolume> SpawningVolume : SpawningVolumes)
+	{
+		if (IsValid(SpawningVolume)) SpawningVolume->SetFolderPath(RoomPath);
+	}
+	TArray<FOverlapResult> Overlaps;
+	GetAllOverlappingActors(Overlaps);
+	for (const FOverlapResult& Overlap : Overlaps)
+	{
+		if (IsValid(Overlap.GetActor()))
+		{
+			Overlap.GetActor()->SetFolderPath(RoomPath);
+		}
+	}
+}
+
 void ACameraBoundary::RenameVolumes()
 {
 	for (TObjectPtr<AEncounterSpawnVolume> SpawningVolume : SpawningVolumes)
@@ -377,7 +400,7 @@ void ACameraBoundary::DestroyOutOfBoundsEncounters() const
 	}
 }
 
-void ACameraBoundary::ToggleLevelActorActivity(bool bActivate) const
+void ACameraBoundary::GetAllOverlappingActors(TArray<FOverlapResult>& Overlaps) const
 {
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(EOT_OneWayPlatform);
@@ -385,8 +408,13 @@ void ACameraBoundary::ToggleLevelActorActivity(bool bActivate) const
 	TArray<AActor*> OutActors;
 	FCollisionQueryParams BoxParams;
 	BoxParams.AddIgnoredActors(ActorsToIgnore);
-	TArray<FOverlapResult> Overlaps;
 	GetWorld()->OverlapMultiByObjectType(Overlaps, GetActorLocation(), FQuat::Identity, FCollisionObjectQueryParams(FCollisionObjectQueryParams::InitType::AllDynamicObjects), FCollisionShape::MakeBox(EnteringBoundary->GetScaledBoxExtent()), BoxParams);
+}
+
+void ACameraBoundary::ToggleLevelActorActivity(bool bActivate) const
+{
+	TArray<FOverlapResult> Overlaps;
+	GetAllOverlappingActors(Overlaps);
 	for (FOverlapResult& Overlap : Overlaps)
 	{
 		if (Overlap.GetActor() && Overlap.GetActor()->Implements<ULevelActorInterface>())
@@ -529,6 +557,11 @@ FName ACameraBoundary::GetValidRoomName() const
 FName ACameraBoundary::GetValidRoomNameTrimmed() const
 {
 	return FName(GetValidRoomName().ToString().Replace(TEXT(" "), TEXT("")).Replace(TEXT("TM_"), TEXT("")));
+}
+
+FName ACameraBoundary::MakeFolderPathFromRoomName() const
+{
+	return FName(*FString("Room_").Append(GetValidRoomNameTrimmed().ToString()));
 }
 
 FIntPoint ACameraBoundary::GetRoomSize() const

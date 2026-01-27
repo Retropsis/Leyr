@@ -80,8 +80,7 @@ void ABreakable::BeginPlay()
 	{
 		SubdivisionCoordinates = UWorldUtility::GetPlayerRoomCoordinates(GetActorLocation(), CameraBoundary->GetTileMapLocation());
 		// GEngine->AddOnScreenDebugMessage(3249, 90.f, FColor::Cyan, FString::Printf(TEXT("CameraBoundary RoomCoordinates: (x:%d, y:%d) This Actor WorldCoordinates: (x:%d, y:%d)"),
-		const FIntPoint CameraBoundaryCoordinates = UWorldUtility::GetRoomCoordinates(CameraBoundary->GetActorLocation());
-		const FVector SubdivisionLocation = FVector{  (CameraBoundaryCoordinates.X + SubdivisionCoordinates.X) * 1280.f + 640.f, 0.f, (CameraBoundaryCoordinates.Y - SubdivisionCoordinates.Y) *  768.f - 384.f };
+		const FVector SubdivisionLocation = FVector{  (CameraBoundary->GetTileMapLocation().X + SubdivisionCoordinates.X * 1280.f + 640.f), 0.f, (CameraBoundary->GetTileMapLocation().Y - SubdivisionCoordinates.Y *  768.f - 384.f) };
 		const float Angle = UWorldUtility::GetAngleBetweenPoints(SubdivisionLocation, GetActorLocation());
 		SubdivisionSide = UWorldUtility::GetSubdivisionSideFromAngle(Angle);
 		// GEngine->AddOnScreenDebugMessage(3248, 90.f, FColor::Cyan, FString::Printf(TEXT("SubdivisionCoordinates: (x:%d, y:%d) Angle: %f"), SubdivisionCoordinates.X, SubdivisionCoordinates.Y, Angle));

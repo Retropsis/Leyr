@@ -10,6 +10,15 @@
 
 class UMapWidget;
 
+USTRUCT()
+struct FExplorationData
+{
+	GENERATED_BODY()
+
+	UPROPERTY() uint32 SubdivisionExploredCount = 0;
+	UPROPERTY() uint32 SubdivisionTotalCount = 0;
+};
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class LEYR_API UMapComponent : public UActorComponent
 {
@@ -17,6 +26,7 @@ class LEYR_API UMapComponent : public UActorComponent
 
 public:
 	UMapComponent();
+	virtual void OnComponentCreated() override;
 	void ConstructMapWidget();
 	void ConstructMapRooms();
 	void StartTrackingPlayerRoomCoordinates(const FName& RoomName, const FVector& RoomLocation);
@@ -31,6 +41,10 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="Map")
 	void InitializeMap();
+	FGameplayTag GetCurrentRegionTag() const;
+
+	TMap<FName, FRoomData> GetRooms() const { return Rooms; }
+	void SetRooms(const TMap<FName, FRoomData>& InRooms) { Rooms = InRooms; }
 
 private:
 	TArray<FRoomData> FilterRoomsByRegion(const FGameplayTag& RegionTag);
@@ -59,8 +73,7 @@ private:
 	UPROPERTY()
 	TMap<FName, FRoomData> Rooms;
 
-	UPROPERTY() uint32 SubdivisionExploredCount = 0;
-	UPROPERTY() uint32 SubdivisionTotalCount = 0;
+	UPROPERTY() TMap<FGameplayTag, FExplorationData> ExplorationData;
 	
 	TWeakObjectPtr<APlayerController> OwningController;
 	TWeakObjectPtr<ACharacter> PlayerCharacter;

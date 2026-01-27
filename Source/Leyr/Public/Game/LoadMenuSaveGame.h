@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "Data/MapData.h"
 #include "GameFramework/SaveGame.h"
 #include "UI/Controller/InventoryWidgetController.h"
 #include "LoadMenuSaveGame.generated.h"
@@ -164,4 +165,10 @@ public:
 
 	UPROPERTY()
 	TMap<FGameplayTag, FEquippedItem> SavedEquippedItems;
+	
+	/*
+	 * Mapping
+	 */
+	UPROPERTY()
+	TMap<FName, FRoomData> SavedRooms;
 };

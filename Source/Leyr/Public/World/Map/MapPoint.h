@@ -21,10 +21,10 @@ public:
 	virtual void LoadActor_Implementation() override;
 	/* SaveInterface */
 	
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Leyr")
 	TSoftObjectPtr<UWorld> DestinationMap;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Leyr")
 	FName DestinationPlayerStartTag;
 
 protected:
