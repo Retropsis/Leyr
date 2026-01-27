@@ -31,7 +31,7 @@ public:
 	void LeavingRoom(const FRoomData& RoomData, const FIntPoint& PlayerCoordinates);
 	void UnveilRoom(const FRoomData& RoomData);
 	void UpdateRoomTileAt(const FRoomData& RoomData, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates);
-	void UpdateCompletionText(float CompletionRate) const;
+	void UpdateCompletionText(float CompletionRate, float RegionRate) const;
 
 	UFUNCTION(BlueprintCallable)
 	void RedrawMap(float DeltaSecond);
@@ -51,6 +51,9 @@ private:
 	
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UTextBlock> Text_MapCompletion;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UTextBlock> Text_RegionCompletion;
 
 	UPROPERTY(VisibleAnywhere)
 	TMap<FName, URoom*> Rooms;

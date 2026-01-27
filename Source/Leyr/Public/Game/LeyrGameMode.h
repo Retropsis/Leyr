@@ -7,6 +7,7 @@
 #include "Inventory/InventoryComponent.h"
 #include "LeyrGameMode.generated.h"
 
+class UGameData;
 class ULootDataSet;
 class ULoadMenuSaveGame;
 class USaveGame;
@@ -27,7 +28,7 @@ UCLASS()
 class LEYR_API ALeyrGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "Character Class Defaults")
 	TObjectPtr<UCharacterClassInfo> CharacterClassInfo;
@@ -93,6 +94,16 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void BackToMainMenu(ACharacter* Character);
+
+	/*
+	 * Mapping
+	*/
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<USaveGame> GameDataClass;
+	
+	UGameData* RetrieveGameData() const;
+	void SetRegionTotalCount(const FGameplayTag& RegionTag, uint32 Count) const;
+	uint32 GetSubdivisionTotalCount() const;
 
 protected:
 	virtual void BeginPlay() override;

@@ -71,6 +71,15 @@ void ABreakable::BeginPlay()
 	}
 
 	if (!bIsHiddenWall) return;
+
+	if (bWasRevealed)
+	{
+		FlipbookComponent->SetPlaybackPosition(1.f, false);
+		TopFlipbookComponent->SetPlaybackPosition(1.f, false);
+		TopFlipbookComponent->SetVisibility(true);
+		HitBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		HitBox->SetCollisionResponseToAllChannels(ECR_Ignore);
+	}
 	
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 	ObjectTypes.Add(ObjectTypeQuery2);
@@ -108,9 +117,16 @@ void ABreakable::OnConstruction(const FTransform& Transform)
 
 void ABreakable::DestroyActor_Implementation()
 {
-	Super::DestroyActor_Implementation();
-	MulticastHandleDestruction();
 	OnHiddenRevealed.Broadcast(SubdivisionCoordinates, SubdivisionSide);
+	MulticastHandleDestruction();
+	
+	if (bIsHiddenWall)
+	{
+		bWasRevealed = true;
+		return;
+	}
+	
+	Super::DestroyActor_Implementation();
 }
 
 void ABreakable::MulticastHandleDestruction_Implementation()

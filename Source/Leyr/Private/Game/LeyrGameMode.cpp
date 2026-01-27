@@ -4,6 +4,7 @@
 #include "EngineUtils.h"
 #include "LeyrLogChannels.h"
 #include "Data/ItemDataRow.h"
+#include "Game/GameData.h"
 #include "Game/LeyrGameInstance.h"
 #include "Game/LoadMenuSaveGame.h"
 #include "GameFramework/Character.h"
@@ -13,6 +14,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 #include "UI/ViewModel/MVVM_LoadSlot.h"
+#include "World/Data/MapInfo.h"
 
 void ALeyrGameMode::BeginPlay()
 {
@@ -246,4 +248,51 @@ void ALeyrGameMode::PlayerDefeated(ACharacter* Character)
 void ALeyrGameMode::BackToMainMenu(ACharacter* Character)
 {
 	UGameplayStatics::OpenLevel(Character, FName("MainMenu"));
+}
+
+/*
+ * Mapping
+ */
+UGameData* ALeyrGameMode::RetrieveGameData() const
+{
+	USaveGame* GameDataObject = nullptr;
+	if (UGameplayStatics::DoesSaveGameExist("LeyrGameData", 0))
+	{
+		GameDataObject = UGameplayStatics::LoadGameFromSlot("LeyrGameData", 0);
+	}
+	else
+	{
+		GameDataObject = UGameplayStatics::CreateSaveGameObject(GameDataClass);
+	}
+	UGameData* GameData = Cast<UGameData>(GameDataObject);
+	return GameData;
+}
+
+void ALeyrGameMode::SetRegionTotalCount(const FGameplayTag& RegionTag, uint32 Count) const
+{
+	if (UGameData* GameDataObject = RetrieveGameData())
+	{
+		if (GameDataObject->ExplorationData.Contains(RegionTag))
+		{
+			GameDataObject->ExplorationData[RegionTag].SubdivisionTotalCount = Count;
+		}
+		else
+		{
+			GameDataObject->ExplorationData.Add(RegionTag, FExplorationData{ 0, Count });
+		}
+		UGameplayStatics::SaveGameToSlot(GameDataObject, "LeyrGameData", 0);
+	}
+}
+
+uint32 ALeyrGameMode::GetSubdivisionTotalCount() const
+{
+	uint32 TotalCount = 0;
+	if (UGameData* GameDataObject = RetrieveGameData())
+	{
+		for (const TTuple<FGameplayTag, FExplorationData>& Data : GameDataObject->ExplorationData)
+        {
+        	TotalCount += Data.Value.SubdivisionTotalCount;
+        }
+	}
+	return TotalCount;
 }

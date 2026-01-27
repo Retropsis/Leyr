@@ -171,4 +171,7 @@ public:
 	 */
 	UPROPERTY()
 	TMap<FName, FRoomData> SavedRooms;
+
+	UPROPERTY()
+	float MapCompletionRate = 0.f;
 };

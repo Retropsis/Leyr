@@ -50,11 +50,13 @@ public:
 	void SetMapName(FString InMapName);
 	void SetLoadSlotName(FString InLoadSlotName);
 	void SetPlayerLevel(int32 InPlayerLevel);
+	void SetMapCompletionRate(float InMapCompletionRate);
 
 	FString GetPlayerName() const { return PlayerName; }
 	FString GetMapName() const { return MapName; }
 	FString GetLoadSlotName() const { return LoadSlotName; }
 	int32 GetPlayerLevel() const { return PlayerLevel; }
+	float GetMapCompletionRate() const { return MapCompletionRate; }
 	
 private:	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta=(AllowPrivateAccess="true"))
@@ -68,4 +70,7 @@ private:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta=(AllowPrivateAccess="true"))
 	FString LoadSlotName;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta=(AllowPrivateAccess="true"))
+	float MapCompletionRate;
 };

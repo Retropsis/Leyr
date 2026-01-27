@@ -71,7 +71,7 @@ void UMapWidget::InterpolateMinimapToCenter(const ERoomUpdateType& UpdateType, U
 	const UCanvasPanelSlot* RoomCPS = UWidgetLayoutLibrary::SlotAsCanvasSlot(Room);
 	const FVector2D CurrentRoomTilePosition = Room->GetOriginalPositionInCanvas() + RoomCPS->GetSize() / 2.f;
 	FTimerHandle InterpTimer;
-	GetWorld()->GetTimerManager().SetTimer(InterpTimer, [this, UpdateType, CurrentRoomTilePosition] ()
+	GetWorld()->GetTimerManager().SetTimer(InterpTimer, [this, CurrentRoomTilePosition] ()
 	{
 		StartInterpolation(CurrentRoomTilePosition);
 	}, .05f, false);
@@ -115,9 +115,10 @@ void UMapWidget::UpdateRoomTileAt(const FRoomData& RoomData, const ERoomUpdateTy
 	}
 }
 
-void UMapWidget::UpdateCompletionText(const float CompletionRate) const
+void UMapWidget::UpdateCompletionText(const float CompletionRate, const float RegionRate) const
 {
-	Text_MapCompletion->SetText(FText::FromString(FString::Printf(TEXT("%.1f"), CompletionRate)));
+	Text_MapCompletion->SetText(FText::FromString(FString::Printf(TEXT("%.1f%%"), CompletionRate)));
+	Text_RegionCompletion->SetText(FText::FromString(FString::Printf(TEXT("(%.1f%%)"), RegionRate)));
 }
 
 void UMapWidget::StartInterpolation(const FVector2D& RoomTilePosition)

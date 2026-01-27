@@ -6,18 +6,10 @@
 #include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
 #include "Data/MapData.h"
+#include "World/Data/MapInfo.h"
 #include "MapComponent.generated.h"
 
 class UMapWidget;
-
-USTRUCT()
-struct FExplorationData
-{
-	GENERATED_BODY()
-
-	UPROPERTY() uint32 SubdivisionExploredCount = 0;
-	UPROPERTY() uint32 SubdivisionTotalCount = 0;
-};
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class LEYR_API UMapComponent : public UActorComponent
@@ -26,7 +18,7 @@ class LEYR_API UMapComponent : public UActorComponent
 
 public:
 	UMapComponent();
-	virtual void OnComponentCreated() override;
+	void InitializeExplorationData();
 	void ConstructMapWidget();
 	void ConstructMapRooms();
 	void StartTrackingPlayerRoomCoordinates(const FName& RoomName, const FVector& RoomLocation);
@@ -45,6 +37,7 @@ public:
 
 	TMap<FName, FRoomData> GetRooms() const { return Rooms; }
 	void SetRooms(const TMap<FName, FRoomData>& InRooms) { Rooms = InRooms; }
+	float GetMapCompletionRate() const { return TotalCompletionRate; }
 
 private:
 	TArray<FRoomData> FilterRoomsByRegion(const FGameplayTag& RegionTag);
@@ -53,6 +46,7 @@ private:
 	void SetRoomUnveiled(const FName& RoomName, bool bUnveiled = true);
 	bool IsRoomTileExplored(const FName& RoomName, const FIntPoint& Coordinates) const;
 	void SetRoomTileExplored(const FName& RoomName, const FIntPoint& Coordinates);
+	void UpdateCompletionRate();
 	void ExploreRoomTile(const FName& RoomName, const FIntPoint& Coordinates);
 	void UnveilRoom(const FName& RoomName);
 	void TrackPlayerRoomCoordinates(const FName& RoomName, const FVector& RoomLocation);
@@ -74,6 +68,8 @@ private:
 	TMap<FName, FRoomData> Rooms;
 
 	UPROPERTY() TMap<FGameplayTag, FExplorationData> ExplorationData;
+	uint32 SubdivisionTotalCount = 0;
+	float TotalCompletionRate = 0.f;
 	
 	TWeakObjectPtr<APlayerController> OwningController;
 	TWeakObjectPtr<ACharacter> PlayerCharacter;

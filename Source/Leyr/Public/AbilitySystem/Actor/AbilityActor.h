@@ -48,16 +48,16 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UAttributeSet> AttributeSet;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Leyr")
 	EActorClass ActorClass = EActorClass::Default;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Leyr")
 	TObjectPtr<UBaseAttributeSet> AbilitySet = nullptr;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character|Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Leyr")
 	float LifeSpan = 1.f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Character Class Defaults")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Leyr")
 	int32 Level = 1;
 	
 	UFUNCTION(NetMulticast, Reliable)
@@ -66,9 +66,9 @@ protected:
 	UPROPERTY(BlueprintReadOnly)
 	bool bDestroyed = false;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Leyr")
 	UNiagaraSystem* InteractEffect;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character|Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Leyr")
 	USoundBase* DestructionSound;
 };

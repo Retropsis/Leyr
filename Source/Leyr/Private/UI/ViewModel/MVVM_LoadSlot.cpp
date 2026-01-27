@@ -28,3 +28,8 @@ void UMVVM_LoadSlot::SetPlayerLevel(int32 InPlayerLevel)
 {
 	UE_MVVM_SET_PROPERTY_VALUE(PlayerLevel, InPlayerLevel);
 }
+
+void UMVVM_LoadSlot::SetMapCompletionRate(float InMapCompletionRate)
+{
+	UE_MVVM_SET_PROPERTY_VALUE(MapCompletionRate, InMapCompletionRate);
+}

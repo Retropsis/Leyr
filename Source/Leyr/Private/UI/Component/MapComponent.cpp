@@ -17,27 +17,55 @@ UMapComponent::UMapComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-void UMapComponent::OnComponentCreated()
-{
-	Super::OnComponentCreated();
-	UE_LOG(LogTemp, Warning, TEXT("OnComponentCreated"));
-}
-
 void UMapComponent::InitializeMap()
 {
 	const ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this));
+	SubdivisionTotalCount = LeyrGameMode->GetSubdivisionTotalCount();
+	
 	const ULeyrGameInstance* LeyrGameInstance = Cast<ULeyrGameInstance>(LeyrGameMode->GetGameInstance());
 	if (const ULoadMenuSaveGame* SaveGame = LeyrGameMode->GetSaveSlotData(LeyrGameInstance->LoadSlotName, LeyrGameInstance->LoadSlotIndex))
 	{
 		Rooms = SaveGame->SavedRooms;
+		InitializeExplorationData();
 	}
 	
 	if (Rooms.IsEmpty())
 	{
 		ConstructMapRooms();
 	}
+	const FGameplayTag RegionTag = GetCurrentRegionTag(); 
+	if (ExplorationData.Contains(RegionTag))
+	{
+		LeyrGameMode->SetRegionTotalCount(RegionTag, ExplorationData[RegionTag].SubdivisionTotalCount);
+	}
 	
 	ConstructMapWidget();
+	UpdateCompletionRate();
+}
+
+void UMapComponent::InitializeExplorationData()
+{
+	for (TTuple<FName, FRoomData> Room : Rooms)
+	{
+		if (FExplorationData* Data = ExplorationData.Find(Room.Value.RegionTag))
+		{
+			for (TTuple<UE::Math::TIntPoint<int>, FSubdivision> Subdivision : Room.Value.Subdivisions)
+			{
+				Data->SubdivisionExploredCount += Subdivision.Value.SubdivisionState == ESubdivisionState::Explored ? 1 : 0;
+				Data->SubdivisionTotalCount++;
+			}
+		}
+		else
+		{
+			FExplorationData NewData = FExplorationData{};
+			for (TTuple<UE::Math::TIntPoint<int>, FSubdivision> Subdivision : Room.Value.Subdivisions)
+			{
+				NewData.SubdivisionExploredCount += Subdivision.Value.SubdivisionState == ESubdivisionState::Explored ? 1 : 0;
+				NewData.SubdivisionTotalCount++;
+			}
+			ExplorationData.Add(Room.Value.RegionTag, NewData);
+		}
+	}
 }
 
 void UMapComponent::ConstructMapWidget()
@@ -218,13 +246,27 @@ void UMapComponent::ExploreRoomTile(const FName& RoomName, const FIntPoint& Coor
 {
 	if (!IsRoomTileExplored(RoomName, Coordinates))
 	{
-		const FGameplayTag RegionTag = GetCurrentRegionTag();
-		if (FExplorationData* RegionData = ExplorationData.Find(RegionTag))
-		{
-			RegionData->SubdivisionExploredCount++;
-			MapWidget->UpdateCompletionText(static_cast<float>(RegionData->SubdivisionExploredCount) / static_cast<float>(RegionData->SubdivisionTotalCount) * 100.f);
-		}
+		UpdateCompletionRate();
 		SetRoomTileExplored(RoomName, Coordinates);
+	}
+}
+
+void UMapComponent::UpdateCompletionRate()
+{
+	const FGameplayTag RegionTag = GetCurrentRegionTag();
+	if (FExplorationData* RegionData = ExplorationData.Find(RegionTag))
+	{
+		RegionData->SubdivisionExploredCount++;
+			
+		uint32 ExploredCount = 0;
+		for (const TTuple<FGameplayTag, FExplorationData> Data : ExplorationData)
+		{
+			ExploredCount += Data.Value.SubdivisionExploredCount;
+		}
+
+		const float RegionCompletionRate = static_cast<float>(RegionData->SubdivisionExploredCount) / static_cast<float>(RegionData->SubdivisionTotalCount) * 100.f;
+		TotalCompletionRate = static_cast<float>(ExploredCount) / static_cast<float>(SubdivisionTotalCount) * 100.f;
+		MapWidget->UpdateCompletionText(TotalCompletionRate, RegionCompletionRate);
 	}
 }
 

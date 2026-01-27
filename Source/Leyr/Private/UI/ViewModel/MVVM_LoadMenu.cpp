@@ -35,6 +35,7 @@ void UMVVM_LoadMenu::LoadData()
 		LoadSlot.Value->SetPlayerName(SaveObject->PlayerName);
 		LoadSlot.Value->SetMapName(SaveObject->MapName);
 		LoadSlot.Value->SetPlayerLevel(SaveObject->Level);
+		LoadSlot.Value->SetMapCompletionRate(SaveObject->MapCompletionRate);
 		LoadSlot.Value->SlotStatus =  SaveObject->SaveSlotStatus;
 		LoadSlot.Value->PlayerStartTag =  SaveObject->PlayerStartTag;
 		LoadSlot.Value->InitializeSlot();

@@ -1127,8 +1127,6 @@ void APlayerCharacter::SaveProgress_Implementation(const FName& SavePointTag)
 		SaveData->Wisdom = UBaseAttributeSet::GetWisdomAttribute().GetGameplayAttributeData(GetAttributeSet())->GetBaseValue();
 		SaveData->Spirit = UBaseAttributeSet::GetSpiritAttribute().GetGameplayAttributeData(GetAttributeSet())->GetBaseValue();
 		
-		
-
 		SaveData->bFirstTimeLoadIn = false;
 
 		if(!HasAuthority()) return;
@@ -1144,6 +1142,7 @@ void APlayerCharacter::SaveProgress_Implementation(const FName& SavePointTag)
 			if (const UMapComponent* MapComponent = PlayerCharacterController->FindComponentByClass<UMapComponent>())
 			{
 				SaveData->SavedRooms = MapComponent->GetRooms();
+				SaveData->MapCompletionRate = MapComponent->GetMapCompletionRate();
 			}
 		}
 

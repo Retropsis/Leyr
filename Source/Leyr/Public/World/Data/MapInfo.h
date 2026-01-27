@@ -48,6 +48,15 @@ struct FMapDefaultInfo
 	UPROPERTY(EditDefaultsOnly, Category="Map Defaults") FParallaxLayerData ForegroundLayerData = FParallaxLayerData();
 };
 
+USTRUCT()
+struct FExplorationData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(VisibleDefaultsOnly) uint32 SubdivisionExploredCount = 0;
+	UPROPERTY(VisibleDefaultsOnly) uint32 SubdivisionTotalCount = 0;
+};
+
 UCLASS()
 class LEYR_API UMapInfo : public UDataAsset
 {
