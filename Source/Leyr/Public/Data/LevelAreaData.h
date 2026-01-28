@@ -7,14 +7,8 @@
 #include "Engine/DataAsset.h"
 #include "LevelAreaData.generated.h"
 
-struct FGameplayTag;
 class UNiagaraSystem;
 class UGameplayEffect;
-class UEncounterSpawnData;
-
-// DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelAreaDataPropertyChanged, FName /* PropertyName */);
-// DECLARE_MULTICAST_DELEGATE_OneParam(FOnEncounterSpawnsPropertyChanged, FName /* PropertyName */);
-// DECLARE_MULTICAST_DELEGATE_OneParam(FOnEncounterSpawnsPropertyDeleted, FGameplayTag /* EncounterSpawnTag */);
 
 UCLASS(BlueprintType)
 class LEYR_API ULevelAreaData : public UPrimaryDataAsset
@@ -27,10 +21,6 @@ public:
 	// virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	// virtual void PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent) override;
 #endif
-
-	// FOnLevelAreaDataPropertyChanged OnLevelAreaDataPropertyChanged;
-	// FOnEncounterSpawnsPropertyChanged OnEncounterSpawnsPropertyChanged;
-	// FOnEncounterSpawnsPropertyDeleted OnEncounterSpawnsPropertyDeleted;
 	
 	UPROPERTY(EditDefaultsOnly)
 	FName LevelAreaName = FName("");
@@ -43,6 +33,4 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TObjectPtr<UNiagaraSystem>> EnvironmentEffects;
-	
-	// TArray<FEncounterSpawn> TempEncounterSpawns;
 };

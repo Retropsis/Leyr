@@ -75,7 +75,6 @@ void ACameraBoundary::PostEditChangeProperty(struct FPropertyChangedEvent& Prope
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 	
-	
 	if (PropertyChangedEvent.Property->GetName() == TEXT("LevelAreaData") && IsValid(LevelAreaData))
 	{
 		LevelAreaName = LevelAreaData->LevelAreaName;
@@ -150,11 +149,24 @@ void ACameraBoundary::BeginPlay()
 void ACameraBoundary::GroupIntoRoomFolder()
 {
 	const FName RoomPath = MakeFolderPathFromRoomName();
-	const FString NewLabel = FString::Printf(TEXT("CameraBoundary_%s"), *GetValidRoomName().ToString());
+	FString NewLabel = FString::Printf(TEXT("CameraBoundary_%s"), *GetValidRoomName().ToString());
+	NewLabel.RemoveSpacesInline();
 	SetActorLabel(NewLabel);
 	SetFolderPath(RoomPath);
-	if (IsValid(TileMap)) TileMap->SetFolderPath(RoomPath);
-	if (IsValid(WaterVolume)) WaterVolume->SetFolderPath(RoomPath);
+	if (IsValid(TileMap))
+	{
+		FString NewTileMapLabel = GetValidRoomName().ToString();
+		NewTileMapLabel.RemoveSpacesInline();
+		TileMap->SetActorLabel(FString::Printf(TEXT("TM_%s"), *NewTileMapLabel));
+		TileMap->SetFolderPath(RoomPath);
+	}
+	if (IsValid(WaterVolume))
+	{
+		FString NewWaterVolumeLabel = GetValidRoomName().ToString();
+		NewWaterVolumeLabel.RemoveSpacesInline();
+		WaterVolume->SetActorLabel(FString::Printf(TEXT("WaterVolume_%s"), *NewWaterVolumeLabel));
+		WaterVolume->SetFolderPath(RoomPath);
+	}
 	for (TObjectPtr<AEncounterSpawnVolume> SpawningVolume : SpawningVolumes)
 	{
 		if (IsValid(SpawningVolume)) SpawningVolume->SetFolderPath(RoomPath);
@@ -166,6 +178,12 @@ void ACameraBoundary::GroupIntoRoomFolder()
 		if (IsValid(Overlap.GetActor()))
 		{
 			Overlap.GetActor()->SetFolderPath(RoomPath);
+			if (Overlap.GetActor()->ActorHasTag("SavePoint"))
+			{
+				FString SavePointLabel = GetValidRoomName().ToString();
+				SavePointLabel.RemoveSpacesInline();
+				Overlap.GetActor()->SetActorLabel(FString::Printf(TEXT("SavePoint_%s"), *SavePointLabel));
+			}
 		}
 	}
 }
@@ -177,6 +195,7 @@ void ACameraBoundary::RenameVolumes()
 		if (IsValid(SpawningVolume))
 		{
 			FString NewLabel = FString::Printf(TEXT("SpawningVolume_%s"), *LevelAreaName.ToString());
+			NewLabel.RemoveSpacesInline();
 			SpawningVolume->SetActorLabel(NewLabel);
 		}
 	}
@@ -205,7 +224,8 @@ void ACameraBoundary::AddSpawnVolume(const int32 Index)
 	
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-	const FString NewLabel = FString::Printf(TEXT("SpawningVolume_%s"), *LevelAreaName.ToString());
+	FString NewLabel = FString::Printf(TEXT("SpawningVolume_%s"), *LevelAreaName.ToString());
+	NewLabel.RemoveSpacesInline();
 	const FVector Location = FVector{ GetActorLocation().X, 0.f, GetActorLocation().Z } + FVector{ 100.f + Index * 50.f, 0.f, 0.f };
 	AEncounterSpawnVolume* SpawningVolume = GetWorld()->SpawnActor<AEncounterSpawnVolume>(SpawningVolumeClass, Location, FRotator::ZeroRotator, SpawnParams);
 	// SpawningVolume->SetEncounterSpawnTag(Data.EncounterSpawnTag);

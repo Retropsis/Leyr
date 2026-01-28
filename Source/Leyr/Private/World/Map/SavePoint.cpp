@@ -23,6 +23,8 @@ ASavePoint::ASavePoint(const FObjectInitializer& ObjectInitializer) : Super(Obje
 	OverlapBox->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
 	OverlapBox->SetBoxExtent(FVector{ 32.f, 100.f, 32.f });
 	OverlapBox->SetupAttachment(GetRootComponent());
+
+	Tags.Add("SavePoint");
 }
 
 void ASavePoint::LoadActor_Implementation()
