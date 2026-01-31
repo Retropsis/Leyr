@@ -29,6 +29,24 @@ struct FParallaxLayerData
 };
 
 USTRUCT(BlueprintType)
+struct FMinimapData
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditDefaultsOnly)
+	FSlateColor ExploredTint;
+	
+	UPROPERTY(EditDefaultsOnly)
+	FSlateColor WallTint;
+	
+	UPROPERTY(EditDefaultsOnly)
+	FSlateColor DoorTint;
+	
+	UPROPERTY(EditDefaultsOnly)
+	FSlateColor CornerTint;
+};
+
+USTRUCT(BlueprintType)
 struct FMapDefaultInfo
 {
 	GENERATED_BODY()
@@ -46,6 +64,8 @@ struct FMapDefaultInfo
 	UPROPERTY(EditDefaultsOnly, Category="Map Defaults") FParallaxLayerData ForegroundFogLayerData = FParallaxLayerData();
 	UPROPERTY(EditDefaultsOnly, Category="Map Defaults") FParallaxLayerData BackgroundFogLayerData = FParallaxLayerData();
 	UPROPERTY(EditDefaultsOnly, Category="Map Defaults") FParallaxLayerData ForegroundLayerData = FParallaxLayerData();
+	
+	UPROPERTY(EditDefaultsOnly, Category="Map Defaults") FMinimapData MinimapData = FMinimapData();
 };
 
 USTRUCT()

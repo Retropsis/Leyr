@@ -14,7 +14,7 @@ void UMapWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 	RedrawMap(InDeltaTime);
 }
 
-void UMapWidget::ConstructMapCanvas(const TArray<FRoomData>& MapData)
+void UMapWidget::ConstructMapCanvas(const TArray<FRoomData>& MapData, const FMinimapData& MinimapData)
 {
 	if (!IsValid(CanvasPanel))
 	{
@@ -27,6 +27,7 @@ void UMapWidget::ConstructMapCanvas(const TArray<FRoomData>& MapData)
 		URoom* Room = CreateWidget<URoom>(this, RoomClass);
 		Room->SetRoomState(ERoomState::Unexplored);
 		Room->SetRoomType(RoomData.RoomType);
+		Room->SetMinimapData(MinimapData);
 		Room->ConstructRoom(RoomData);
 		// UE_LOG(LogTemp, Warning, TEXT("Room was created with the name: %s size: (w%d, h%d), coords: (x%d, y%d) Type: %s"), *RoomData.RoomName.ToString(), RoomData.RoomSize.X, RoomData.RoomSize.Y, RoomData.RoomCoordinates.X, RoomData.RoomCoordinates.Y, *UEnum::GetValueAsString(RoomData.RoomType));
 

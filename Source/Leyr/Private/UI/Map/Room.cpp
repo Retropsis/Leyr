@@ -12,7 +12,7 @@ void URoom::ConstructRoom(const FRoomData& RoomData)
 		for (int w = 0; w < RoomData.RoomSize.X; ++w)
 		{
 			URoomTile* RoomTile = CreateWidget<URoomTile>(this, RoomTileClass);
-			RoomTile->InitializeRoomTile(RoomData, FIntPoint(w, h));
+			RoomTile->InitializeRoomTile(RoomData, FIntPoint(w, h), MinimapData);
 			RoomSize = RoomData.RoomSize;
 			RoomGrid->AddChildToGrid(RoomTile, h, w);
 			RoomTiles.Emplace(FIntPoint(w, h), RoomTile);

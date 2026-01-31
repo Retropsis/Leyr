@@ -77,7 +77,12 @@ void UMapComponent::ConstructMapWidget()
 	PlayerCharacter = OwningController->GetCharacter();
 
 	MapWidget = CreateWidget<UMapWidget>(OwningController.Get(), MapWidgetClass);
-	MapWidget->ConstructMapCanvas(FilterRoomsByRegion(GetCurrentRegionTag()));
+	const ALeyrGameMode* LeyrGameMode = Cast<ALeyrGameMode>(UGameplayStatics::GetGameMode(this));
+	if (IsValid(LeyrGameMode) && IsValid(LeyrGameMode->MapInfo))
+	{
+		const FName RegionName = FName(GetWorld()->GetName());
+		MapWidget->ConstructMapCanvas(FilterRoomsByRegion(GetCurrentRegionTag()), LeyrGameMode->MapInfo->GetMapDefaultInfo(RegionName).MinimapData);
+	}
 	// CloseInventoryMenu();
 }
 

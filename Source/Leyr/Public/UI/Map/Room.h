@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "CommonUserWidget.h"
 #include "Data/MapData.h"
+#include "World/Data/MapInfo.h"
 #include "Room.generated.h"
 
 class URoomTile;
@@ -29,6 +30,7 @@ public:
 	ERoomType GetRoomType() const { return RoomType; }
 	void SetOriginalPositionInCanvas(const FVector2D Position) { OriginalPositionInCanvas = Position; }
 	FVector2D GetOriginalPositionInCanvas() const { return OriginalPositionInCanvas; }
+	void SetMinimapData(const FMinimapData& Data) { MinimapData = Data; }
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void HandleUnveilAnimation();
@@ -48,4 +50,5 @@ private:
 	ERoomState RoomState = ERoomState::None;
 	ERoomType RoomType = ERoomType::None;
 	FVector2D OriginalPositionInCanvas = FVector2D::ZeroVector;
+	FMinimapData MinimapData;
 };

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CommonUserWidget.h"
+#include "World/Data/MapInfo.h"
 #include "MapWidget.generated.h"
 
 class UTextBlock;
@@ -24,7 +25,7 @@ class LEYR_API UMapWidget : public UCommonUserWidget
 	
 public:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-	void ConstructMapCanvas(const TArray<FRoomData>& MapData);
+	void ConstructMapCanvas(const TArray<FRoomData>& MapData, const FMinimapData& MinimapData);
 	void InterpolateMinimapToCenter(const ERoomUpdateType& UpdateType, URoom* Room);
 	void StartInterpolation(const FVector2D& RoomTilePosition);
 	void EnteringRoom(const FRoomData& RoomData, const ERoomUpdateType& UpdateType, const FIntPoint& PlayerCoordinates);

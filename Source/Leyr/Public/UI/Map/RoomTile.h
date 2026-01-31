@@ -7,6 +7,7 @@
 #include "Data/MapData.h"
 #include "RoomTile.generated.h"
 
+struct FMinimapData;
 enum class ERoomState : uint8;
 class UImage;
 
@@ -18,7 +19,7 @@ class LEYR_API URoomTile : public UCommonUserWidget
 public:
 
 	void UpdateRoomTile(const ERoomUpdateType& UpdateType);
-	void InitializeRoomTile(const FRoomData& RoomData, const FIntPoint& SubdivisionCoordinates);
+	void InitializeRoomTile(const FRoomData& RoomData, const FIntPoint& SubdivisionCoordinates, const FMinimapData& MinimapData);
 	void EnterRoomTile();
 	void LeaveRoomTile();
 	void ExploreRoomTile();
@@ -46,7 +47,7 @@ public:
 	void HandleRevealAnimation();
 
 protected:
-	virtual void NativeConstruct() override;
+	void InitializeTint(const FMinimapData& Data);
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category ="Map")
@@ -67,6 +68,39 @@ private:
 	UPROPERTY(meta=(BindWidget))
 	TObjectPtr<UImage> Image_BorderBottom;
 	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_CornerTopLeft;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_CornerTopRight;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_CornerBottomLeft;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_CornerBottomRight;
+	
+	UPROPERTY(meta=(BindWidget))
+	TObjectPtr<UImage> Image_Item;
+
+	/*
+	 * Tints
+	 */
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateColor ExploredTint;
+	
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateColor WallTint;
+	
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateColor DoorTint;
+	
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateColor CornerTint;
+	
+	/*
+	 * Rooms
+	 */
 	UPROPERTY(EditAnywhere, Category="Map")
 	FSlateBrush Brush_Unexplored;
 	
@@ -87,13 +121,19 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category="Map")
 	FSlateBrush Brush_ExitRoom;
-	
+
+	/*
+	 * Unexplored
+	 */
 	UPROPERTY(EditAnywhere, Category="Map")
 	FSlateBrush Brush_Border_Undiscovered_H;
 	
 	UPROPERTY(EditAnywhere, Category="Map")
 	FSlateBrush Brush_Border_Undiscovered_V;
-	
+
+	/*
+	 * Walls
+	 */
 	UPROPERTY(EditAnywhere, Category="Map")
 	FSlateBrush Brush_Horizontal_Wall_Top;
 	
@@ -105,7 +145,25 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category="Map")
 	FSlateBrush Brush_Vertical_Wall_Right;
+
+	/*
+	 * Corners
+	 */
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateBrush Brush_Corner_Top_Left;
 	
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateBrush Brush_Corner_Top_Right;
+	
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateBrush Brush_Corner_Bottom_Left;
+	
+	UPROPERTY(EditAnywhere, Category="Map")
+	FSlateBrush Brush_Corner_Bottom_Right;
+
+	/*
+	 * Doors
+	 */
 	UPROPERTY(EditAnywhere, Category="Map")
 	FSlateBrush Brush_Horizontal_Door_Top;
 	
