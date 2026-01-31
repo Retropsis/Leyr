@@ -95,34 +95,28 @@ private:
 	FSlateBrush Brush_Border_Undiscovered_V;
 	
 	UPROPERTY(EditAnywhere, Category="Map")
-	FSlateBrush Brush_Border_H;
+	FSlateBrush Brush_Horizontal_Wall_Top;
 	
 	UPROPERTY(EditAnywhere, Category="Map")
-	FSlateBrush Brush_Border_H_L;
+	FSlateBrush Brush_Horizontal_Wall_Bottom;
 	
 	UPROPERTY(EditAnywhere, Category="Map")
-	FSlateBrush Brush_Border_H_R;
+	FSlateBrush Brush_Vertical_Wall_Left;
 	
 	UPROPERTY(EditAnywhere, Category="Map")
-	FSlateBrush Brush_Border_H_LR;
+	FSlateBrush Brush_Vertical_Wall_Right;
 	
 	UPROPERTY(EditAnywhere, Category="Map")
-	FSlateBrush Brush_Border_V;
+	FSlateBrush Brush_Horizontal_Door_Top;
 	
 	UPROPERTY(EditAnywhere, Category="Map")
-	FSlateBrush Brush_Border_V_T;
+	FSlateBrush Brush_Horizontal_Door_Bottom;
 	
 	UPROPERTY(EditAnywhere, Category="Map")
-	FSlateBrush Brush_Border_V_B;
+	FSlateBrush Brush_Vertical_Door_Left;
 	
 	UPROPERTY(EditAnywhere, Category="Map")
-	FSlateBrush Brush_Border_V_TB;
-	
-	UPROPERTY(EditAnywhere, Category="Map")
-	FSlateBrush Brush_DoorBorder_H;
-	
-	UPROPERTY(EditAnywhere, Category="Map")
-	FSlateBrush Brush_DoorBorder_V;
+	FSlateBrush Brush_Vertical_Door_Right;
 
 	FIntPoint RoomSize;
 	FIntPoint TileCoordinates;

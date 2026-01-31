@@ -124,19 +124,19 @@ void URoomTile::DrawDoors(const FSubdivision& Subdivision) const
 		case ESubdivisionSide::None:
 			break;
 		case ESubdivisionSide::Top:
-			Image_BorderTop->SetBrush(Door.Value == EEntranceType::Hidden ? Brush_Border_H : Brush_DoorBorder_H);
+			Image_BorderTop->SetBrush(Door.Value == EEntranceType::Hidden ? Brush_Horizontal_Wall_Top : Brush_Horizontal_Door_Top);
 			Image_BorderTop->SetVisibility(ESlateVisibility::Visible);
 			break;
 		case ESubdivisionSide::Bottom:
-			Image_BorderBottom->SetBrush(Door.Value == EEntranceType::Hidden ? Brush_Border_H : Brush_DoorBorder_H);
+			Image_BorderBottom->SetBrush(Door.Value == EEntranceType::Hidden ? Brush_Horizontal_Wall_Bottom : Brush_Horizontal_Door_Bottom);
 			Image_BorderBottom->SetVisibility(ESlateVisibility::Visible);
 			break;
 		case ESubdivisionSide::Left:
-			Image_BorderLeft->SetBrush(Door.Value == EEntranceType::Hidden ? Brush_Border_V : Brush_DoorBorder_V);
+			Image_BorderLeft->SetBrush(Door.Value == EEntranceType::Hidden ? Brush_Vertical_Wall_Left : Brush_Vertical_Door_Left);
 			Image_BorderLeft->SetVisibility(ESlateVisibility::Visible);
 			break;
 		case ESubdivisionSide::Right:
-			Image_BorderRight->SetBrush(Door.Value == EEntranceType::Hidden ? Brush_Border_V : Brush_DoorBorder_V);
+			Image_BorderRight->SetBrush(Door.Value == EEntranceType::Hidden ? Brush_Vertical_Wall_Right : Brush_Vertical_Door_Right);
 			Image_BorderRight->SetVisibility(ESlateVisibility::Visible);
 			break;
 		}
@@ -147,34 +147,22 @@ void URoomTile::SetBorders(const FIntPoint& Coordinates, const FIntPoint& Size) 
 {
 	if (Coordinates.X == 0)
 	{
-		if (Coordinates.Y == 0 && Coordinates.Y == Size.Y - 1) Image_BorderLeft->SetBrush(Brush_Border_V_TB);
-		else if (Coordinates.Y == 0) Image_BorderLeft->SetBrush(Brush_Border_V_T);
-		else if (Coordinates.Y == Size.Y - 1) Image_BorderLeft->SetBrush(Brush_Border_V_B);
-		else Image_BorderLeft->SetBrush(Brush_Border_V);
+		Image_BorderLeft->SetBrush(Brush_Vertical_Wall_Left);
 		Image_BorderLeft->SetVisibility(ESlateVisibility::Visible);
 	}
 	if (Coordinates.X == Size.X - 1)
 	{
-		if (Coordinates.Y == 0 && Coordinates.Y == Size.Y - 1) Image_BorderRight->SetBrush(Brush_Border_V_TB);
-		else if (Coordinates.Y == 0) Image_BorderRight->SetBrush(Brush_Border_V_T);
-		else if (Coordinates.Y == Size.Y - 1) Image_BorderRight->SetBrush(Brush_Border_V_B);
-		else Image_BorderRight->SetBrush(Brush_Border_V);
+		Image_BorderRight->SetBrush(Brush_Vertical_Wall_Right);
 		Image_BorderRight->SetVisibility(ESlateVisibility::Visible);
 	}
 	if (Coordinates.Y == Size.Y - 1)
 	{
-		if (Coordinates.X == 0 && Coordinates.X == Size.X - 1) Image_BorderBottom->SetBrush(Brush_Border_H_LR);
-		else if (Coordinates.X == 0) Image_BorderBottom->SetBrush(Brush_Border_H_L);
-		else if (Coordinates.X == Size.X - 1) Image_BorderBottom->SetBrush(Brush_Border_H_R);
-		else Image_BorderBottom->SetBrush(Brush_Border_H);
+		Image_BorderBottom->SetBrush(Brush_Horizontal_Wall_Bottom);
 		Image_BorderBottom->SetVisibility(ESlateVisibility::Visible);
 	}
 	if (Coordinates.Y == 0)
 	{
-		if (Coordinates.X == 0 && Coordinates.X == Size.X - 1) Image_BorderTop->SetBrush(Brush_Border_H_LR);
-		else if (Coordinates.X == 0) Image_BorderTop->SetBrush(Brush_Border_H_L);
-		else if (Coordinates.X == Size.X - 1) Image_BorderTop->SetBrush(Brush_Border_H_R);
-		else Image_BorderTop->SetBrush(Brush_Border_H);
+		Image_BorderTop->SetBrush(Brush_Horizontal_Wall_Top);
 		Image_BorderTop->SetVisibility(ESlateVisibility::Visible);
 	}
 }
