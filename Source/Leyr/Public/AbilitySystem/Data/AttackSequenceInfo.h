@@ -49,7 +49,7 @@ public:
 	FTaggedMontage UseSequence;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation", meta=(TitleProperty="MontageTag"))
-	FTaggedMontage ThrowSequence;
+	TArray<FTaggedMontage> ThrowSequences;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "AttackSequenceInformation", meta=(TitleProperty="MontageTag"))
 	TArray<FTaggedMontage> DaggerSequences;

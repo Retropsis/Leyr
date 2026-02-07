@@ -463,7 +463,9 @@ void APlayerCharacter::SwimmingTagChanged(const FGameplayTag CallbackTag, int32 
 void APlayerCharacter::RuleTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
 {
 	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-	if (AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Rule_Block_Movement))
+	
+	if ((!GetCharacterMovement()->IsFalling() && AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Rule_Block_Movement_Ground)) ||
+		AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Rule_Block_Movement_All))
 	{
 		GetCharacterMovement()->StopMovementImmediately();
 	}
@@ -478,17 +480,17 @@ void APlayerCharacter::RuleTagChanged(const FGameplayTag CallbackTag, int32 NewC
  */
 void APlayerCharacter::Move(const FVector2D MovementVector)
 {
+	HandleCombatDirection(MovementVector);
+	
 	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-	if (AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Rule_Block_Movement)) return;
-
+	if (!AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Condition_Falling) &&
+		(AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Rule_Block_Movement_Ground) ||
+		AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Rule_Block_Movement_All))) return;
+	
 	// TODO: Remove this line when Root Motion Abilities are handling rules
 	if(CombatState >= ECombatState::Dodging) return;
 	
 	if(CombatState < ECombatState::Aiming && !AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Rule_Block_Direction)) RotateController();
-	
-	PreviousCombatDirection = CombatDirection;
-	CombatDirection = GetCombatDirectionFromVector2D(MovementVector);
-	if(PreviousCombatDirection != CombatDirection) HandleCombatDirectionTag();
 	
 	HandleCrouching(MovementVector.Y < 0.f);
 	
@@ -556,6 +558,13 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	case ECombatState::Defeated:
 		break;
 	}
+}
+
+void APlayerCharacter::HandleCombatDirection(const FVector2D MovementVector)
+{
+	PreviousCombatDirection = CombatDirection;
+	CombatDirection = GetCombatDirectionFromVector2D(MovementVector);
+	if(PreviousCombatDirection != CombatDirection) HandleCombatDirectionTag();
 }
 
 void APlayerCharacter::TryClimbingRope(const FVector2D MovementVector)
@@ -894,6 +903,10 @@ void APlayerCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeigh
 
 void APlayerCharacter::HandleCrouching(bool bShouldCrouch)
 {
+	// FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+	// if (AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Rule_Block_Crouch) ||
+	// 	AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Rule_Block_Uncrouch)) return;
+	
 	bCrouchButtonHeld = bShouldCrouch;
 	if(CombatState > ECombatState::Falling) return;
 	

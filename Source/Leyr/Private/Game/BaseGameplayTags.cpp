@@ -352,6 +352,11 @@ void FBaseGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.CombatState_Rule_Block = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Block"), FString("CombatState Rule Block"));
 	GameplayTags.CombatState_Rule_Block_All = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Block.All"), FString("CombatState Rule Block All"));
 	GameplayTags.CombatState_Rule_Block_Movement = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Block.Movement"), FString("CombatState Rule Block Movement"));
+	GameplayTags.CombatState_Rule_Block_Movement_Ground = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Block.Movement.Ground"), FString("CombatState Rule Block Movement Ground"));
+	GameplayTags.CombatState_Rule_Block_Movement_Airborne = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Block.Movement.Airborne"), FString("CombatState Rule Block Movement Airborne"));
+	GameplayTags.CombatState_Rule_Block_Movement_All = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Block.Movement.All"), FString("CombatState Rule Block Movement All"));
+	GameplayTags.CombatState_Rule_Block_Crouch = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Block.Crouch"), FString("CombatState Rule Block Crouch"));
+	GameplayTags.CombatState_Rule_Block_Uncrouch = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Block.Uncrouch"), FString("CombatState Rule Block Uncrouch"));
 	GameplayTags.CombatState_Rule_Block_Ability = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Block.Ability"), FString("CombatState Rule Block Ability"));
 	GameplayTags.CombatState_Rule_Block_Direction = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Block.Direction"), FString("CombatState Rule Block Direction"));
 	GameplayTags.CombatState_Rule_Stop = UGameplayTagsManager::Get().AddNativeGameplayTag(FName("CombatState.Rule.Stop"), FString("CombatState Rule Stop"));

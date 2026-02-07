@@ -39,6 +39,7 @@ public:
 	virtual void PeacefulTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 	virtual void SwimmingTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
 	virtual void RuleTagChanged(const FGameplayTag CallbackTag, int32 NewCount);
+	void HandleCombatDirection(FVector2D MovementVector);
 	virtual void OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 	virtual void Die(const FVector& DeathImpulse, bool bExecute) override;
