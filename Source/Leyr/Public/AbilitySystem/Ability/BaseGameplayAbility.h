@@ -184,4 +184,5 @@ private:
 	FActiveGameplayEffectHandle ActiveSourceObjectEffectHandle;
 	FActiveGameplayEffectHandle ActivePoiseEffectHandle;
 	bool bResetPitch = true;
+	bool bWantsToCrouch = false;
 };

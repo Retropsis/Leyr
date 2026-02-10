@@ -43,6 +43,7 @@ public:
 	virtual void OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 	virtual void Die(const FVector& DeathImpulse, bool bExecute) override;
+	virtual void HandleCrouching(bool bShouldCrouch) override;
 	
 	void Move(const FVector2D MovementVector);
 	void Pitch(float InPitch);
@@ -50,7 +51,6 @@ public:
 	bool TryDescendLadder();
 	void TryClimbingRope(FVector2D MovementVector);
 	bool TryVaultingDown();
-	void HandleCrouching(bool bShouldCrouch);
 	void JumpButtonPressed();
 
 	UFUNCTION()

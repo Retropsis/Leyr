@@ -9,12 +9,14 @@
 #include "UObject/Interface.h"
 #include "CombatInterface.generated.h"
 
+class ABaseCharacter;
 enum class ESequenceType : uint8;
 class UNiagaraSystem;
 class UPaperZDAnimSequence;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnASCRegistered, UAbilitySystemComponent*);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDeath, AActor*, DeadActor);
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnWantsToCrouch, bool /*  bShouldCrouch */);
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI, BlueprintType)
@@ -35,6 +37,7 @@ public:
 	virtual void Die(const FVector& DeathImpulse, bool bExecute) = 0;
 	virtual FOnASCRegistered& GetOnASCRegistered() = 0;
 	virtual FOnDeath& GetOnDeath() = 0;
+	virtual FOnWantsToCrouch& GetOnUnCrouch() = 0;
 	virtual ECharacterClass GetEncounterClass() { return ECharacterClass::Default; }
 	virtual int32 GetEncounterLevel() { return 0; }
 	

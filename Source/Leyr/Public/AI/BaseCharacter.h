@@ -32,6 +32,7 @@ public:
 	virtual void BeginPlay() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Landed(const FHitResult& Hit) override;
+	virtual void HandleCrouching(bool bShouldCrouch) {}
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComponent; } 
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 	UPaperZDAnimInstance* SetWeaponAnimInstance(const TSubclassOf<UPaperZDAnimInstance>& AnimInstance) const;
@@ -47,6 +48,7 @@ public:
 	
 	FOnDeath OnDeath;
 	FOnASCRegistered OnASCRegistered;
+	FOnWantsToCrouch OnWantsToCrouch;
 
 protected:
 	/*
@@ -166,6 +168,7 @@ protected:
 	
 	virtual FOnASCRegistered& GetOnASCRegistered() override { return OnASCRegistered; }
 	virtual FOnDeath& GetOnDeath() override { return OnDeath; }
+	virtual FOnWantsToCrouch& GetOnUnCrouch() override { return OnWantsToCrouch; }
 	virtual void BroadcastOnDeath_Implementation() override { OnDeath.Broadcast(this); }
 
 	virtual void SetCharacterCapsuleCollisionResponse_Implementation(const ECollisionChannel Channel, const ECollisionResponse Response) override;

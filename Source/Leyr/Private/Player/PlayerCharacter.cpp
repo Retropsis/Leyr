@@ -481,6 +481,7 @@ void APlayerCharacter::RuleTagChanged(const FGameplayTag CallbackTag, int32 NewC
 void APlayerCharacter::Move(const FVector2D MovementVector)
 {
 	HandleCombatDirection(MovementVector);
+	HandleCrouching(MovementVector.Y < 0.f);
 	
 	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
 	if (!AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Condition_Falling) &&
@@ -492,7 +493,6 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 	
 	if(CombatState < ECombatState::Aiming && !AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Rule_Block_Direction)) RotateController();
 	
-	HandleCrouching(MovementVector.Y < 0.f);
 	
 	switch (CombatState) {
 	case ECombatState::Unoccupied:
@@ -903,9 +903,17 @@ void APlayerCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeigh
 
 void APlayerCharacter::HandleCrouching(bool bShouldCrouch)
 {
-	// FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
-	// if (AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Rule_Block_Crouch) ||
-	// 	AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Rule_Block_Uncrouch)) return;
+	FBaseGameplayTags GameplayTags = FBaseGameplayTags::Get();
+	if (AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Rule_Block_Crouch) ||
+		AbilitySystemComponent->HasMatchingGameplayTag(GameplayTags.CombatState_Rule_Block_Uncrouch))
+	{
+		if (bCrouchButtonHeld != bShouldCrouch)
+		{
+			bCrouchButtonHeld = bShouldCrouch;
+			OnWantsToCrouch.Broadcast(bCrouchButtonHeld);
+		}
+		return;
+	}
 	
 	bCrouchButtonHeld = bShouldCrouch;
 	if(CombatState > ECombatState::Falling) return;

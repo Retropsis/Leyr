@@ -62,12 +62,17 @@ void UBaseGameplayAbility::InitAbility()
 
 bool UBaseGameplayAbility::FetchAnimInstances()
 {
-	if (!GetAvatarActorFromActorInfo()->Implements<UCombatInterface>()) return true;
+	ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo());
+	if (!CombatInterface) return true;
 	
 	if (bResetPitch) ICombatInterface::Execute_ResetAimingPitch(GetAvatarActorFromActorInfo());
 	PaperAnimInstance = ICombatInterface::Execute_GetPaperAnimInstance(GetAvatarActorFromActorInfo());
 	UpperBodyAnimInstance = ICombatInterface::Execute_GetUpperBodyAnimInstance(GetAvatarActorFromActorInfo());
 	WeaponAnimInstance = ICombatInterface::Execute_GetWeaponAnimInstance(GetAvatarActorFromActorInfo());
+	CombatInterface->GetOnUnCrouch().AddWeakLambda(this, [this] (bool bShouldCrouch)
+	{
+		bWantsToCrouch = bShouldCrouch;
+	});
 	if (WeaponAnimInstance) WeaponAnimInstance->StopAllAnimationOverrides();
 	
 	return false;
@@ -157,6 +162,15 @@ void UBaseGameplayAbility::InitAbilityWithParams(FInitAbilityParams Params)
 void UBaseGameplayAbility::PrepareToEndAbility()
 {
 	RemovePoise();
+	GetWorld()->GetTimerManager().SetTimerForNextTick([&] ()
+	{
+		if (ABaseCharacter* Character = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo()))
+		{
+			Character->HandleCrouching(bWantsToCrouch);
+		}
+	});
+	PaperAnimInstance->StopAllAnimationOverrides();
+	WeaponAnimInstance->StopAllAnimationOverrides();
 }
 
 void UBaseGameplayAbility::PrepareToEndAbilityWithParams(FEndAbilityParams Params)
