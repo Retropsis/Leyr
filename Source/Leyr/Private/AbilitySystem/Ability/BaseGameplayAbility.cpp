@@ -14,6 +14,7 @@
 #include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "Interaction/CombatInterface.h"
 #include "Interaction/PlayerInterface.h"
+#include "Player/PlayerCharacterAnimInstance.h"
 
 void UBaseGameplayAbility::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
@@ -69,9 +70,19 @@ bool UBaseGameplayAbility::FetchAnimInstances()
 	PaperAnimInstance = ICombatInterface::Execute_GetPaperAnimInstance(GetAvatarActorFromActorInfo());
 	UpperBodyAnimInstance = ICombatInterface::Execute_GetUpperBodyAnimInstance(GetAvatarActorFromActorInfo());
 	WeaponAnimInstance = ICombatInterface::Execute_GetWeaponAnimInstance(GetAvatarActorFromActorInfo());
+	bWasCrouched = Cast<ACharacter>(GetAvatarActorFromActorInfo())->bIsCrouched;
+	bCrouchWasHeld = bWasCrouched;
 	CombatInterface->GetOnUnCrouch().AddWeakLambda(this, [this] (bool bShouldCrouch)
 	{
-		bWantsToCrouch = bShouldCrouch;
+		bCrouchWasHeld = bShouldCrouch;
+		if (bCrouchWasHeld)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Crouch Was Held"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Crouch Was NOT Held"));
+		}
 	});
 	if (WeaponAnimInstance) WeaponAnimInstance->StopAllAnimationOverrides();
 	
@@ -162,15 +173,58 @@ void UBaseGameplayAbility::InitAbilityWithParams(FInitAbilityParams Params)
 void UBaseGameplayAbility::PrepareToEndAbility()
 {
 	RemovePoise();
-	GetWorld()->GetTimerManager().SetTimerForNextTick([&] ()
+	HandleCrouching();
+}
+
+void UBaseGameplayAbility::HandleCrouching()
+{
+	if (bWasCrouched && !bCrouchWasHeld)
 	{
+		GetWorld()->GetTimerManager().SetTimerForNextTick([&] ()
+		{
+			if (ABaseCharacter* Character = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo()))
+			{
+				Character->HandleCrouching(bCrouchWasHeld);
+			}
+		});
+		PaperAnimInstance->StopAllAnimationOverrides();
+		// PaperAnimInstance->PlayAnimationOverride();
+		WeaponAnimInstance->StopAllAnimationOverrides();
+	}
+	if (bWasCrouched && bCrouchWasHeld)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Was crouched and keeps crouching"));
 		if (ABaseCharacter* Character = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo()))
 		{
-			Character->HandleCrouching(bWantsToCrouch);
+			Character->HandleCrouching(bCrouchWasHeld);
 		}
-	});
-	PaperAnimInstance->StopAllAnimationOverrides();
-	WeaponAnimInstance->StopAllAnimationOverrides();
+		if (UPlayerCharacterAnimInstance* PlayerCharacterAnimInstance = Cast<UPlayerCharacterAnimInstance>(PaperAnimInstance))
+		{
+			PlayerCharacterAnimInstance->CombatState = ECombatState::Crouching;
+		}
+		GetWorld()->GetTimerManager().SetTimerForNextTick([&] ()
+		{
+			if (ABaseCharacter* Character = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo()))
+			{
+				PaperAnimInstance->StopAllAnimationOverrides();
+				WeaponAnimInstance->StopAllAnimationOverrides();
+			}
+		});
+		// PaperAnimInstance->PlayAnimationOverride();
+	}
+	if (!bWasCrouched && bCrouchWasHeld)
+	{
+		GetWorld()->GetTimerManager().SetTimerForNextTick([&] ()
+		{
+			if (ABaseCharacter* Character = Cast<ABaseCharacter>(GetAvatarActorFromActorInfo()))
+			{
+				Character->HandleCrouching(bCrouchWasHeld);
+			}
+		});
+		PaperAnimInstance->StopAllAnimationOverrides();
+		// PaperAnimInstance->PlayAnimationOverride();
+		WeaponAnimInstance->StopAllAnimationOverrides();
+	}
 }
 
 void UBaseGameplayAbility::PrepareToEndAbilityWithParams(FEndAbilityParams Params)

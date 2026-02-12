@@ -119,6 +119,7 @@ protected:
 	
 	UFUNCTION(BlueprintCallable)
 	virtual void InitAbilityWithParams(FInitAbilityParams Params);
+	void HandleCrouching();
 	void RemovePoise() const;
 
 	UFUNCTION(BlueprintCallable)
@@ -184,5 +185,6 @@ private:
 	FActiveGameplayEffectHandle ActiveSourceObjectEffectHandle;
 	FActiveGameplayEffectHandle ActivePoiseEffectHandle;
 	bool bResetPitch = true;
-	bool bWantsToCrouch = false;
+	bool bCrouchWasHeld = false;
+	bool bWasCrouched= false;
 };
