@@ -1288,10 +1288,10 @@ void APlayerCharacter::TraceForLedge()
 	UKismetSystemLibrary::LineTraceSingle(this, BottomStart, BottomEnd, TraceTypeQuery1,
 	false, ActorsToIgnore, EDrawDebugTrace::None, BottomHit, true);
 	
-	UKismetSystemLibrary::LineTraceSingle(this, GetActorLocation(), GetActorLocation() + GetActorForwardVector() * 45.f, TraceTypeQuery1,
+	UKismetSystemLibrary::LineTraceSingle(this, GetActorLocation(), GetActorLocation() + GetActorForwardVector() * DistanceToLedgeHanging, TraceTypeQuery1,
 	false, ActorsToIgnore, EDrawDebugTrace::None, MidHit, true);
 	
-	UKismetSystemLibrary::LineTraceSingle(this, RopeHangingCollision->GetComponentLocation(), RopeHangingCollision->GetComponentLocation() + RopeHangingCollision->GetForwardVector() * 45.f, TraceTypeQuery1,
+	UKismetSystemLibrary::LineTraceSingle(this, RopeHangingCollision->GetComponentLocation(), RopeHangingCollision->GetComponentLocation() + RopeHangingCollision->GetForwardVector() * DistanceToLedgeHanging, TraceTypeQuery1,
 		false, ActorsToIgnore, EDrawDebugTrace::None, TopHit, true);
 
 	if(MidHit.bBlockingHit && MidHit.GetActor() && MidHit.GetActor()->ActorHasTag("Platform")) return;
@@ -1299,13 +1299,17 @@ void APlayerCharacter::TraceForLedge()
 	if(MidHit.bBlockingHit && !TopHit.bBlockingHit && !BottomHit.bBlockingHit)
 	{		
 		FHitResult LedgeHit;		
-		for (int i = 0; i < (RopeHangingCollision->GetComponentLocation() - TopHit.TraceEnd).Length() + 45; i += 5)
+		for (int i = 15; i < (RopeHangingCollision->GetComponentLocation() - TopHit.TraceEnd).Length() + DistanceToLedgeHanging; i += 5)
 		{
 			FVector Start = RopeHangingCollision->GetComponentLocation() + FVector(static_cast<float>(i), 0.f, 0.f) * GetActorForwardVector().X;
 			UKismetSystemLibrary::LineTraceSingle(this, Start, Start + FVector::DownVector * 82.f, TraceTypeQuery1,
 				false, ActorsToIgnore, EDrawDebugTrace::None, LedgeHit, true);
 			
-			if(LedgeHit.bBlockingHit) break;
+			if(LedgeHit.bBlockingHit)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Distance where ledge was found %d"), i);
+				break;
+			}
 		}
 		if(LedgeHit.bBlockingHit && LedgeHit.GetActor() && LedgeHit.GetActor()->ActorHasTag("VaultDownPlatform")) return;
 		HandleHangingOnLedge(LedgeHit.bBlockingHit ? LedgeHit.Location - Delta : LedgeHit.TraceEnd - Delta);

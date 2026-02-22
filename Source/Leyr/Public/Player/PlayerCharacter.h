@@ -203,55 +203,55 @@ protected:
 	bool IsWithinCameraBounds(const FVector& InLocation) const;
 	virtual void BeginPlay() override;
 	
-	UPROPERTY(EditDefaultsOnly, Category="Player", meta=(Categories=Player))
+	UPROPERTY(EditDefaultsOnly, Category="Leyr", meta=(Categories=Player))
 	FGameplayTag CharacterTag = FGameplayTag();
 	
-	UPROPERTY(EditDefaultsOnly, Category="Player")
+	UPROPERTY(EditDefaultsOnly, Category="Leyr")
 	TObjectPtr<UCharacterInfo> CharacterInfo = nullptr;
 
 	/*
 	 * Movement
 	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Leyr")
 	float BaseRunSpeed = 450.f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Leyr")
 	float LadderWalkSpeed = 120.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Leyr")
 	float RopeWalkSpeed = 120.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Leyr")
 	float ClimbingWalkSpeed = 120.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Leyr")
 	float AimingWalkSpeed = 80.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Leyr")
 	float SwimmingSpeed = 225.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Leyr")
 	float GroundSlopeGravityScale = 1.25f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Leyr")
 	float ClimbingSpeed = 3.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Leyr")
 	float DodgingSpeed = 2400.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Leyr")
 	float DodgingMaxAcceleration = 5000.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Leyr")
 	float DodgingBrakeFrictionFactor = .2f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Leyr")
 	float RollingSpeed = 1000.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Leyr")
 	float RollingMaxAcceleration = 5000.f;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Player|Movement")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Leyr")
 	float RollingBrakeFrictionFactor = 500.f;
 
 	FTimerHandle OffLedgeTimer;
@@ -289,22 +289,22 @@ protected:
 	virtual void OnRep_Burned() override;
 
 private:			
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Leyr", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<USpringArmComponent> SpringArm;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Leyr", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UCameraComponent> FollowCamera;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Leyr", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<USpringArmComponent> ParallaxSpringArm;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player", meta=(AllowPrivateAccess="true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Leyr", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<AParallaxController> ParallaxController;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(AllowPrivateAccess="true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Leyr", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UInventoryComponent> PlayerInventory;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Inventory", meta=(AllowPrivateAccess="true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Leyr", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UHotbarComponent> HotbarComponent;
 
 	UPROPERTY()
@@ -313,29 +313,32 @@ private:
 	UPROPERTY()
 	TObjectPtr<AContainer> InteractingContainer;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Leyr", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<USceneComponent> GroundPoint;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Leyr", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UBoxComponent> RopeHangingCollision;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Leyr", meta=(AllowPrivateAccess="true"))
 	TObjectPtr<UBoxComponent> SwimmingCollision;
 
-	UPROPERTY(EditDefaultsOnly, Category="Player|Plaforming")
+	UPROPERTY(EditDefaultsOnly, Category="Leyr")
 	float PlatformTraceDistance = 15.f;
 
-	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
+	UPROPERTY(EditAnywhere, Category="Leyr", meta=(AllowPrivateAccess="true"))
 	float OverlapPlatformTime = .25f;
 
-	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
+	UPROPERTY(EditAnywhere, Category="Leyr", meta=(AllowPrivateAccess="true"))
 	float EntangledExitTime = .1f;
 	
-	UPROPERTY(EditAnywhere, Category="Player|Plaforming", meta=(AllowPrivateAccess="true"))
+	UPROPERTY(EditAnywhere, Category="Leyr", meta=(AllowPrivateAccess="true"))
 	float SwimmingExitTime = .09f;
 	
-	UPROPERTY(EditAnywhere, Category="Player|Combat", meta=(AllowPrivateAccess="true"))
+	UPROPERTY(EditAnywhere, Category="Leyr", meta=(AllowPrivateAccess="true"))
 	float ForgetOverridePitchTime = 3.f;
+	
+	UPROPERTY(EditAnywhere, Category="Leyr", meta=(AllowPrivateAccess="true"))
+	int32 DistanceToLedgeHanging = 25;
 	
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastLevelUpParticles() const;
