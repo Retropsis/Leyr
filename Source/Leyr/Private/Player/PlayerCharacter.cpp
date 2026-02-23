@@ -1294,7 +1294,7 @@ void APlayerCharacter::TraceForLedge()
 	UKismetSystemLibrary::LineTraceSingle(this, RopeHangingCollision->GetComponentLocation(), RopeHangingCollision->GetComponentLocation() + RopeHangingCollision->GetForwardVector() * DistanceToLedgeHanging, TraceTypeQuery1,
 		false, ActorsToIgnore, EDrawDebugTrace::None, TopHit, true);
 
-	if(MidHit.bBlockingHit && MidHit.GetActor() && MidHit.GetActor()->ActorHasTag("Platform")) return;
+	if(MidHit.bBlockingHit && MidHit.GetActor() && MidHit.GetActor()->ActorHasTag("IgnoreLedge")) return;
 
 	if(MidHit.bBlockingHit && !TopHit.bBlockingHit && !BottomHit.bBlockingHit)
 	{		

@@ -16,7 +16,7 @@ APlatform::APlatform()
 	BoxCollision->SetCollisionResponseToChannel(ECC_Player, ECR_Overlap);
 	SetRootComponent(BoxCollision);
 
-	Tags.Add(FName("Platform"));
+	Tags.Add(FName("IgnoreLedge"));
 }
 
 void APlatform::BeginPlay()

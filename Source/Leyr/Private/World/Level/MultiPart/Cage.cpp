@@ -29,6 +29,8 @@ ACage::ACage()
 	RootSpriteComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	// RootSpriteComponent->SetGenerateOverlapEvents(false);
 	RootSpriteComponent->SetupAttachment(MultiPartFlipbook, MultiPartFlipbook->GetBoneName(0));
+	
+	Tags.Add(FName("IgnoreLedge"));
 }
 
 void ACage::BeginPlay()
