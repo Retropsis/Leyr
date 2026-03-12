@@ -43,4 +43,7 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Summoning")
 	float SpawnSpread = 90.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Summoning")
+	float OffsetZ = 50.f;
 };

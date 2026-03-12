@@ -47,11 +47,12 @@ TArray<FVector> USummonAbility::GetSpawnLocations()
 		if (ChosenSpawnLocation.X > Left && ChosenSpawnLocation.X < Right)
 		{
 			FHitResult Hit;
-			GetWorld()->LineTraceSingleByChannel(Hit, ChosenSpawnLocation + FVector(0.f, 0.f, 100.f), ChosenSpawnLocation - FVector(0.f, 0.f, 100.f), ECC_Visibility);
+			GetWorld()->LineTraceSingleByChannel(Hit, ChosenSpawnLocation + FVector(0.f, 0.f, 100.f), ChosenSpawnLocation - FVector(0.f, 0.f, 500.f), ECC_Visibility);
 			if (Hit.bBlockingHit)
 			{
 				ChosenSpawnLocation = Hit.ImpactPoint;
-				SpawnLocations.Add(ChosenSpawnLocation);
+				
+				SpawnLocations.Add(FVector( ChosenSpawnLocation.X, 0.f, GetAvatarActorFromActorInfo()->GetActorLocation().Z + OffsetZ ));
 				bForwardWasSuccessful = true;
 			}
 		}

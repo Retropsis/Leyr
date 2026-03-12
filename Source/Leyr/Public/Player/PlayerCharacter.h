@@ -49,6 +49,7 @@ public:
 	void Pitch(float InPitch);
 	void RotateController() const;
 	bool TryDescendLadder();
+	void StopHangingLedge(float NewOffLedgeTime);
 	void TryClimbingRope(FVector2D MovementVector);
 	bool TryVaultingDown();
 	void JumpButtonPressed();

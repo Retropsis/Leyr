@@ -535,8 +535,9 @@ FVector AAICharacter::FindRandomLocation_Implementation()
 	return StartLocation;
 }
 
-bool AAICharacter::MoveToLocation_Implementation(FVector TargetLocation, float Threshold, bool bBackward, bool bIgnoreZ)
+bool AAICharacter::MoveToLocation_Implementation(FVector TargetLocation, float Threshold, float HeightOffset, bool bBackward, bool bIgnoreZ)
 {
+	TargetLocation += FVector(0.f, 0.f, HeightOffset);
 	FVector ActorLocation = GetActorLocation();
 	if (bIgnoreZ)
 	{

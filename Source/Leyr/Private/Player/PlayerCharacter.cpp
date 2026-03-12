@@ -545,6 +545,10 @@ void APlayerCharacter::Move(const FVector2D MovementVector)
 		break;
 	case ECombatState::HangingLedge:
 		TraceForHoppingLedge(MovementVector.X);
+		if (MovementVector.Y < 0.f)
+		{
+			StopHangingLedge(1.f);
+		}
 		break;
 	case ECombatState::UnCrouching:
 	case ECombatState::ClimbingRope:
@@ -716,10 +720,7 @@ void APlayerCharacter::JumpButtonPressed()
 	}
 	if(CombatState >= ECombatState::HangingLedge)
 	{
-		HandleCombatState(ECombatState::Unoccupied);
-		bCanGrabLedge = false;
-		GetWorld()->GetTimerManager().SetTimer(OffLedgeTimer, FTimerDelegate::CreateLambda([this] () { bCanGrabLedge = true; }), OffLedgeTime, false);
-		if(GetAttachParentActor()) DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		StopHangingLedge(bCanGrabLedge);
 	}
 	if (bIsCrouched)
 	{
@@ -731,6 +732,14 @@ void APlayerCharacter::JumpButtonPressed()
 			}
 		}
 	} else Jump();
+}
+
+void APlayerCharacter::StopHangingLedge(const float NewOffLedgeTime)
+{
+	HandleCombatState(ECombatState::Unoccupied);
+	bCanGrabLedge = false;
+	GetWorld()->GetTimerManager().SetTimer(OffLedgeTimer, FTimerDelegate::CreateLambda([this] () { bCanGrabLedge = true; }), NewOffLedgeTime, false);
+	if(GetAttachParentActor()) DetachFromActor(FDetachmentTransformRules::KeepWorldTransform); // TODO: Do I still need this?
 }
 
 void APlayerCharacter::SetCombatStateToHandle_Implementation(ECombatState NewState, const FCombatStateParams& Params)

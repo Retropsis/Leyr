@@ -150,7 +150,7 @@ public:
 	bool IsTargetWithinEnteringBounds(const FVector& Location);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	bool MoveToLocation(FVector TargetLocation, float Threshold, bool bBackward = false, bool bIgnoreZ = true);
+	bool MoveToLocation(FVector TargetLocation, float Threshold, float HeightOffset, bool bBackward = false, bool bIgnoreZ = true);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FVector FindTargetLocation(AActor* TargetActor, float DistanceToKeep);
