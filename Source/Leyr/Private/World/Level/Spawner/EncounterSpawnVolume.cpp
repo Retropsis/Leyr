@@ -489,7 +489,7 @@ void AEncounterSpawnVolume::SpawnEncountersDelayed()
 		{
 			SpawnEncounter(EncounterSpawnData->EncounterData->EncounterClass.Get(), DetermineSpawnTransform(RandomIndex));
 			SpawnTimers.Remove(SpawnTimer);
-		}), SpawnDelay * (i + 1), false);
+		}), SpawnDelay * i + InitialSpawnDelay, false);
 		SpawnTimers.Add(SpawnTimer);
 	}
 }

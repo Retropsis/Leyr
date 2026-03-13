@@ -1258,6 +1258,16 @@ void APlayerCharacter::TraceForPlatforms() const
 	
 	if(Hit.GetActor() && Hit.GetActor()->ActorHasTag("VaultDownPlatform"))
 	{
+		FHitResult LeftHit;
+		const FVector LeftStart = GroundPoint->GetComponentLocation() + FVector::DownVector * GetCapsuleComponent()->GetScaledCapsuleHalfHeight() - GetActorForwardVector() * GetCapsuleComponent()->Bounds.BoxExtent.X;
+		const FVector LeftEnd = LeftStart - GetActorForwardVector() * PlatformTraceDistance;
+		UKismetSystemLibrary::LineTraceSingleForObjects(this, LeftStart, LeftEnd, ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::None, LeftHit, true);
+		FHitResult RightHit;
+		const FVector RightStart = GroundPoint->GetComponentLocation() + FVector::DownVector * GetCapsuleComponent()->GetScaledCapsuleHalfHeight() + GetActorForwardVector() * GetCapsuleComponent()->Bounds.BoxExtent.X;;
+		const FVector RightEnd = RightStart + GetActorForwardVector() * PlatformTraceDistance;
+		UKismetSystemLibrary::LineTraceSingleForObjects(this, RightStart, RightEnd, ObjectTypes, false, TArray<AActor*>(), EDrawDebugTrace::None, RightHit, true);
+		if ((LeftHit.bBlockingHit && !RightHit.bBlockingHit) || (!LeftHit.bBlockingHit && RightHit.bBlockingHit)) return;
+		
 		GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_OneWayPlatform, bOverlapPlatformTimerEnded ? ECR_Block : ECR_Overlap);
 		IPlatformInterface::Execute_SetBoxCollisionEnabled(Hit.GetActor(), bOverlapPlatformTimerEnded);
 	}
@@ -1316,7 +1326,7 @@ void APlayerCharacter::TraceForLedge()
 			
 			if(LedgeHit.bBlockingHit)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Distance where ledge was found %d"), i);
+				// UE_LOG(LogTemp, Warning, TEXT("Distance where ledge was found %d"), i);
 				break;
 			}
 		}
